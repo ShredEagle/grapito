@@ -5,7 +5,6 @@
 
 namespace ad {
 
-
 struct Position : public aunteater::Component<Position>
 {
     explicit Position(math::Position<2, int> aPosition = math::Position<2, int>::Zero()) :

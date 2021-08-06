@@ -6,9 +6,11 @@ Render::Render(aunteater::Engine & aEngine, Application & aApplication) :
     mEngine(aEngine),
     mRenderables(mEngine),
     mApplication(aApplication),
+#ifdef KIMBO_DEBUG
+    mColliders(mEngine),
+#endif
     mTrivialShaping{aApplication.getEngine()->getWindowSize()}
 {}
-
 
 void Render::update(const aunteater::Timer aTimer)
 {
@@ -17,8 +19,29 @@ void Render::update(const aunteater::Timer aTimer)
 
     for(auto renderable : mRenderables)
     {
-        mTrivialShaping.addRectangle({{renderable->get<Position>().position, {100, 100}}, Color{255,255,255}});
+        mTrivialShaping.addRectangle({{renderable->get<Position>().position, {100, 100}}, Color{255, 255, 255}});
     }
+#ifdef KIMBO_DEBUG
+    for(auto collider : mColliders)
+    {
+        Color color = Color{255, 80, 80};
+
+        if (collider->get<EnvironmentCollisionBox>().collidingWith.size())
+        {
+            color = Color{80,255,80};
+        }
+
+        mTrivialShaping.addRectangle(
+            {
+                {
+                    collider->get<Position>().position + static_cast<math::Vec<2,int>>(collider->get<EnvironmentCollisionBox>().box.mPosition),
+                    collider->get<EnvironmentCollisionBox>().box.mDimension
+                },
+                color
+            }
+        );
+    }
+#endif
 
     mTrivialShaping.render();
 }

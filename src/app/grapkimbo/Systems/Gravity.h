@@ -2,8 +2,7 @@
 
 #include "Input.h"
 
-#include <Components/Controllable.h>
-#include <Components/Position.h>
+#include <Components/Weight.h>
 #include <Components/ForceAndSpeed.h>
 
 #include <aunteater/Archetype.h>
@@ -12,13 +11,13 @@
 
 namespace ad {
 
-typedef aunteater::Archetype<Controllable, Position, ForceAndSpeed> Controlled;
+typedef aunteater::Archetype<Weight, ForceAndSpeed> Weightable;
 
-class Control : public aunteater::System
+class Gravity : public aunteater::System
 {
 
 public:
-    Control(aunteater::Engine & aEngine);
+    Gravity(aunteater::Engine & aEngine);
 
     void update(const aunteater::Timer aTimer) override;
 
@@ -26,8 +25,7 @@ public:
 
 private:
     aunteater::Engine & mEngine;
-    const aunteater::FamilyHelp<Controlled> mControllables;
-    gameInputState mInputState;
+    const aunteater::FamilyHelp<Weightable> mWeightables;
 
 };
 

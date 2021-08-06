@@ -1,7 +1,5 @@
 #include "Control.h"
 
-#include "Components/Position.h"
-
 #include <GLFW/glfw3.h>
 
 namespace ad {
@@ -11,11 +9,12 @@ Control::Control(aunteater::Engine & aEngine) :
     mControllables(mEngine)
 {}
 
-
 void Control::update(const aunteater::Timer aTimer)
 {
     for(auto controllable : mControllables)
     {
+        ForceAndSpeed fas = controllable->get<ForceAndSpeed>();
+
         for (auto input : mInputState)
         {
             if (input.state == 1)
@@ -24,22 +23,20 @@ void Control::update(const aunteater::Timer aTimer)
                 {
                     case COMMAND::UP:
                     {
-                        controllable->get<Position>().position.y() += 10;
                         break;
                     }
                     case COMMAND::DOWN:
                     {
-                        controllable->get<Position>().position.y() += -10;
                         break;
                     }
                     case COMMAND::LEFT:
                     {
-                        controllable->get<Position>().position.x() += -10;
+                        fas.speeds[0].x() = std::max(10.f, fas.speeds[0].x());
                         break;
                     }
                     case COMMAND::RIGHT:
                     {
-                        controllable->get<Position>().position.x() += 10;
+                        fas.speeds[0].x() = std::min(-10.f, fas.speeds[0].x());
                         break;
                     }
                 }

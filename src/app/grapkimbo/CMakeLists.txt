@@ -5,14 +5,24 @@ set(${TARGET_NAME}_HEADERS
 
     Components/Position.h
     Components/Controllable.h
-    Systems/Render.h
+    Components/Environment.h
+    Components/EnvironmentCollisionBox.h
+    Components/ForceAndSpeed.h
+    Components/Weight.h
     Systems/Control.h
+    Systems/EnvironmentCollision.h
+    Systems/Gravity.h
+    Systems/Render.h
+    Systems/SpeedResolution.h
 )
 
 set(${TARGET_NAME}_SOURCES
     Game.cpp
-    Systems/Render.cpp
     Systems/Control.cpp
+    Systems/EnvironmentCollision.cpp
+    Systems/Gravity.cpp
+    Systems/Render.cpp
+    Systems/SpeedResolution.cpp
 )
 
 find_package(Aunteater CONFIG REQUIRED COMPONENTS aunteater)
@@ -31,7 +41,7 @@ add_executable(${TARGET_NAME}
 
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
     target_compile_options(${TARGET_NAME}
-        PRIVATE "-fno-omit-frame-pointer" "-fsanitize=address" "-fsanitize=undefined")
+        PRIVATE "-fno-omit-frame-pointer" "-fsanitize=address" "-fsanitize=undefined" "-D KIMBO_DEBUG")
     target_link_options(${TARGET_NAME}
         PRIVATE "-fsanitize=address" "-fsanitize=undefined")
 endif()

@@ -1,6 +1,9 @@
 #pragma once
 
 #include <Components/Position.h>
+#ifdef KIMBO_DEBUG
+#include <Components/EnvironmentCollisionBox.h>
+#endif
 
 #include <aunteater/Archetype.h>
 #include <aunteater/FamilyHelp.h>
@@ -12,6 +15,9 @@
 namespace ad {
 
 typedef aunteater::Archetype<Position> Rendered;
+#ifdef KIMBO_DEBUG
+typedef aunteater::Archetype<EnvironmentCollisionBox> Collider;
+#endif
 
 class Render : public aunteater::System
 {
@@ -26,6 +32,9 @@ private:
     const aunteater::FamilyHelp<Rendered> mRenderables;
     Application & mApplication;
     TrivialShaping mTrivialShaping;
+#ifdef KIMBO_DEBUG
+    const aunteater::FamilyHelp<Collider> mColliders;
+#endif
 
 };
 
