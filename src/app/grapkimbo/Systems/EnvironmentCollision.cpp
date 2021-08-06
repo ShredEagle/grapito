@@ -33,14 +33,10 @@ void EnvironmentCollision::update(const aunteater::Timer aTimer)
             };
 
             if (
-                    envTranslatedCollisionBox.contains(collTranslatedCollisionBox.bottomLeft())
-                    || envTranslatedCollisionBox.contains(collTranslatedCollisionBox.bottomRight())
-                    || envTranslatedCollisionBox.contains(collTranslatedCollisionBox.topLeft())
-                    || envTranslatedCollisionBox.contains(collTranslatedCollisionBox.topRight())
-                    || collTranslatedCollisionBox.contains(envTranslatedCollisionBox.bottomLeft())
-                    || collTranslatedCollisionBox.contains(envTranslatedCollisionBox.bottomRight())
-                    || collTranslatedCollisionBox.contains(envTranslatedCollisionBox.topLeft())
-                    || collTranslatedCollisionBox.contains(envTranslatedCollisionBox.topRight())
+                    envTranslatedCollisionBox.x() < collTranslatedCollisionBox.x() + collTranslatedCollisionBox.width()
+                    && envTranslatedCollisionBox.x() + envTranslatedCollisionBox.width() > collTranslatedCollisionBox.x()
+                    && envTranslatedCollisionBox.y() < collTranslatedCollisionBox.y() + collTranslatedCollisionBox.height()
+                    && envTranslatedCollisionBox.y() + envTranslatedCollisionBox.height() > collTranslatedCollisionBox.y()
             )
             {
                 collider->get<EnvironmentCollisionBox>().collidingWith.push_back(environment);
