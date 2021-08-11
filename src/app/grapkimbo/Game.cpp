@@ -37,7 +37,7 @@ Game::Game(aunteater::Engine & aEngine, Application & aApplication) :
             .add<Controllable>()
             .add<EnvironmentCollisionBox>(math::Rectangle<int>{{0,0}, {20,20}})
             .add<ForceAndSpeed>()
-            .add<Weight>(1)
+            .add<Weight>(1.f)
            );
 
    aEngine.addEntity(

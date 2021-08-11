@@ -3,6 +3,8 @@
 #include <aunteater/Component.h>
 #include <math/Vector.h>
 
+#include <vector>
+
 namespace ad {
 
 struct ForceAndSpeed : public aunteater::Component<ForceAndSpeed>

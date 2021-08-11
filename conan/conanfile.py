@@ -21,8 +21,8 @@ class GrapkimboConan(ConanFile):
         ("glad/0.1.34"),
 
         ("aunteater/6afa38a266@adnn/develop"),
-        ("graphics/d3958e3ec1@adnn/develop"),
-        ("math/4086708c05@adnn/develop"),
+        ("graphics/b2798d209f@adnn/develop"),
+        ("math/2c25e0f7ee@adnn/develop"),
         ("websocket/84bbb84476@adnn/develop"),
     )
 
