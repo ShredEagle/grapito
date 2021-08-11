@@ -4,17 +4,21 @@ from conan.tools.cmake import CMake
 from os import path
 
 
-class GrapkimboConan(ConanFile):
-    name = "graphkimbo"
+class GrapitoConan(ConanFile):
+    name = "grapito"
     license = "MIT"
     author = "adnn"
-    url = "https://github.com/ShredEagle/Graphkimbo"
+    url = "https://github.com/ShredEagle/grapito"
     description = "Shoot them urp!"
     topics = ("opengl", "2D", "game")
     settings = "os", "compiler", "build_type", "arch"
-    options = {"shared": [True, False]}
+    options = {
+        "shared": [True, False],
+        "build_tests": [True, False],
+    }
     default_options = {
         "shared": False,
+        "build_tests": False,
     }
 
     requires = (
@@ -50,6 +54,7 @@ class GrapkimboConan(ConanFile):
             config.write("message(STATUS \"Including user generated conan config.\")\n")
             # avoid path.join, on Windows it outputs '\', which is a string escape sequence.
             config.write("include(\"{}\")\n".format("${CMAKE_CURRENT_LIST_DIR}/conan_paths.cmake"))
+            config.write("set({} {})\n".format("BUILD_tests", self.options.build_tests))
 
 
     def generate(self):
