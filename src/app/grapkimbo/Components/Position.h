@@ -7,11 +7,11 @@ namespace ad {
 
 struct Position : public aunteater::Component<Position>
 {
-    explicit Position(math::Position<2, int> aPosition = math::Position<2, int>::Zero()) :
+    explicit Position(math::Position<2, double> aPosition = math::Position<2, double>::Zero()) :
         position{std::move(aPosition)}
     {}
 
-    math::Position<2, int> position;
+    math::Position<2, double> position;
 };
 
 

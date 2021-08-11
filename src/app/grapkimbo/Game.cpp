@@ -33,18 +33,18 @@ Game::Game(aunteater::Engine & aEngine, Application & aApplication) :
 
    aEngine.addEntity(
            aunteater::Entity()
-            .add<Position>(math::Position<2, int>{200, 200})
+            .add<Position>(math::Position<2, double>{200., 800.})
             .add<Controllable>()
-            .add<EnvironmentCollisionBox>(math::Rectangle<int>{{0,0}, {20,20}})
+            .add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {20., 20.}})
             .add<ForceAndSpeed>()
             .add<Weight>(1.f)
            );
 
    aEngine.addEntity(
            aunteater::Entity()
-            .add<Position>(math::Position<2, int>{0, 0})
+            .add<Position>(math::Position<2, double>{0., 0.})
             .add<Environment>()
-            .add<EnvironmentCollisionBox>(math::Rectangle<int>{{0,0}, {1000,20}})
+            .add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {1000., 20.}})
            );
 }
 

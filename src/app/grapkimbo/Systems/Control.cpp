@@ -31,12 +31,12 @@ void Control::update(const aunteater::Timer aTimer)
                     }
                     case COMMAND::LEFT:
                     {
-                        fas.speeds[0].x() = std::max(10.f, fas.speeds[0].x());
+                        fas.speeds[0].x() = std::max(10., fas.speeds[0].x());
                         break;
                     }
                     case COMMAND::RIGHT:
                     {
-                        fas.speeds[0].x() = std::min(-10.f, fas.speeds[0].x());
+                        fas.speeds[0].x() = std::min(-10., fas.speeds[0].x());
                         break;
                     }
                 }

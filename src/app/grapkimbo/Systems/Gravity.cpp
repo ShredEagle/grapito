@@ -4,7 +4,7 @@
 
 namespace ad {
 
-const math::Vec<2, float> gravityVector = {0.f, -1.f};
+const math::Vec<2, double> gravityVector = {0., - Gravity::gAcceleration};
 
 Gravity::Gravity(aunteater::Engine & aEngine) :
     mEngine(aEngine),

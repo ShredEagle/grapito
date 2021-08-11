@@ -12,11 +12,11 @@ namespace ad {
 
 struct EnvironmentCollisionBox : public aunteater::Component<EnvironmentCollisionBox>
 {
-    explicit EnvironmentCollisionBox(math::Rectangle<int> aBox = math::Rectangle<int>{{0,0}, {1,1}}):
+    explicit EnvironmentCollisionBox(math::Rectangle<double> aBox = math::Rectangle<double>{{0., 0.}, {1. , 1.}}):
         box{std::move(aBox)}
     {}
 
-    math::Rectangle<int> box;
+    math::Rectangle<double> box;
     std::vector<aunteater::weak_entity> collidingWith;
 };
 

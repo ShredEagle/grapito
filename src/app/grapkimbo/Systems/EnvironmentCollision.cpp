@@ -20,15 +20,15 @@ void EnvironmentCollision::update(const aunteater::Timer aTimer)
     {
         collider->get<EnvironmentCollisionBox>().collidingWith.clear();
 
-        math::Rectangle<int> collTranslatedCollisionBox{
-            collider->get<Position>().position + static_cast<math::Vec<2, int>>(collider->get<EnvironmentCollisionBox>().box.mPosition),
+        math::Rectangle<double> collTranslatedCollisionBox{
+            collider->get<Position>().position + collider->get<EnvironmentCollisionBox>().box.mPosition.as<math::Vec>(),
             collider->get<EnvironmentCollisionBox>().box.mDimension
         };
 
         for(auto environment : mEnvironments)
         {
-            math::Rectangle<int> envTranslatedCollisionBox{
-                environment->get<Position>().position + static_cast<math::Vec<2,int>>(environment->get<EnvironmentCollisionBox>().box.mPosition),
+            math::Rectangle<double> envTranslatedCollisionBox{
+                environment->get<Position>().position + environment->get<EnvironmentCollisionBox>().box.mPosition.as<math::Vec>(),
                 environment->get<EnvironmentCollisionBox>().box.mDimension
             };
 

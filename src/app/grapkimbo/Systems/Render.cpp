@@ -19,7 +19,10 @@ void Render::update(const aunteater::Timer aTimer)
 
     for(auto renderable : mRenderables)
     {
-        mTrivialShaping.addRectangle({{renderable->get<Position>().position, {100, 100}}, Color{255, 255, 255}});
+        mTrivialShaping.addRectangle({
+            {static_cast<math::Position<2, int>>(renderable->get<Position>().position), {100 , 100}},
+            Color{255, 255, 255}
+        });
     }
 #ifdef KIMBO_DEBUG
     for(auto collider : mColliders)
@@ -34,8 +37,9 @@ void Render::update(const aunteater::Timer aTimer)
         mTrivialShaping.addRectangle(
             {
                 {
-                    collider->get<Position>().position + static_cast<math::Vec<2,int>>(collider->get<EnvironmentCollisionBox>().box.mPosition),
-                    collider->get<EnvironmentCollisionBox>().box.mDimension
+                    static_cast<math::Position<2, int>>(collider->get<Position>().position 
+                                                       + collider->get<EnvironmentCollisionBox>().box.mPosition.as<math::Vec>()),
+                    static_cast<math::Size<2, int>>(collider->get<EnvironmentCollisionBox>().box.mDimension)
                 },
                 color
             }

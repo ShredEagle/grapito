@@ -9,13 +9,13 @@ namespace ad {
 
 struct ForceAndSpeed : public aunteater::Component<ForceAndSpeed>
 {
-    explicit ForceAndSpeed(math::Vec<2, float> baseSpeed = math::Vec<2,float>::Zero())
+    explicit ForceAndSpeed(math::Vec<2, double> baseSpeed = math::Vec<2, double>::Zero())
     {
         speeds.push_back(baseSpeed);
     }
 
-    std::vector<math::Vec<2, float>> forces;
-    std::vector<math::Vec<2, float>> speeds;
+    std::vector<math::Vec<2, double>> forces;
+    std::vector<math::Vec<2, double>> speeds;
 };
 
 

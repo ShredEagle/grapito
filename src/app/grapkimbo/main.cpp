@@ -34,9 +34,8 @@ int main(int argc, const char * argv[])
 
         grapkimbo::Game game{gameEngine, application};
 
-        while(true)
+        while(application.handleEvents())
         {
-            glfwPollEvents();
             for (size_t i = 0; i < inputStore.size(); ++i)
             {
                 //Get keyboard state

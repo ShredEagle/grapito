@@ -23,6 +23,8 @@ public:
 
     void loadInputState(const gameInputState & aInputState);
 
+    static constexpr double gAcceleration = 9.8;
+
 private:
     aunteater::Engine & mEngine;
     const aunteater::FamilyHelp<Weightable> mWeightables;
