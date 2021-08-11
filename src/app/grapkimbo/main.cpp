@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "Game_pendulum.h"
 #include "Input.h"
 
 #include <aunteater/Timer.h>
@@ -32,7 +33,8 @@ int main(int argc, const char * argv[])
 
         glfwSetInputMode(application.getWindow(), GLFW_STICKY_KEYS, GLFW_TRUE);
 
-        grapkimbo::Game game{gameEngine, application};
+        //grapkimbo::Game game{gameEngine, application};
+        grapkimbo::Game_pendulum game{gameEngine, application};
 
         while(application.handleEvents())
         {
