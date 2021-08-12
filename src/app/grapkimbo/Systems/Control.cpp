@@ -1,17 +1,22 @@
 #include "Control.h"
 
+#include "Gravity.h"
+
 #include <GLFW/glfw3.h>
 
 namespace ad {
 
+
 Control::Control(aunteater::Engine & aEngine) :
-    mEngine(aEngine),
-    mControllables(mEngine)
+    mEngine{aEngine},
+    mCartesianControllables{mEngine},
+    mPolarControllables{mEngine}
 {}
+
 
 void Control::update(const aunteater::Timer aTimer)
 {
-    for(auto controllable : mControllables)
+    for(auto controllable : mCartesianControllables)
     {
         ForceAndSpeed fas = controllable->get<ForceAndSpeed>();
 
@@ -37,6 +42,64 @@ void Control::update(const aunteater::Timer aTimer)
                     case COMMAND::RIGHT:
                     {
                         fas.speeds[0].x() = std::min(-10., fas.speeds[0].x());
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    for(auto & entity : mPolarControllables)
+    {
+        auto & [_discard, geometry, pendular] = entity;
+
+        pendular.angularAccelerationControl = math::Radian<double>{0.};
+        for (auto input : mInputState)
+        {
+            if (input.state == 1)
+            {
+                switch (input.command)
+                {
+                    case COMMAND::UP:
+                    {
+                        break;
+                    }
+                    case COMMAND::DOWN:
+                    {
+                        break;
+                    }
+                    case COMMAND::LEFT:
+                    {
+                        pendular.angularAccelerationControl = 
+                            math::Radian<double>{- Gravity::gAcceleration / pendular.length / 6.};
+                        break;
+                    }
+                    case COMMAND::RIGHT:
+                    {
+                        pendular.angularAccelerationControl =
+                            math::Radian<double>{+ Gravity::gAcceleration / pendular.length / 6.};
+                        break;
+                    }
+                    case COMMAND::A:
+                    {
+                        break;
+                    }
+                    case COMMAND::B:
+                    {
+                        // TODO if we edit the components on the live entity, everything crashes because the 
+                        // family are instantly edited to reflect the changes (invalidating iterators)
+                        // this shoud be reworked!
+                        mEngine.markToRemove(entity);
+                        mEngine.addEntity(
+                           aunteater::Entity()
+                            .add<Position>(geometry)
+                            .add<Controllable>()
+                            .add<Weight>(80.)
+                            .add<ForceAndSpeed>(math::Vec<2>{
+                                cos(pendular.angle) * pendular.length * pendular.angularSpeed.value(),
+                                sin(pendular.angle) * pendular.length * pendular.angularSpeed.value()
+                            })
+                        );
                         break;
                     }
                 }

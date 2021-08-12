@@ -21,6 +21,7 @@ struct Pendular : public aunteater::Component<Pendular>
     math::Radian<double> angle;
     double length;
     math::Radian<double> angularSpeed{0.};
+    math::Radian<double> angularAccelerationControl{0.};
 };
 
 

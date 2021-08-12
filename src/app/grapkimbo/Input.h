@@ -5,7 +5,7 @@
 namespace ad {
 
 enum COMMAND {
-    UP, DOWN, LEFT, RIGHT, A,
+    UP, DOWN, LEFT, RIGHT, A, B,
 };
 
 struct Input
@@ -21,7 +21,7 @@ struct InputState
     int state;
 };
 
-typedef std::array<Input, 5> gameInputConfig;
-typedef std::array<InputState, 5> gameInputState;
+typedef std::array<Input, 6> gameInputConfig;
+typedef std::array<InputState, 6> gameInputState;
 
 }

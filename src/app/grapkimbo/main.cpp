@@ -21,7 +21,8 @@ int main(int argc, const char * argv[])
             Input{DOWN, GLFW_KEY_DOWN, GLFW_GAMEPAD_AXIS_LEFT_Y},
             Input{LEFT, GLFW_KEY_LEFT, GLFW_GAMEPAD_AXIS_LEFT_X},
             Input{RIGHT, GLFW_KEY_RIGHT, GLFW_GAMEPAD_AXIS_LEFT_X},
-            Input{A, GLFW_KEY_X, GLFW_GAMEPAD_AXIS_LEFT_Y},
+            Input{A, GLFW_KEY_X, GLFW_GAMEPAD_BUTTON_A},
+            Input{B, GLFW_KEY_SPACE, GLFW_GAMEPAD_BUTTON_B},
         };
 
         gameInputState inputState;

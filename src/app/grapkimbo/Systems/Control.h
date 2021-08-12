@@ -3,6 +3,7 @@
 #include "Input.h"
 
 #include <Components/Controllable.h>
+#include <Components/Pendular.h>
 #include <Components/Position.h>
 #include <Components/ForceAndSpeed.h>
 
@@ -12,7 +13,8 @@
 
 namespace ad {
 
-typedef aunteater::Archetype<Controllable, Position, ForceAndSpeed> Controlled;
+typedef aunteater::Archetype<Controllable, Position, ForceAndSpeed> CartesianControlled;
+typedef aunteater::Archetype<Controllable, Position, Pendular> PolarControlled;
 
 class Control : public aunteater::System
 {
@@ -26,7 +28,8 @@ public:
 
 private:
     aunteater::Engine & mEngine;
-    const aunteater::FamilyHelp<Controlled> mControllables;
+    const aunteater::FamilyHelp<CartesianControlled> mCartesianControllables;
+    const aunteater::FamilyHelp<PolarControlled> mPolarControllables;
     gameInputState mInputState;
 
 };

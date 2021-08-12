@@ -3,6 +3,7 @@ set(TARGET_NAME grapkimbo)
 set(${TARGET_NAME}_HEADERS
     Game.h
     Game_pendulum.h
+    Input.h
 
     Components/Position.h
     Components/Controllable.h
@@ -52,7 +53,7 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
         PRIVATE "-fsanitize=address" "-fsanitize=undefined")
 endif()
 
-target_compile_definitions(${TARGET_NAME} PRIVATE KIMBO_DEBUG)
+#target_compile_definitions(${TARGET_NAME} PRIVATE KIMBO_DEBUG)
 
 target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
