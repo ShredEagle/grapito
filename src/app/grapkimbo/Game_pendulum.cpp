@@ -1,6 +1,7 @@
 #include "Game_pendulum.h"
 
 #include <Components/Controllable.h>
+#include <Components/EnvironmentCollisionBox.h>
 #include <Components/ForceAndSpeed.h>
 #include <Components/Pendular.h>
 #include <Components/Position.h>
@@ -32,16 +33,17 @@ Game_pendulum::Game_pendulum(aunteater::Engine & aEngine, Application & aApplica
    // Anchor point
    aEngine.addEntity(
            aunteater::Entity()
-            .add<Position>(math::Position<2, double>{500., 600.})
-            .add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {50., 50.}})
+            .add<Position>(math::Position<2, double>{4., 6.}, math::Size<2, double>{2., 2.} )
+            //.add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {50., 50.}})
            );
 
    // Player
    aEngine.addEntity(
            aunteater::Entity()
-            .add<Position>(math::Position<2, double>{0., 0.}) // The position will be set by pendulum simulation
-            .add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {30., 30.}})
-            .add<Pendular>(Pendular{ {550., 600.}, math::Radian<double>{3.14/4.}, 200. })
+            .add<Position>(math::Position<2, double>{0., 0.}, math::Size<2, double>{0.8, 1.9}) // The position will be set by pendulum simulation
+            //.add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {30., 30.}})
+            .add<Pendular>(Pendular{ {5., 6.}, math::Radian<double>{3.14/3.}, 3. })
+            .add<Controllable>()
            );
 }
 

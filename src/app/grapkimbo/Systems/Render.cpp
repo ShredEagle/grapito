@@ -17,10 +17,13 @@ void Render::update(const aunteater::Timer aTimer)
     mTrivialShaping.clearShapes();
     mApplication.getEngine()->clear();
 
-    for(auto renderable : mRenderables)
+    for(const auto [geometry] : mRenderables)
     {
         mTrivialShaping.addRectangle({
-            {static_cast<math::Position<2, int>>(renderable->get<Position>().position), {100 , 100}},
+            {
+                static_cast<math::Position<2, int>>(geometry.position * gPixelsPerMeter),
+                static_cast<math::Size<2, int>>(geometry.dimension * gPixelsPerMeter)  
+            },
             Color{255, 255, 255}
         });
     }
