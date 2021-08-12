@@ -44,6 +44,7 @@ Game_pendulum::Game_pendulum(aunteater::Engine & aEngine, Application & aApplica
             //.add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {30., 30.}})
             .add<Pendular>(Pendular{ {5., 6.}, math::Radian<double>{3.14/3.}, 3. })
             .add<Controllable>()
+            .add<Weight>(80.)
            );
 }
 

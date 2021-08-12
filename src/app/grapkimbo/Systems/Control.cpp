@@ -18,7 +18,8 @@ void Control::update(const aunteater::Timer aTimer)
 {
     for(auto controllable : mCartesianControllables)
     {
-        ForceAndSpeed fas = controllable->get<ForceAndSpeed>();
+        ForceAndSpeed & fas = controllable->get<ForceAndSpeed>();
+        const Weight weight = controllable->get<Weight>();
 
         for (auto input : mInputState)
         {
@@ -36,12 +37,14 @@ void Control::update(const aunteater::Timer aTimer)
                     }
                     case COMMAND::LEFT:
                     {
-                        fas.speeds[0].x() = std::max(10., fas.speeds[0].x());
+                        fas.forces.emplace_back(- gAirControlAcceleration * weight.mass, 0.);
+                        //fas.speeds[0].x() = std::max(10., fas.speeds[0].x());
                         break;
                     }
                     case COMMAND::RIGHT:
                     {
-                        fas.speeds[0].x() = std::min(-10., fas.speeds[0].x());
+                        fas.forces.emplace_back(+ gAirControlAcceleration * weight.mass, 0.);
+                        //fas.speeds[0].x() = std::min(-10., fas.speeds[0].x());
                         break;
                     }
                 }
@@ -51,7 +54,7 @@ void Control::update(const aunteater::Timer aTimer)
 
     for(auto & entity : mPolarControllables)
     {
-        auto & [_discard, geometry, pendular] = entity;
+        auto & [_discard, geometry, pendular, weight] = entity;
 
         pendular.angularAccelerationControl = math::Radian<double>{0.};
         for (auto input : mInputState)
@@ -71,13 +74,15 @@ void Control::update(const aunteater::Timer aTimer)
                     case COMMAND::LEFT:
                     {
                         pendular.angularAccelerationControl = 
-                            math::Radian<double>{- Gravity::gAcceleration / pendular.length / 6.};
+                            math::Radian<double>{- Gravity::gAcceleration / pendular.length 
+                                                 * gPendularControlAccelerationFactor};
                         break;
                     }
                     case COMMAND::RIGHT:
                     {
                         pendular.angularAccelerationControl =
-                            math::Radian<double>{+ Gravity::gAcceleration / pendular.length / 6.};
+                            math::Radian<double>{+ Gravity::gAcceleration / pendular.length 
+                                                 * gPendularControlAccelerationFactor};
                         break;
                     }
                     case COMMAND::A:
@@ -94,7 +99,7 @@ void Control::update(const aunteater::Timer aTimer)
                            aunteater::Entity()
                             .add<Position>(geometry)
                             .add<Controllable>()
-                            .add<Weight>(80.)
+                            .add<Weight>(weight.mass)
                             .add<ForceAndSpeed>(math::Vec<2>{
                                 cos(pendular.angle) * pendular.length * pendular.angularSpeed.value(),
                                 sin(pendular.angle) * pendular.length * pendular.angularSpeed.value()

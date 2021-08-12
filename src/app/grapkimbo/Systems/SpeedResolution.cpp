@@ -23,7 +23,7 @@ void SpeedResolution::update(const aunteater::Timer aTimer)
 
         for (auto force :fas.forces)
         {
-            totalSpeed += (force / movable->get<Weight>().weight) * aTimer.delta();
+            totalSpeed += (force / movable->get<Weight>().mass) * aTimer.delta();
         }
 
         fas.speeds.clear();
