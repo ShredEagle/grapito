@@ -3,6 +3,7 @@
 #include "Input.h"
 
 #include <Components/Controllable.h>
+#include <Components/EnvironmentCollisionBox.h>
 #include <Components/ForceAndSpeed.h>
 #include <Components/Pendular.h>
 #include <Components/Position.h>
@@ -12,10 +13,14 @@
 #include <aunteater/FamilyHelp.h>
 #include <aunteater/System.h>
 
+#include <utility>
+
 namespace ad {
 
 typedef aunteater::Archetype<Controllable, Position, ForceAndSpeed, Weight> CartesianControlled;
 typedef aunteater::Archetype<Controllable, Position, Pendular, Weight> PolarControlled;
+// Just use EnvironmentCollisionBox as a tag, because it is not correctly positioned...
+typedef aunteater::Archetype<Position, EnvironmentCollisionBox> AnchorElement;
 
 class Control : public aunteater::System
 {
@@ -31,9 +36,12 @@ public:
     static constexpr double gAirControlAcceleration = 12.; // m/s
 
 private:
+    std::pair<math::Position<2, double>, double> anchor(const math::Position<2, double> aPosition);
+
     aunteater::Engine & mEngine;
     const aunteater::FamilyHelp<CartesianControlled> mCartesianControllables;
     const aunteater::FamilyHelp<PolarControlled> mPolarControllables;
+    const aunteater::FamilyHelp<AnchorElement> mAnchorables;
     gameInputState mInputState;
 
 };

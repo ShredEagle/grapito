@@ -27,6 +27,7 @@ void Render::update(const aunteater::Timer aTimer)
             Color{255, 255, 255}
         });
     }
+
 #ifdef KIMBO_DEBUG
     for(auto collider : mColliders)
     {
