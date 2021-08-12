@@ -35,6 +35,13 @@ std::pair<math::Position<2, double>, double> Control::anchor(const math::Positio
 }
 
 
+template <class T_vecLeft, class T_vecRight>
+math::Radian<double> angleBetween(T_vecLeft a, T_vecRight b)
+{
+    return math::Radian<double>{ std::atan2(b.y(), b.x()) - std::atan2(a.y(), a.x()) };
+}
+
+
 void Control::update(const aunteater::Timer aTimer)
 {
     for(auto controllable : mCartesianControllables)
@@ -74,13 +81,17 @@ void Control::update(const aunteater::Timer aTimer)
                         math::Position<2, double> grappleOrigin = geometry.position + (geometry.dimension / 2).as<math::Vec>();
                         auto [anchorPoint, length] = this->anchor(grappleOrigin);
                         math::Vec<2, double> grappleLine = anchorPoint - grappleOrigin;
+                        // grapple line goes from origin to anchor, we need the angle with -Y
                         math::Radian<double> angle{std::atan2(-grappleLine.x(), grappleLine.y())};
+
+                        math::Vec<2, double> tangent{grappleLine.y(), - grappleLine.x()};
+                        math::Radian<double> angularSpeed{ cos(angleBetween(fas.speeds.at(0), tangent)) * fas.speeds.at(0).getNorm() / length };
 
                         mEngine.markToRemove(controllable);
                         mEngine.addEntity(
                            aunteater::Entity()
                             .add<Position>(geometry)
-                            .add<Pendular>(Pendular{anchorPoint, angle, length})
+                            .add<Pendular>(Pendular{anchorPoint, angle, length, angularSpeed})
                             .add<Controllable>()
                             .add<Weight>(weight.mass)
                         );

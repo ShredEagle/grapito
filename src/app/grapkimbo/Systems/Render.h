@@ -27,7 +27,7 @@ public:
 
     void update(const aunteater::Timer aTimer) override;
 
-    static constexpr int gPixelsPerMeter = 100;
+    static constexpr int gPixelsPerMeter = 40;
 
 private:
     aunteater::Engine & mEngine;

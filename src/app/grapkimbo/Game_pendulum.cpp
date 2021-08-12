@@ -43,6 +43,12 @@ Game_pendulum::Game_pendulum(aunteater::Engine & aEngine, Application & aApplica
             .add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {2., 2.}})
         );
 
+    aEngine.addEntity(
+        aunteater::Entity()
+            .add<Position>(math::Position<2, double>{24., 9.}, math::Size<2, double>{2., 2.} )
+            .add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {2., 2.}})
+        );
+
     // Player
     aEngine.addEntity(
         aunteater::Entity()
