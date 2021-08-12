@@ -14,7 +14,7 @@ void SpeedResolution::update(const aunteater::Timer aTimer)
     for(auto movable : mMovables)
     {
         math::Vec<2, double> totalSpeed = math::Vec<2, double>::Zero();
-        ForceAndSpeed fas = movable->get<ForceAndSpeed>();
+        ForceAndSpeed & fas = movable->get<ForceAndSpeed>();
 
         for (auto speed : fas.speeds)
         {
