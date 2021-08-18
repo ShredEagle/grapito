@@ -4,12 +4,12 @@
 
 #include <Components/Controllable.h>
 #include <Components/EnvironmentCollisionBox.h>
-#include <Components/ForceAndSpeed.h>
+#include <Components/AccelAndSpeed.h>
 #include <Components/GrappleControl.h>
 #include <Components/Pendular.h>
 #include <Components/PlayerData.h>
 #include <Components/Position.h>
-#include <Components/Weight.h>
+#include <Components/Mass.h>
 
 #include <aunteater/Archetype.h>
 #include <aunteater/FamilyHelp.h>
@@ -20,9 +20,9 @@
 
 namespace ad {
 
-typedef aunteater::Archetype<Controllable, Position, ForceAndSpeed, Weight> CartesianControlled;
-typedef aunteater::Archetype<Controllable, Position, Pendular, Weight> PolarControlled;
-typedef aunteater::Archetype<Controllable, ForceAndSpeed, GrappleControl, Position> Grappler;
+typedef aunteater::Archetype<Controllable, Position, AccelAndSpeed, Mass> CartesianControlled;
+typedef aunteater::Archetype<Controllable, Position, Pendular, Mass> PolarControlled;
+typedef aunteater::Archetype<Controllable, AccelAndSpeed, GrappleControl, Position> Grappler;
 typedef aunteater::Archetype<Controllable, GrappleControl, PlayerData> ModeSelectable; // est une bande de mecs sympas
 // Currently using EnvironmentCollisionBox as a tag, because it is not correctly positioned...
 typedef aunteater::Archetype<Position, EnvironmentCollisionBox> AnchorElement;
@@ -31,7 +31,7 @@ class Control : public aunteater::System<GameInputState>
 {
 
 public:
-    Control(aunteater::EntityManager & mEntityManager);
+    Control(aunteater::EntityManager & aEntityManager);
 
     void update(const aunteater::Timer aTimer, const GameInputState & aInputState) override;
 

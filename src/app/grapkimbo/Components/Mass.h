@@ -5,13 +5,13 @@
 namespace ad {
 
 
-struct Weight : public aunteater::Component<Weight>
+struct Mass : public aunteater::Component<Mass>
 {
-    explicit Weight(double aMass = 1) :
+    explicit Mass(float aMass = 1) :
         mass{aMass}
     {}
 
-    double mass;
+    float mass;
 };
 
 

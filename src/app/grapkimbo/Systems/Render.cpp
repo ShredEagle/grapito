@@ -1,5 +1,7 @@
 #include "Render.h"
 
+#include "Utils/DrawDebugStuff.h"
+
 namespace ad {
 
 Render::Render(aunteater::EntityManager & aEntityManager, Application & aApplication) :
@@ -19,6 +21,7 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
 {
     mTrivialShaping.clearShapes();
     mTrivialLineStrip.clearLines();
+    debugDrawer->clear();
     mApplication.getEngine()->clear();
 
     for(const auto [geometry, visualRectangle] : mRectangles)
@@ -28,6 +31,7 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
                 static_cast<math::Position<2, int>>(geometry.position * gPixelsPerMeter),
                 static_cast<math::Size<2, int>>(geometry.dimension * gPixelsPerMeter)  
             },
+            0.,
             visualRectangle.color
         });
     }
@@ -57,27 +61,27 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
     for(auto collider : mColliders)
     {
         Color color = Color{255, 80, 80};
+        Color vecColor = Color{200,200,20};
 
-        if (collider->get<EnvironmentCollisionBox>().collidingWith.size())
-        {
-            color = Color{80,255,80};
-        }
-
-        mTrivialShaping.addRectangle(
+        debugDrawer->drawRectangle(
             {
-                {
-                    static_cast<math::Position<2, int>>(collider->get<Position>().position 
-                                                       + collider->get<EnvironmentCollisionBox>().box.mPosition.as<math::Vec>()),
-                    static_cast<math::Size<2, int>>(collider->get<EnvironmentCollisionBox>().box.mDimension)
-                },
+                collider->get<Position>().position + collider->get<EnvironmentCollisionBox>().box.mBox.mPosition.as<math::Vec>(),
+                collider->get<EnvironmentCollisionBox>().box.mBox.mDimension,
                 color
             }
         );
+
+        for (auto contact : collider->get<EnvironmentCollisionBox>().collidingWith)
+        {
+            //contact.debugRender(vecColor);
+        }
+
     }
 #endif
 
     mTrivialLineStrip.render();
     mTrivialShaping.render();
+    debugDrawer->render();
 }
 
 } // namespace ad

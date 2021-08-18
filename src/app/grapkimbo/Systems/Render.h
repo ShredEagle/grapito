@@ -15,6 +15,7 @@
 
 #include <engine/TrivialLineStrip.h>
 #include <engine/TrivialShaping.h>
+#include <engine/DrawLine.h>
 #include <engine/Application.h>
 
 namespace ad {

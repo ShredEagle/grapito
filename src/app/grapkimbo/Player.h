@@ -4,7 +4,7 @@
 #include "Configuration.h"
 #include "Input.h"
 
-#include "Components/ForceAndSpeed.h"
+#include "Components/AccelAndSpeed.h"
 #include "Components/GrappleControl.h"
 #include "Components/Pendular.h"
 #include "Components/PlayerData.h"
@@ -40,17 +40,17 @@ inline Pendular makePendular(math::Position<2, double> aGrappleOrigin, math::Pos
 inline void connectGrapple(aunteater::weak_entity aEntity, Pendular aPendular)
 {
     (*aEntity)
-        .markComponentToRemove<ForceAndSpeed>()
+        .markComponentToRemove<AccelAndSpeed>()
         .add<Pendular>(std::move(aPendular))
         ;
 }
 
 
-inline void retractGrapple(aunteater::weak_entity aEntity, ForceAndSpeed aForceAndSpeed)
+inline void retractGrapple(aunteater::weak_entity aEntity, AccelAndSpeed aAccelAndSpeed)
 {
     (*aEntity)
         .markComponentToRemove<Pendular>()
-        .add<ForceAndSpeed>(std::move(aForceAndSpeed))
+        .add<AccelAndSpeed>(std::move(aAccelAndSpeed))
         ;
 }
 

@@ -1,28 +1,29 @@
 #include "Game_pendulum.h"
 #include "Player.h"
+#include "Systems/AccelSolver.h"
 
 #include <Components/AnchorSelector.h>
 #include <Components/Controllable.h>
 #include <Components/EnvironmentCollisionBox.h>
-#include <Components/ForceAndSpeed.h>
+#include <Components/AccelAndSpeed.h>
 #include <Components/GrappleControl.h>
 #include <Components/Pendular.h>
 #include <Components/Position.h>
 #include <Components/VisualRectangle.h>
-#include <Components/Weight.h>
+#include <Components/Mass.h>
 
 #include <Systems/Control.h>
 #include <Systems/ControlAnchorSight.h>
 #include <Systems/Gravity.h>
 #include <Systems/PendulumSimulation.h>
 #include <Systems/Render.h>
-#include <Systems/SpeedResolution.h>
 
 #include <aunteater/Entity.h>
 #include <aunteater/UpdateTiming.h>
 
 
 namespace ad {
+debug::DrawDebugStuff * debugDrawer;
 namespace grapkimbo {
 
 
@@ -30,10 +31,11 @@ static constexpr Color gAnchorColor{200, 200, 200};
 
 Game_pendulum::Game_pendulum(Application & aApplication)
 {
+    debugDrawer = new debug::DrawDebugStuff(aApplication);
     mSystemManager.add<Control>();
     mSystemManager.add<PendulumSimulation>();
     mSystemManager.add<Gravity>();
-    mSystemManager.add<SpeedResolution>();
+    mSystemManager.add<AccelSolver>();
     mSystemManager.add<ControlAnchorSight>(); // it will position the sight, which might follow something impacted by speed resolution
     mSystemManager.add<Render>(aApplication); 
 

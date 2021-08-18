@@ -60,7 +60,7 @@ void readKeyboard(const KeyboardInputConfig & aConfig, ControllerInputState & aS
     for (size_t i = 0; i < aConfig.size(); ++i)
     {
         handleButtonEdges(aState[aConfig[i].command],
-                          glfwGetKey(aApplication.getWindow(), aConfig[i].glKeyCode));
+                          aApplication.getKey(aConfig[i].glKeyCode));
     }
 }
 

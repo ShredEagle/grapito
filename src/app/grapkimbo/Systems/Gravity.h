@@ -2,8 +2,8 @@
 
 #include "Input.h"
 
-#include <Components/Weight.h>
-#include <Components/ForceAndSpeed.h>
+#include <Components/Mass.h>
+#include <Components/AccelAndSpeed.h>
 
 #include <aunteater/Archetype.h>
 #include <aunteater/FamilyHelp.h>
@@ -11,7 +11,7 @@
 
 namespace ad {
 
-typedef aunteater::Archetype<Weight, ForceAndSpeed> Weightable;
+typedef aunteater::Archetype<Mass, AccelAndSpeed> Massive;
 
 class Gravity : public aunteater::System<GameInputState>
 {
@@ -23,11 +23,10 @@ public:
 
     void loadInputState(const GameInputState & aInputState);
 
-    static constexpr double gAcceleration = 9.8;
+    static constexpr double gAcceleration = 100.f;
 
 private:
-    aunteater::EntityManager & mEntityManager;
-    const aunteater::FamilyHelp<Weightable> mWeightables;
+    const aunteater::FamilyHelp<Massive> mMassives;
 
 };
 
