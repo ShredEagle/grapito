@@ -24,9 +24,9 @@ const math::Position<2, double> projectPointOnLine(math::Position<2, double> poi
 
 const double distanceToLine(math::Position<2, double> point, math::Position<2, double> origin, math::Position<2, double> end, math::Vec<2, double> normal)
 {
-    math::Vec<2, double> orthVector = point - projectPointOnLine(point, origin, end);
-    return orthVector.dot(normal);
-    //return (((end.x() - origin.x()) * (origin.y() - point.y())) - ((origin.x() - point.x()) * (end.y() - origin.y()))) / (origin - end).getNorm();
+    //math::Vec<2, double> orthVector = point - projectPointOnLine(point, origin, end);
+    //return orthVector.dot(normal);
+    return (((end.x() - origin.x()) * (origin.y() - point.y())) - ((origin.x() - point.x()) * (end.y() - origin.y()))) / (origin - end).getNorm();
 }
 
 ContactPointQuery QueryFacePenetration(const CollisionBox & collisionBoxA, const CollisionBox & collisionBoxB)

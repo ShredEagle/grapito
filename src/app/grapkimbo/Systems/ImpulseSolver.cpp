@@ -31,7 +31,7 @@ void ImpulseSolver::update(const aunteater::Timer aTimer, const GameInputState &
         }
     }
 
-    for (int i = 0; i < 20; ++i)
+    for (int i = 0; i < 5; ++i)
     {
         for (auto impulsable : mImpulsables)
         {
