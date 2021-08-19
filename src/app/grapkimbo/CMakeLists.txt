@@ -2,6 +2,7 @@ set(TARGET_NAME grapkimbo)
 
 set(${TARGET_NAME}_HEADERS
     Configuration.h
+    DebugUI.h
     Game.h
     Game_pendulum.h
     Input.h
@@ -35,6 +36,7 @@ set(${TARGET_NAME}_HEADERS
 set(${TARGET_NAME}_SOURCES
     main.cpp
 
+    DebugUI.cpp
     Game.cpp
     Game_pendulum.cpp
     Input.cpp

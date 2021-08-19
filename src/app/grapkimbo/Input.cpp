@@ -16,6 +16,8 @@ const KeyboardInputConfig gKeyboardConfig = {
     KeyboardInputMapping{Right,   GLFW_KEY_RIGHT},
     KeyboardInputMapping{Jump,    GLFW_KEY_SPACE},
     KeyboardInputMapping{Grapple, GLFW_KEY_X},
+    KeyboardInputMapping{Pause,   GLFW_KEY_P},
+    KeyboardInputMapping{Step,    GLFW_KEY_O},
 };
 
 

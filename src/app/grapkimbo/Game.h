@@ -1,5 +1,6 @@
 #pragma once
 
+#include "DebugUI.h"
 #include "Input.h"
 #include "Systems/Control.h"
 
@@ -24,5 +25,6 @@ public:
 private:
     aunteater::EntityManager mEntityManager;
     aunteater::SystemManager<GameInputState> mSystemManager{mEntityManager};
+    DebugUI mUI;
 };
 }} // namespace ad::grapkimbo

@@ -70,26 +70,23 @@ Game::Game(Application & aApplication)
 bool Game::update(const aunteater::Timer & aTimer, const GameInputState & aInputState)
 {
     aunteater::UpdateTiming<GameInputState> timings;
-    /*
-    InputState pauseInput = aInputState[COMMAND::PAUSE];
-    InputState step = aInputState[COMMAND::STEP_FRAME];
-    if (pauseInput.edge && pauseInput.state == GLFW_PRESS)
+    InputState pauseInput = aInputState.get(Controller::Keyboard)[Command::Pause];
+    InputState step = aInputState.get(Controller::Keyboard)[Command::Step];
+    if (pauseInput.positiveEdge())
     {
         pause = !pause;
     }
 
-    if (!pause || (step.edge && step.state == GLFW_PRESS))
+    if (!pause || step.positiveEdge())
     {
         mSystemManager.pause(false);
-        */
         mSystemManager.update(aTimer, aInputState, timings);
-        /*
+        mUI.broadcast(timings);
     }
     else 
     {
         mSystemManager.pause(true);
     }
-*/
     return ! mSystemManager.isPaused();
 }
 
