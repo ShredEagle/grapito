@@ -14,7 +14,7 @@ void SpeedResolution::update(const aunteater::Timer aTimer)
     for(auto movable : mMovables)
     {
         math::Vec<2, double> totalSpeed = math::Vec<2, double>::Zero();
-        ForceAndSpeed fas = movable->get<ForceAndSpeed>();
+        ForceAndSpeed & fas = movable->get<ForceAndSpeed>();
 
         for (auto speed : fas.speeds)
         {
@@ -23,10 +23,7 @@ void SpeedResolution::update(const aunteater::Timer aTimer)
 
         for (auto force :fas.forces)
         {
-            // Add all accelerations (F/m)
-            // Note: for some reason multiplying by time to go from acceleration to speed increment 
-            // does give unpleasant results...
-            totalSpeed += (force / movable->get<Weight>().weight) /* * aTimer.delta()*/;
+            totalSpeed += (force / movable->get<Weight>().mass) * aTimer.delta();
         }
 
         fas.speeds.clear();

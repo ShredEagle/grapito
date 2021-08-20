@@ -15,7 +15,7 @@ void Gravity::update(const aunteater::Timer aTimer)
 {
     for(auto weightable : mWeightables)
     {
-        weightable->get<ForceAndSpeed>().forces.push_back(gravityVector * weightable->get<Weight>().weight);
+        weightable->get<ForceAndSpeed>().forces.push_back(gravityVector * weightable->get<Weight>().mass);
     }
 }
 } // namespace ad

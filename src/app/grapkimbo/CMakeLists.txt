@@ -2,25 +2,32 @@ set(TARGET_NAME grapkimbo)
 
 set(${TARGET_NAME}_HEADERS
     Game.h
+    Game_pendulum.h
+    Input.h
 
     Components/Position.h
     Components/Controllable.h
     Components/Environment.h
     Components/EnvironmentCollisionBox.h
     Components/ForceAndSpeed.h
+    Components/Pendular.h
     Components/Weight.h
     Systems/Control.h
     Systems/EnvironmentCollision.h
     Systems/Gravity.h
+    Systems/PendulumSimulation.h
     Systems/Render.h
     Systems/SpeedResolution.h
 )
 
 set(${TARGET_NAME}_SOURCES
     Game.cpp
+    Game_pendulum.cpp
+
     Systems/Control.cpp
     Systems/EnvironmentCollision.cpp
     Systems/Gravity.cpp
+    Systems/PendulumSimulation.cpp
     Systems/Render.cpp
     Systems/SpeedResolution.cpp
 )
@@ -41,10 +48,12 @@ add_executable(${TARGET_NAME}
 
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
     target_compile_options(${TARGET_NAME}
-        PRIVATE "-fno-omit-frame-pointer" "-fsanitize=address" "-fsanitize=undefined" "-D KIMBO_DEBUG")
+        PRIVATE "-fno-omit-frame-pointer" "-fsanitize=address" "-fsanitize=undefined")
     target_link_options(${TARGET_NAME}
         PRIVATE "-fsanitize=address" "-fsanitize=undefined")
 endif()
+
+#target_compile_definitions(${TARGET_NAME} PRIVATE KIMBO_DEBUG)
 
 target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 

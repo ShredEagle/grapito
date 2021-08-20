@@ -24,10 +24,10 @@ class GrapitoConan(ConanFile):
     requires = (
         ("glad/0.1.34"),
 
-        ("aunteater/6afa38a266@adnn/develop"),
-        ("graphics/b2798d209f@adnn/develop"),
-        ("math/2c25e0f7ee@adnn/develop"),
-        ("websocket/84bbb84476@adnn/develop"),
+        ("aunteater/ad037e347a@adnn/develop"),
+        ("graphics/5b8faf542f@adnn/develop"),
+        ("math/77d9136abf@adnn/develop"),
+        ("websocket/717708d463@adnn/develop"),
     )
 
     build_requires = ("cmake/3.20.4")
