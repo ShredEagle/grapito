@@ -1,5 +1,7 @@
 #pragma once
 
+#include "PendulumSimulation.h" // for pendulum archetype
+
 #include <Components/Position.h>
 #ifdef KIMBO_DEBUG
 #include <Components/EnvironmentCollisionBox.h>
@@ -9,6 +11,7 @@
 #include <aunteater/FamilyHelp.h>
 #include <aunteater/System.h>
 
+#include <engine/TrivialLineStrip.h>
 #include <engine/TrivialShaping.h>
 #include <engine/Application.h>
 
@@ -32,8 +35,10 @@ public:
 private:
     aunteater::Engine & mEngine;
     const aunteater::FamilyHelp<Rendered> mRenderables;
+    const aunteater::FamilyHelp<Pendulum> mPendulums;
     Application & mApplication;
     TrivialShaping mTrivialShaping;
+    TrivialLineStrip mTrivialLineStrip;
 #ifdef KIMBO_DEBUG
     const aunteater::FamilyHelp<Collider> mColliders;
 #endif

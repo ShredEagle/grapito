@@ -5,16 +5,19 @@ namespace ad {
 Render::Render(aunteater::Engine & aEngine, Application & aApplication) :
     mEngine(aEngine),
     mRenderables(mEngine),
+    mPendulums(mEngine),
     mApplication(aApplication),
 #ifdef KIMBO_DEBUG
     mColliders(mEngine),
 #endif
-    mTrivialShaping{aApplication.getEngine()->getWindowSize()}
+    mTrivialShaping{aApplication.getEngine()->getWindowSize()},
+    mTrivialLineStrip{aApplication.getEngine()->getWindowSize()}
 {}
 
 void Render::update(const aunteater::Timer aTimer)
 {
     mTrivialShaping.clearShapes();
+    mTrivialLineStrip.clearLines();
     mApplication.getEngine()->clear();
 
     for(const auto [geometry] : mRenderables)
@@ -25,6 +28,14 @@ void Render::update(const aunteater::Timer aTimer)
                 static_cast<math::Size<2, int>>(geometry.dimension * gPixelsPerMeter)  
             },
             Color{255, 255, 255}
+        });
+    }
+
+    for(const auto [pendular, geometry] : mPendulums)
+    {
+        mTrivialLineStrip.addLine({
+            {static_cast<math::Position<2, GLfloat>>(pendular.anchor * gPixelsPerMeter), math::sdr::gRed},
+            {static_cast<math::Position<2, GLfloat>>(geometry.center() * gPixelsPerMeter), math::sdr::gGreen},
         });
     }
 
@@ -51,6 +62,7 @@ void Render::update(const aunteater::Timer aTimer)
     }
 #endif
 
+    mTrivialLineStrip.render();
     mTrivialShaping.render();
 }
 

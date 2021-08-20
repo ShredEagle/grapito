@@ -13,6 +13,9 @@ struct Position : public aunteater::Component<Position>
         dimension{std::move(aDimension)}
     {}
 
+    math::Position<2, double> center() const
+    { return position + dimension.as<math::Vec>() / 2.; }
+
     math::Position<2, double> position;
     math::Size<2, double> dimension;
 };
