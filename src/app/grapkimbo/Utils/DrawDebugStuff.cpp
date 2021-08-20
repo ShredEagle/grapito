@@ -14,6 +14,11 @@ namespace ad
             mLines.push_back(aLine);
         }
 
+        void DrawDebugStuff::drawPoint(Point aPoint)
+        {
+            mPoints.push_back(aPoint);
+        }
+
         void DrawDebugStuff::render()
         {
             for (auto rectangle : mRectangles)
@@ -42,16 +47,36 @@ namespace ad
                 );
             }
 
+            for (auto point : mPoints)
+            {
+                mDrawLine.addLine(
+                    {
+                        static_cast<math::Position<2, int>>(point.origin + math::Vec<2, double>{1.f, 1.f} * point.radius),
+                        static_cast<math::Position<2, int>>(point.origin + math::Vec<2, double>{-1.f, -1.f} * point.radius),
+                        2.f,
+                        point.color
+                    }
+                );
+                mDrawLine.addLine(
+                    {
+                        static_cast<math::Position<2, int>>(point.origin + math::Vec<2, double>{1.f, -1.f} * point.radius),
+                        static_cast<math::Position<2, int>>(point.origin + math::Vec<2, double>{-1.f, 1.f} * point.radius),
+                        2.f,
+                        point.color
+                    }
+                );
+            }
+
             mTrivialShaping.render();
             mDrawLine.render();
-        }
-
-        void DrawDebugStuff::clear()
-        {
             mRectangles.clear();
             mLines.clear();
             mPoints.clear();
             mArrows.clear();
+        }
+
+        void DrawDebugStuff::clear()
+        {
             mTrivialShaping.clearShapes();
             mDrawLine.clearShapes();
         }

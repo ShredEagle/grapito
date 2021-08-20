@@ -12,7 +12,6 @@ set(${TARGET_NAME}_HEADERS
     Components/AccelAndSpeed.h
     Components/AnchorSelector.h
     Components/Controllable.h
-    Components/EnvironmentCollisionBox.h
     Components/GrappleControl.h
     Components/Mass.h
     Components/Pendular.h
@@ -20,10 +19,13 @@ set(${TARGET_NAME}_HEADERS
     Components/Position.h
     Components/VisualOutline.h
     Components/VisualRectangle.h
+    Components/Body.h
+    Components/AccelAndSpeed.h
 
     Systems/Control.h
     Systems/ControlAnchorSight.h
-    Systems/EnvironmentCollision.h
+    Systems/Control.h
+    Systems/ContactConstraintCreation.h
     Systems/Gravity.h
     Systems/PendulumSimulation.h
     Systems/Render.h
@@ -44,7 +46,7 @@ set(${TARGET_NAME}_SOURCES
 
     Systems/Control.cpp
     Systems/ControlAnchorSight.cpp
-    Systems/EnvironmentCollision.cpp
+    Systems/ContactConstraintCreation.cpp
     Systems/Gravity.cpp
     Systems/PendulumSimulation.cpp
     Systems/Render.cpp

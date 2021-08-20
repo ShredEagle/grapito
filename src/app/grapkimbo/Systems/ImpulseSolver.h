@@ -1,12 +1,9 @@
 #pragma once
 
-#include "Components/EnvironmentCollisionBox.h"
-#include "Components/Mass.h"
-#include "Input.h"
-#include "aunteater/EntityManager.h"
-
-#include <Components/Position.h>
 #include <Components/AccelAndSpeed.h>
+#include "Components/Body.h"
+#include "Input.h"
+#include <Components/Position.h>
 
 #include <aunteater/Archetype.h>
 #include <aunteater/FamilyHelp.h>
@@ -14,7 +11,7 @@
 
 namespace ad {
 
-typedef aunteater::Archetype<AccelAndSpeed, Position, EnvironmentCollisionBox, Mass> Impulsable;
+typedef aunteater::Archetype<AccelAndSpeed, Position, Body> Impulsable;
 
 class ImpulseSolver : public aunteater::System<GameInputState>
 {

@@ -7,11 +7,11 @@ namespace ad {
 
 struct Mass : public aunteater::Component<Mass>
 {
-    explicit Mass(float aMass = 1) :
+    explicit Mass(double aMass) :
         mass{aMass}
     {}
 
-    float mass;
+    double mass;
 };
 
 

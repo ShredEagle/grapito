@@ -2,7 +2,7 @@
 
 #include "Input.h"
 
-#include <Components/Mass.h>
+#include "Components/Body.h"
 #include <Components/AccelAndSpeed.h>
 
 #include <aunteater/Archetype.h>
@@ -11,7 +11,7 @@
 
 namespace ad {
 
-typedef aunteater::Archetype<Mass, AccelAndSpeed> Massive;
+typedef aunteater::Archetype<AccelAndSpeed, Body> Massive;
 
 class Gravity : public aunteater::System<GameInputState>
 {

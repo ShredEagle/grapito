@@ -79,11 +79,11 @@ namespace ad
                 float aRadius,
                 const Color & aColor
             ) :
-                origin{static_cast<math::Position<2, int>>(aOrigin)},
+                origin{aOrigin},
                 radius{aRadius},
                 color{aColor}
             {}
-            math::Position<2, int> origin;
+            math::Position<2, double> origin;
             float radius;
             Color color;
         };
@@ -97,6 +97,7 @@ namespace ad
                 {}
                 void drawRectangle(Rectangle aRectangle);
                 void drawLine(Line aLine);
+                void drawPoint(Point aPoint);
                 //void drawArrow(Arrow aArrow);
                 //void drawPoint(Point aPoint);
                 void render();

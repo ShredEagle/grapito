@@ -1,24 +1,24 @@
 #include "Game.h"
+#include "Components/VisualRectangle.h"
 #include "Input.h"
 
 #include <Systems/Render.h>
-#include <Systems/EnvironmentCollision.h>
+#include <Systems/ContactConstraintCreation.h>
 #include <Systems/Control.h>
 #include <Systems/Gravity.h>
 #include "Systems/AccelSolver.h"
 #include "Systems/ImpulseSolver.h"
 #include <Utils/DrawDebugStuff.h>
 
+#include "Components/Body.h"
 #include <Components/Position.h>
-#include <Components/EnvironmentCollisionBox.h>
 #include <Components/Controllable.h>
-#include <Components/Mass.h>
 #include <Components/AccelAndSpeed.h>
 
 #include <aunteater/UpdateTiming.h>
 #include <aunteater/Entity.h>
 
-#include <stdio.h>
+#include <iostream>
 
 namespace ad {
 bool pause = false;
@@ -28,43 +28,61 @@ namespace grapkimbo {
 Game::Game(Application & aApplication)
 {
     debugDrawer = new debug::DrawDebugStuff(aApplication);
-    mSystemManager.add<Control>();
     mSystemManager.add<Gravity>();
     mSystemManager.add<AccelSolver>();
-    mSystemManager.add<EnvironmentCollision>();
+    mSystemManager.add<ContactConstraintCreation>();
     mSystemManager.add<ImpulseSolver>();
     mSystemManager.add<Render>(aApplication); 
 
     mEntityManager.addEntity(
             aunteater::Entity()
-            .add<Position>(math::Position<2, double>{222., 502.})
+            .add<Position>(math::Position<2, double>{2., 5.}, math::Size<2, double>{2., 2.})
             .add<Controllable>(Controller::Keyboard)
-            .add<EnvironmentCollisionBox>(
-                math::Rectangle<double>{{0., 0.}, {100., 100.}},
-                EntityType::PHYSICAL
+            .add<Body>(
+                math::Rectangle<double>{{0., 0.}, {2., 2.}},
+                BodyType::DYNAMIC,
+                ShapeType::HULL,
+                0.001
             )
+            .add<VisualRectangle>(math::sdr::gCyan, 0.001)
             .add<AccelAndSpeed>()
-            .add<Mass>(1.f)
             );
 
     mEntityManager.addEntity(
             aunteater::Entity()
-            .add<Position>(math::Position<2, double>{222., 222.})
-            .add<EnvironmentCollisionBox>(
-                math::Rectangle<double>{{0., 0.}, {100., 100.}},
-                EntityType::PHYSICAL
-            )
             .add<AccelAndSpeed>()
-            .add<Mass>(1.f)
-            );
-
-    mEntityManager.addEntity(
-            aunteater::Entity()
-            .add<Position>(math::Position<2, double>{200., 200.})
-            .add<EnvironmentCollisionBox>(
-                math::Rectangle<double>{{0., 0.}, {1000., 20.}},
-                EntityType::GROUND
+            .add<Position>(math::Position<2, double>{2.87, 2.}, math::Size<2, double>{.25, .5})
+            .add<VisualRectangle>(math::sdr::gCyan)
+            .add<Body>(
+                math::Rectangle<double>{{0., 0.}, {.25, .5}},
+                BodyType::STATIC,
+                ShapeType::HULL
             ));
+
+    /*mEntityManager.addEntity(
+            aunteater::Entity()
+            .add<Position>(math::Position<2, double>{7., 3.}, math::Size<2, double>{2., 2.})
+            .add<VisualRectangle>(math::sdr::gCyan)
+            .add<Body>(
+                math::Rectangle<double>{{0., 0.}, {2., 2.}},
+                BodyType::DYNAMIC,
+                ShapeType::HULL,
+                1.f
+            )
+            .add<AccelAndSpeed>()
+            );
+
+    mEntityManager.addEntity(
+            aunteater::Entity()
+            .add<AccelAndSpeed>()
+            .add<Position>(math::Position<2, double>{6., 2.}, math::Size<2, double>{4., .5})
+            .add<VisualRectangle>(math::sdr::gCyan)
+            .add<Body>(
+                math::Rectangle<double>{{0., 0.}, {4., .5}},
+                BodyType::STATIC,
+                ShapeType::HULL
+            ));
+            */
 }
 
 bool Game::update(const aunteater::Timer & aTimer, const GameInputState & aInputState)

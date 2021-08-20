@@ -1,11 +1,12 @@
 #include "Game_pendulum.h"
+#include "Components/Body.h"
 #include "Player.h"
 #include "Systems/AccelSolver.h"
 
-#include <Components/AnchorSelector.h>
-#include <Components/Controllable.h>
-#include <Components/EnvironmentCollisionBox.h>
 #include <Components/AccelAndSpeed.h>
+#include <Components/AnchorSelector.h>
+#include <Components/Body.h>
+#include <Components/Controllable.h>
 #include <Components/GrappleControl.h>
 #include <Components/Pendular.h>
 #include <Components/Position.h>
@@ -43,21 +44,33 @@ Game_pendulum::Game_pendulum(Application & aApplication)
     aunteater::weak_entity anchor_1 = mEntityManager.addEntity(
         aunteater::Entity()
             .add<Position>(math::Position<2, double>{4., 6.}, math::Size<2, double>{2., 2.} )
-            .add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {2., 2.}})
+            .add<Body>(
+                math::Rectangle<double>{{0., 0.}, {2., 2.}},
+                BodyType::STATIC,
+                ShapeType::HULL
+                )
             .add<VisualRectangle>(gAnchorColor)
         );
 
     aunteater::weak_entity anchor_2 = mEntityManager.addEntity(
         aunteater::Entity()
             .add<Position>(math::Position<2, double>{12., 5.}, math::Size<2, double>{2., 2.} )
-            .add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {2., 2.}})
+            .add<Body>(
+                math::Rectangle<double>{{0., 0.}, {2., 2.}},
+                BodyType::STATIC,
+                ShapeType::HULL
+                )
             .add<VisualRectangle>(gAnchorColor)
         );
 
     aunteater::weak_entity anchor_3 = mEntityManager.addEntity(
         aunteater::Entity()
             .add<Position>(math::Position<2, double>{24., 9.}, math::Size<2, double>{2., 2.} )
-            .add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {2., 2.}})
+            .add<Body>(
+                math::Rectangle<double>{{0., 0.}, {2., 2.}},
+                BodyType::STATIC,
+                ShapeType::HULL
+                )
             .add<VisualRectangle>(gAnchorColor)
         );
 

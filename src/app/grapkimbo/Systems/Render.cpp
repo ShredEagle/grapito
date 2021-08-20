@@ -31,7 +31,7 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
                 static_cast<math::Position<2, int>>(geometry.position * gPixelsPerMeter),
                 static_cast<math::Size<2, int>>(geometry.dimension * gPixelsPerMeter)  
             },
-            0.,
+            visualRectangle.angle,
             visualRectangle.color
         });
     }
@@ -65,15 +65,15 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
 
         debugDrawer->drawRectangle(
             {
-                collider->get<Position>().position + collider->get<EnvironmentCollisionBox>().box.mBox.mPosition.as<math::Vec>(),
-                collider->get<EnvironmentCollisionBox>().box.mBox.mDimension,
+                collider->get<Position>().position + collider->get<Body>().box.mBox.mPosition.as<math::Vec>(),
+                collider->get<Body>().box.mBox.mDimension,
                 color
             }
         );
 
-        for (auto contact : collider->get<EnvironmentCollisionBox>().collidingWith)
+        for (auto contact : collider->get<Body>().collidingWith)
         {
-            //contact.debugRender(vecColor);
+            contact.debugRender(vecColor);
         }
 
     }

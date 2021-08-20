@@ -1,4 +1,6 @@
 #include "ImpulseSolver.h"
+#include "Utils/DrawDebugStuff.h"
+#include "engine/commons.h"
 #include "math/Vector.h"
 #include <algorithm>
 #include <iostream>
@@ -22,53 +24,55 @@ void ImpulseSolver::update(const aunteater::Timer aTimer, const GameInputState &
     {
         AccelAndSpeed & aas = impulsable->get<AccelAndSpeed>();
         Position & pos = impulsable->get<Position>();
-        EnvironmentCollisionBox & ecb = impulsable->get<EnvironmentCollisionBox>();
-        Mass & mass = impulsable->get<Mass>();
+        Body & ecb = impulsable->get<Body>();
 
         for (auto query : ecb.collidingWith)
         {
-            applyImpulse(pos, aas, query.contact.impulse * query.contact.normal / mass.mass, aTimer.delta());
+            for (auto contact : query.contacts)
+            {
+                applyImpulse(pos, aas, contact.impulse * query.normal * ecb.invMass, aTimer.delta());
+            }
         }
     }
 
-    for (int i = 0; i < 5; ++i)
+    for (int i = 0; i < 10; ++i)
     {
         for (auto impulsable : mImpulsables)
         {
-            AccelAndSpeed & aas = impulsable->get<AccelAndSpeed>();
-            Position & pos = impulsable->get<Position>();
-            EnvironmentCollisionBox & ecb = impulsable->get<EnvironmentCollisionBox>();
-            Mass & mass = impulsable->get<Mass>();
+            AccelAndSpeed & aasA = impulsable->get<AccelAndSpeed>();
+            Position & posA = impulsable->get<Position>();
+            Body & ecbA = impulsable->get<Body>();
 
-            for (auto query : ecb.collidingWith)
+            for (auto query : ecbA.collidingWith)
             {
-                math::Vec<2, double> effSpeed = aas.speed;
-                double totalMass = 1 / mass.mass;
+                AccelAndSpeed & aasB = query.entity->get<AccelAndSpeed>();
+                Position & posB = query.entity->get<Position>();
+                Body & ecbB = query.entity->get<Body>();
 
-                if (query.entity->has<AccelAndSpeed>())
+                for (auto contact : query.contacts)
                 {
-                    effSpeed -= query.entity->get<AccelAndSpeed>().speed;
-                }
+                    double normalSpeed = (aasA.speed - aasB.speed).dot(query.normal);
+                    double totalMass = ecbA.invMass + ecbB.invMass;
 
-                if (query.entity->has<Mass>())
-                {
-                    totalMass += 1 / query.entity->get<Mass>().mass;
-                }
+                    double lambda = -(1 / totalMass) * (normalSpeed);
+                    double newImpulse = std::max(contact.impulse + lambda, (double)0.f);
+                    lambda = newImpulse - contact.impulse;
+                    contact.impulse = newImpulse;
 
-                double normalSpeed = effSpeed.dot(query.contact.normal);
-                double lambda = -(1 / totalMass) * (normalSpeed + 0.01 * query.contact.distance);
-                double newImpulse = std::max(query.contact.impulse + lambda, (double)0.f);
-                lambda = newImpulse - query.contact.impulse;
-                query.contact.impulse = newImpulse;
 
-                math::Vec<2, double> impVec = lambda * query.contact.normal / mass.mass;
+                    math::Vec<2, double> impVec = lambda * query.normal * ecbA.invMass;
 
-                applyImpulse(pos, aas, impVec, aTimer.delta());
+                    debugDrawer->drawLine({
+                            contact.point,
+                            contact.point + impVec,
+                            2.f,
+                            Color{0,0,255}
+                            });
 
-                if (query.entity->has<Mass>() && query.entity->has<AccelAndSpeed>() && query.entity->has<Position>())
-                {
-                    impVec = -lambda * query.contact.normal / query.entity->get<Mass>().mass;
-                    applyImpulse(query.entity->get<Position>(), query.entity->get<AccelAndSpeed>(), impVec, aTimer.delta());
+                    applyImpulse(posA, aasA, impVec, aTimer.delta());
+
+                    impVec = -lambda * query.normal * ecbB.invMass;
+                    applyImpulse(posB, aasB, impVec, aTimer.delta());
                 }
             }
         }

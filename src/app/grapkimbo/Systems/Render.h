@@ -6,7 +6,7 @@
 #include <Components/VisualOutline.h>
 #include <Components/VisualRectangle.h>
 #ifdef KIMBO_DEBUG
-#include <Components/EnvironmentCollisionBox.h>
+#include <Components/Body.h>
 #endif
 
 #include <aunteater/Archetype.h>
@@ -24,7 +24,7 @@ typedef aunteater::Archetype<Position, VisualRectangle> RenderedRectangle;
 typedef aunteater::Archetype<Position, VisualOutline> RenderedOutline;
 
 #ifdef KIMBO_DEBUG
-typedef aunteater::Archetype<EnvironmentCollisionBox> Collider;
+typedef aunteater::Archetype<Body> Collider;
 #endif
 
 class Render : public aunteater::System<GameInputState>
