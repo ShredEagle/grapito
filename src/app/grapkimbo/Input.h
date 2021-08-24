@@ -19,6 +19,10 @@ enum Command {
     Right, 
     A,
     B,
+    LeftHorizontalAxis,
+    LeftVerticalAxis,
+    RightHorizontalAxis,
+    RightVerticalAxis,
 
     // Always leave that as last element, until we have reflection for enums
     EndCommand,
@@ -59,6 +63,11 @@ struct InputState
     {
         return std::get<int>(state) == 1;
     }
+
+    operator float() const
+    {
+        return std::get<float>(state);
+    }
 };
 
 
@@ -79,6 +88,7 @@ enum class Controller
 struct GameInputState
 {
     void readAll(Application & aApplication);
+    float asAxis(Controller aController, Command aNegativeButton, Command aPositiveButton, Command aGamepadAxis);
 
     std::array<ControllerInputState, static_cast<std::size_t>(Controller::End)> controllerState;
 };

@@ -24,6 +24,8 @@ const GamepadInputConfig gGamepadConfig = {
     GamepadInputMapping{Right, GLFW_GAMEPAD_BUTTON_DPAD_RIGHT, Button},
     GamepadInputMapping{A, GLFW_GAMEPAD_BUTTON_A, Button},
     GamepadInputMapping{B, GLFW_GAMEPAD_BUTTON_B, Button},
+    GamepadInputMapping{LeftHorizontalAxis, GLFW_GAMEPAD_AXIS_LEFT_X, Axis},
+    GamepadInputMapping{LeftVerticalAxis,   GLFW_GAMEPAD_AXIS_LEFT_Y, Axis},
 };
 
 
@@ -85,5 +87,23 @@ void GameInputState::readAll(Application & aApplication)
     }
 }
 
+
+float GameInputState::asAxis(Controller aController, Command aNegativeButton, Command aPositiveButton, Command aGamepadAxis)
+{
+    ControllerInputState input = controllerState[static_cast<std::size_t>(aController)];
+    float axis = input[aGamepadAxis];
+    if (aController == Controller::Keyboard)
+    {
+        if (input[aNegativeButton])
+        {
+            axis -= 1.f;
+        }
+        if (input[aPositiveButton])
+        {
+            axis += 1.f;
+        }
+    }
+    return axis;
+}
 
 } // namespace ad

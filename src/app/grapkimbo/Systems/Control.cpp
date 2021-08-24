@@ -49,14 +49,9 @@ void Control::update(const aunteater::Timer aTimer)
         auto & [controllable, geometry, fas, weight] = entity;
         ControllerInputState inputs = mInputState.controllerState[(std::size_t)controllable.controller];
 
-        if (inputs[Left])
-        {
-            fas.forces.emplace_back(- gAirControlAcceleration * weight.mass, 0.);
-        }
-        if (inputs[Right])
-        {
-            fas.forces.emplace_back(+ gAirControlAcceleration * weight.mass, 0.);
-        }
+        float horizontalAxis = mInputState.asAxis(controllable.controller, Left, Right, LeftHorizontalAxis);
+        fas.forces.emplace_back(horizontalAxis * gAirControlAcceleration * weight.mass, 0.);
+
         if (inputs[A])
         {
             math::Position<2, double> grappleOrigin = geometry.position + (geometry.dimension / 2).as<math::Vec>();
@@ -95,18 +90,11 @@ void Control::update(const aunteater::Timer aTimer)
 
         ControllerInputState inputs = mInputState.controllerState[(std::size_t)controllable.controller];
 
-        if (inputs[Left])
-        {
-            pendular.angularAccelerationControl = 
-                math::Radian<double>{- Gravity::gAcceleration / pendular.length 
-                                     * gPendularControlAccelerationFactor};
-        }
-        if (inputs[Right])
-        {
-            pendular.angularAccelerationControl =
-                math::Radian<double>{+ Gravity::gAcceleration / pendular.length 
-                                     * gPendularControlAccelerationFactor};
-        }
+        float horizontalAxis = mInputState.asAxis(controllable.controller, Left, Right, LeftHorizontalAxis);
+        pendular.angularAccelerationControl = 
+            math::Radian<double>{horizontalAxis * Gravity::gAcceleration / pendular.length 
+                                 * gPendularControlAccelerationFactor};
+
         if (inputs[B])
         {
             // TODO if we edit the components on the live entity, everything crashes because the 
