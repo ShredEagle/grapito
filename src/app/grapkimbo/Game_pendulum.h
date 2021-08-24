@@ -19,7 +19,7 @@ class Game_pendulum
 public:
     Game_pendulum(aunteater::Engine & aEngine, Application & aApplication);
 
-    bool update(const aunteater::Timer & aTimer, gameInputState & aInputState);
+    bool update(const aunteater::Timer & aTimer, GameInputState & aInputState);
 
 private:
     aunteater::Engine & mEntityEngine;

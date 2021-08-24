@@ -48,7 +48,7 @@ Game::Game(aunteater::Engine & aEngine, Application & aApplication) :
            );
 }
 
-bool Game::update(const aunteater::Timer & aTimer, gameInputState & aInputState)
+bool Game::update(const aunteater::Timer & aTimer, GameInputState & aInputState)
 {
     aunteater::UpdateTiming timings;
     mControlSystem->loadInputState(aInputState);

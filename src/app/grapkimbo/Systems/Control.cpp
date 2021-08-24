@@ -52,31 +52,31 @@ void Control::update(const aunteater::Timer aTimer)
 
         for (auto input : mInputState)
         {
-            if (input.state == 1)
+            if (input.nature == Button && std::get<int>(input.state) == 1)
             {
                 switch (input.command)
                 {
-                    case COMMAND::UP:
+                    case Up:
                     {
                         break;
                     }
-                    case COMMAND::DOWN:
+                    case Down:
                     {
                         break;
                     }
-                    case COMMAND::LEFT:
+                    case Left:
                     {
                         fas.forces.emplace_back(- gAirControlAcceleration * weight.mass, 0.);
                         //fas.speeds[0].x() = std::max(10., fas.speeds[0].x());
                         break;
                     }
-                    case COMMAND::RIGHT:
+                    case Right:
                     {
                         fas.forces.emplace_back(+ gAirControlAcceleration * weight.mass, 0.);
                         //fas.speeds[0].x() = std::min(-10., fas.speeds[0].x());
                         break;
                     }
-                    case COMMAND::A:
+                    case A:
                     {
                         math::Position<2, double> grappleOrigin = geometry.position + (geometry.dimension / 2).as<math::Vec>();
                         auto [anchorPoint, length] = this->anchor(grappleOrigin);
@@ -97,7 +97,7 @@ void Control::update(const aunteater::Timer aTimer)
                         );
                         break;
                     }
-                    case COMMAND::B:
+                    case B:
                     {
                         fas.forces.emplace_back(0., + gAirControlAcceleration * weight.mass);
                         break;
@@ -114,37 +114,37 @@ void Control::update(const aunteater::Timer aTimer)
         pendular.angularAccelerationControl = math::Radian<double>{0.};
         for (auto input : mInputState)
         {
-            if (input.state == 1)
+            if (input.nature == Button && std::get<int>(input.state) == 1)
             {
                 switch (input.command)
                 {
-                    case COMMAND::UP:
+                    case Up:
                     {
                         break;
                     }
-                    case COMMAND::DOWN:
+                    case Down:
                     {
                         break;
                     }
-                    case COMMAND::LEFT:
+                    case Left:
                     {
                         pendular.angularAccelerationControl = 
                             math::Radian<double>{- Gravity::gAcceleration / pendular.length 
                                                  * gPendularControlAccelerationFactor};
                         break;
                     }
-                    case COMMAND::RIGHT:
+                    case Right:
                     {
                         pendular.angularAccelerationControl =
                             math::Radian<double>{+ Gravity::gAcceleration / pendular.length 
                                                  * gPendularControlAccelerationFactor};
                         break;
                     }
-                    case COMMAND::A:
+                    case A:
                     {
                         break;
                     }
-                    case COMMAND::B:
+                    case B:
                     {
                         // TODO if we edit the components on the live entity, everything crashes because the 
                         // family are instantly edited to reflect the changes (invalidating iterators)
@@ -168,7 +168,7 @@ void Control::update(const aunteater::Timer aTimer)
     }
 }
 
-void Control::loadInputState(const gameInputState & aInputState)
+void Control::loadInputState(const GameInputState & aInputState)
 {
     mInputState = aInputState;
 }

@@ -11,21 +11,43 @@
 using namespace ad;
 
 
+void readJoystick(const GameInputConfig & aConfig, GameInputState & aState)
+{
+    GLFWgamepadstate gpState;
+    if (glfwGetGamepadState(GLFW_JOYSTICK_1, &gpState))
+    {
+        for (size_t i = 0; i < aConfig.size(); ++i)
+        {
+            Input input = aConfig[i];
+            aState[i].command = input.command;
+            aState[i].nature = input.gamepadNature;
+            if (input.isButton())
+            {
+                aState[i].state = gpState.buttons[input.glGamePadCode];
+            }
+            else
+            {
+                aState[i].state = gpState.axes[input.glGamePadCode];
+            }
+        }
+    }
+}
+
 int main(int argc, const char * argv[])
 {
     try
     {
 
-        gameInputConfig inputStore = {
-            Input{UP, GLFW_KEY_UP, GLFW_GAMEPAD_AXIS_LEFT_Y},
-            Input{DOWN, GLFW_KEY_DOWN, GLFW_GAMEPAD_AXIS_LEFT_Y},
-            Input{LEFT, GLFW_KEY_LEFT, GLFW_GAMEPAD_AXIS_LEFT_X},
-            Input{RIGHT, GLFW_KEY_RIGHT, GLFW_GAMEPAD_AXIS_LEFT_X},
-            Input{A, GLFW_KEY_X, GLFW_GAMEPAD_BUTTON_A},
-            Input{B, GLFW_KEY_SPACE, GLFW_GAMEPAD_BUTTON_B},
+        GameInputConfig inputConfig = {
+            Input{Up, GLFW_KEY_UP, GLFW_GAMEPAD_BUTTON_DPAD_UP, Button},
+            Input{Down, GLFW_KEY_DOWN, GLFW_GAMEPAD_BUTTON_DPAD_DOWN, Button},
+            Input{Left, GLFW_KEY_LEFT, GLFW_GAMEPAD_BUTTON_DPAD_LEFT, Button},
+            Input{Right, GLFW_KEY_RIGHT, GLFW_GAMEPAD_BUTTON_DPAD_RIGHT, Button},
+            Input{A, GLFW_KEY_X, GLFW_GAMEPAD_BUTTON_A, Button},
+            Input{B, GLFW_KEY_SPACE, GLFW_GAMEPAD_BUTTON_B, Button},
         };
 
-        gameInputState inputState;
+        GameInputState inputState;
 
         Application application("grapkimbo", 1600, 900,
                                 Application::Window_Keep_Ratio);
@@ -39,14 +61,16 @@ int main(int argc, const char * argv[])
 
         while(application.handleEvents())
         {
-            for (size_t i = 0; i < inputStore.size(); ++i)
+            for (size_t i = 0; i < inputConfig.size(); ++i)
             {
                 //Get keyboard state
                 inputState[i] = {
-                    inputStore[i].command,
-                    glfwGetKey(application.getWindow(), inputStore[i].GLKeyCode)
+                    inputConfig[i].command,
+                    Button,
+                    glfwGetKey(application.getWindow(), inputConfig[i].glKeyCode)
                 };
             }
+            readJoystick(inputConfig, inputState);
 
             timer.mark(glfwGetTime());
             if (game.update(timer, inputState))

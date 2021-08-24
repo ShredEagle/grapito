@@ -21,7 +21,7 @@ public:
 
     void update(const aunteater::Timer aTimer) override;
 
-    void loadInputState(const gameInputState & aInputState);
+    void loadInputState(const GameInputState & aInputState);
 
     static constexpr double gAcceleration = 9.8;
 

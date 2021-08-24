@@ -30,7 +30,7 @@ public:
 
     void update(const aunteater::Timer aTimer) override;
 
-    void loadInputState(const gameInputState & aInputState);
+    void loadInputState(const GameInputState & aInputState);
 
     static constexpr double gPendularControlAccelerationFactor = 1./6.;
     static constexpr double gAirControlAcceleration = 12.; // m/s
@@ -42,7 +42,7 @@ private:
     const aunteater::FamilyHelp<CartesianControlled> mCartesianControllables;
     const aunteater::FamilyHelp<PolarControlled> mPolarControllables;
     const aunteater::FamilyHelp<AnchorElement> mAnchorables;
-    gameInputState mInputState;
+    GameInputState mInputState;
 
 };
 

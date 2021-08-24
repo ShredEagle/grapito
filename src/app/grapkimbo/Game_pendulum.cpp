@@ -61,7 +61,7 @@ Game_pendulum::Game_pendulum(aunteater::Engine & aEngine, Application & aApplica
 }
 
 
-bool Game_pendulum::update(const aunteater::Timer & aTimer, gameInputState & aInputState)
+bool Game_pendulum::update(const aunteater::Timer & aTimer, GameInputState & aInputState)
 {
     aunteater::UpdateTiming timings;
     mControlSystem->loadInputState(aInputState);

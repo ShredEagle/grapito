@@ -1,27 +1,55 @@
 #pragma once
 
 #include <array>
+#include <variant>
+
+#include <vector>
+
 
 namespace ad {
 
-enum COMMAND {
-    UP, DOWN, LEFT, RIGHT, A, B,
+
+enum Command {
+    Up, 
+    Down,
+    Left, 
+    Right, 
+    A,
+    B,
 };
+
+
+enum GamepadNature
+{
+    Button,
+    Axis,
+};
+
 
 struct Input
 {
-    COMMAND command;
-    int GLKeyCode;
-    int GLGamePadCode;
+    Command command;
+    int glKeyCode;
+    int glGamePadCode;
+    GamepadNature gamepadNature;
+
+    constexpr bool isButton()
+    {
+        return gamepadNature == Button;
+    }
 };
+
 
 struct InputState
 {
-    COMMAND command;
-    int state;
+    Command command;
+    GamepadNature nature;
+    std::variant<int, float> state;
 };
 
-typedef std::array<Input, 6> gameInputConfig;
-typedef std::array<InputState, 6> gameInputState;
 
-}
+typedef std::vector<Input> GameInputConfig;
+typedef std::array<InputState, 6> GameInputState;
+
+
+} // namespace ad
