@@ -7,7 +7,7 @@ namespace ad {
 
 struct Weight : public aunteater::Component<Weight>
 {
-    explicit Weight(float aMass = 1) :
+    explicit Weight(double aMass = 1) :
         mass{aMass}
     {}
 

@@ -23,6 +23,7 @@ set(${TARGET_NAME}_HEADERS
 set(${TARGET_NAME}_SOURCES
     Game.cpp
     Game_pendulum.cpp
+    Input.cpp
 
     Systems/Control.cpp
     Systems/EnvironmentCollision.cpp

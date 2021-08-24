@@ -34,7 +34,7 @@ Game::Game(aunteater::Engine & aEngine, Application & aApplication) :
    aEngine.addEntity(
            aunteater::Entity()
             .add<Position>(math::Position<2, double>{200., 800.})
-            .add<Controllable>()
+            .add<Controllable>(Controller::Keyboard)
             .add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {20., 20.}})
             .add<ForceAndSpeed>()
             .add<Weight>(1.f)
