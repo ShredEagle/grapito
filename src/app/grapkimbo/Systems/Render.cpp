@@ -20,14 +20,14 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
     mTrivialLineStrip.clearLines();
     mApplication.getEngine()->clear();
 
-    for(const auto [geometry] : mRenderables)
+    for(const auto [geometry, visualRectangle] : mRenderables)
     {
         mTrivialShaping.addRectangle({
             {
                 static_cast<math::Position<2, int>>(geometry.position * gPixelsPerMeter),
                 static_cast<math::Size<2, int>>(geometry.dimension * gPixelsPerMeter)  
             },
-            Color{255, 255, 255}
+            visualRectangle.color
         });
     }
 

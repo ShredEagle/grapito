@@ -3,6 +3,7 @@
 #include "PendulumSimulation.h" // for pendulum archetype
 
 #include <Components/Position.h>
+#include <Components/VisualRectangle.h>
 #ifdef KIMBO_DEBUG
 #include <Components/EnvironmentCollisionBox.h>
 #endif
@@ -17,7 +18,7 @@
 
 namespace ad {
 
-typedef aunteater::Archetype<Position> Rendered;
+typedef aunteater::Archetype<Position, VisualRectangle> Rendered;
 #ifdef KIMBO_DEBUG
 typedef aunteater::Archetype<EnvironmentCollisionBox> Collider;
 #endif

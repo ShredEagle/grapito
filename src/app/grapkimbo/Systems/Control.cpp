@@ -2,7 +2,10 @@
 
 #include "Gravity.h"
 
+#include <Components/VisualRectangle.h>
+
 #include <GLFW/glfw3.h>
+
 
 namespace ad {
 
@@ -67,6 +70,7 @@ void Control::update(const aunteater::Timer aTimer, const GameInputState & aInpu
             mEntityManager.addEntity(
                aunteater::Entity()
                 .add<Position>(geometry)
+                .add<VisualRectangle>(entity->get<VisualRectangle>())
                 .add<Pendular>(Pendular{anchorPoint, angle, length, angularSpeed})
                 .add<Controllable>(controllable)
                 .add<Weight>(weight.mass)
@@ -104,6 +108,7 @@ void Control::update(const aunteater::Timer aTimer, const GameInputState & aInpu
             mEntityManager.addEntity(
                aunteater::Entity()
                 .add<Position>(geometry)
+                .add<VisualRectangle>(entity->get<VisualRectangle>())
                 .add<Controllable>(controllable)
                 .add<Weight>(weight.mass)
                 .add<ForceAndSpeed>(math::Vec<2>{

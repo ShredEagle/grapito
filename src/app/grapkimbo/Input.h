@@ -79,6 +79,9 @@ enum class Controller
 {
     Keyboard,
     Gamepad_0,
+    Gamepad_1,
+    Gamepad_2,
+    Gamepad_3,
 
     // Always leave that as last element, until we have reflection for enums
     End,

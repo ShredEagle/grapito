@@ -5,6 +5,7 @@
 #include <Components/ForceAndSpeed.h>
 #include <Components/Pendular.h>
 #include <Components/Position.h>
+#include <Components/VisualRectangle.h>
 #include <Components/Weight.h>
 
 #include <Systems/Control.h>
@@ -21,6 +22,8 @@ namespace ad {
 namespace grapkimbo {
 
 
+static constexpr Color gAnchorColor{200, 200, 200};
+
 Game_pendulum::Game_pendulum(Application & aApplication)
 {
     mSystemManager.add<Render>(aApplication); 
@@ -34,32 +37,47 @@ Game_pendulum::Game_pendulum(Application & aApplication)
         aunteater::Entity()
             .add<Position>(math::Position<2, double>{4., 6.}, math::Size<2, double>{2., 2.} )
             .add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {2., 2.}})
+            .add<VisualRectangle>(gAnchorColor)
         );
 
     mEntityManager.addEntity(
         aunteater::Entity()
             .add<Position>(math::Position<2, double>{12., 5.}, math::Size<2, double>{2., 2.} )
             .add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {2., 2.}})
+            .add<VisualRectangle>(gAnchorColor)
         );
 
     mEntityManager.addEntity(
         aunteater::Entity()
             .add<Position>(math::Position<2, double>{24., 9.}, math::Size<2, double>{2., 2.} )
             .add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {2., 2.}})
+            .add<VisualRectangle>(gAnchorColor)
         );
 
-    // Player
+    // Player 1
     mEntityManager.addEntity(
         aunteater::Entity()
             .add<Position>(math::Position<2, double>{0., 0.}, math::Size<2, double>{0.8, 1.9}) // The position will be set by pendulum simulation
-            //.add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {30., 30.}})
-            .add<Pendular>(Pendular{ {5., 6.}, math::Radian<double>{3.14/3.}, 3. })
+            .add<VisualRectangle>(math::sdr::gCyan)
+            .add<Pendular>(Pendular{ {5., 6.}, math::Radian<double>{math::pi<double>/3.}, 3. })
             .add<Controllable>(isGamepadPresent(Controller::Gamepad_0) ?
                                Controller::Gamepad_0 : Controller::Keyboard)
             .add<Weight>(80.)
         );
-}
 
+    // Player 2
+    if (isGamepadPresent(Controller::Gamepad_1))
+    {
+        mEntityManager.addEntity(
+            aunteater::Entity()
+                .add<Position>(math::Position<2, double>{0., 0.}, math::Size<2, double>{0.8, 1.9}) // The position will be set by pendulum simulation
+                .add<VisualRectangle>(math::sdr::gMagenta)
+                .add<Pendular>(Pendular{ {25., 9.}, math::Radian<double>{-math::pi<double>/3.}, 3. })
+                .add<Controllable>(Controller::Gamepad_1)
+                .add<Weight>(80.)
+            );
+    }
+}
 
 bool Game_pendulum::update(const aunteater::Timer & aTimer, const GameInputState & aInputState)
 {
