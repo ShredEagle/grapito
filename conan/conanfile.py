@@ -24,7 +24,7 @@ class GrapitoConan(ConanFile):
     requires = (
         ("glad/0.1.34"),
 
-        ("aunteater/ad037e347a@adnn/develop"),
+        ("aunteater/b5222bbdfb@adnn/develop"),
         ("graphics/5b8faf542f@adnn/develop"),
         ("math/77d9136abf@adnn/develop"),
         ("websocket/717708d463@adnn/develop"),
