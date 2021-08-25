@@ -40,7 +40,7 @@ Game_pendulum::Game_pendulum(Application & aApplication)
             .add<VisualRectangle>(gAnchorColor)
         );
 
-    mEntityManager.addEntity(
+    aunteater::weak_entity anchor_2 = mEntityManager.addEntity(
         aunteater::Entity()
             .add<Position>(math::Position<2, double>{12., 5.}, math::Size<2, double>{2., 2.} )
             .add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {2., 2.}})
@@ -55,7 +55,7 @@ Game_pendulum::Game_pendulum(Application & aApplication)
         );
 
     // Player 1
-    mEntityManager.addEntity(
+    aunteater::weak_entity player_1 = mEntityManager.addEntity(
         aunteater::Entity()
             .add<Position>(math::Position<2, double>{0., 0.}, math::Size<2, double>{0.8, 1.9}) // The position will be set by pendulum simulation
             .add<VisualRectangle>(math::sdr::gCyan)
@@ -64,6 +64,13 @@ Game_pendulum::Game_pendulum(Application & aApplication)
                                Controller::Gamepad_0 : Controller::Keyboard)
             .add<Weight>(80.)
         );
+
+    // Player 1 sight
+    mEntityManager.addEntity(
+        aunteater::Entity()
+            .add<Position>(anchor_2->get<Position>())
+            .add<VisualOutline>(player_1->get<VisualRectangle>().color, 0.3)
+    );
 
     // Player 2
     if (isGamepadPresent(Controller::Gamepad_1))

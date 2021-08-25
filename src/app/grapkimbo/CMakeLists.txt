@@ -5,16 +5,19 @@ set(${TARGET_NAME}_HEADERS
     Game_pendulum.h
     Input.h
 
-    Components/Position.h
+    Components/AnchorSelector.h
     Components/Controllable.h
     Components/Environment.h
     Components/EnvironmentCollisionBox.h
     Components/ForceAndSpeed.h
     Components/Pendular.h
+    Components/Position.h
+    Components/VisualOutline.h
     Components/VisualRectangle.h
     Components/Weight.h
 
     Systems/Control.h
+    Systems/ControlAnchorSight.h
     Systems/EnvironmentCollision.h
     Systems/Gravity.h
     Systems/PendulumSimulation.h
@@ -28,6 +31,7 @@ set(${TARGET_NAME}_SOURCES
     Input.cpp
 
     Systems/Control.cpp
+    Systems/ControlAnchorSight.cpp
     Systems/EnvironmentCollision.cpp
     Systems/Gravity.cpp
     Systems/PendulumSimulation.cpp
