@@ -19,7 +19,6 @@ int main(int argc, const char * argv[])
 
         Application application("grapkimbo", 1600, 900,
                                 Application::Window_Keep_Ratio);
-        aunteater::Engine gameEngine;
         aunteater::Timer timer{glfwGetTime()};
 
         glfwSetInputMode(application.getWindow(), GLFW_STICKY_KEYS, GLFW_TRUE);
@@ -28,7 +27,7 @@ int main(int argc, const char * argv[])
         // "Game" selection
         // 
         //grapkimbo::Game game{gameEngine, application};
-        grapkimbo::Game_pendulum game{gameEngine, application};
+        grapkimbo::Game_pendulum game{application};
 
         while(application.handleEvents())
         {

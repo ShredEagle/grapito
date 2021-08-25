@@ -88,7 +88,10 @@ void GameInputState::readAll(Application & aApplication)
 }
 
 
-float GameInputState::asAxis(Controller aController, Command aNegativeButton, Command aPositiveButton, Command aGamepadAxis)
+float GameInputState::asAxis(Controller aController,
+                             Command aNegativeButton,
+                             Command aPositiveButton,
+                             Command aGamepadAxis) const
 {
     ControllerInputState input = controllerState[static_cast<std::size_t>(aController)];
     float axis = input[aGamepadAxis];

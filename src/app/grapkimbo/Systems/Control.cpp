@@ -7,11 +7,11 @@
 namespace ad {
 
 
-Control::Control(aunteater::Engine & aEngine) :
-    mEngine{aEngine},
-    mCartesianControllables{mEngine},
-    mPolarControllables{mEngine},
-    mAnchorables{mEngine}
+Control::Control(aunteater::EntityManager & aEntityManager) :
+    mEntityManager{aEntityManager},
+    mCartesianControllables{mEntityManager},
+    mPolarControllables{mEntityManager},
+    mAnchorables{mEntityManager}
 {}
 
 
@@ -42,14 +42,14 @@ math::Radian<double> angleBetween(T_vecLeft a, T_vecRight b)
 }
 
 
-void Control::update(const aunteater::Timer aTimer)
+void Control::update(const aunteater::Timer aTimer, const GameInputState & aInputState)
 {
     for(auto entity :  mCartesianControllables)
     {
         auto & [controllable, geometry, fas, weight] = entity;
-        ControllerInputState inputs = mInputState.controllerState[(std::size_t)controllable.controller];
+        ControllerInputState inputs = aInputState.controllerState[(std::size_t)controllable.controller];
 
-        float horizontalAxis = mInputState.asAxis(controllable.controller, Left, Right, LeftHorizontalAxis);
+        float horizontalAxis = aInputState.asAxis(controllable.controller, Left, Right, LeftHorizontalAxis);
         fas.forces.emplace_back(horizontalAxis * gAirControlAcceleration * weight.mass, 0.);
 
         if (inputs[A])
@@ -63,8 +63,8 @@ void Control::update(const aunteater::Timer aTimer)
             math::Vec<2, double> tangent{grappleLine.y(), - grappleLine.x()};
             math::Radian<double> angularSpeed{ cos(angleBetween(fas.speeds.at(0), tangent)) * fas.speeds.at(0).getNorm() / length };
 
-            mEngine.markToRemove(entity);
-            mEngine.addEntity(
+            mEntityManager.markToRemove(entity);
+            mEntityManager.addEntity(
                aunteater::Entity()
                 .add<Position>(geometry)
                 .add<Pendular>(Pendular{anchorPoint, angle, length, angularSpeed})
@@ -88,9 +88,9 @@ void Control::update(const aunteater::Timer aTimer)
         auto & [controllable, geometry, pendular, weight] = entity;
         pendular.angularAccelerationControl = math::Radian<double>{0.};
 
-        ControllerInputState inputs = mInputState.controllerState[(std::size_t)controllable.controller];
+        ControllerInputState inputs = aInputState.controllerState[(std::size_t)controllable.controller];
 
-        float horizontalAxis = mInputState.asAxis(controllable.controller, Left, Right, LeftHorizontalAxis);
+        float horizontalAxis = aInputState.asAxis(controllable.controller, Left, Right, LeftHorizontalAxis);
         pendular.angularAccelerationControl = 
             math::Radian<double>{horizontalAxis * Gravity::gAcceleration / pendular.length 
                                  * gPendularControlAccelerationFactor};
@@ -100,8 +100,8 @@ void Control::update(const aunteater::Timer aTimer)
             // TODO if we edit the components on the live entity, everything crashes because the 
             // family are instantly edited to reflect the changes (invalidating iterators)
             // this shoud be reworked!
-            mEngine.markToRemove(entity);
-            mEngine.addEntity(
+            mEntityManager.markToRemove(entity);
+            mEntityManager.addEntity(
                aunteater::Entity()
                 .add<Position>(geometry)
                 .add<Controllable>(controllable)
@@ -113,11 +113,6 @@ void Control::update(const aunteater::Timer aTimer)
             );
         }
     }
-}
-
-void Control::loadInputState(const GameInputState & aInputState)
-{
-    mInputState = aInputState;
 }
 
 } // namespace ad

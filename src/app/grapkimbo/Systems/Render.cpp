@@ -2,19 +2,19 @@
 
 namespace ad {
 
-Render::Render(aunteater::Engine & aEngine, Application & aApplication) :
-    mEngine(aEngine),
-    mRenderables(mEngine),
-    mPendulums(mEngine),
+Render::Render(aunteater::EntityManager & aEntityManager, Application & aApplication) :
+    mEntityManager{aEntityManager},
+    mRenderables{mEntityManager},
+    mPendulums{mEntityManager},
     mApplication(aApplication),
 #ifdef KIMBO_DEBUG
-    mColliders(mEngine),
+    mColliders{mEntityManager},
 #endif
     mTrivialShaping{aApplication.getEngine()->getWindowSize()},
     mTrivialLineStrip{aApplication.getEngine()->getWindowSize()}
 {}
 
-void Render::update(const aunteater::Timer aTimer)
+void Render::update(const aunteater::Timer aTimer, const GameInputState &)
 {
     mTrivialShaping.clearShapes();
     mTrivialLineStrip.clearLines();

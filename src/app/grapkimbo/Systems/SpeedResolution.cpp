@@ -4,12 +4,12 @@
 
 namespace ad {
 
-SpeedResolution::SpeedResolution(aunteater::Engine & aEngine) :
-    mEngine(aEngine),
-    mMovables(mEngine)
+SpeedResolution::SpeedResolution(aunteater::EntityManager & aEntityManager) :
+    mEntityManager{aEntityManager},
+    mMovables{mEntityManager}
 {}
 
-void SpeedResolution::update(const aunteater::Timer aTimer)
+void SpeedResolution::update(const aunteater::Timer aTimer, const GameInputState &)
 {
     for(auto movable : mMovables)
     {

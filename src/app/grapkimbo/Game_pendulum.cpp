@@ -21,36 +21,35 @@ namespace ad {
 namespace grapkimbo {
 
 
-Game_pendulum::Game_pendulum(aunteater::Engine & aEngine, Application & aApplication) :
-    mEntityEngine(aEngine)
+Game_pendulum::Game_pendulum(Application & aApplication)
 {
-    mEntityEngine.addSystem<Render>(aApplication); 
-    mControlSystem = mEntityEngine.addSystem<Control>();
-    mEntityEngine.addSystem<PendulumSimulation>();
-    mEntityEngine.addSystem<Gravity>();
-    mEntityEngine.addSystem<SpeedResolution>();
+    mSystemManager.add<Render>(aApplication); 
+    mSystemManager.add<Control>();
+    mSystemManager.add<PendulumSimulation>();
+    mSystemManager.add<Gravity>();
+    mSystemManager.add<SpeedResolution>();
 
     // Environment anchors
-    aEngine.addEntity(
+    mEntityManager.addEntity(
         aunteater::Entity()
             .add<Position>(math::Position<2, double>{4., 6.}, math::Size<2, double>{2., 2.} )
             .add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {2., 2.}})
         );
 
-    aEngine.addEntity(
+    mEntityManager.addEntity(
         aunteater::Entity()
             .add<Position>(math::Position<2, double>{12., 5.}, math::Size<2, double>{2., 2.} )
             .add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {2., 2.}})
         );
 
-    aEngine.addEntity(
+    mEntityManager.addEntity(
         aunteater::Entity()
             .add<Position>(math::Position<2, double>{24., 9.}, math::Size<2, double>{2., 2.} )
             .add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {2., 2.}})
         );
 
     // Player
-    aEngine.addEntity(
+    mEntityManager.addEntity(
         aunteater::Entity()
             .add<Position>(math::Position<2, double>{0., 0.}, math::Size<2, double>{0.8, 1.9}) // The position will be set by pendulum simulation
             //.add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {30., 30.}})
@@ -61,13 +60,12 @@ Game_pendulum::Game_pendulum(aunteater::Engine & aEngine, Application & aApplica
 }
 
 
-bool Game_pendulum::update(const aunteater::Timer & aTimer, GameInputState & aInputState)
+bool Game_pendulum::update(const aunteater::Timer & aTimer, const GameInputState & aInputState)
 {
-    aunteater::UpdateTiming timings;
-    mControlSystem->loadInputState(aInputState);
-    mEntityEngine.update(aTimer, timings);
+    aunteater::UpdateTiming<GameInputState> timings;
+    mSystemManager.update(aTimer, aInputState, timings);
 
-    return ! mEntityEngine.isPaused();
+    return ! mSystemManager.isPaused();
 }
 
 } // namespace grapkimbo

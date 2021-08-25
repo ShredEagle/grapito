@@ -22,18 +22,18 @@ typedef aunteater::Archetype<Position> Rendered;
 typedef aunteater::Archetype<EnvironmentCollisionBox> Collider;
 #endif
 
-class Render : public aunteater::System
+class Render : public aunteater::System<GameInputState>
 {
 
 public:
-    Render(aunteater::Engine & aEngine, Application & aApplication);
+    Render(aunteater::EntityManager & aEntityManager, Application & aApplication);
 
-    void update(const aunteater::Timer aTimer) override;
+    void update(const aunteater::Timer aTimer, const GameInputState &) override;
 
     static constexpr int gPixelsPerMeter = 40;
 
 private:
-    aunteater::Engine & mEngine;
+    aunteater::EntityManager & mEntityManager;
     const aunteater::FamilyHelp<Rendered> mRenderables;
     const aunteater::FamilyHelp<Pendulum> mPendulums;
     Application & mApplication;

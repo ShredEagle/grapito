@@ -22,16 +22,15 @@
 namespace ad {
 namespace grapkimbo {
 
-Game::Game(aunteater::Engine & aEngine, Application & aApplication) :
-    mEntityEngine(aEngine)
+Game::Game(Application & aApplication)
 {
-   mEntityEngine.addSystem<Render>(aApplication); 
-   mControlSystem = mEntityEngine.addSystem<Control>();
-   mEntityEngine.addSystem<EnvironmentCollision>();
-   mEntityEngine.addSystem<Gravity>();
-   mEntityEngine.addSystem<SpeedResolution>();
+   mSystemManager.add<Render>(aApplication); 
+   mSystemManager.add<Control>();
+   mSystemManager.add<EnvironmentCollision>();
+   mSystemManager.add<Gravity>();
+   mSystemManager.add<SpeedResolution>();
 
-   aEngine.addEntity(
+   mEntityManager.addEntity(
            aunteater::Entity()
             .add<Position>(math::Position<2, double>{200., 800.})
             .add<Controllable>(Controller::Keyboard)
@@ -40,7 +39,7 @@ Game::Game(aunteater::Engine & aEngine, Application & aApplication) :
             .add<Weight>(1.f)
            );
 
-   aEngine.addEntity(
+   mEntityManager.addEntity(
            aunteater::Entity()
             .add<Position>(math::Position<2, double>{0., 0.})
             .add<Environment>()
@@ -48,13 +47,12 @@ Game::Game(aunteater::Engine & aEngine, Application & aApplication) :
            );
 }
 
-bool Game::update(const aunteater::Timer & aTimer, GameInputState & aInputState)
+bool Game::update(const aunteater::Timer & aTimer, const GameInputState & aInputState)
 {
-    aunteater::UpdateTiming timings;
-    mControlSystem->loadInputState(aInputState);
-    mEntityEngine.update(aTimer, timings);
+    aunteater::UpdateTiming<GameInputState> timings;
+    mSystemManager.update(aTimer, aInputState, timings);
 
-    return ! mEntityEngine.isPaused();
+    return ! mSystemManager.isPaused();
 }
 
 } // namespace grapkimbo

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../Input.h"
+
 #include <aunteater/FamilyHelp.h>
 #include <aunteater/System.h>
 
@@ -13,12 +15,12 @@ namespace ad {
 using Pendulum = aunteater::Archetype<Pendular, Position>;
 
 
-class PendulumSimulation : public aunteater::System
+class PendulumSimulation : public aunteater::System<GameInputState>
 {
 public:
-    PendulumSimulation(aunteater::Engine &aEngine);
+    PendulumSimulation(aunteater::EntityManager & aEntityManager);
 
-    void update(const aunteater::Timer aTimer) override;
+    void update(const aunteater::Timer aTimer, const GameInputState &) override;
 
 private:
     const aunteater::FamilyHelp<Pendulum> mPendulums;

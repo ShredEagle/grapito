@@ -14,16 +14,16 @@ namespace ad {
 
 typedef aunteater::Archetype<Position, ForceAndSpeed, Weight> Movable;
 
-class SpeedResolution : public aunteater::System
+class SpeedResolution : public aunteater::System<GameInputState>
 {
 
 public:
-    SpeedResolution(aunteater::Engine & aEngine);
+    SpeedResolution(aunteater::EntityManager & aEntityManager);
 
-    void update(const aunteater::Timer aTimer) override;
+    void update(const aunteater::Timer aTimer, const GameInputState &) override;
 
 private:
-    aunteater::Engine & mEngine;
+    aunteater::EntityManager & mEntityManager;
     const aunteater::FamilyHelp<Movable> mMovables;
 
 };

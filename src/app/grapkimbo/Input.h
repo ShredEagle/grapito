@@ -88,7 +88,7 @@ enum class Controller
 struct GameInputState
 {
     void readAll(Application & aApplication);
-    float asAxis(Controller aController, Command aNegativeButton, Command aPositiveButton, Command aGamepadAxis);
+    float asAxis(Controller aController, Command aNegativeButton, Command aPositiveButton, Command aGamepadAxis) const;
 
     std::array<ControllerInputState, static_cast<std::size_t>(Controller::End)> controllerState;
 };
