@@ -52,7 +52,7 @@ void Control::update(const aunteater::Timer aTimer, const GameInputState & aInpu
         float horizontalAxis = aInputState.asAxis(controllable.controller, Left, Right, LeftHorizontalAxis);
         fas.forces.emplace_back(horizontalAxis * gAirControlAcceleration * weight.mass, 0.);
 
-        if (inputs[A])
+        if (inputs[Grapple])
         {
             math::Position<2, double> grappleOrigin = geometry.position + (geometry.dimension / 2).as<math::Vec>();
             auto [anchorPoint, length] = this->anchor(grappleOrigin);
@@ -73,7 +73,7 @@ void Control::update(const aunteater::Timer aTimer, const GameInputState & aInpu
             );
             break;
         }
-        if (inputs[B])
+        if (inputs[Jump])
         {
             fas.forces.emplace_back(0., + gAirControlAcceleration * weight.mass);
             break;
@@ -95,7 +95,7 @@ void Control::update(const aunteater::Timer aTimer, const GameInputState & aInpu
             math::Radian<double>{horizontalAxis * Gravity::gAcceleration / pendular.length 
                                  * gPendularControlAccelerationFactor};
 
-        if (inputs[B])
+        if (inputs[Jump])
         {
             // TODO if we edit the components on the live entity, everything crashes because the 
             // family are instantly edited to reflect the changes (invalidating iterators)

@@ -17,8 +17,8 @@ enum Command {
     Down,
     Left, 
     Right, 
-    A,
-    B,
+    Jump,
+    Grapple,
     LeftHorizontalAxis,
     LeftVerticalAxis,
     RightHorizontalAxis,
@@ -83,6 +83,9 @@ enum class Controller
     // Always leave that as last element, until we have reflection for enums
     End,
 };
+
+
+bool isGamepadPresent(Controller aController);
 
 
 struct GameInputState

@@ -2,18 +2,20 @@
 
 #include <GLFW/glfw3.h>
 
+#include <cassert>
+
 
 namespace ad 
 {
 
 
 const KeyboardInputConfig gKeyboardConfig = {
-    KeyboardInputMapping{Up, GLFW_KEY_UP},
-    KeyboardInputMapping{Down, GLFW_KEY_DOWN},
-    KeyboardInputMapping{Left, GLFW_KEY_LEFT},
-    KeyboardInputMapping{Right, GLFW_KEY_RIGHT},
-    KeyboardInputMapping{A, GLFW_KEY_X},
-    KeyboardInputMapping{B, GLFW_KEY_SPACE},
+    KeyboardInputMapping{Up,      GLFW_KEY_UP},
+    KeyboardInputMapping{Down,    GLFW_KEY_DOWN},
+    KeyboardInputMapping{Left,    GLFW_KEY_LEFT},
+    KeyboardInputMapping{Right,   GLFW_KEY_RIGHT},
+    KeyboardInputMapping{Jump,    GLFW_KEY_SPACE},
+    KeyboardInputMapping{Grapple, GLFW_KEY_X},
 };
 
 
@@ -22,8 +24,8 @@ const GamepadInputConfig gGamepadConfig = {
     GamepadInputMapping{Down, GLFW_GAMEPAD_BUTTON_DPAD_DOWN, Button},
     GamepadInputMapping{Left, GLFW_GAMEPAD_BUTTON_DPAD_LEFT, Button},
     GamepadInputMapping{Right, GLFW_GAMEPAD_BUTTON_DPAD_RIGHT, Button},
-    GamepadInputMapping{A, GLFW_GAMEPAD_BUTTON_A, Button},
-    GamepadInputMapping{B, GLFW_GAMEPAD_BUTTON_B, Button},
+    GamepadInputMapping{Jump, GLFW_GAMEPAD_BUTTON_A, Button},
+    GamepadInputMapping{Grapple, GLFW_GAMEPAD_BUTTON_B, Button},
     GamepadInputMapping{LeftHorizontalAxis, GLFW_GAMEPAD_AXIS_LEFT_X, Axis},
     GamepadInputMapping{LeftVerticalAxis,   GLFW_GAMEPAD_AXIS_LEFT_Y, Axis},
 };
@@ -70,6 +72,11 @@ int toGlfwJoystickId(Controller aController)
     return static_cast<int>(aController) - static_cast<int>(Controller::Gamepad_0);
 }
 
+bool isGamepadPresent(Controller aController)
+{
+    assert(aController >= Controller::Gamepad_0);
+    return glfwJoystickIsGamepad(toGlfwJoystickId(aController));
+}
 
 void GameInputState::readAll(Application & aApplication)
 {
@@ -94,7 +101,7 @@ float GameInputState::asAxis(Controller aController,
                              Command aGamepadAxis) const
 {
     ControllerInputState input = controllerState[static_cast<std::size_t>(aController)];
-    float axis = input[aGamepadAxis];
+    float axis = 0.;
     if (aController == Controller::Keyboard)
     {
         if (input[aNegativeButton])
@@ -105,6 +112,10 @@ float GameInputState::asAxis(Controller aController,
         {
             axis += 1.f;
         }
+    }
+    else
+    {
+        axis = input[aGamepadAxis];
     }
     return axis;
 }

@@ -54,7 +54,8 @@ Game_pendulum::Game_pendulum(Application & aApplication)
             .add<Position>(math::Position<2, double>{0., 0.}, math::Size<2, double>{0.8, 1.9}) // The position will be set by pendulum simulation
             //.add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {30., 30.}})
             .add<Pendular>(Pendular{ {5., 6.}, math::Radian<double>{3.14/3.}, 3. })
-            .add<Controllable>(Controller::Gamepad_0)
+            .add<Controllable>(isGamepadPresent(Controller::Gamepad_0) ?
+                               Controller::Gamepad_0 : Controller::Keyboard)
             .add<Weight>(80.)
         );
 }
