@@ -2,16 +2,19 @@
 
 #include "Gravity.h"
 
+#include <Components/VisualRectangle.h>
+
 #include <GLFW/glfw3.h>
+
 
 namespace ad {
 
 
-Control::Control(aunteater::Engine & aEngine) :
-    mEngine{aEngine},
-    mCartesianControllables{mEngine},
-    mPolarControllables{mEngine},
-    mAnchorables{mEngine}
+Control::Control(aunteater::EntityManager & aEntityManager) :
+    mEntityManager{aEntityManager},
+    mCartesianControllables{mEntityManager},
+    mPolarControllables{mEntityManager},
+    mAnchorables{mEntityManager}
 {}
 
 
@@ -42,135 +45,79 @@ math::Radian<double> angleBetween(T_vecLeft a, T_vecRight b)
 }
 
 
-void Control::update(const aunteater::Timer aTimer)
+void Control::update(const aunteater::Timer aTimer, const GameInputState & aInputState)
 {
-    for(auto controllable : mCartesianControllables)
+    for(auto entity :  mCartesianControllables)
     {
-        ForceAndSpeed & fas = controllable->get<ForceAndSpeed>();
-        const Weight weight = controllable->get<Weight>();
-        const Position & geometry = controllable->get<Position>();
+        auto & [controllable, geometry, fas, weight] = entity;
+        ControllerInputState inputs = aInputState.controllerState[(std::size_t)controllable.controller];
 
-        for (auto input : mInputState)
+        float horizontalAxis = aInputState.asAxis(controllable.controller, Left, Right, LeftHorizontalAxis);
+        fas.forces.emplace_back(horizontalAxis * gAirControlAcceleration * weight.mass, 0.);
+
+        if (inputs[Grapple])
         {
-            if (input.state == 1)
-            {
-                switch (input.command)
-                {
-                    case COMMAND::UP:
-                    {
-                        break;
-                    }
-                    case COMMAND::DOWN:
-                    {
-                        break;
-                    }
-                    case COMMAND::LEFT:
-                    {
-                        fas.forces.emplace_back(- gAirControlAcceleration * weight.mass, 0.);
-                        //fas.speeds[0].x() = std::max(10., fas.speeds[0].x());
-                        break;
-                    }
-                    case COMMAND::RIGHT:
-                    {
-                        fas.forces.emplace_back(+ gAirControlAcceleration * weight.mass, 0.);
-                        //fas.speeds[0].x() = std::min(-10., fas.speeds[0].x());
-                        break;
-                    }
-                    case COMMAND::A:
-                    {
-                        math::Position<2, double> grappleOrigin = geometry.position + (geometry.dimension / 2).as<math::Vec>();
-                        auto [anchorPoint, length] = this->anchor(grappleOrigin);
-                        math::Vec<2, double> grappleLine = anchorPoint - grappleOrigin;
-                        // grapple line goes from origin to anchor, we need the angle with -Y
-                        math::Radian<double> angle{std::atan2(-grappleLine.x(), grappleLine.y())};
+            math::Position<2, double> grappleOrigin = geometry.position + (geometry.dimension / 2).as<math::Vec>();
+            auto [anchorPoint, length] = this->anchor(grappleOrigin);
+            math::Vec<2, double> grappleLine = anchorPoint - grappleOrigin;
+            // grapple line goes from origin to anchor, we need the angle with -Y
+            math::Radian<double> angle{std::atan2(-grappleLine.x(), grappleLine.y())};
 
-                        math::Vec<2, double> tangent{grappleLine.y(), - grappleLine.x()};
-                        math::Radian<double> angularSpeed{ cos(angleBetween(fas.speeds.at(0), tangent)) * fas.speeds.at(0).getNorm() / length };
+            math::Vec<2, double> tangent{grappleLine.y(), - grappleLine.x()};
+            math::Radian<double> angularSpeed{ cos(angleBetween(fas.speeds.at(0), tangent)) * fas.speeds.at(0).getNorm() / length };
 
-                        mEngine.markToRemove(controllable);
-                        mEngine.addEntity(
-                           aunteater::Entity()
-                            .add<Position>(geometry)
-                            .add<Pendular>(Pendular{anchorPoint, angle, length, angularSpeed})
-                            .add<Controllable>()
-                            .add<Weight>(weight.mass)
-                        );
-                        break;
-                    }
-                    case COMMAND::B:
-                    {
-                        fas.forces.emplace_back(0., + gAirControlAcceleration * weight.mass);
-                        break;
-                    }
-                }
-            }
+            mEntityManager.markToRemove(entity);
+            mEntityManager.addEntity(
+               aunteater::Entity()
+                .add<Position>(geometry)
+                .add<VisualRectangle>(entity->get<VisualRectangle>())
+                .add<Pendular>(Pendular{anchorPoint, angle, length, angularSpeed})
+                .add<Controllable>(controllable)
+                .add<Weight>(weight.mass)
+            );
+            break;
+        }
+        if (inputs[Jump])
+        {
+            fas.forces.emplace_back(0., + gAirControlAcceleration * weight.mass);
+            break;
         }
     }
 
+    //
+    // Polar
+    //
     for(auto & entity : mPolarControllables)
     {
-        auto & [_discard, geometry, pendular, weight] = entity;
-
+        auto & [controllable, geometry, pendular, weight] = entity;
         pendular.angularAccelerationControl = math::Radian<double>{0.};
-        for (auto input : mInputState)
+
+        ControllerInputState inputs = aInputState.controllerState[(std::size_t)controllable.controller];
+
+        float horizontalAxis = aInputState.asAxis(controllable.controller, Left, Right, LeftHorizontalAxis);
+        pendular.angularAccelerationControl = 
+            math::Radian<double>{horizontalAxis * Gravity::gAcceleration / pendular.length 
+                                 * gPendularControlAccelerationFactor};
+
+        if (inputs[Jump])
         {
-            if (input.state == 1)
-            {
-                switch (input.command)
-                {
-                    case COMMAND::UP:
-                    {
-                        break;
-                    }
-                    case COMMAND::DOWN:
-                    {
-                        break;
-                    }
-                    case COMMAND::LEFT:
-                    {
-                        pendular.angularAccelerationControl = 
-                            math::Radian<double>{- Gravity::gAcceleration / pendular.length 
-                                                 * gPendularControlAccelerationFactor};
-                        break;
-                    }
-                    case COMMAND::RIGHT:
-                    {
-                        pendular.angularAccelerationControl =
-                            math::Radian<double>{+ Gravity::gAcceleration / pendular.length 
-                                                 * gPendularControlAccelerationFactor};
-                        break;
-                    }
-                    case COMMAND::A:
-                    {
-                        break;
-                    }
-                    case COMMAND::B:
-                    {
-                        // TODO if we edit the components on the live entity, everything crashes because the 
-                        // family are instantly edited to reflect the changes (invalidating iterators)
-                        // this shoud be reworked!
-                        mEngine.markToRemove(entity);
-                        mEngine.addEntity(
-                           aunteater::Entity()
-                            .add<Position>(geometry)
-                            .add<Controllable>()
-                            .add<Weight>(weight.mass)
-                            .add<ForceAndSpeed>(math::Vec<2>{
-                                cos(pendular.angle) * pendular.length * pendular.angularSpeed.value(),
-                                sin(pendular.angle) * pendular.length * pendular.angularSpeed.value()
-                            })
-                        );
-                        break;
-                    }
-                }
-            }
+            // TODO if we edit the components on the live entity, everything crashes because the 
+            // family are instantly edited to reflect the changes (invalidating iterators)
+            // this shoud be reworked!
+            mEntityManager.markToRemove(entity);
+            mEntityManager.addEntity(
+               aunteater::Entity()
+                .add<Position>(geometry)
+                .add<VisualRectangle>(entity->get<VisualRectangle>())
+                .add<Controllable>(controllable)
+                .add<Weight>(weight.mass)
+                .add<ForceAndSpeed>(math::Vec<2>{
+                    cos(pendular.angle) * pendular.length * pendular.angularSpeed.value(),
+                    sin(pendular.angle) * pendular.length * pendular.angularSpeed.value()
+                })
+            );
         }
     }
-}
-
-void Control::loadInputState(const gameInputState & aInputState)
-{
-    mInputState = aInputState;
 }
 
 } // namespace ad

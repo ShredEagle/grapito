@@ -2,32 +2,32 @@
 
 namespace ad {
 
-Render::Render(aunteater::Engine & aEngine, Application & aApplication) :
-    mEngine(aEngine),
-    mRenderables(mEngine),
-    mPendulums(mEngine),
+Render::Render(aunteater::EntityManager & aEntityManager, Application & aApplication) :
+    mEntityManager{aEntityManager},
+    mRenderables{mEntityManager},
+    mPendulums{mEntityManager},
     mApplication(aApplication),
 #ifdef KIMBO_DEBUG
-    mColliders(mEngine),
+    mColliders{mEntityManager},
 #endif
     mTrivialShaping{aApplication.getEngine()->getWindowSize()},
     mTrivialLineStrip{aApplication.getEngine()->getWindowSize()}
 {}
 
-void Render::update(const aunteater::Timer aTimer)
+void Render::update(const aunteater::Timer aTimer, const GameInputState &)
 {
     mTrivialShaping.clearShapes();
     mTrivialLineStrip.clearLines();
     mApplication.getEngine()->clear();
 
-    for(const auto [geometry] : mRenderables)
+    for(const auto [geometry, visualRectangle] : mRenderables)
     {
         mTrivialShaping.addRectangle({
             {
                 static_cast<math::Position<2, int>>(geometry.position * gPixelsPerMeter),
                 static_cast<math::Size<2, int>>(geometry.dimension * gPixelsPerMeter)  
             },
-            Color{255, 255, 255}
+            visualRectangle.color
         });
     }
 

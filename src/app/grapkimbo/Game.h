@@ -3,8 +3,9 @@
 #include "Input.h"
 #include "Systems/Control.h"
 
-#include <aunteater/Engine.h>
+#include <aunteater/EntityManager.h>
 #include <aunteater/Timer.h>
+#include <aunteater/SystemManager.h>
 
 #include <engine/Application.h>
 
@@ -16,12 +17,12 @@ namespace grapkimbo {
 class Game
 {
 public:
-    Game(aunteater::Engine & aEngine, Application & aApplication);
+    Game(Application & aApplication);
 
-    bool update(const aunteater::Timer & aTimer, gameInputState & aInputState);
+    bool update(const aunteater::Timer & aTimer, const GameInputState & aInputState);
 
 private:
-    aunteater::Engine & mEntityEngine;
-    std::shared_ptr<Control> mControlSystem;
+    aunteater::EntityManager mEntityManager;
+    aunteater::SystemManager<GameInputState> mSystemManager{mEntityManager};
 };
 }} // namespace ad::grapkimbo

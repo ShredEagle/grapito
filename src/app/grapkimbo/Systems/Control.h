@@ -11,6 +11,7 @@
 
 #include <aunteater/Archetype.h>
 #include <aunteater/FamilyHelp.h>
+#include <aunteater/EntityManager.h>
 #include <aunteater/System.h>
 
 #include <utility>
@@ -22,15 +23,13 @@ typedef aunteater::Archetype<Controllable, Position, Pendular, Weight> PolarCont
 // Just use EnvironmentCollisionBox as a tag, because it is not correctly positioned...
 typedef aunteater::Archetype<Position, EnvironmentCollisionBox> AnchorElement;
 
-class Control : public aunteater::System
+class Control : public aunteater::System<GameInputState>
 {
 
 public:
-    Control(aunteater::Engine & aEngine);
+    Control(aunteater::EntityManager & mEntityManager);
 
-    void update(const aunteater::Timer aTimer) override;
-
-    void loadInputState(const gameInputState & aInputState);
+    void update(const aunteater::Timer aTimer, const GameInputState & aInputState) override;
 
     static constexpr double gPendularControlAccelerationFactor = 1./6.;
     static constexpr double gAirControlAcceleration = 12.; // m/s
@@ -38,11 +37,10 @@ public:
 private:
     std::pair<math::Position<2, double>, double> anchor(const math::Position<2, double> aPosition);
 
-    aunteater::Engine & mEngine;
+    aunteater::EntityManager & mEntityManager;
     const aunteater::FamilyHelp<CartesianControlled> mCartesianControllables;
     const aunteater::FamilyHelp<PolarControlled> mPolarControllables;
     const aunteater::FamilyHelp<AnchorElement> mAnchorables;
-    gameInputState mInputState;
 
 };
 

@@ -6,12 +6,12 @@
 namespace ad {
 
 
-PendulumSimulation::PendulumSimulation(aunteater::Engine &aEngine) :
-    mPendulums{aEngine}
+PendulumSimulation::PendulumSimulation(aunteater::EntityManager & aEntityManager) :
+    mPendulums{aEntityManager}
 {}
 
 
-void PendulumSimulation::update(const aunteater::Timer aTimer)
+void PendulumSimulation::update(const aunteater::Timer aTimer, const GameInputState &)
 {
     for(auto & [pendular, geometry] : mPendulums)
     {

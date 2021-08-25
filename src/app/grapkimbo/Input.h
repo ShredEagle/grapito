@@ -1,27 +1,107 @@
 #pragma once
 
+#include <engine/Application.h>
+
 #include <array>
+#include <variant>
+
+#include <map>
+#include <vector>
+
 
 namespace ad {
 
-enum COMMAND {
-    UP, DOWN, LEFT, RIGHT, A, B,
+
+enum Command {
+    Up, 
+    Down,
+    Left, 
+    Right, 
+    Jump,
+    Grapple,
+    LeftHorizontalAxis,
+    LeftVerticalAxis,
+    RightHorizontalAxis,
+    RightVerticalAxis,
+
+    // Always leave that as last element, until we have reflection for enums
+    EndCommand,
 };
 
-struct Input
+
+enum GamepadNature
 {
-    COMMAND command;
-    int GLKeyCode;
-    int GLGamePadCode;
+    Button,
+    Axis,
 };
+
+
+struct KeyboardInputMapping
+{
+    Command command;
+    int glKeyCode;
+};
+
+
+struct GamepadInputMapping
+{
+    Command command;
+    int glGamePadCode;
+    GamepadNature nature;
+};
+
+
+using KeyboardInputConfig = std::vector<KeyboardInputMapping> ;
+using GamepadInputConfig = std::vector<GamepadInputMapping> ;
+
 
 struct InputState
 {
-    COMMAND command;
-    int state;
+    std::variant<int, float> state;
+
+    operator bool() const
+    {
+        return std::get<int>(state) == 1;
+    }
+
+    operator float() const
+    {
+        return std::get<float>(state);
+    }
 };
 
-typedef std::array<Input, 6> gameInputConfig;
-typedef std::array<InputState, 6> gameInputState;
 
-}
+// The index is the command
+using ControllerInputState = std::array<InputState, EndCommand>;
+
+
+enum class Controller
+{
+    Keyboard,
+    Gamepad_0,
+    Gamepad_1,
+    Gamepad_2,
+    Gamepad_3,
+
+    // Always leave that as last element, until we have reflection for enums
+    End,
+};
+
+
+bool isGamepadPresent(Controller aController);
+
+
+struct GameInputState
+{
+    void readAll(Application & aApplication);
+    float asAxis(Controller aController, Command aNegativeButton, Command aPositiveButton, Command aGamepadAxis) const;
+
+    std::array<ControllerInputState, static_cast<std::size_t>(Controller::End)> controllerState;
+};
+
+
+extern const KeyboardInputConfig gKeyboardConfig;
+extern const GamepadInputConfig gGamepadConfig;
+
+
+} // namespace ad

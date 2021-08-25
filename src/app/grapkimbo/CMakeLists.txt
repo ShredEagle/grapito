@@ -11,7 +11,9 @@ set(${TARGET_NAME}_HEADERS
     Components/EnvironmentCollisionBox.h
     Components/ForceAndSpeed.h
     Components/Pendular.h
+    Components/VisualRectangle.h
     Components/Weight.h
+
     Systems/Control.h
     Systems/EnvironmentCollision.h
     Systems/Gravity.h
@@ -23,6 +25,7 @@ set(${TARGET_NAME}_HEADERS
 set(${TARGET_NAME}_SOURCES
     Game.cpp
     Game_pendulum.cpp
+    Input.cpp
 
     Systems/Control.cpp
     Systems/EnvironmentCollision.cpp

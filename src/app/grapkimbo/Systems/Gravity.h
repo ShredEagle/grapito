@@ -13,20 +13,20 @@ namespace ad {
 
 typedef aunteater::Archetype<Weight, ForceAndSpeed> Weightable;
 
-class Gravity : public aunteater::System
+class Gravity : public aunteater::System<GameInputState>
 {
 
 public:
-    Gravity(aunteater::Engine & aEngine);
+    Gravity(aunteater::EntityManager & aEntityManager);
 
-    void update(const aunteater::Timer aTimer) override;
+    void update(const aunteater::Timer aTimer, const GameInputState &) override;
 
-    void loadInputState(const gameInputState & aInputState);
+    void loadInputState(const GameInputState & aInputState);
 
     static constexpr double gAcceleration = 9.8;
 
 private:
-    aunteater::Engine & mEngine;
+    aunteater::EntityManager & mEntityManager;
     const aunteater::FamilyHelp<Weightable> mWeightables;
 
 };

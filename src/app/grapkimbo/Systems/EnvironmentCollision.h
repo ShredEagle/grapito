@@ -14,16 +14,16 @@ namespace ad {
 typedef aunteater::Archetype<Position, EnvironmentCollisionBox, Controllable> EnvironmentCollider;
 typedef aunteater::Archetype<Position, EnvironmentCollisionBox, Environment> EnvironmentTerrain;
 
-class EnvironmentCollision : public aunteater::System
+class EnvironmentCollision : public aunteater::System<GameInputState>
 {
 
 public:
-    EnvironmentCollision(aunteater::Engine & aEngine);
+    EnvironmentCollision(aunteater::EntityManager & aEntityManager);
 
-    void update(const aunteater::Timer aTimer) override;
+    void update(const aunteater::Timer aTimer, const GameInputState &) override;
 
 private:
-    aunteater::Engine & mEngine;
+    aunteater::EntityManager & mEntityManager;
     const aunteater::FamilyHelp<EnvironmentCollider> mColliders;
     const aunteater::FamilyHelp<EnvironmentTerrain> mEnvironments;
 

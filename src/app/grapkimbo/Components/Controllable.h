@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../Input.h"
+
 #include <aunteater/Component.h>
 
 namespace ad {
@@ -7,9 +9,11 @@ namespace ad {
 
 struct Controllable : public aunteater::Component<Controllable>
 {
-    //Should have a controller id
-    explicit Controllable()
+    explicit Controllable(Controller aController) :
+        controller{aController}
     {}
+
+    Controller controller;
 };
 
 

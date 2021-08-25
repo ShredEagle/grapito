@@ -2,14 +2,14 @@
 
 namespace ad {
 
-EnvironmentCollision::EnvironmentCollision(aunteater::Engine & aEngine) :
-    mEngine(aEngine),
-    mColliders(mEngine),
-    mEnvironments(mEngine)
+EnvironmentCollision::EnvironmentCollision(aunteater::EntityManager & aEntityManager) :
+    mEntityManager{aEntityManager},
+    mColliders{mEntityManager},
+    mEnvironments{mEntityManager}
 {}
 
 
-void EnvironmentCollision::update(const aunteater::Timer aTimer)
+void EnvironmentCollision::update(const aunteater::Timer aTimer, const GameInputState &)
 {
     for(auto environment : mEnvironments)
     {

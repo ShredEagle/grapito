@@ -6,12 +6,12 @@ namespace ad {
 
 const math::Vec<2, double> gravityVector = {0., - Gravity::gAcceleration};
 
-Gravity::Gravity(aunteater::Engine & aEngine) :
-    mEngine(aEngine),
-    mWeightables(mEngine)
+Gravity::Gravity(aunteater::EntityManager & aEntityManager) :
+    mEntityManager{aEntityManager},
+    mWeightables{mEntityManager}
 {}
 
-void Gravity::update(const aunteater::Timer aTimer)
+void Gravity::update(const aunteater::Timer aTimer, const GameInputState &)
 {
     for(auto weightable : mWeightables)
     {

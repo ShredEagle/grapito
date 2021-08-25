@@ -5,6 +5,7 @@
 #include <Components/ForceAndSpeed.h>
 #include <Components/Pendular.h>
 #include <Components/Position.h>
+#include <Components/VisualRectangle.h>
 #include <Components/Weight.h>
 
 #include <Systems/Control.h>
@@ -21,53 +22,69 @@ namespace ad {
 namespace grapkimbo {
 
 
-Game_pendulum::Game_pendulum(aunteater::Engine & aEngine, Application & aApplication) :
-    mEntityEngine(aEngine)
+static constexpr Color gAnchorColor{200, 200, 200};
+
+Game_pendulum::Game_pendulum(Application & aApplication)
 {
-    mEntityEngine.addSystem<Render>(aApplication); 
-    mControlSystem = mEntityEngine.addSystem<Control>();
-    mEntityEngine.addSystem<PendulumSimulation>();
-    mEntityEngine.addSystem<Gravity>();
-    mEntityEngine.addSystem<SpeedResolution>();
+    mSystemManager.add<Render>(aApplication); 
+    mSystemManager.add<Control>();
+    mSystemManager.add<PendulumSimulation>();
+    mSystemManager.add<Gravity>();
+    mSystemManager.add<SpeedResolution>();
 
     // Environment anchors
-    aEngine.addEntity(
+    mEntityManager.addEntity(
         aunteater::Entity()
             .add<Position>(math::Position<2, double>{4., 6.}, math::Size<2, double>{2., 2.} )
             .add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {2., 2.}})
+            .add<VisualRectangle>(gAnchorColor)
         );
 
-    aEngine.addEntity(
+    mEntityManager.addEntity(
         aunteater::Entity()
             .add<Position>(math::Position<2, double>{12., 5.}, math::Size<2, double>{2., 2.} )
             .add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {2., 2.}})
+            .add<VisualRectangle>(gAnchorColor)
         );
 
-    aEngine.addEntity(
+    mEntityManager.addEntity(
         aunteater::Entity()
             .add<Position>(math::Position<2, double>{24., 9.}, math::Size<2, double>{2., 2.} )
             .add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {2., 2.}})
+            .add<VisualRectangle>(gAnchorColor)
         );
 
-    // Player
-    aEngine.addEntity(
+    // Player 1
+    mEntityManager.addEntity(
         aunteater::Entity()
             .add<Position>(math::Position<2, double>{0., 0.}, math::Size<2, double>{0.8, 1.9}) // The position will be set by pendulum simulation
-            //.add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {30., 30.}})
-            .add<Pendular>(Pendular{ {5., 6.}, math::Radian<double>{3.14/3.}, 3. })
-            .add<Controllable>()
+            .add<VisualRectangle>(math::sdr::gCyan)
+            .add<Pendular>(Pendular{ {5., 6.}, math::Radian<double>{math::pi<double>/3.}, 3. })
+            .add<Controllable>(isGamepadPresent(Controller::Gamepad_0) ?
+                               Controller::Gamepad_0 : Controller::Keyboard)
             .add<Weight>(80.)
         );
+
+    // Player 2
+    if (isGamepadPresent(Controller::Gamepad_1))
+    {
+        mEntityManager.addEntity(
+            aunteater::Entity()
+                .add<Position>(math::Position<2, double>{0., 0.}, math::Size<2, double>{0.8, 1.9}) // The position will be set by pendulum simulation
+                .add<VisualRectangle>(math::sdr::gMagenta)
+                .add<Pendular>(Pendular{ {25., 9.}, math::Radian<double>{-math::pi<double>/3.}, 3. })
+                .add<Controllable>(Controller::Gamepad_1)
+                .add<Weight>(80.)
+            );
+    }
 }
 
-
-bool Game_pendulum::update(const aunteater::Timer & aTimer, gameInputState & aInputState)
+bool Game_pendulum::update(const aunteater::Timer & aTimer, const GameInputState & aInputState)
 {
-    aunteater::UpdateTiming timings;
-    mControlSystem->loadInputState(aInputState);
-    mEntityEngine.update(aTimer, timings);
+    aunteater::UpdateTiming<GameInputState> timings;
+    mSystemManager.update(aTimer, aInputState, timings);
 
-    return ! mEntityEngine.isPaused();
+    return ! mSystemManager.isPaused();
 }
 
 } // namespace grapkimbo
