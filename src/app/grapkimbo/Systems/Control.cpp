@@ -4,6 +4,8 @@
 
 #include <Components/VisualRectangle.h>
 
+#include <math/VectorUtilities.h>
+
 #include <GLFW/glfw3.h>
 
 
@@ -38,13 +40,6 @@ std::pair<math::Position<2, double>, double> Control::anchor(const math::Positio
 }
 
 
-template <class T_vecLeft, class T_vecRight>
-math::Radian<double> angleBetween(T_vecLeft a, T_vecRight b)
-{
-    return math::Radian<double>{ std::atan2(b.y(), b.x()) - std::atan2(a.y(), a.x()) };
-}
-
-
 void Control::update(const aunteater::Timer aTimer, const GameInputState & aInputState)
 {
     for(auto entity :  mCartesianControllables)
@@ -64,7 +59,8 @@ void Control::update(const aunteater::Timer aTimer, const GameInputState & aInpu
             math::Radian<double> angle{std::atan2(-grappleLine.x(), grappleLine.y())};
 
             math::Vec<2, double> tangent{grappleLine.y(), - grappleLine.x()};
-            math::Radian<double> angularSpeed{ cos(angleBetween(fas.speeds.at(0), tangent)) * fas.speeds.at(0).getNorm() / length };
+            math::Radian<double> angularSpeed{ cos(math::getOrientedAngle(fas.speeds.at(0), tangent)) 
+                                               * fas.speeds.at(0).getNorm() / length };
 
             mEntityManager.markToRemove(entity);
             mEntityManager.addEntity(

@@ -20,7 +20,7 @@ namespace ad {
 
 typedef aunteater::Archetype<Controllable, Position, ForceAndSpeed, Weight> CartesianControlled;
 typedef aunteater::Archetype<Controllable, Position, Pendular, Weight> PolarControlled;
-// Just use EnvironmentCollisionBox as a tag, because it is not correctly positioned...
+// Currently using EnvironmentCollisionBox as a tag, because it is not correctly positioned...
 typedef aunteater::Archetype<Position, EnvironmentCollisionBox> AnchorElement;
 
 class Control : public aunteater::System<GameInputState>
