@@ -2,6 +2,8 @@
 
 #include "Gravity.h"
 
+#include "../Utilities.h"
+
 #include <Components/VisualRectangle.h>
 
 #include <math/VectorUtilities.h>
@@ -20,26 +22,6 @@ Control::Control(aunteater::EntityManager & aEntityManager) :
 {}
 
 
-std::pair<math::Position<2, double>, double> Control::anchor(const math::Position<2, double> aPosition)
-{
-    math::Position<2, double> closest = math::Position<2, double>::Zero();
-    double normSquared = std::numeric_limits<double>::max();
-
-    for (const auto [geometry, _discard] : mAnchorables) 
-    {
-        math::Rectangle<double> box{geometry.position, geometry.dimension};
-        math::Position<2, double> candidate = box.closestPoint(aPosition);
-        if( (aPosition - candidate).getNormSquared() < normSquared)
-        {
-            normSquared = (aPosition - candidate).getNormSquared();
-            closest = candidate;
-        }
-    }
-
-    return {closest, std::sqrt(normSquared)};
-}
-
-
 void Control::update(const aunteater::Timer aTimer, const GameInputState & aInputState)
 {
     for(auto entity :  mCartesianControllables)
@@ -53,21 +35,28 @@ void Control::update(const aunteater::Timer aTimer, const GameInputState & aInpu
         if (inputs[Grapple])
         {
             math::Position<2, double> grappleOrigin = geometry.position + (geometry.dimension / 2).as<math::Vec>();
-            auto [anchorPoint, length] = this->anchor(grappleOrigin);
+            auto closest = getClosest(mAnchorables,
+                                      grappleOrigin,
+                                      [grappleOrigin](math::Rectangle<double> aRectangle)
+                                      {
+                                           return aRectangle.closestPoint(grappleOrigin);
+                                      });
+            math::Position<2, double> anchorPoint = closest->testedPosition;
+
             math::Vec<2, double> grappleLine = anchorPoint - grappleOrigin;
             // grapple line goes from origin to anchor, we need the angle with -Y
             math::Radian<double> angle{std::atan2(-grappleLine.x(), grappleLine.y())};
 
             math::Vec<2, double> tangent{grappleLine.y(), - grappleLine.x()};
             math::Radian<double> angularSpeed{ cos(math::getOrientedAngle(fas.speeds.at(0), tangent)) 
-                                               * fas.speeds.at(0).getNorm() / length };
+                                               * fas.speeds.at(0).getNorm() / closest->distance };
 
             mEntityManager.markToRemove(entity);
             mEntityManager.addEntity(
                aunteater::Entity()
                 .add<Position>(geometry)
                 .add<VisualRectangle>(entity->get<VisualRectangle>())
-                .add<Pendular>(Pendular{anchorPoint, angle, length, angularSpeed})
+                .add<Pendular>(Pendular{anchorPoint, angle, closest->distance, angularSpeed})
                 .add<Controllable>(controllable)
                 .add<Weight>(weight.mass)
             );

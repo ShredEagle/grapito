@@ -4,6 +4,7 @@ set(${TARGET_NAME}_HEADERS
     Game.h
     Game_pendulum.h
     Input.h
+    Utilities.h
 
     Components/AnchorSelector.h
     Components/Controllable.h
