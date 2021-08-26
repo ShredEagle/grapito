@@ -36,8 +36,10 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
     {
         mTrivialLineStrip.outlineRectangle(
             {
-                static_cast<math::Position<2, GLfloat>>((geometry.position - visualOutline.overshoot) * gPixelsPerMeter),
-                static_cast<math::Size<2, GLfloat>>((geometry.dimension + 2*visualOutline.overshoot.as<math::Size>()) * gPixelsPerMeter)  
+                static_cast<math::Position<2, GLfloat>>((geometry.position - visualOutline.overshoot) 
+                                                        * gPixelsPerMeter),
+                static_cast<math::Size<2, GLfloat>>((geometry.dimension + 2*visualOutline.overshoot.as<math::Size>()) 
+                                                    * gPixelsPerMeter)  
             },
             visualOutline.color
         );

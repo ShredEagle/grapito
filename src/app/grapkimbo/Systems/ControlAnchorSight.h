@@ -4,6 +4,8 @@
 #include <Components/Controllable.h>
 #include <Components/Position.h>
 
+#include <Systems/Control.h> // for AnchorElement archetype
+
 #include <aunteater/EntityManager.h>
 #include <aunteater/FamilyHelp.h>
 #include <aunteater/System.h>
@@ -24,7 +26,7 @@ public:
 
 private:
     const aunteater::FamilyHelp<AnchorSight> mAnchorSights;
-
+    const aunteater::FamilyHelp<AnchorElement> mAnchorables;
 };
 
 

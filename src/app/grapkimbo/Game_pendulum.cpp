@@ -1,5 +1,6 @@
 #include "Game_pendulum.h"
 
+#include <Components/AnchorSelector.h>
 #include <Components/Controllable.h>
 #include <Components/EnvironmentCollisionBox.h>
 #include <Components/ForceAndSpeed.h>
@@ -9,6 +10,7 @@
 #include <Components/Weight.h>
 
 #include <Systems/Control.h>
+#include <Systems/ControlAnchorSight.h>
 #include <Systems/Gravity.h>
 #include <Systems/PendulumSimulation.h>
 #include <Systems/Render.h>
@@ -26,11 +28,12 @@ static constexpr Color gAnchorColor{200, 200, 200};
 
 Game_pendulum::Game_pendulum(Application & aApplication)
 {
-    mSystemManager.add<Render>(aApplication); 
     mSystemManager.add<Control>();
+    mSystemManager.add<ControlAnchorSight>();
     mSystemManager.add<PendulumSimulation>();
     mSystemManager.add<Gravity>();
     mSystemManager.add<SpeedResolution>();
+    mSystemManager.add<Render>(aApplication); 
 
     // Environment anchors
     mEntityManager.addEntity(
@@ -55,20 +58,24 @@ Game_pendulum::Game_pendulum(Application & aApplication)
         );
 
     // Player 1
+    Controller controller = isGamepadPresent(Controller::Gamepad_0) ?
+                            Controller::Gamepad_0 : Controller::Keyboard;
+
     aunteater::weak_entity player_1 = mEntityManager.addEntity(
         aunteater::Entity()
+            .add<Controllable>(controller)
+            .add<Pendular>(Pendular{ {5., 6.}, math::Radian<double>{math::pi<double>/3.}, 3. })
             .add<Position>(math::Position<2, double>{0., 0.}, math::Size<2, double>{0.8, 1.9}) // The position will be set by pendulum simulation
             .add<VisualRectangle>(math::sdr::gCyan)
-            .add<Pendular>(Pendular{ {5., 6.}, math::Radian<double>{math::pi<double>/3.}, 3. })
-            .add<Controllable>(isGamepadPresent(Controller::Gamepad_0) ?
-                               Controller::Gamepad_0 : Controller::Keyboard)
             .add<Weight>(80.)
         );
 
     // Player 1 sight
     mEntityManager.addEntity(
         aunteater::Entity()
-            .add<Position>(anchor_2->get<Position>())
+            .add<AnchorSelector>(20., math::Degree<double>{35.}, anchor_2)
+            .add<Controllable>(controller)
+            .add<Position>() // Will be handled by ControlAnchorSight system
             .add<VisualOutline>(player_1->get<VisualRectangle>().color, 0.3)
     );
 

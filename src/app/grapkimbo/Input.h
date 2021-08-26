@@ -33,6 +33,7 @@ enum GamepadNature
 {
     Button,
     Axis,
+    AxisInverted,
 };
 
 
@@ -88,6 +89,8 @@ enum class Controller
 };
 
 
+constexpr bool isGamepad(Controller aController);
+
 bool isGamepadPresent(Controller aController);
 
 
@@ -95,6 +98,19 @@ struct GameInputState
 {
     void readAll(Application & aApplication);
     float asAxis(Controller aController, Command aNegativeButton, Command aPositiveButton, Command aGamepadAxis) const;
+    math::Vec<2, float> asDirection(Controller aController,
+                                    Command aHorizontalAxis,
+                                    Command aVerticalAxis,
+                                    float aDeadZone) const;
+
+    const ControllerInputState & get(Controller aController) const
+    { return controllerState[(std::size_t)aController]; }
+
+    math::Vec<2, float> getLeftDirection(Controller aController, float aDeadZone = 0.2) const
+    { return asDirection(aController, LeftHorizontalAxis, LeftVerticalAxis, aDeadZone); }
+
+    math::Vec<2, float> getRightDirection(Controller aController, float aDeadZone = 0.2) const
+    { return asDirection(aController, RightHorizontalAxis, RightVerticalAxis, aDeadZone); }
 
     std::array<ControllerInputState, static_cast<std::size_t>(Controller::End)> controllerState;
 };
