@@ -1,6 +1,8 @@
 #pragma once
 
 
+#include "Components/Position.h"
+
 #include <aunteater/FamilyHelp.h>
 
 #include <math/Vector.h>
@@ -39,13 +41,13 @@ getClosest(
         T_positionProvider && aProvider,
         T_filter && aFilter = & isCloser<T_archetype>)
 {
-    std::optional<aunteater::FamilyHelp<T_archetype>::const_Wrap> closest;
+    std::optional<typename aunteater::FamilyHelp<T_archetype>::const_Wrap> closest;
     math::Position<2, double> position = math::Position<2, double>::Zero();
     double normSquared = std::numeric_limits<double>::max();
 
     for (const auto entity : aEntities) 
     {
-        const Position & geometry =  entity->get<Position>();
+        const Position & geometry =  entity->template get<Position>();
         math::Position<2, double> candidate = aProvider(geometry.rectangle());
 
         if (aFilter(entity, (candidate - aPosition), normSquared))
