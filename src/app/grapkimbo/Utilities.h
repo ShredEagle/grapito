@@ -46,8 +46,7 @@ getClosest(
     for (const auto entity : aEntities) 
     {
         const Position & geometry =  entity->get<Position>();
-        math::Rectangle<double> rect{geometry.position, geometry.dimension};
-        math::Position<2, double> candidate = aProvider(rect);
+        math::Position<2, double> candidate = aProvider(geometry.rectangle());
 
         if (aFilter(entity, (candidate - aPosition), normSquared))
         {

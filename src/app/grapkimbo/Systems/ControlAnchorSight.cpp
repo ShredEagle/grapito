@@ -1,5 +1,6 @@
 #include "ControlAnchorSight.h"
 
+#include "../Player.h"
 #include "../Utilities.h"
 
 #include <math/VectorUtilities.h>
@@ -17,43 +18,64 @@ ControlAnchorSight::ControlAnchorSight(aunteater::EntityManager & aEntityManager
 using AnchorWrap = aunteater::FamilyHelp<AnchorElement>::const_Wrap;
 
 
+void ControlAnchorSight::positionSight(AnchorSelector & aSelector,
+                                       Position & aGeometry,
+                                       math::Vec<2, double> aInputDirection) const
+{
+    auto positionProvider = [](const Rectangle<double> aCandidate)
+    {
+        return aCandidate.center();
+    };
+
+    auto filter = [&](const AnchorWrap & anchor, math::Vec<2, double> aVec, double aNormSquared)
+    {
+        return anchor != aSelector.anchor  // eliminate the currently selected anchor
+               && aVec.getNormSquared() < std::min(aNormSquared, aSelector.reachDistanceSquared)
+               && abs(math::getOrientedAngle(aVec, aInputDirection)) < aSelector.tolerance
+            ;
+    };
+
+    if (aSelector.currentAnchor()) 
+    {
+        // There is a deadzone, so it will be exactly zero when no direction is considered
+        if (aInputDirection != math::Vec<2, double>::Zero())
+        {
+            auto nextAnchor = getClosest(mAnchorables,
+                                         aSelector.anchor->get<Position>().center(),
+                                         positionProvider,
+                                         filter);
+
+            aSelector.anchorToCommit = nextAnchor ? nextAnchor->entity : (aunteater::weak_entity)nullptr;
+        }
+        else if (aSelector.anchorToCommit)
+        {
+            aSelector.commit();
+        }
+
+        aGeometry = aSelector.currentAnchor()->get<Position>();
+    }
+}
+
+
 void ControlAnchorSight::update(const aunteater::Timer aTimer, const GameInputState & aInputState)
 {
     for (auto & [selector, controllable, geometry] : mAnchorSights)
     {
         math::Vec<2, double> inputDirection{aInputState.getRightDirection(controllable.controller, 0.8f)};
+        positionSight(selector, geometry, inputDirection);
 
-        auto positionProvider = [](const Rectangle<double> aCandidate)
+        if (aInputState.get(controllable.controller)[Grapple])
         {
-            return aCandidate.center();
-        };
-
-        auto filter = [&](const AnchorWrap & anchor, math::Vec<2, double> aVec, double aNormSquared)
-        {
-            return anchor != selector.anchor  // eliminate the currently selected anchor
-                   && aVec.getNormSquared() < std::min(aNormSquared, selector.reachDistanceSquared)
-                   && abs(math::getOrientedAngle(aVec, inputDirection)) < selector.tolerance
-                ;
-        };
-
-        if (selector.currentAnchor()) 
-        {
-            // There is a deadzone, so it will be exactly zero when no direction is considered
-            if (inputDirection != math::Vec<2, double>::Zero())
+            aunteater::weak_entity anchor = selector.currentAnchor();
+            aunteater::weak_entity player = selector.player;
+            if (anchor->has<Position>() && player->has<Position>() && player->has<ForceAndSpeed>())
             {
-                auto nextAnchor = getClosest(mAnchorables,
-                                             selector.anchor->get<Position>().center(),
-                                             positionProvider,
-                                             filter);
+                math::Position<2, double> grappleOrigin = player->get<Position>().center();
+                math::Position<2, double> anchorPoint = 
+                    anchor->get<Position>().rectangle().closestPoint(grappleOrigin);
 
-                selector.anchorToCommit = nextAnchor ? nextAnchor->entity : (aunteater::weak_entity)nullptr;
+                connectGrapple(player, makePendular(grappleOrigin, anchorPoint, player->get<ForceAndSpeed>().currentSpeed()));
             }
-            else if (selector.anchorToCommit)
-            {
-                selector.commit();
-            }
-
-            geometry = selector.currentAnchor()->get<Position>();
         }
     }
 }

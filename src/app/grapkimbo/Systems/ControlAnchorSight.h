@@ -25,6 +25,10 @@ public:
     void update(const aunteater::Timer aTimer, const GameInputState & aInputState) override;
 
 private:
+    void positionSight(AnchorSelector & aSelector,
+                       Position & aGeometry,
+                       math::Vec<2, double> aInputDirection) const;
+
     const aunteater::FamilyHelp<AnchorSight> mAnchorSights;
     const aunteater::FamilyHelp<AnchorElement> mAnchorables;
 };

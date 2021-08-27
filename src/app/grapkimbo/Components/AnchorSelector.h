@@ -10,9 +10,13 @@ namespace ad {
 
 struct AnchorSelector : public aunteater::Component<AnchorSelector>
 {
-    AnchorSelector(double aReachDistance, math::Degree<double> aTolerance, aunteater::weak_entity aAnchor = nullptr) :
+    AnchorSelector(double aReachDistance,
+                   math::Degree<double> aTolerance,
+                   aunteater::weak_entity aPlayer, 
+                   aunteater::weak_entity aAnchor = nullptr) :
         reachDistanceSquared{std::pow(aReachDistance, 2)},
         tolerance{aTolerance},
+        player{aPlayer},
         anchor{aAnchor}
     {}
 
@@ -31,9 +35,9 @@ struct AnchorSelector : public aunteater::Component<AnchorSelector>
     math::Degree<double> tolerance;
     
     // TODO need a much better way to store reference to entities across update steps.
+    aunteater::weak_entity player{nullptr};
     aunteater::weak_entity anchor{nullptr};
     aunteater::weak_entity anchorToCommit{nullptr};
-    aunteater::weak_entity player{nullptr};
 };
 
 

@@ -4,6 +4,7 @@
 #include <Components/Controllable.h>
 #include <Components/EnvironmentCollisionBox.h>
 #include <Components/ForceAndSpeed.h>
+#include <Components/GrappleControl.h>
 #include <Components/Pendular.h>
 #include <Components/Position.h>
 #include <Components/VisualRectangle.h>
@@ -64,6 +65,7 @@ Game_pendulum::Game_pendulum(Application & aApplication)
     aunteater::weak_entity player_1 = mEntityManager.addEntity(
         aunteater::Entity()
             .add<Controllable>(controller)
+            .add<GrappleControl>(GrappleMode::AnchorSight)
             .add<Pendular>(Pendular{ {5., 6.}, math::Radian<double>{math::pi<double>/3.}, 3. })
             .add<Position>(math::Position<2, double>{0., 0.}, math::Size<2, double>{0.8, 1.9}) // The position will be set by pendulum simulation
             .add<VisualRectangle>(math::sdr::gCyan)
@@ -73,7 +75,7 @@ Game_pendulum::Game_pendulum(Application & aApplication)
     // Player 1 sight
     mEntityManager.addEntity(
         aunteater::Entity()
-            .add<AnchorSelector>(20., math::Degree<double>{35.}, anchor_2)
+            .add<AnchorSelector>(20., math::Degree<double>{35.}, player_1, anchor_2)
             .add<Controllable>(controller)
             .add<Position>() // Will be handled by ControlAnchorSight system
             .add<VisualOutline>(player_1->get<VisualRectangle>().color, 0.3)
