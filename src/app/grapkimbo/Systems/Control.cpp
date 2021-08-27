@@ -18,16 +18,20 @@ Control::Control(aunteater::EntityManager & aEntityManager) :
     mCartesianControllables{mEntityManager},
     mPolarControllables{mEntityManager},
     mGrapplers{mEntityManager},
+    mModeSelectables{mEntityManager},
     mAnchorables{mEntityManager}
 {}
 
 
 void Control::update(const aunteater::Timer aTimer, const GameInputState & aInputState)
 {
+    //
+    // Air
+    //
     for(auto entity :  mCartesianControllables)
     {
         auto & [controllable, geometry, fas, weight] = entity;
-        ControllerInputState inputs = aInputState.controllerState[(std::size_t)controllable.controller];
+        const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
 
         float horizontalAxis = aInputState.asAxis(controllable.controller, Left, Right, LeftHorizontalAxis);
         fas.forces.emplace_back(horizontalAxis * gAirControlAcceleration * weight.mass, 0.);
@@ -40,14 +44,14 @@ void Control::update(const aunteater::Timer aTimer, const GameInputState & aInpu
     }
 
     //
-    // Polar
+    // Swinging on a grapple
     //
     for(auto & entity : mPolarControllables)
     {
         auto & [controllable, geometry, pendular, weight] = entity;
         pendular.angularAccelerationControl = math::Radian<double>{0.};
 
-        ControllerInputState inputs = aInputState.controllerState[(std::size_t)controllable.controller];
+        const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
 
         float horizontalAxis = aInputState.asAxis(controllable.controller, Left, Right, LeftHorizontalAxis);
         pendular.angularAccelerationControl = 
@@ -66,12 +70,14 @@ void Control::update(const aunteater::Timer aTimer, const GameInputState & aInpu
     }
 
     //
-    // Grapple
+    // Grapple candidates
     //
     for(const auto & entity : mGrapplers)
     {
-        const auto & [controllable, fas, grappleControl, geometry] = entity;
-        ControllerInputState inputs = aInputState.controllerState[(std::size_t)controllable.controller];
+        auto & [controllable, fas, grappleControl, geometry] = entity;
+        const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
+
+
         switch (grappleControl.mode)
         {
         case GrappleMode::Closest:
@@ -98,6 +104,21 @@ void Control::update(const aunteater::Timer aTimer, const GameInputState & aInpu
             break;
         }
     }
+
+    //
+    // Change grapple mode
+    //
+    for(const auto & entity : mModeSelectables)
+    {
+        auto & [controllable, grappleControl, playerData] = entity;
+        const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
+
+        if (inputs[ChangeMode])
+        {
+            setGrappleMode(entity, playerData, toggle(grappleControl.mode), mEntityManager);
+        }
+    }
 }
+
 
 } // namespace ad

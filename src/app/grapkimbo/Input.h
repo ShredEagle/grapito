@@ -19,6 +19,7 @@ enum Command {
     Right, 
     Jump,
     Grapple,
+    ChangeMode, // intended to change the grappling mode (see GrappleControl component)
     LeftHorizontalAxis,
     LeftVerticalAxis,
     RightHorizontalAxis,

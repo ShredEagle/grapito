@@ -7,6 +7,7 @@
 #include <Components/ForceAndSpeed.h>
 #include <Components/GrappleControl.h>
 #include <Components/Pendular.h>
+#include <Components/PlayerData.h>
 #include <Components/Position.h>
 #include <Components/Weight.h>
 
@@ -22,6 +23,7 @@ namespace ad {
 typedef aunteater::Archetype<Controllable, Position, ForceAndSpeed, Weight> CartesianControlled;
 typedef aunteater::Archetype<Controllable, Position, Pendular, Weight> PolarControlled;
 typedef aunteater::Archetype<Controllable, ForceAndSpeed, GrappleControl, Position> Grappler;
+typedef aunteater::Archetype<Controllable, GrappleControl, PlayerData> ModeSelectable; // est une bande de mecs sympas
 // Currently using EnvironmentCollisionBox as a tag, because it is not correctly positioned...
 typedef aunteater::Archetype<Position, EnvironmentCollisionBox> AnchorElement;
 
@@ -43,6 +45,7 @@ private:
     const aunteater::FamilyHelp<CartesianControlled> mCartesianControllables;
     const aunteater::FamilyHelp<PolarControlled> mPolarControllables;
     const aunteater::FamilyHelp<Grappler> mGrapplers;
+    const aunteater::FamilyHelp<ModeSelectable> mModeSelectables;
     const aunteater::FamilyHelp<AnchorElement> mAnchorables;
 
 };
