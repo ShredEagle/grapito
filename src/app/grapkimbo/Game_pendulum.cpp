@@ -75,7 +75,7 @@ Game_pendulum::Game_pendulum(Application & aApplication)
     // Player 1 sight
     mEntityManager.addEntity(
         aunteater::Entity()
-            .add<AnchorSelector>(20., math::Degree<double>{35.}, player_1, anchor_2)
+            .add<AnchorSelector>(20., math::Degree<double>{35.}, player_1, nullptr)
             .add<Controllable>(controller)
             .add<Position>() // Will be handled by ControlAnchorSight system
             .add<VisualOutline>(player_1->get<VisualRectangle>().color, 0.3)

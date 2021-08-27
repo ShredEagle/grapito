@@ -35,24 +35,29 @@ void ControlAnchorSight::positionSight(AnchorSelector & aSelector,
             ;
     };
 
-    if (aSelector.currentAnchor()) 
+    math::Position<2, double> basePosition = aSelector.anchor ?
+        aSelector.anchor->get<Position>().center()
+        : aSelector.player->get<Position>().center();
+
+    // There is a deadzone, so it will be exactly zero when no direction is considered
+    if (aInputDirection != math::Vec<2, double>::Zero())
     {
-        // There is a deadzone, so it will be exactly zero when no direction is considered
-        if (aInputDirection != math::Vec<2, double>::Zero())
-        {
-            auto nextAnchor = getClosest(mAnchorables,
-                                         aSelector.anchor->get<Position>().center(),
-                                         positionProvider,
-                                         filter);
+        auto nextAnchor = getClosest(mAnchorables, basePosition, positionProvider, filter);
 
-            aSelector.anchorToCommit = nextAnchor ? nextAnchor->entity : (aunteater::weak_entity)nullptr;
-        }
-        else if (aSelector.anchorToCommit)
-        {
-            aSelector.commit();
-        }
+        aSelector.anchorToCommit = nextAnchor ? nextAnchor->entity : (aunteater::weak_entity)nullptr;
+    }
+    else if (aSelector.anchorToCommit)
+    {
+        aSelector.commit();
+    }
 
-        aGeometry = aSelector.currentAnchor()->get<Position>();
+    if (auto anchor = aSelector.currentAnchor())
+    {
+        aGeometry = anchor->get<Position>();
+    }
+    else
+    {
+        aGeometry = aSelector.player->get<Position>();
     }
 }
 
