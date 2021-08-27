@@ -1,6 +1,7 @@
 #pragma once
 
 #include <aunteater/Component.h>
+#include <math/Rectangle.h>
 #include <math/Vector.h>
 
 namespace ad {
@@ -15,6 +16,9 @@ struct Position : public aunteater::Component<Position>
 
     math::Position<2, double> center() const
     { return position + dimension.as<math::Vec>() / 2.; }
+
+    math::Rectangle<double> rectangle() const
+    { return {position, dimension}; } 
 
     math::Position<2, double> position;
     math::Size<2, double> dimension;

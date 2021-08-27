@@ -3,6 +3,7 @@
 #include "PendulumSimulation.h" // for pendulum archetype
 
 #include <Components/Position.h>
+#include <Components/VisualOutline.h>
 #include <Components/VisualRectangle.h>
 #ifdef KIMBO_DEBUG
 #include <Components/EnvironmentCollisionBox.h>
@@ -18,7 +19,9 @@
 
 namespace ad {
 
-typedef aunteater::Archetype<Position, VisualRectangle> Rendered;
+typedef aunteater::Archetype<Position, VisualRectangle> RenderedRectangle;
+typedef aunteater::Archetype<Position, VisualOutline> RenderedOutline;
+
 #ifdef KIMBO_DEBUG
 typedef aunteater::Archetype<EnvironmentCollisionBox> Collider;
 #endif
@@ -35,7 +38,8 @@ public:
 
 private:
     aunteater::EntityManager & mEntityManager;
-    const aunteater::FamilyHelp<Rendered> mRenderables;
+    const aunteater::FamilyHelp<RenderedRectangle> mRectangles;
+    const aunteater::FamilyHelp<RenderedOutline> mOutlines;
     const aunteater::FamilyHelp<Pendulum> mPendulums;
     Application & mApplication;
     TrivialShaping mTrivialShaping;

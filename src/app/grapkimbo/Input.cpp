@@ -26,20 +26,41 @@ const GamepadInputConfig gGamepadConfig = {
     GamepadInputMapping{Right, GLFW_GAMEPAD_BUTTON_DPAD_RIGHT, Button},
     GamepadInputMapping{Jump, GLFW_GAMEPAD_BUTTON_A, Button},
     GamepadInputMapping{Grapple, GLFW_GAMEPAD_BUTTON_B, Button},
+    GamepadInputMapping{ChangeMode, GLFW_GAMEPAD_BUTTON_Y, Button},
     GamepadInputMapping{LeftHorizontalAxis, GLFW_GAMEPAD_AXIS_LEFT_X, Axis},
-    GamepadInputMapping{LeftVerticalAxis,   GLFW_GAMEPAD_AXIS_LEFT_Y, Axis},
+    GamepadInputMapping{LeftVerticalAxis,   GLFW_GAMEPAD_AXIS_LEFT_Y, AxisInverted},
+    GamepadInputMapping{RightHorizontalAxis, GLFW_GAMEPAD_AXIS_RIGHT_X, Axis},
+    GamepadInputMapping{RightVerticalAxis,   GLFW_GAMEPAD_AXIS_RIGHT_Y, AxisInverted},
 };
 
+
+void handleButtonEdges(InputState & aInputState, int aGlfwState)
+{
+    if(aInputState && aGlfwState)
+    {
+        aInputState.state = Pressed;
+    }
+    else if(aInputState && ! aGlfwState)
+    {
+        aInputState.state = NegativeEdge;
+    }
+    else if(! aInputState && aGlfwState)
+    {
+        aInputState.state = PositiveEdge;
+    }
+    else
+    {
+        aInputState.state = Released;
+    }
+}
 
 
 void readKeyboard(const KeyboardInputConfig & aConfig, ControllerInputState & aState, Application & aApplication)
 {
     for (size_t i = 0; i < aConfig.size(); ++i)
     {
-        //Get keyboard state
-        aState[aConfig[i].command] = {
-            glfwGetKey(aApplication.getWindow(), aConfig[i].glKeyCode)
-        };
+        handleButtonEdges(aState[aConfig[i].command],
+                          glfwGetKey(aApplication.getWindow(), aConfig[i].glKeyCode));
     }
 }
 
@@ -53,13 +74,17 @@ void readJoystick(int aGlfwJoystickId, const GamepadInputConfig & aConfig, Contr
              mapping != aConfig.end();
              ++mapping)
         {
-            if (mapping->nature == Button)
+            switch(mapping->nature)
             {
-                aState[mapping->command].state = gamepadState.buttons[mapping->glGamePadCode];
-            }
-            else
-            {
-                aState[mapping->command].state = gamepadState.axes[mapping->glGamePadCode];
+            case Button:
+                handleButtonEdges(aState[mapping->command], gamepadState.buttons[mapping->glGamePadCode]);
+                break;
+            case Axis:
+                aState[mapping->command].state = + gamepadState.axes[mapping->glGamePadCode];
+                break;
+            case AxisInverted:
+                aState[mapping->command].state = - gamepadState.axes[mapping->glGamePadCode];
+                break;
             }
         }
     }
@@ -72,11 +97,19 @@ int toGlfwJoystickId(Controller aController)
     return static_cast<int>(aController) - static_cast<int>(Controller::Gamepad_0);
 }
 
+
+constexpr bool isGamepad(Controller aController)
+{
+    return aController != Controller::Keyboard;
+}
+
+
 bool isGamepadPresent(Controller aController)
 {
     assert(aController >= Controller::Gamepad_0);
     return glfwJoystickIsGamepad(toGlfwJoystickId(aController));
 }
+
 
 void GameInputState::readAll(Application & aApplication)
 {
@@ -100,9 +133,9 @@ float GameInputState::asAxis(Controller aController,
                              Command aPositiveButton,
                              Command aGamepadAxis) const
 {
-    ControllerInputState input = controllerState[static_cast<std::size_t>(aController)];
+    ControllerInputState input = get(aController);
     float axis = 0.;
-    if (aController == Controller::Keyboard)
+    if (! isGamepad(aController))
     {
         if (input[aNegativeButton])
         {
@@ -118,6 +151,29 @@ float GameInputState::asAxis(Controller aController,
         axis = input[aGamepadAxis];
     }
     return axis;
+}
+
+
+template <class T>
+T filterDeadzoneSingleAxis(T aValue, T aDeadzone, T aDefault = 0)
+{
+    return std::abs(aValue) <= aDeadzone ? aDefault : aValue;
+}
+
+
+math::Vec<2, float> GameInputState::asDirection(Controller aController,
+                                                Command aHorizontalAxis,
+                                                Command aVerticalAxis,
+                                                float aDeadZone) const
+{
+    if (! isGamepad(aController))
+    {
+        return math::Vec<2, float>::Zero();
+    }
+
+    ControllerInputState input = get(aController);
+    math::Vec<2, float> candidate{input[aHorizontalAxis], input[aVerticalAxis]};
+    return candidate.getNorm() > aDeadZone ? candidate : math::Vec<2, float>::Zero();
 }
 
 } // namespace ad

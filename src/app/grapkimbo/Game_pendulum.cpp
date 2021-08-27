@@ -1,14 +1,18 @@
 #include "Game_pendulum.h"
+#include "Player.h"
 
+#include <Components/AnchorSelector.h>
 #include <Components/Controllable.h>
 #include <Components/EnvironmentCollisionBox.h>
 #include <Components/ForceAndSpeed.h>
+#include <Components/GrappleControl.h>
 #include <Components/Pendular.h>
 #include <Components/Position.h>
 #include <Components/VisualRectangle.h>
 #include <Components/Weight.h>
 
 #include <Systems/Control.h>
+#include <Systems/ControlAnchorSight.h>
 #include <Systems/Gravity.h>
 #include <Systems/PendulumSimulation.h>
 #include <Systems/Render.h>
@@ -26,28 +30,29 @@ static constexpr Color gAnchorColor{200, 200, 200};
 
 Game_pendulum::Game_pendulum(Application & aApplication)
 {
-    mSystemManager.add<Render>(aApplication); 
     mSystemManager.add<Control>();
     mSystemManager.add<PendulumSimulation>();
     mSystemManager.add<Gravity>();
     mSystemManager.add<SpeedResolution>();
+    mSystemManager.add<ControlAnchorSight>(); // it will position the sight, which might follow something impacted by speed resolution
+    mSystemManager.add<Render>(aApplication); 
 
     // Environment anchors
-    mEntityManager.addEntity(
+    aunteater::weak_entity anchor_1 = mEntityManager.addEntity(
         aunteater::Entity()
             .add<Position>(math::Position<2, double>{4., 6.}, math::Size<2, double>{2., 2.} )
             .add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {2., 2.}})
             .add<VisualRectangle>(gAnchorColor)
         );
 
-    mEntityManager.addEntity(
+    aunteater::weak_entity anchor_2 = mEntityManager.addEntity(
         aunteater::Entity()
             .add<Position>(math::Position<2, double>{12., 5.}, math::Size<2, double>{2., 2.} )
             .add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {2., 2.}})
             .add<VisualRectangle>(gAnchorColor)
         );
 
-    mEntityManager.addEntity(
+    aunteater::weak_entity anchor_3 = mEntityManager.addEntity(
         aunteater::Entity()
             .add<Position>(math::Position<2, double>{24., 9.}, math::Size<2, double>{2., 2.} )
             .add<EnvironmentCollisionBox>(math::Rectangle<double>{{0., 0.}, {2., 2.}})
@@ -55,27 +60,17 @@ Game_pendulum::Game_pendulum(Application & aApplication)
         );
 
     // Player 1
+    Controller controller = isGamepadPresent(Controller::Gamepad_0) ?
+                            Controller::Gamepad_0 : Controller::Keyboard;
+
     mEntityManager.addEntity(
-        aunteater::Entity()
-            .add<Position>(math::Position<2, double>{0., 0.}, math::Size<2, double>{0.8, 1.9}) // The position will be set by pendulum simulation
-            .add<VisualRectangle>(math::sdr::gCyan)
-            .add<Pendular>(Pendular{ {5., 6.}, math::Radian<double>{math::pi<double>/3.}, 3. })
-            .add<Controllable>(isGamepadPresent(Controller::Gamepad_0) ?
-                               Controller::Gamepad_0 : Controller::Keyboard)
-            .add<Weight>(80.)
-        );
+        makePlayer(0, controller, math::sdr::gCyan, makePendular(anchor_1)));
 
     // Player 2
     if (isGamepadPresent(Controller::Gamepad_1))
     {
         mEntityManager.addEntity(
-            aunteater::Entity()
-                .add<Position>(math::Position<2, double>{0., 0.}, math::Size<2, double>{0.8, 1.9}) // The position will be set by pendulum simulation
-                .add<VisualRectangle>(math::sdr::gMagenta)
-                .add<Pendular>(Pendular{ {25., 9.}, math::Radian<double>{-math::pi<double>/3.}, 3. })
-                .add<Controllable>(Controller::Gamepad_1)
-                .add<Weight>(80.)
-            );
+            makePlayer(1, Controller::Gamepad_1, math::sdr::gMagenta, makePendular(anchor_3)));
     }
 }
 

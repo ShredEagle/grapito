@@ -14,6 +14,9 @@ struct ForceAndSpeed : public aunteater::Component<ForceAndSpeed>
         speeds.push_back(baseSpeed);
     }
 
+    math::Vec<2, double> currentSpeed() const
+    { return speeds.at(0); }
+
     std::vector<math::Vec<2, double>> forces;
     std::vector<math::Vec<2, double>> speeds;
 };

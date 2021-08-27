@@ -1,20 +1,28 @@
 set(TARGET_NAME grapkimbo)
 
 set(${TARGET_NAME}_HEADERS
+    Configuration.h
     Game.h
     Game_pendulum.h
     Input.h
+    Player.h
+    Utilities.h
 
-    Components/Position.h
+    Components/AnchorSelector.h
     Components/Controllable.h
     Components/Environment.h
     Components/EnvironmentCollisionBox.h
     Components/ForceAndSpeed.h
+    Components/GrappleControl.h
     Components/Pendular.h
+    Components/PlayerData.h
+    Components/Position.h
+    Components/VisualOutline.h
     Components/VisualRectangle.h
     Components/Weight.h
 
     Systems/Control.h
+    Systems/ControlAnchorSight.h
     Systems/EnvironmentCollision.h
     Systems/Gravity.h
     Systems/PendulumSimulation.h
@@ -23,17 +31,26 @@ set(${TARGET_NAME}_HEADERS
 )
 
 set(${TARGET_NAME}_SOURCES
+    main.cpp
+
     Game.cpp
     Game_pendulum.cpp
     Input.cpp
+    Player.cpp
 
     Systems/Control.cpp
+    Systems/ControlAnchorSight.cpp
     Systems/EnvironmentCollision.cpp
     Systems/Gravity.cpp
     Systems/PendulumSimulation.cpp
     Systems/Render.cpp
     Systems/SpeedResolution.cpp
 )
+
+source_group(TREE ${CMAKE_CURRENT_LIST_DIR}
+             FILES ${${TARGET_NAME}_HEADERS} ${${TARGET_NAME}_SOURCES}
+)
+
 
 find_package(Aunteater CONFIG REQUIRED COMPONENTS aunteater)
 find_package(Graphics CONFIG REQUIRED COMPONENTS engine)
@@ -44,7 +61,6 @@ find_package(glad REQUIRED)
 
 
 add_executable(${TARGET_NAME}
-    main.cpp
     ${${TARGET_NAME}_SOURCES}
     ${${TARGET_NAME}_HEADERS}
 )

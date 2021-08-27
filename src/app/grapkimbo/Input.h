@@ -19,6 +19,7 @@ enum Command {
     Right, 
     Jump,
     Grapple,
+    ChangeMode, // intended to change the grappling mode (see GrappleControl component)
     LeftHorizontalAxis,
     LeftVerticalAxis,
     RightHorizontalAxis,
@@ -33,6 +34,7 @@ enum GamepadNature
 {
     Button,
     Axis,
+    AxisInverted,
 };
 
 
@@ -55,13 +57,31 @@ using KeyboardInputConfig = std::vector<KeyboardInputMapping> ;
 using GamepadInputConfig = std::vector<GamepadInputMapping> ;
 
 
+enum ButtonStatus
+{
+    Released,
+    NegativeEdge, // just released
+    Pressed,
+    PositiveEdge, // just pressed
+};
+
 struct InputState
 {
-    std::variant<int, float> state;
+    std::variant<ButtonStatus, float> state;
 
     operator bool() const
     {
-        return std::get<int>(state) == 1;
+        return std::get<ButtonStatus>(state) >= ButtonStatus::Pressed;
+    }
+
+    bool positiveEdge() const
+    {
+        return std::get<ButtonStatus>(state) == ButtonStatus::PositiveEdge;
+    }
+
+    bool negativeEdge() const
+    {
+        return std::get<ButtonStatus>(state) == ButtonStatus::NegativeEdge;
     }
 
     operator float() const
@@ -88,6 +108,8 @@ enum class Controller
 };
 
 
+constexpr bool isGamepad(Controller aController);
+
 bool isGamepadPresent(Controller aController);
 
 
@@ -95,6 +117,19 @@ struct GameInputState
 {
     void readAll(Application & aApplication);
     float asAxis(Controller aController, Command aNegativeButton, Command aPositiveButton, Command aGamepadAxis) const;
+    math::Vec<2, float> asDirection(Controller aController,
+                                    Command aHorizontalAxis,
+                                    Command aVerticalAxis,
+                                    float aDeadZone) const;
+
+    const ControllerInputState & get(Controller aController) const
+    { return controllerState[(std::size_t)aController]; }
+
+    math::Vec<2, float> getLeftDirection(Controller aController, float aDeadZone = 0.2) const
+    { return asDirection(aController, LeftHorizontalAxis, LeftVerticalAxis, aDeadZone); }
+
+    math::Vec<2, float> getRightDirection(Controller aController, float aDeadZone = 0.2) const
+    { return asDirection(aController, RightHorizontalAxis, RightVerticalAxis, aDeadZone); }
 
     std::array<ControllerInputState, static_cast<std::size_t>(Controller::End)> controllerState;
 };
