@@ -34,15 +34,33 @@ const GamepadInputConfig gGamepadConfig = {
 };
 
 
+void handleButtonEdges(InputState & aInputState, int aGlfwState)
+{
+    if(aInputState && aGlfwState)
+    {
+        aInputState.state = Pressed;
+    }
+    else if(aInputState && ! aGlfwState)
+    {
+        aInputState.state = NegativeEdge;
+    }
+    else if(! aInputState && aGlfwState)
+    {
+        aInputState.state = PositiveEdge;
+    }
+    else
+    {
+        aInputState.state = Released;
+    }
+}
+
 
 void readKeyboard(const KeyboardInputConfig & aConfig, ControllerInputState & aState, Application & aApplication)
 {
     for (size_t i = 0; i < aConfig.size(); ++i)
     {
-        //Get keyboard state
-        aState[aConfig[i].command] = {
-            glfwGetKey(aApplication.getWindow(), aConfig[i].glKeyCode)
-        };
+        handleButtonEdges(aState[aConfig[i].command],
+                          glfwGetKey(aApplication.getWindow(), aConfig[i].glKeyCode));
     }
 }
 
@@ -59,7 +77,7 @@ void readJoystick(int aGlfwJoystickId, const GamepadInputConfig & aConfig, Contr
             switch(mapping->nature)
             {
             case Button:
-                aState[mapping->command].state = gamepadState.buttons[mapping->glGamePadCode];
+                handleButtonEdges(aState[mapping->command], gamepadState.buttons[mapping->glGamePadCode]);
                 break;
             case Axis:
                 aState[mapping->command].state = + gamepadState.axes[mapping->glGamePadCode];

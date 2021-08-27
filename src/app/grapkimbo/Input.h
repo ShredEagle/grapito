@@ -57,13 +57,31 @@ using KeyboardInputConfig = std::vector<KeyboardInputMapping> ;
 using GamepadInputConfig = std::vector<GamepadInputMapping> ;
 
 
+enum ButtonStatus
+{
+    Released,
+    NegativeEdge, // just released
+    Pressed,
+    PositiveEdge, // just pressed
+};
+
 struct InputState
 {
-    std::variant<int, float> state;
+    std::variant<ButtonStatus, float> state;
 
     operator bool() const
     {
-        return std::get<int>(state) == 1;
+        return std::get<ButtonStatus>(state) >= ButtonStatus::Pressed;
+    }
+
+    bool positiveEdge() const
+    {
+        return std::get<ButtonStatus>(state) == ButtonStatus::PositiveEdge;
+    }
+
+    bool negativeEdge() const
+    {
+        return std::get<ButtonStatus>(state) == ButtonStatus::NegativeEdge;
     }
 
     operator float() const

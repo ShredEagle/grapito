@@ -113,7 +113,7 @@ void Control::update(const aunteater::Timer aTimer, const GameInputState & aInpu
         auto & [controllable, grappleControl, playerData] = entity;
         const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
 
-        if (inputs[ChangeMode])
+        if (inputs[ChangeMode].positiveEdge())
         {
             setGrappleMode(entity, playerData, toggle(grappleControl.mode), mEntityManager);
         }

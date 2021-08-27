@@ -31,10 +31,10 @@ static constexpr Color gAnchorColor{200, 200, 200};
 Game_pendulum::Game_pendulum(Application & aApplication)
 {
     mSystemManager.add<Control>();
-    mSystemManager.add<ControlAnchorSight>();
     mSystemManager.add<PendulumSimulation>();
     mSystemManager.add<Gravity>();
     mSystemManager.add<SpeedResolution>();
+    mSystemManager.add<ControlAnchorSight>(); // it will position the sight, which might follow something impacted by speed resolution
     mSystemManager.add<Render>(aApplication); 
 
     // Environment anchors
