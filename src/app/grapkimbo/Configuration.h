@@ -15,7 +15,14 @@ namespace player
     constexpr math::Size<2, double> gSize{0.8, 1.9};
     constexpr double gInitialRopeLength = 3.;
     constexpr math::Radian<double> gInitialAngle{math::pi<double>/3.};
-}
+} // namespace player
+
+
+namespace render
+{
+    constexpr float gViewedHeight = 30.f;
+} // namespace render
+
 
 namespace sight
 {

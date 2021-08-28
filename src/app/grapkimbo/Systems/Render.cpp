@@ -1,7 +1,12 @@
 #include "Render.h"
 
 #include "Utils/DrawDebugStuff.h"
+#include "Configuration.h"
+
+#include <engine/CameraUtilities.h>
+
 #include <math/Transformations.h>
+#include <math/VectorUtilities.h>
 
 
 namespace ad {
@@ -12,7 +17,7 @@ Render::Render(aunteater::EntityManager & aEntityManager, Application & aApplica
     mOutlines{mEntityManager},
     mPendulums{mEntityManager},
     mGuides{mEntityManager},
-    mApplication(aApplication),
+    mEngine(aApplication.getEngine()),
 #ifdef KIMBO_DEBUG
     mColliders{mEntityManager},
 #endif
@@ -26,13 +31,14 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
     mTrivialLineStrip.clearLines();
     debugDrawer->clear();
     mApplication.getEngine()->clear();
+    mEngine->clear();
 
     for(const auto [geometry, visualRectangle] : mRectangles)
     {
         mTrivialShaping.addRectangle({
             {
-                static_cast<math::Position<2, GLfloat>>(geometry.position * gPixelsPerMeter),
-                static_cast<math::Size<2, GLfloat>>(geometry.dimension * gPixelsPerMeter)  
+                static_cast<math::Position<2, GLfloat>>(geometry.position),
+                static_cast<math::Size<2, GLfloat>>(geometry.dimension)  
             },
             visualRectangle.angle,
             visualRectangle.color
@@ -43,10 +49,8 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
     {
         mTrivialLineStrip.outlineRectangle(
             {
-                static_cast<math::Position<2, GLfloat>>((geometry.position - visualOutline.overshoot) 
-                                                        * gPixelsPerMeter),
-                static_cast<math::Size<2, GLfloat>>((geometry.dimension + 2*visualOutline.overshoot.as<math::Size>()) 
-                                                    * gPixelsPerMeter)  
+                static_cast<math::Position<2, GLfloat>>(geometry.position - visualOutline.overshoot),
+                static_cast<math::Size<2, GLfloat>>(geometry.dimension + 2*visualOutline.overshoot.as<math::Size>())  
             },
             visualOutline.color
         );
@@ -55,18 +59,20 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
     for(const auto [pendular, geometry] : mPendulums)
     {
         mTrivialLineStrip.addLine({
-            {static_cast<math::Position<2, GLfloat>>(pendular.anchor * gPixelsPerMeter), math::sdr::gRed},
-            {static_cast<math::Position<2, GLfloat>>(geometry.center() * gPixelsPerMeter), math::sdr::gGreen},
+            {static_cast<math::Position<2, GLfloat>>(pendular.anchor), math::sdr::gRed},
+            {static_cast<math::Position<2, GLfloat>>(geometry.center()), math::sdr::gGreen},
         });
     }
 
 
     for(const auto & [cameraGuide, geometry] : mGuides)
     {
-        // Naively follow the latest guide
-        auto cameraTransformation = math::trans2d::translate(- static_cast<math::Vec<2, GLfloat>>(geometry.position) * gPixelsPerMeter
-                                                             + math::Vec<2, GLfloat>{800.f, 450.f});
-        mTrivialShaping.setCameraTransformation(cameraTransformation);
+        auto viewed = math::Rectangle<GLfloat>{
+            static_cast<math::Position<2, GLfloat>>(geometry.position),
+            math::makeSizeFromHeight(render::gViewedHeight, math::getRatio<GLfloat>(mEngine->getWindowSize()))
+        }.centered();
+        setViewedRectangle(mTrivialShaping, viewed);
+        setViewedRectangle(mTrivialLineStrip, viewed);
     }
 
 #ifdef KIMBO_DEBUG

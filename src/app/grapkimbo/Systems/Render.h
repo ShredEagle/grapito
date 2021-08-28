@@ -37,15 +37,13 @@ public:
 
     void update(const aunteater::Timer aTimer, const GameInputState &) override;
 
-    static constexpr int gPixelsPerMeter = 40;
-
 private:
     aunteater::EntityManager & mEntityManager;
     const aunteater::FamilyHelp<RenderedRectangle> mRectangles;
     const aunteater::FamilyHelp<RenderedOutline> mOutlines;
     const aunteater::FamilyHelp<Pendulum> mPendulums;
     const aunteater::FamilyHelp<Guide> mGuides;
-    Application & mApplication;
+    std::shared_ptr<Engine> mEngine;
     TrivialShaping mTrivialShaping;
     TrivialLineStrip mTrivialLineStrip;
 #ifdef KIMBO_DEBUG
