@@ -11,6 +11,7 @@ set(${TARGET_NAME}_HEADERS
 
     Components/AccelAndSpeed.h
     Components/AnchorSelector.h
+    Components/CameraGuide.h
     Components/Controllable.h
     Components/GrappleControl.h
     Components/Mass.h

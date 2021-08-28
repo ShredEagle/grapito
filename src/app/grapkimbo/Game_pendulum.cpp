@@ -6,6 +6,7 @@
 #include <Components/AccelAndSpeed.h>
 #include <Components/AnchorSelector.h>
 #include <Components/Body.h>
+#include <Components/CameraGuide.h>
 #include <Components/Controllable.h>
 #include <Components/GrappleControl.h>
 #include <Components/Pendular.h>
@@ -79,7 +80,8 @@ Game_pendulum::Game_pendulum(Application & aApplication)
                             Controller::Gamepad_0 : Controller::Keyboard;
 
     mEntityManager.addEntity(
-        makePlayer(0, controller, math::sdr::gCyan, makePendular(anchor_1)));
+        makePlayer(0, controller, math::sdr::gCyan, makePendular(anchor_1))
+            .add<CameraGuide>());
 
     // Player 2
     if (isGamepadPresent(Controller::Gamepad_1))

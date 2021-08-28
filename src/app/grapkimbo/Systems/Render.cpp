@@ -1,6 +1,8 @@
 #include "Render.h"
 
 #include "Utils/DrawDebugStuff.h"
+#include <math/Transformations.h>
+
 
 namespace ad {
 
@@ -9,6 +11,7 @@ Render::Render(aunteater::EntityManager & aEntityManager, Application & aApplica
     mRectangles{mEntityManager},
     mOutlines{mEntityManager},
     mPendulums{mEntityManager},
+    mGuides{mEntityManager},
     mApplication(aApplication),
 #ifdef KIMBO_DEBUG
     mColliders{mEntityManager},
@@ -28,8 +31,8 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
     {
         mTrivialShaping.addRectangle({
             {
-                static_cast<math::Position<2, int>>(geometry.position * gPixelsPerMeter),
-                static_cast<math::Size<2, int>>(geometry.dimension * gPixelsPerMeter)  
+                static_cast<math::Position<2, GLfloat>>(geometry.position * gPixelsPerMeter),
+                static_cast<math::Size<2, GLfloat>>(geometry.dimension * gPixelsPerMeter)  
             },
             visualRectangle.angle,
             visualRectangle.color
@@ -55,6 +58,15 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
             {static_cast<math::Position<2, GLfloat>>(pendular.anchor * gPixelsPerMeter), math::sdr::gRed},
             {static_cast<math::Position<2, GLfloat>>(geometry.center() * gPixelsPerMeter), math::sdr::gGreen},
         });
+    }
+
+
+    for(const auto & [cameraGuide, geometry] : mGuides)
+    {
+        // Naively follow the latest guide
+        auto cameraTransformation = math::trans2d::translate(- static_cast<math::Vec<2, GLfloat>>(geometry.position) * gPixelsPerMeter
+                                                             + math::Vec<2, GLfloat>{800.f, 450.f});
+        mTrivialShaping.setCameraTransformation(cameraTransformation);
     }
 
 #ifdef KIMBO_DEBUG
