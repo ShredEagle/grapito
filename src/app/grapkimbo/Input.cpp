@@ -16,6 +16,8 @@ const KeyboardInputConfig gKeyboardConfig = {
     KeyboardInputMapping{Right,   GLFW_KEY_RIGHT},
     KeyboardInputMapping{Jump,    GLFW_KEY_SPACE},
     KeyboardInputMapping{Grapple, GLFW_KEY_X},
+    KeyboardInputMapping{Pause,   GLFW_KEY_P},
+    KeyboardInputMapping{Step,    GLFW_KEY_O},
 };
 
 
@@ -60,7 +62,7 @@ void readKeyboard(const KeyboardInputConfig & aConfig, ControllerInputState & aS
     for (size_t i = 0; i < aConfig.size(); ++i)
     {
         handleButtonEdges(aState[aConfig[i].command],
-                          glfwGetKey(aApplication.getWindow(), aConfig[i].glKeyCode));
+                          aApplication.getKey(aConfig[i].glKeyCode));
     }
 }
 

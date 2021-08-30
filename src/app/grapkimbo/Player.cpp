@@ -8,7 +8,7 @@
 #include "Components/Position.h"
 #include "Components/VisualOutline.h"
 #include "Components/VisualRectangle.h"
-#include "Components/Weight.h"
+#include "Components/Mass.h"
 
 #include "Systems/ControlAnchorSight.h"
 
@@ -31,7 +31,7 @@ aunteater::Entity makePlayer(int aIndex,
         .add<PlayerData>(aIndex, aColor)
         .add<Position>(math::Position<2, double>{0., 0.}, player::gSize) // The position will be set by pendulum simulation
         .add<VisualRectangle>(aColor)
-        .add<Weight>(player::gMass)
+        .add<Mass>(player::gMass)
     ;
 }
 

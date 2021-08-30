@@ -73,13 +73,13 @@ void ControlAnchorSight::update(const aunteater::Timer aTimer, const GameInputSt
         {
             aunteater::weak_entity anchor = selector.currentAnchor();
             aunteater::weak_entity player = selector.player;
-            if (anchor && anchor->has<Position>() && player->has<Position>() && player->has<ForceAndSpeed>())
+            if (anchor && anchor->has<Position>() && player->has<Position>() && player->has<AccelAndSpeed>())
             {
                 math::Position<2, double> grappleOrigin = player->get<Position>().center();
                 math::Position<2, double> anchorPoint = 
                     anchor->get<Position>().rectangle().closestPoint(grappleOrigin);
 
-                connectGrapple(player, makePendular(grappleOrigin, anchorPoint, player->get<ForceAndSpeed>().currentSpeed()));
+                connectGrapple(player, makePendular(grappleOrigin, anchorPoint, player->get<AccelAndSpeed>().speed));
             }
         }
     }

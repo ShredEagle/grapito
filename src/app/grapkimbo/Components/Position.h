@@ -11,6 +11,7 @@ struct Position : public aunteater::Component<Position>
     explicit Position(math::Position<2, double> aPosition  = math::Position<2, double>::Zero(),
                       math::Size<2, double> aDimension = math::Size<2, double>{1., 1.}) :
         position{std::move(aPosition)},
+        oldPosition(position),
         dimension{std::move(aDimension)}
     {}
 
@@ -22,6 +23,7 @@ struct Position : public aunteater::Component<Position>
 
     math::Position<2, double> position;
     math::Size<2, double> dimension;
+    math::Position<2, double> oldPosition;
 };
 
 

@@ -2,37 +2,43 @@ set(TARGET_NAME grapkimbo)
 
 set(${TARGET_NAME}_HEADERS
     Configuration.h
+    DebugUI.h
     Game.h
     Game_pendulum.h
     Input.h
     Player.h
     Utilities.h
 
+    Components/AccelAndSpeed.h
     Components/AnchorSelector.h
     Components/Controllable.h
-    Components/Environment.h
-    Components/EnvironmentCollisionBox.h
-    Components/ForceAndSpeed.h
     Components/GrappleControl.h
+    Components/Mass.h
     Components/Pendular.h
     Components/PlayerData.h
     Components/Position.h
     Components/VisualOutline.h
     Components/VisualRectangle.h
-    Components/Weight.h
+    Components/Body.h
+    Components/AccelAndSpeed.h
 
     Systems/Control.h
     Systems/ControlAnchorSight.h
-    Systems/EnvironmentCollision.h
+    Systems/Control.h
+    Systems/ContactConstraintCreation.h
     Systems/Gravity.h
     Systems/PendulumSimulation.h
     Systems/Render.h
-    Systems/SpeedResolution.h
+    Systems/AccelSolver.h
+    Systems/ImpulseSolver.h
+    Utils/CollisionBox.h
+    Utils/DrawDebugStuff.h
 )
 
 set(${TARGET_NAME}_SOURCES
     main.cpp
 
+    DebugUI.cpp
     Game.cpp
     Game_pendulum.cpp
     Input.cpp
@@ -40,11 +46,13 @@ set(${TARGET_NAME}_SOURCES
 
     Systems/Control.cpp
     Systems/ControlAnchorSight.cpp
-    Systems/EnvironmentCollision.cpp
+    Systems/ContactConstraintCreation.cpp
     Systems/Gravity.cpp
     Systems/PendulumSimulation.cpp
     Systems/Render.cpp
-    Systems/SpeedResolution.cpp
+    Systems/AccelSolver.cpp
+    Systems/ImpulseSolver.cpp
+    Utils/DrawDebugStuff.cpp
 )
 
 source_group(TREE ${CMAKE_CURRENT_LIST_DIR}

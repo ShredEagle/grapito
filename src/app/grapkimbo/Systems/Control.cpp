@@ -30,15 +30,15 @@ void Control::update(const aunteater::Timer aTimer, const GameInputState & aInpu
     //
     for(auto entity :  mCartesianControllables)
     {
-        auto & [controllable, geometry, fas, weight] = entity;
+        auto & [controllable, geometry, aas, weight] = entity;
         const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
 
         float horizontalAxis = aInputState.asAxis(controllable.controller, Left, Right, LeftHorizontalAxis);
-        fas.forces.emplace_back(horizontalAxis * gAirControlAcceleration * weight.mass, 0.);
+        aas.accel += math::Vec<2, double>{horizontalAxis * gAirControlAcceleration, 0.};
 
         if (inputs[Jump])
         {
-            fas.forces.emplace_back(0., + gAirControlAcceleration * weight.mass);
+            aas.accel += math::Vec<2, double>{0., + gAirControlAcceleration};
             break;
         }
     }
@@ -62,7 +62,7 @@ void Control::update(const aunteater::Timer aTimer, const GameInputState & aInpu
         {
             retractGrapple(
                 entity,
-                ForceAndSpeed{ math::Vec<2>{
+                AccelAndSpeed{ math::Vec<2>{
                     cos(pendular.angle) * pendular.length * pendular.angularSpeed.value(),
                     sin(pendular.angle) * pendular.length * pendular.angularSpeed.value()
             }});
@@ -74,7 +74,7 @@ void Control::update(const aunteater::Timer aTimer, const GameInputState & aInpu
     //
     for(const auto & entity : mGrapplers)
     {
-        auto & [controllable, fas, grappleControl, geometry] = entity;
+        auto & [controllable, aas, grappleControl, geometry] = entity;
         const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
 
 
@@ -94,7 +94,7 @@ void Control::update(const aunteater::Timer aTimer, const GameInputState & aInpu
                 connectGrapple(entity, 
                                makePendular(grappleOrigin,
                                             closest->testedPosition,
-                                            fas.currentSpeed(),
+                                            aas.speed,
                                             closest->distance));
             }
             break;

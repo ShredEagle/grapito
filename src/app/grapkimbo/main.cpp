@@ -21,13 +21,11 @@ int main(int argc, const char * argv[])
                                 Application::Window_Keep_Ratio);
         aunteater::Timer timer{glfwGetTime()};
 
-        glfwSetInputMode(application.getWindow(), GLFW_STICKY_KEYS, GLFW_TRUE);
-
         //
         // "Game" selection
         // 
-        //grapkimbo::Game game{gameEngine, application};
-        grapkimbo::Game_pendulum game{application};
+        grapkimbo::Game game{application};
+        //grapkimbo::Game_pendulum game{application};
 
         while(application.handleEvents())
         {

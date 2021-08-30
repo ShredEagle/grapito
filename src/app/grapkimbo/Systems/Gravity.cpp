@@ -7,15 +7,17 @@ namespace ad {
 const math::Vec<2, double> gravityVector = {0., - Gravity::gAcceleration};
 
 Gravity::Gravity(aunteater::EntityManager & aEntityManager) :
-    mEntityManager{aEntityManager},
-    mWeightables{mEntityManager}
+    mMassives(aEntityManager)
 {}
 
 void Gravity::update(const aunteater::Timer aTimer, const GameInputState &)
 {
-    for(auto weightable : mWeightables)
+    for(auto massive : mMassives)
     {
-        weightable->get<ForceAndSpeed>().forces.push_back(gravityVector * weightable->get<Weight>().mass);
+        if (massive->get<Body>().bodyType != BodyType::STATIC)
+        {
+            massive->get<AccelAndSpeed>().accel += gravityVector;
+        }
     }
 }
 } // namespace ad

@@ -20,6 +20,8 @@ enum Command {
     Jump,
     Grapple,
     ChangeMode, // intended to change the grappling mode (see GrappleControl component)
+    Pause,
+    Step,
     LeftHorizontalAxis,
     LeftVerticalAxis,
     RightHorizontalAxis,
@@ -133,7 +135,6 @@ struct GameInputState
 
     std::array<ControllerInputState, static_cast<std::size_t>(Controller::End)> controllerState;
 };
-
 
 extern const KeyboardInputConfig gKeyboardConfig;
 extern const GamepadInputConfig gGamepadConfig;

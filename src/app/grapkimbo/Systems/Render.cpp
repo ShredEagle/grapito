@@ -1,5 +1,7 @@
 #include "Render.h"
 
+#include "Utils/DrawDebugStuff.h"
+
 namespace ad {
 
 Render::Render(aunteater::EntityManager & aEntityManager, Application & aApplication) :
@@ -19,6 +21,7 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
 {
     mTrivialShaping.clearShapes();
     mTrivialLineStrip.clearLines();
+    debugDrawer->clear();
     mApplication.getEngine()->clear();
 
     for(const auto [geometry, visualRectangle] : mRectangles)
@@ -28,6 +31,7 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
                 static_cast<math::Position<2, int>>(geometry.position * gPixelsPerMeter),
                 static_cast<math::Size<2, int>>(geometry.dimension * gPixelsPerMeter)  
             },
+            visualRectangle.angle,
             visualRectangle.color
         });
     }
@@ -56,28 +60,19 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
 #ifdef KIMBO_DEBUG
     for(auto collider : mColliders)
     {
-        Color color = Color{255, 80, 80};
+        Color vecColor = Color{200,200,20};
 
-        if (collider->get<EnvironmentCollisionBox>().collidingWith.size())
+        for (auto contact : collider->get<Body>().collidingWith)
         {
-            color = Color{80,255,80};
+            contact.debugRender(vecColor);
         }
 
-        mTrivialShaping.addRectangle(
-            {
-                {
-                    static_cast<math::Position<2, int>>(collider->get<Position>().position 
-                                                       + collider->get<EnvironmentCollisionBox>().box.mPosition.as<math::Vec>()),
-                    static_cast<math::Size<2, int>>(collider->get<EnvironmentCollisionBox>().box.mDimension)
-                },
-                color
-            }
-        );
     }
 #endif
 
     mTrivialLineStrip.render();
     mTrivialShaping.render();
+    debugDrawer->render(gPixelsPerMeter);
 }
 
 } // namespace ad
