@@ -18,15 +18,12 @@ void AccelSolver::update(const aunteater::Timer aTimer, const GameInputState & a
         AccelAndSpeed & aas = accelerated->get<AccelAndSpeed>();
         Position & pos = accelerated->get<Position>();
 
-        for (auto accel : aas.accelerations)
-        {
-            pos.oldPosition = pos.position;
-            pos.position += aas.speed * aTimer.delta() + .5f * accel * aTimer.delta() * aTimer.delta();
-            aas.oldSpeed = aas.speed;
-            aas.speed += accel * aTimer.delta();
-        }
+        pos.oldPosition = pos.position;
+        pos.position += aas.speed * aTimer.delta() + .5f * aas.accel * aTimer.delta() * aTimer.delta();
+        aas.oldSpeed = aas.speed;
+        aas.speed += aas.accel * aTimer.delta();
 
-        aas.accelerations.clear();
+        aas.accel = math::Vec<2, double>::Zero();
     }
 }
 

@@ -29,6 +29,7 @@ Game::Game(Application & aApplication)
 {
     debugDrawer = new debug::DrawDebugStuff(aApplication);
     mSystemManager.add<Gravity>();
+    mSystemManager.add<Control>();
     mSystemManager.add<AccelSolver>();
     mSystemManager.add<ContactConstraintCreation>();
     mSystemManager.add<ImpulseSolver>();
@@ -36,7 +37,22 @@ Game::Game(Application & aApplication)
 
     mEntityManager.addEntity(
             aunteater::Entity()
+            .add<Position>(math::Position<2, double>{3., 10.}, math::Size<2, double>{2., 2.})
+            .add<Body>(
+                math::Rectangle<double>{{0., 0.}, {2., 2.}},
+                BodyType::DYNAMIC,
+                ShapeType::HULL,
+                1.,
+                1.
+            )
+            .add<VisualRectangle>(math::sdr::gCyan, 1.)
+            .add<AccelAndSpeed>()
+            );
+
+    mEntityManager.addEntity(
+            aunteater::Entity()
             .add<Position>(math::Position<2, double>{2., 5.}, math::Size<2, double>{2., 2.})
+            .add<Mass>(1.)
             .add<Controllable>(Controller::Keyboard)
             .add<Body>(
                 math::Rectangle<double>{{0., 0.}, {2., 2.}},
@@ -45,7 +61,7 @@ Game::Game(Application & aApplication)
                 1.,
                 0.
             )
-            .add<VisualRectangle>(math::sdr::gCyan, 0.001)
+            .add<VisualRectangle>(math::sdr::gCyan, 0.)
             .add<AccelAndSpeed>()
             );
 
@@ -60,7 +76,7 @@ Game::Game(Application & aApplication)
                 ShapeType::HULL
             ));
 
-    /*mEntityManager.addEntity(
+    mEntityManager.addEntity(
             aunteater::Entity()
             .add<Position>(math::Position<2, double>{7., 3.}, math::Size<2, double>{2., 2.})
             .add<VisualRectangle>(math::sdr::gCyan)
@@ -68,7 +84,20 @@ Game::Game(Application & aApplication)
                 math::Rectangle<double>{{0., 0.}, {2., 2.}},
                 BodyType::DYNAMIC,
                 ShapeType::HULL,
-                1.f
+                1.
+            )
+            .add<AccelAndSpeed>()
+            );
+
+    mEntityManager.addEntity(
+            aunteater::Entity()
+            .add<Position>(math::Position<2, double>{7., 10.}, math::Size<2, double>{2., 2.})
+            .add<VisualRectangle>(math::sdr::gCyan)
+            .add<Body>(
+                math::Rectangle<double>{{0., 0.}, {2., 2.}},
+                BodyType::DYNAMIC,
+                ShapeType::HULL,
+                1.
             )
             .add<AccelAndSpeed>()
             );
@@ -83,7 +112,6 @@ Game::Game(Application & aApplication)
                 BodyType::STATIC,
                 ShapeType::HULL
             ));
-            */
 }
 
 bool Game::update(const aunteater::Timer & aTimer, const GameInputState & aInputState)

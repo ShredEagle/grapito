@@ -60,17 +60,7 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
 #ifdef KIMBO_DEBUG
     for(auto collider : mColliders)
     {
-        Color color = Color{255, 80, 80};
         Color vecColor = Color{200,200,20};
-
-        debugDrawer->drawRectangle(
-            {
-                collider->get<Position>().position + collider->get<Body>().box.mBox.mPosition.as<math::Vec>(),
-                collider->get<Body>().box.mBox.mDimension,
-                collider->get<Body>().box.theta,
-                color
-            }
-        );
 
         for (auto contact : collider->get<Body>().collidingWith)
         {
@@ -82,7 +72,7 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
 
     mTrivialLineStrip.render();
     mTrivialShaping.render();
-    debugDrawer->render();
+    debugDrawer->render(gPixelsPerMeter);
 }
 
 } // namespace ad

@@ -100,7 +100,7 @@ namespace ad
                 void drawPoint(Point aPoint);
                 //void drawArrow(Arrow aArrow);
                 //void drawPoint(Point aPoint);
-                void render();
+                void render(const int pixelsPerMeter);
                 void clear();
             private:
                 std::vector<Rectangle> mRectangles;

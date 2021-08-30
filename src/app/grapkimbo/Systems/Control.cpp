@@ -34,11 +34,11 @@ void Control::update(const aunteater::Timer aTimer, const GameInputState & aInpu
         const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
 
         float horizontalAxis = aInputState.asAxis(controllable.controller, Left, Right, LeftHorizontalAxis);
-        aas.accelerations.emplace_back(horizontalAxis * gAirControlAcceleration, 0.);
+        aas.accel += math::Vec<2, double>{horizontalAxis * gAirControlAcceleration, 0.};
 
         if (inputs[Jump])
         {
-            aas.accelerations.emplace_back(0., + gAirControlAcceleration);
+            aas.accel += math::Vec<2, double>{0., + gAirControlAcceleration};
             break;
         }
     }

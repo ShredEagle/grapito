@@ -16,7 +16,7 @@ void Gravity::update(const aunteater::Timer aTimer, const GameInputState &)
     {
         if (massive->get<Body>().bodyType != BodyType::STATIC)
         {
-            massive->get<AccelAndSpeed>().accelerations.push_back(gravityVector);
+            massive->get<AccelAndSpeed>().accel += gravityVector;
         }
     }
 }

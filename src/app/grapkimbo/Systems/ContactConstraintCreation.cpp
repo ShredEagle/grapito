@@ -73,15 +73,6 @@ void QueryFacePenetration(ContactQuery & query, const CollisionBox & collisionBo
         }
     }
 
-    if (bestDistance < 0.)
-    {
-        debugDrawer->drawPoint({
-            bestContact.point,
-            2.,
-            Color{180,0,0}
-        });
-    }
-
 #ifdef KIMBO_DEBUG
     query.origin = bestOrigin;
     query.end = bestEnd;
@@ -169,7 +160,6 @@ bool findIntersectionPoint(math::Position<2, double> & result, const Line lineA,
         return false;
     }
 
-    std::cout << "T here : " << t << "\n";
     result = lineA.origin + t * lineA.direction;
 
     return true;
@@ -182,7 +172,7 @@ void getContactPoints(
 )
 {
     std::vector<Contact> candidateContact;
-    // TODO we should the already found contactPoint query.contacts
+    // TODO we should test and take into account the already found contactPoint query.contacts
 
     Edge referenceEdge = referenceBox.getEdge(query.index);
     math::Vec<2, double> edgeDirection = {referenceEdge.normal.y(), -referenceEdge.normal.x()}; 
@@ -274,6 +264,17 @@ void getContactPoints(
         candidateContact.push_back({bestEdge.origin});
     }
 
+    if (
+            projectedEnd.y() <= projectedReferenceOrigin.y() &&
+            projectedEnd.x() <= projectedReferenceOrigin.x() &&
+            projectedEnd.x() >= projectedReferenceEnd.x()
+       )
+    {
+        candidateContact.push_back({bestEdge.end});
+    }
+
+    query.contacts = candidateContact;
+
     /*
     debugDrawer->drawLine(
             {
@@ -300,58 +301,43 @@ void getContactPoints(
                 Color{40, 200, 200}
             }
         );
-        */
 
+    math::Vec<2, double> baseOrigin = math::Vec<2, double>{10., 10.};
     debugDrawer->drawPoint({
-            (math::Position<2, double>)math::Vec<2, double>{500., 500.} + projectedOrigin.as<math::Vec>(),
+            (math::Position<2, double>) baseOrigin + projectedOrigin.as<math::Vec>(),
             3.f,
             {200,20,200},
         });
     debugDrawer->drawPoint({
-            (math::Position<2, double>)math::Vec<2, double>{500., 500.} + projectedEnd.as<math::Vec>(),
+            (math::Position<2, double>) baseOrigin + projectedEnd.as<math::Vec>(),
             3.f,
             {200,20,200},
         });
     debugDrawer->drawPoint({
-            (math::Position<2, double>)math::Vec<2, double>{500., 500.} + projectedReferenceEnd.as<math::Vec>(),
+            (math::Position<2, double>)baseOrigin + projectedReferenceEnd.as<math::Vec>(),
             3.f,
             {200,100,20},
         });
     debugDrawer->drawPoint({
-            (math::Position<2, double>)math::Vec<2, double>{500., 500.} + projectedReferenceOrigin.as<math::Vec>(),
+            (math::Position<2, double>)baseOrigin + projectedReferenceOrigin.as<math::Vec>(),
             3.f,
             {200,200,20},
         });
-    std::cout << "ProjectedReferenceOrigin x : " << projectedReferenceOrigin.x() << " y " << projectedReferenceOrigin.y() << "\n";
-    std::cout << "ProjectedReferenceEnd x : " << projectedReferenceEnd.x() << " y " << projectedReferenceEnd.y() << "\n";
-    std::cout << "ProjectedOrigin x : " << projectedOrigin.x() << " y " << projectedOrigin.y() << "\n";
-    std::cout << "ProjectedEnd x : " << projectedEnd.x() << " y " << projectedEnd.y() << "\n";
 
     debugDrawer->drawLine({
-            {500., 500.},
-            (math::Position<2, double>)(edgeDirection * 100 + math::Vec<2, double>{500., 500.}),
+            (math::Position<2, double>)baseOrigin,
+            (math::Position<2, double>)(edgeDirection * 100 + baseOrigin),
             2.f,
             Color{200, 255, 200},
             });
 
     debugDrawer->drawLine({
-            {500., 500.},
-            (math::Position<2, double>)(referenceEdge.normal * 100 + math::Vec<2, double>{500., 500.}),
+            (math::Position<2, double>)baseOrigin,
+            (math::Position<2, double>)(referenceEdge.normal * 100 + baseOrigin),
             2.f,
             Color{255, 200, 200},
             });
-
-
-    if (
-            projectedEnd.y() <= projectedReferenceOrigin.y() &&
-            projectedEnd.x() <= projectedReferenceOrigin.x() &&
-            projectedEnd.x() >= projectedReferenceEnd.x()
-       )
-    {
-        candidateContact.push_back({bestEdge.end});
-    }
-
-    query.contacts = candidateContact;
+        */
 }
 
 

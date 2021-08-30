@@ -19,15 +19,15 @@ namespace ad
             mPoints.push_back(aPoint);
         }
 
-        void DrawDebugStuff::render()
+        void DrawDebugStuff::render(const int pixelsPerMeter)
         {
             for (auto rectangle : mRectangles)
             {
                 mTrivialShaping.addRectangle(
                     {
                         {
-                            rectangle.origin,
-                            rectangle.dimension
+                            rectangle.origin * pixelsPerMeter,
+                            rectangle.dimension * pixelsPerMeter,
                         },
                         rectangle.angle,
                         rectangle.color
@@ -39,8 +39,8 @@ namespace ad
             {
                 mDrawLine.addLine(
                     {
-                        line.origin,
-                        line.end,
+                        line.origin * pixelsPerMeter,
+                        line.end * pixelsPerMeter,
                         line.width,
                         line.color,
                     }
@@ -51,16 +51,16 @@ namespace ad
             {
                 mDrawLine.addLine(
                     {
-                        static_cast<math::Position<2, int>>(point.origin + math::Vec<2, double>{1.f, 1.f} * point.radius),
-                        static_cast<math::Position<2, int>>(point.origin + math::Vec<2, double>{-1.f, -1.f} * point.radius),
+                        static_cast<math::Position<2, int>>(point.origin * pixelsPerMeter + math::Vec<2, double>{1.f, 1.f} * point.radius),
+                        static_cast<math::Position<2, int>>(point.origin * pixelsPerMeter + math::Vec<2, double>{-1.f, -1.f} * point.radius),
                         2.f,
                         point.color
                     }
                 );
                 mDrawLine.addLine(
                     {
-                        static_cast<math::Position<2, int>>(point.origin + math::Vec<2, double>{1.f, -1.f} * point.radius),
-                        static_cast<math::Position<2, int>>(point.origin + math::Vec<2, double>{-1.f, 1.f} * point.radius),
+                        static_cast<math::Position<2, int>>(point.origin * pixelsPerMeter + math::Vec<2, double>{1.f, -1.f} * point.radius),
+                        static_cast<math::Position<2, int>>(point.origin * pixelsPerMeter + math::Vec<2, double>{-1.f, 1.f} * point.radius),
                         2.f,
                         point.color
                     }
