@@ -25,9 +25,10 @@ struct Body : public aunteater::Component<Body>
         math::Rectangle<double> aBox,
         BodyType aBodyType,
         ShapeType aShapeType,
-        float aMass = 1
+        float aMass = 1,
+        float theta = 0.
     ) :
-        box{std::move(aBox)},
+        box{std::move(aBox), theta},
         bodyType{aBodyType},
         shapeType{aShapeType}
     {

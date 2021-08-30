@@ -17,6 +17,7 @@ struct AccelAndSpeed : public aunteater::Component<AccelAndSpeed>
     std::vector<math::Vec<2, double>> accelerations;
     math::Vec<2, double> speed;
     math::Vec<2, double> oldSpeed;
+    float w;
 };
 
 

@@ -20,12 +20,8 @@ void applyImpulse(Position & pos, AccelAndSpeed & aas, math::Vec<2, double> impV
 
 void ImpulseSolver::update(const aunteater::Timer aTimer, const GameInputState & aInputState)
 {
-    for (auto impulsable : mImpulsables)
+    for (auto & [aas, pos, ecb] : mImpulsables)
     {
-        AccelAndSpeed & aas = impulsable->get<AccelAndSpeed>();
-        Position & pos = impulsable->get<Position>();
-        Body & ecb = impulsable->get<Body>();
-
         for (auto query : ecb.collidingWith)
         {
             for (auto contact : query.contacts)
@@ -37,12 +33,8 @@ void ImpulseSolver::update(const aunteater::Timer aTimer, const GameInputState &
 
     for (int i = 0; i < 10; ++i)
     {
-        for (auto impulsable : mImpulsables)
+        for (auto & [aasA, posA, ecbA] : mImpulsables)
         {
-            AccelAndSpeed & aasA = impulsable->get<AccelAndSpeed>();
-            Position & posA = impulsable->get<Position>();
-            Body & ecbA = impulsable->get<Body>();
-
             for (auto query : ecbA.collidingWith)
             {
                 AccelAndSpeed & aasB = query.entity->get<AccelAndSpeed>();
@@ -61,13 +53,6 @@ void ImpulseSolver::update(const aunteater::Timer aTimer, const GameInputState &
 
 
                     math::Vec<2, double> impVec = lambda * query.normal * ecbA.invMass;
-
-                    debugDrawer->drawLine({
-                            contact.point,
-                            contact.point + impVec,
-                            2.f,
-                            Color{0,0,255}
-                            });
 
                     applyImpulse(posA, aasA, impVec, aTimer.delta());
 

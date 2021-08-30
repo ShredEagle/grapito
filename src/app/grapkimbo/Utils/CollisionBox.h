@@ -1,6 +1,8 @@
 #pragma once
 
+#include "Utils/DrawDebugStuff.h"
 #include <limits>
+#include <math.h>
 #include <math/Vector.h>
 #include <math/Rectangle.h>
 
@@ -25,11 +27,22 @@ namespace ad {
             //In 2D face count and vertex count are always the same
             math::Rectangle<double> mBox;
             int mFaceCount;
+            float theta;
+            math::Position<2, double> massCenter;
 
-            CollisionBox(math::Rectangle<double> aBox = math::Rectangle<double>{{0.f, 0.f}, {1.f, 1.f}}) : 
+            CollisionBox(math::Rectangle<double> aBox = math::Rectangle<double>{{0.f, 0.f}, {1.f, 1.f}}, float aTheta = 0.) : 
                 mBox{aBox},
-                mFaceCount{4}
-            {};
+                mFaceCount{4},
+                massCenter{math::Position<2, double>::Zero()},
+                theta{aTheta}
+            {
+                math::Vec<2, double> vecMassCenter = math::Vec<2, double>::Zero();
+                for (int i = 0; i < mFaceCount; ++i)
+                {
+                    vecMassCenter += (getVertice(i).as<math::Vec>() / mFaceCount);
+                }
+                massCenter = static_cast<math::Position<2, double>>(vecMassCenter);
+            };
 
             // TODO Due to this and the normal calculation 
             // we should not accept collision with negative width or height
@@ -37,8 +50,8 @@ namespace ad {
             // and makes normal computation easy
             const math::Position<2, double> getVertice(const int index) const
             {
-                math::Vec<2, double> xVec{mBox.width(), 0.f};
-                math::Vec<2, double> yVec{0.f, mBox.height()};
+                math::Vec<2, double> xVec{mBox.width() * cos(theta), mBox.width() * sin(theta)};
+                math::Vec<2, double> yVec{-mBox.width() * sin(theta), mBox.height() * cos(theta)};
 
                 return mBox.origin() + ((index & 0x01) ^ index >> 1) * xVec + (index >> 1) * yVec;
             }

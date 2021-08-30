@@ -23,7 +23,7 @@ public:
 
     void loadInputState(const GameInputState & aInputState);
 
-    static constexpr double gAcceleration = 100.f;
+    static constexpr double gAcceleration = 10.;
 
 private:
     const aunteater::FamilyHelp<Massive> mMassives;

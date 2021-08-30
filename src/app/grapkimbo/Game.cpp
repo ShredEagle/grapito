@@ -42,7 +42,8 @@ Game::Game(Application & aApplication)
                 math::Rectangle<double>{{0., 0.}, {2., 2.}},
                 BodyType::DYNAMIC,
                 ShapeType::HULL,
-                0.001
+                1.,
+                0.
             )
             .add<VisualRectangle>(math::sdr::gCyan, 0.001)
             .add<AccelAndSpeed>()

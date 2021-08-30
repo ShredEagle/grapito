@@ -28,14 +28,14 @@ struct ContactQuery
     {
         for (auto contact : contacts)
         {
-            /*
             debugDrawer->drawPoint(
                 {
                     contact.point,
                     2.f,
-                    vecColor
+                    Color{0, 0, 255}
                 }
             );
+            /*
             debugDrawer->drawPoint(
                 {
                     point,
@@ -75,7 +75,6 @@ struct ContactQuery
             debugDrawer->drawPoint({
                 origin,
                 2.,
-                Color{0, 0, 255}
             });
             */
         }

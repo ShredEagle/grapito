@@ -67,6 +67,7 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
             {
                 collider->get<Position>().position + collider->get<Body>().box.mBox.mPosition.as<math::Vec>(),
                 collider->get<Body>().box.mBox.mDimension,
+                collider->get<Body>().box.theta,
                 color
             }
         );

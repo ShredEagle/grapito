@@ -26,9 +26,7 @@ const math::Position<2, double> projectPointOnLine(math::Position<2, double> poi
 
 const double distanceToLine(math::Position<2, double> point, math::Position<2, double> origin, math::Position<2, double> end, math::Vec<2, double> normal)
 {
-    math::Vec<2, double> orthVector = point - projectPointOnLine(point, origin, end);
-    return orthVector.dot(normal);
-    //return (((end.x() - origin.x()) * (origin.y() - point.y())) - ((origin.x() - point.x()) * (end.y() - origin.y()))) / (origin - end).getNorm();
+    return (((end.x() - origin.x()) * (origin.y() - point.y())) - ((origin.x() - point.x()) * (end.y() - origin.y()))) / (origin - end).getNorm();
 }
 
 // This create a basic query from a reference collisionBoxA
@@ -55,7 +53,11 @@ void QueryFacePenetration(ContactQuery & query, const CollisionBox & collisionBo
         const Edge edgeA = collisionBoxA.getEdge(i);
         const math::Position<2, double> support = collisionBoxB.getSupport(-edgeA.normal);
         const double distance = distanceToLine(support, edgeA.origin, edgeA.end, edgeA.normal);
+
+        Color color = distance > 0 ? Color{0, 200, 0} : Color{200, 0, 0};
+#ifdef KIMBO_DEBUG
         const math::Position<2, double> pointOnLine = projectPointOnLine(support, edgeA.origin, edgeA.end);
+#endif
 
         if (distance > bestDistance)
         {
@@ -71,6 +73,15 @@ void QueryFacePenetration(ContactQuery & query, const CollisionBox & collisionBo
         }
     }
 
+    if (bestDistance < 0.)
+    {
+        debugDrawer->drawPoint({
+            bestContact.point,
+            2.,
+            Color{180,0,0}
+        });
+    }
+
 #ifdef KIMBO_DEBUG
     query.origin = bestOrigin;
     query.end = bestEnd;
@@ -79,7 +90,6 @@ void QueryFacePenetration(ContactQuery & query, const CollisionBox & collisionBo
     query.distance = bestDistance;
     query.normal = bestNormal;
     query.index = bestIndex;
-    query.contacts = {bestContact};
 };
 
 ContactConstraintCreation::ContactConstraintCreation(aunteater::EntityManager & aEntityManager) :
@@ -102,12 +112,11 @@ ReferenceFace ContactConstraintCreation::getBestQuery(
 
     queryFunctions[ecbBType][ecbAType](queryA, ecbA, ecbB);
 
+
     if (queryA.distance > 0.f)
     {
         return face;
     }
-
-    bestQuery = queryA;
 
     queryFunctions[ecbAType][ecbBType](queryB, ecbB, ecbA);
 
@@ -116,10 +125,17 @@ ReferenceFace ContactConstraintCreation::getBestQuery(
         return face;
     }
     
-    if (queryB.distance < queryA.distance)
+    // We want the highest distance to minimize displacement because those distance are
+    // negative !
+    if (queryB.distance > queryA.distance)
     {
         face = ReferenceFace::FACEB;
         bestQuery = queryB;
+    }
+    else 
+    {
+        face = ReferenceFace::FACEA;
+        bestQuery = queryA;
     }
 
     return face;
@@ -153,6 +169,7 @@ bool findIntersectionPoint(math::Position<2, double> & result, const Line lineA,
         return false;
     }
 
+    std::cout << "T here : " << t << "\n";
     result = lineA.origin + t * lineA.direction;
 
     return true;
@@ -170,8 +187,8 @@ void getContactPoints(
     Edge referenceEdge = referenceBox.getEdge(query.index);
     math::Vec<2, double> edgeDirection = {referenceEdge.normal.y(), -referenceEdge.normal.x()}; 
 
-    Line lineA{referenceEdge.origin - referenceEdge.normal * 10000., referenceEdge.normal * 20000.};
-    Line lineB{referenceEdge.end - referenceEdge.normal * 10000., referenceEdge.normal * 20000};
+    Line lineA{referenceEdge.origin, -referenceEdge.normal * 20.};
+    Line lineB{referenceEdge.end, -referenceEdge.normal * 20.};
 
     Edge bestEdge{{0.,0.}, {0.,0.}, {0.,0.}};
     double bestDot = -std::numeric_limits<double>::max();
@@ -224,32 +241,106 @@ void getContactPoints(
     // https://www.csd.uwo.ca/~sbeauche/CS3388/CS3388-2D-Clipping.pdf
     // Our y values are reversed because we use bottom right origin
     // This tests gives us all point beyond our colliding axis
-    math::Position<2, double> projectedReferenceOrigin = static_cast<math::Position<2, double>>(
-        referenceEdge.origin.as<math::Vec>().dot(edgeDirection) * edgeDirection +
-        referenceEdge.origin.as<math::Vec>().dot(referenceEdge.normal) * referenceEdge.normal
-        );
-    math::Position<2, double> projectedReferenceEnd = static_cast<math::Position<2, double>>(
-        referenceEdge.end.as<math::Vec>().dot(edgeDirection) * edgeDirection +
-        referenceEdge.end.as<math::Vec>().dot(referenceEdge.normal) * referenceEdge.normal
-        );
-    math::Position<2, double> projectedOrigin = static_cast<math::Position<2, double>>(
-        bestEdge.origin.as<math::Vec>().dot(edgeDirection) * edgeDirection +
-        bestEdge.origin.as<math::Vec>().dot(referenceEdge.normal) * referenceEdge.normal
-        );
-
+    math::Position<2, double> projectedReferenceOrigin = {
+        (referenceEdge.normal.y() * referenceEdge.origin.x() - referenceEdge.normal.x() * referenceEdge.origin.y()) /
+            (referenceEdge.normal.y() * edgeDirection.x() - referenceEdge.normal.x() * edgeDirection.y()),
+        (edgeDirection.y() * referenceEdge.origin.x() - edgeDirection.x() * referenceEdge.origin.y()) /
+            (referenceEdge.normal.x() * edgeDirection.y() - referenceEdge.normal.y() * edgeDirection.x())
+    };
+    math::Position<2, double> projectedReferenceEnd = {
+        (referenceEdge.normal.y() * referenceEdge.end.x() - referenceEdge.normal.x() * referenceEdge.end.y()) /
+            (referenceEdge.normal.y() * edgeDirection.x() - referenceEdge.normal.x() * edgeDirection.y()),
+        (edgeDirection.y() * referenceEdge.end.x() - edgeDirection.x() * referenceEdge.end.y()) /
+            (referenceEdge.normal.x() * edgeDirection.y() - referenceEdge.normal.y() * edgeDirection.x())
+    };
+    math::Position<2, double> projectedOrigin = {
+        (referenceEdge.normal.y() * bestEdge.origin.x() - referenceEdge.normal.x() * bestEdge.origin.y()) /
+            (referenceEdge.normal.y() * edgeDirection.x() - referenceEdge.normal.x() * edgeDirection.y()),
+        (edgeDirection.y() * bestEdge.origin.x() - edgeDirection.x() * bestEdge.origin.y()) /
+            (referenceEdge.normal.x() * edgeDirection.y() - referenceEdge.normal.y() * edgeDirection.x())
+    };
+    math::Position<2, double> projectedEnd = {
+        (referenceEdge.normal.y() * bestEdge.end.x() - referenceEdge.normal.x() * bestEdge.end.y()) /
+            (referenceEdge.normal.y() * edgeDirection.x() - referenceEdge.normal.x() * edgeDirection.y()),
+        (edgeDirection.y() * bestEdge.end.x() - edgeDirection.x() * bestEdge.end.y()) /
+            (referenceEdge.normal.x() * edgeDirection.y() - referenceEdge.normal.y() * edgeDirection.x())
+    };
     if (
             projectedOrigin.y() <= projectedReferenceOrigin.y() &&
             projectedOrigin.x() <= projectedReferenceOrigin.x() &&
             projectedOrigin.x() >= projectedReferenceEnd.x()
        )
     {
-        candidateContact.push_back({projectedOrigin});
+        candidateContact.push_back({bestEdge.origin});
     }
 
-    math::Position<2, double> projectedEnd = static_cast<math::Position<2, double>>(
-        bestEdge.end.as<math::Vec>().dot(edgeDirection) * edgeDirection +
-        bestEdge.end.as<math::Vec>().dot(referenceEdge.normal) * referenceEdge.normal
+    /*
+    debugDrawer->drawLine(
+            {
+                bestEdge.origin,
+                bestEdge.end,
+                2.,
+                Color{200, 100, 40}
+            }
         );
+
+    debugDrawer->drawLine(
+            {
+                lineB.origin,
+                lineB.origin + lineA.direction * 5,
+                2.,
+                Color{40, 200, 200}
+            }
+        );
+    debugDrawer->drawLine(
+            {
+                lineA.origin,
+                lineA.origin + lineB.direction * 100,
+                2.,
+                Color{40, 200, 200}
+            }
+        );
+        */
+
+    debugDrawer->drawPoint({
+            (math::Position<2, double>)math::Vec<2, double>{500., 500.} + projectedOrigin.as<math::Vec>(),
+            3.f,
+            {200,20,200},
+        });
+    debugDrawer->drawPoint({
+            (math::Position<2, double>)math::Vec<2, double>{500., 500.} + projectedEnd.as<math::Vec>(),
+            3.f,
+            {200,20,200},
+        });
+    debugDrawer->drawPoint({
+            (math::Position<2, double>)math::Vec<2, double>{500., 500.} + projectedReferenceEnd.as<math::Vec>(),
+            3.f,
+            {200,100,20},
+        });
+    debugDrawer->drawPoint({
+            (math::Position<2, double>)math::Vec<2, double>{500., 500.} + projectedReferenceOrigin.as<math::Vec>(),
+            3.f,
+            {200,200,20},
+        });
+    std::cout << "ProjectedReferenceOrigin x : " << projectedReferenceOrigin.x() << " y " << projectedReferenceOrigin.y() << "\n";
+    std::cout << "ProjectedReferenceEnd x : " << projectedReferenceEnd.x() << " y " << projectedReferenceEnd.y() << "\n";
+    std::cout << "ProjectedOrigin x : " << projectedOrigin.x() << " y " << projectedOrigin.y() << "\n";
+    std::cout << "ProjectedEnd x : " << projectedEnd.x() << " y " << projectedEnd.y() << "\n";
+
+    debugDrawer->drawLine({
+            {500., 500.},
+            (math::Position<2, double>)(edgeDirection * 100 + math::Vec<2, double>{500., 500.}),
+            2.f,
+            Color{200, 255, 200},
+            });
+
+    debugDrawer->drawLine({
+            {500., 500.},
+            (math::Position<2, double>)(referenceEdge.normal * 100 + math::Vec<2, double>{500., 500.}),
+            2.f,
+            Color{255, 200, 200},
+            });
+
 
     if (
             projectedEnd.y() <= projectedReferenceOrigin.y() &&
@@ -257,7 +348,7 @@ void getContactPoints(
             projectedEnd.x() >= projectedReferenceEnd.x()
        )
     {
-        candidateContact.push_back({projectedEnd});
+        candidateContact.push_back({bestEdge.end});
     }
 
     query.contacts = candidateContact;
@@ -276,7 +367,8 @@ void ContactConstraintCreation::update(const aunteater::Timer aTimer, const Game
             math::Rectangle<double>{
                 posA.position + ecbA.box.mBox.mPosition.as<math::Vec>(),
                 ecbA.box.mBox.mDimension
-            }
+            },
+            ecbA.box.theta,
         };
 
         for(auto colliderB : mColliders)
@@ -290,7 +382,8 @@ void ContactConstraintCreation::update(const aunteater::Timer aTimer, const Game
                     math::Rectangle<double>{
                         colliderB->get<Position>().position + colliderB->get<Body>().box.mBox.mPosition.as<math::Vec>(),
                         colliderB->get<Body>().box.mBox.mDimension
-                    }
+                    },
+                    ecbB.box.theta,
                 };
 
                 ContactQuery bestQuery{colliderB};
