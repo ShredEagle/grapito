@@ -1,6 +1,6 @@
 #include "ControlAnchorSight.h"
 
-#include "../Player.h"
+#include "../Entities.h"
 #include "../Utilities.h"
 
 #include <math/VectorUtilities.h>

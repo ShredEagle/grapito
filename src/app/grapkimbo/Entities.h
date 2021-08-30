@@ -32,6 +32,9 @@ Pendular makePendular(math::Position<2, double> aGrappleOrigin,
                       double aGrappleLength);
 
 
+aunteater::Entity makeAnchor(math::Position<2, double> aPosition, math::Size<2, double> aSize);
+
+
 inline Pendular makePendular(math::Position<2, double> aGrappleOrigin, math::Position<2, double> aAnchorPoint, math::Vec<2, double> aCartesianSpeed)
 {
     return makePendular(aGrappleOrigin, aAnchorPoint, aCartesianSpeed, (aAnchorPoint - aGrappleOrigin).getNorm());

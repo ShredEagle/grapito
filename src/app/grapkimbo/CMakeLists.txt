@@ -6,7 +6,7 @@ set(${TARGET_NAME}_HEADERS
     Game.h
     Game_pendulum.h
     Input.h
-    Player.h
+    Entities.h
     Utilities.h
 
     Components/AccelAndSpeed.h
@@ -28,6 +28,7 @@ set(${TARGET_NAME}_HEADERS
     Systems/Control.h
     Systems/ContactConstraintCreation.h
     Systems/Gravity.h
+    Systems/LevelGeneration.h
     Systems/PendulumSimulation.h
     Systems/Render.h
     Systems/AccelSolver.h
@@ -43,12 +44,13 @@ set(${TARGET_NAME}_SOURCES
     Game.cpp
     Game_pendulum.cpp
     Input.cpp
-    Player.cpp
+    Entities.cpp
 
     Systems/Control.cpp
     Systems/ControlAnchorSight.cpp
     Systems/ContactConstraintCreation.cpp
     Systems/Gravity.cpp
+    Systems/LevelGeneration.cpp
     Systems/PendulumSimulation.cpp
     Systems/Render.cpp
     Systems/AccelSolver.cpp

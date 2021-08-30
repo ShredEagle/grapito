@@ -2,7 +2,7 @@
 
 #include "Gravity.h"
 
-#include "../Player.h"
+#include "../Entities.h"
 #include "../Utilities.h"
 
 #include <Components/VisualRectangle.h>

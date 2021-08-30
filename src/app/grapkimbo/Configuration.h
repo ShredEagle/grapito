@@ -3,10 +3,17 @@
 
 #include <math/Constants.h>
 #include <math/Angle.h>
+#include <math/Color.h>
 #include <math/Vector.h>
 
 
 namespace ad {
+
+
+namespace anchor
+{
+    constexpr math::sdr::Rgb gColor{200, 200, 200};
+} // namespace anchor
 
 
 namespace player

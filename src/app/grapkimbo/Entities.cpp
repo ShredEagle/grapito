@@ -1,4 +1,4 @@
-#include "Player.h"
+#include "Entities.h"
 
 #include "Components/AnchorSelector.h"
 #include "Components/Controllable.h"
@@ -34,6 +34,20 @@ aunteater::Entity makePlayer(int aIndex,
         .add<Mass>(player::gMass)
     ;
 }
+
+
+aunteater::Entity makeAnchor(math::Position<2, double> aPosition, math::Size<2, double> aSize)
+{
+    return aunteater::Entity()
+        .add<Body>(
+            math::Rectangle<double>{{0., 0.}, {2., 2.}},
+            BodyType::STATIC,
+            ShapeType::HULL)
+        .add<Position>(aPosition, aSize)
+        .add<VisualRectangle>(anchor::gColor)
+    ;
+}
+
 
 aunteater::weak_entity setGrappleMode(aunteater::weak_entity aEntity,
                                       const PlayerData & aPlayerData,
