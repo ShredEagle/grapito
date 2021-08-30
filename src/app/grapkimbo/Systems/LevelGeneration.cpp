@@ -103,7 +103,7 @@ void LevelGeneration::generateTiles(TileIndex aIndex)
 {
     std::vector<aunteater::weak_entity> anchors;
 
-    static constexpr int count = 5;
+    static constexpr int count = 7;
     for (int y = 0; y != count; ++y)
     {
         for (int x = 0; x != count; ++x)
