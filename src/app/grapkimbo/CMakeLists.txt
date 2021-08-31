@@ -12,6 +12,7 @@ set(${TARGET_NAME}_HEADERS
     Components/AccelAndSpeed.h
     Components/AnchorSelector.h
     Components/CameraGuide.h
+    Components/CameraTag.h
     Components/Controllable.h
     Components/GrappleControl.h
     Components/Mass.h
@@ -23,6 +24,7 @@ set(${TARGET_NAME}_HEADERS
     Components/Body.h
     Components/AccelAndSpeed.h
 
+    Systems/CameraGuidedControl.h
     Systems/Control.h
     Systems/ControlAnchorSight.h
     Systems/Control.h
@@ -46,6 +48,7 @@ set(${TARGET_NAME}_SOURCES
     Input.cpp
     Entities.cpp
 
+    Systems/CameraGuidedControl.cpp
     Systems/Control.cpp
     Systems/ControlAnchorSight.cpp
     Systems/ContactConstraintCreation.cpp

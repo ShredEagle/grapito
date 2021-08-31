@@ -1,6 +1,8 @@
 #include "Entities.h"
 
 #include "Components/AnchorSelector.h"
+#include "Components/CameraGuide.h"
+#include "Components/CameraTag.h"
 #include "Components/Controllable.h"
 #include <Components/GrappleControl.h>
 #include "Components/Pendular.h"
@@ -24,7 +26,7 @@ aunteater::Entity makePlayer(int aIndex,
                              Pendular aPendular,
                              GrappleMode aGrappleMode)
 {
-    return aunteater::Entity()
+    aunteater::Entity player = aunteater::Entity()
         .add<Controllable>(aController)
         .add<GrappleControl>(aGrappleMode)
         .add<Pendular>(std::move(aPendular))
@@ -33,6 +35,19 @@ aunteater::Entity makePlayer(int aIndex,
         .add<VisualRectangle>(aColor)
         .add<Mass>(player::gMass)
     ;
+
+    aPendular.connected->add<CameraGuide>(math::makeInterpolation<math::ease::SmoothStep>(0., 1., 0.3));
+
+    return player;
+}
+
+
+aunteater::Entity makeCamera()
+{
+    return aunteater::Entity()
+        .add<CameraTag>()
+        .add<Position>()
+        ;
 }
 
 
@@ -46,6 +61,34 @@ aunteater::Entity makeAnchor(math::Position<2, double> aPosition, math::Size<2, 
         .add<Position>(aPosition, aSize)
         .add<VisualRectangle>(anchor::gColor)
     ;
+}
+
+
+void connectGrapple(aunteater::weak_entity aEntity, Pendular aPendular)
+{
+    (*aEntity)
+        .markComponentToRemove<AccelAndSpeed>()
+        .add<Pendular>(std::move(aPendular))
+        ;
+
+    aPendular.connected->add<CameraGuide>(
+        math::makeInterpolation<math::ease::SmoothStep>(0., 1., camera::gAnchorGuideFadeIn));
+}
+
+
+void retractGrapple(aunteater::weak_entity aEntity, AccelAndSpeed aForceAndSpeed)
+{
+    CameraGuide & guide = aEntity->get<Pendular>().connected->get<CameraGuide>();
+    guide = CameraGuide{
+        math::makeInterpolation<math::ease::SmoothStep>(guide.influence, 0., camera::gAnchorGuideFadeOut),
+        CameraGuide::OnCompletion::Remove,
+    };
+
+    (*aEntity)
+        .markComponentToRemove<Pendular>()
+        .add<AccelAndSpeed>(std::move(aForceAndSpeed))
+        ;
+
 }
 
 
@@ -85,6 +128,7 @@ aunteater::weak_entity setGrappleMode(aunteater::weak_entity aEntity,
 
 Pendular makePendular(math::Position<2, double> aGrappleOrigin,
                       math::Position<2, double> aAnchorPoint,
+                      aunteater::weak_entity aConnected,
                       math::Vec<2, double> aCartesianSpeed,
                       double aGrappleLength)
 {
@@ -96,17 +140,18 @@ Pendular makePendular(math::Position<2, double> aGrappleOrigin,
     math::Radian<double> angularSpeed{ cos(math::getOrientedAngle(aCartesianSpeed, tangent)) 
                                        * aCartesianSpeed.getNorm() / aGrappleLength };
 
-    return Pendular{aAnchorPoint, angle, aGrappleLength, angularSpeed};
+    return Pendular{aAnchorPoint, aConnected, angle, aGrappleLength, angularSpeed};
 }
 
 
-Pendular makePendular(aunteater::weak_entity aAnchor,
+Pendular makePendular(aunteater::weak_entity aConnected,
                       double aRopeLength,
                       math::Radian<double> aInitialAngle)
 {
-    auto rectangle = aAnchor->get<Position>().rectangle();
+    auto rectangle = aConnected->get<Position>().rectangle();
     return Pendular{
         (rectangle.bottomLeft() + rectangle.bottomRight().as<math::Vec>()) / 2.,
+        aConnected,
         aInitialAngle,
         aRopeLength
     };

@@ -21,41 +21,41 @@ aunteater::Entity makePlayer(int aIndex,
                              Pendular aPendular,
                              GrappleMode aGrappleMode = GrappleMode::Closest);
 
-Pendular makePendular(aunteater::weak_entity aAnchor,
+aunteater::Entity makeCamera();
+
+
+aunteater::Entity makeAnchor(math::Position<2, double> aPosition, math::Size<2, double> aSize);
+
+
+Pendular makePendular(aunteater::weak_entity aConnected,
                       double aRopeLength = player::gInitialRopeLength,
                       math::Radian<double> aInitialAngle = player::gInitialAngle);
 
 
 Pendular makePendular(math::Position<2, double> aGrappleOrigin,
                       math::Position<2, double> aAnchorPoint,
+                      aunteater::weak_entity aConnected,
                       math::Vec<2, double> aCartesianSpeed,
                       double aGrappleLength);
 
 
-aunteater::Entity makeAnchor(math::Position<2, double> aPosition, math::Size<2, double> aSize);
 
-
-inline Pendular makePendular(math::Position<2, double> aGrappleOrigin, math::Position<2, double> aAnchorPoint, math::Vec<2, double> aCartesianSpeed)
+inline Pendular makePendular(math::Position<2, double> aGrappleOrigin,
+                             math::Position<2, double> aAnchorPoint,
+                             aunteater::weak_entity aConnected,
+                             math::Vec<2, double> aCartesianSpeed)
 {
-    return makePendular(aGrappleOrigin, aAnchorPoint, aCartesianSpeed, (aAnchorPoint - aGrappleOrigin).getNorm());
+    return makePendular(aGrappleOrigin,
+                        aAnchorPoint,
+                        aConnected,
+                        aCartesianSpeed,
+                        (aAnchorPoint - aGrappleOrigin).getNorm());
 }
 
-inline void connectGrapple(aunteater::weak_entity aEntity, Pendular aPendular)
-{
-    (*aEntity)
-        .markComponentToRemove<AccelAndSpeed>()
-        .add<Pendular>(std::move(aPendular))
-        ;
-}
+void connectGrapple(aunteater::weak_entity aEntity, Pendular aPendular);
 
 
-inline void retractGrapple(aunteater::weak_entity aEntity, AccelAndSpeed aAccelAndSpeed)
-{
-    (*aEntity)
-        .markComponentToRemove<Pendular>()
-        .add<AccelAndSpeed>(std::move(aAccelAndSpeed))
-        ;
-}
+void retractGrapple(aunteater::weak_entity aEntity, AccelAndSpeed aForceAndSpeed);
 
 
 aunteater::weak_entity setGrappleMode(aunteater::weak_entity aEntity,

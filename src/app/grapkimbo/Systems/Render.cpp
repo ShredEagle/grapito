@@ -16,7 +16,7 @@ Render::Render(aunteater::EntityManager & aEntityManager, Application & aApplica
     mRectangles{mEntityManager},
     mOutlines{mEntityManager},
     mPendulums{mEntityManager},
-    mGuides{mEntityManager},
+    mCameras{mEntityManager},
     mEngine(aApplication.getEngine()),
 #ifdef KIMBO_DEBUG
     mColliders{mEntityManager},
@@ -65,7 +65,7 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
     }
 
 
-    for(const auto & [cameraGuide, geometry] : mGuides)
+    for(const auto & [cameraTag, geometry] : mCameras)
     {
         auto viewed = math::Rectangle<GLfloat>{
             static_cast<math::Position<2, GLfloat>>(geometry.position),

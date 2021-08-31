@@ -2,13 +2,15 @@
 
 #include "PendulumSimulation.h" // for pendulum archetype
 
-#include <Components/CameraGuide.h>
+#include <Components/CameraTag.h>
 #include <Components/Position.h>
 #include <Components/VisualOutline.h>
 #include <Components/VisualRectangle.h>
 #ifdef KIMBO_DEBUG
 #include <Components/Body.h>
 #endif
+
+#include <Systems/CameraGuidedControl.h>
 
 #include <aunteater/Archetype.h>
 #include <aunteater/FamilyHelp.h>
@@ -23,7 +25,6 @@ namespace ad {
 
 typedef aunteater::Archetype<Position, VisualRectangle> RenderedRectangle;
 typedef aunteater::Archetype<Position, VisualOutline> RenderedOutline;
-typedef aunteater::Archetype<CameraGuide, Position> Guide;
 
 #ifdef KIMBO_DEBUG
 typedef aunteater::Archetype<Body> Collider;
@@ -42,7 +43,7 @@ private:
     const aunteater::FamilyHelp<RenderedRectangle> mRectangles;
     const aunteater::FamilyHelp<RenderedOutline> mOutlines;
     const aunteater::FamilyHelp<Pendulum> mPendulums;
-    const aunteater::FamilyHelp<Guide> mGuides;
+    const aunteater::FamilyHelp<Camera> mCameras;
     std::shared_ptr<Engine> mEngine;
     TrivialShaping mTrivialShaping;
     TrivialLineStrip mTrivialLineStrip;

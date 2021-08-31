@@ -16,6 +16,13 @@ namespace anchor
 } // namespace anchor
 
 
+namespace camera
+{
+    constexpr double gAnchorGuideFadeIn = 2.;
+    constexpr double gAnchorGuideFadeOut = 0.8;
+}
+
+
 namespace player
 {
     constexpr double gMass = 80.;

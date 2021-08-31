@@ -13,6 +13,7 @@
 #include <Components/Mass.h>
 
 #include <Systems/AccelSolver.h>
+#include <Systems/CameraGuidedControl.h>
 #include <Systems/Control.h>
 #include <Systems/ControlAnchorSight.h>
 #include <Systems/Gravity.h>
@@ -43,8 +44,11 @@ Game_pendulum::Game_pendulum(Application & aApplication)
     mSystemManager.add<Gravity>();
     mSystemManager.add<AccelSolver>();
     mSystemManager.add<ControlAnchorSight>(); // it will position the sight, which might follow something impacted by speed resolution
+    mSystemManager.add<CameraGuidedControl>();
     mSystemManager.add<Render>(aApplication); 
 
+    // Camera
+    aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera());
     // Environment anchors
     aunteater::weak_entity anchor_1 = mEntityManager.addEntity(
         makeAnchor(math::Position<2, double>{4., 6.}, math::Size<2, double>{2., 2.}));
@@ -61,7 +65,7 @@ Game_pendulum::Game_pendulum(Application & aApplication)
 
     mEntityManager.addEntity(
         makePlayer(0, controller, math::sdr::gCyan, makePendular(anchor_1))
-            .add<CameraGuide>());
+            .add<CameraGuide>(1.0));
 
     // Player 2
     if (isGamepadPresent(Controller::Gamepad_1))

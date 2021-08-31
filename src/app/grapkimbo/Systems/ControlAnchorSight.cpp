@@ -94,7 +94,8 @@ void ControlAnchorSight::update(const aunteater::Timer aTimer, const GameInputSt
                 math::Position<2, double> anchorPoint = 
                     anchor->get<Position>().rectangle().closestPoint(grappleOrigin);
 
-                connectGrapple(player, makePendular(grappleOrigin, anchorPoint, player->get<AccelAndSpeed>().speed));
+                connectGrapple(player,
+                               makePendular(grappleOrigin, anchorPoint, anchor, player->get<AccelAndSpeed>().speed));
             }
         }
     }
