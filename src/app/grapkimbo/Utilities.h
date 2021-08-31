@@ -26,10 +26,11 @@ struct ClosestResult
 
 template <class T_archetype>
 bool isCloser(const typename aunteater::FamilyHelp<T_archetype>::const_Wrap &,
-              math::Vec<2, double> aVec,
+              math::Position<2, double> aCandidate,
+              math::Position<2, double> aBasePosition,
               double aNormSquared)
 {
-    return aVec.getNormSquared() < aNormSquared;
+    return (aCandidate - aBasePosition).getNormSquared() < aNormSquared;
 }
 
 
@@ -50,7 +51,7 @@ getClosest(
         const Position & geometry =  entity->template get<Position>();
         math::Position<2, double> candidate = aProvider(geometry.rectangle());
 
-        if (aFilter(entity, (candidate - aPosition), normSquared))
+        if (aFilter(entity, candidate, aPosition, normSquared))
         {
             normSquared = (candidate - aPosition).getNormSquared();
             position = candidate;

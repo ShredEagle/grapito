@@ -2,7 +2,7 @@
 
 #include "Gravity.h"
 
-#include "../Player.h"
+#include "../Entities.h"
 #include "../Utilities.h"
 
 #include <Components/VisualRectangle.h>
@@ -94,6 +94,7 @@ void Control::update(const aunteater::Timer aTimer, const GameInputState & aInpu
                 connectGrapple(entity, 
                                makePendular(grappleOrigin,
                                             closest->testedPosition,
+                                            closest->entity,
                                             aas.speed,
                                             closest->distance));
             }

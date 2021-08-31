@@ -16,7 +16,7 @@ struct VisualRectangle : public aunteater::Component<VisualRectangle>
     {}
 
     Color color;
-    float angle;
+    math::Radian<float> angle;
 };
 
 

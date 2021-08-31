@@ -3,10 +3,24 @@
 
 #include <math/Constants.h>
 #include <math/Angle.h>
+#include <math/Color.h>
 #include <math/Vector.h>
 
 
 namespace ad {
+
+
+namespace anchor
+{
+    constexpr math::sdr::Rgb gColor{200, 200, 200};
+} // namespace anchor
+
+
+namespace camera
+{
+    constexpr double gAnchorGuideFadeIn = 2.;
+    constexpr double gAnchorGuideFadeOut = 0.8;
+}
 
 
 namespace player
@@ -15,7 +29,14 @@ namespace player
     constexpr math::Size<2, double> gSize{0.8, 1.9};
     constexpr double gInitialRopeLength = 3.;
     constexpr math::Radian<double> gInitialAngle{math::pi<double>/3.};
-}
+} // namespace player
+
+
+namespace render
+{
+    constexpr float gViewedHeight = 40.f;
+} // namespace render
+
 
 namespace sight
 {

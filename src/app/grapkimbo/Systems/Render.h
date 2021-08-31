@@ -2,12 +2,15 @@
 
 #include "PendulumSimulation.h" // for pendulum archetype
 
+#include <Components/CameraTag.h>
 #include <Components/Position.h>
 #include <Components/VisualOutline.h>
 #include <Components/VisualRectangle.h>
 #ifdef KIMBO_DEBUG
 #include <Components/Body.h>
 #endif
+
+#include <Systems/CameraGuidedControl.h>
 
 #include <aunteater/Archetype.h>
 #include <aunteater/FamilyHelp.h>
@@ -35,14 +38,13 @@ public:
 
     void update(const aunteater::Timer aTimer, const GameInputState &) override;
 
-    static constexpr int gPixelsPerMeter = 40;
-
 private:
     aunteater::EntityManager & mEntityManager;
     const aunteater::FamilyHelp<RenderedRectangle> mRectangles;
     const aunteater::FamilyHelp<RenderedOutline> mOutlines;
     const aunteater::FamilyHelp<Pendulum> mPendulums;
-    Application & mApplication;
+    const aunteater::FamilyHelp<Camera> mCameras;
+    std::shared_ptr<Engine> mEngine;
     TrivialShaping mTrivialShaping;
     TrivialLineStrip mTrivialLineStrip;
 #ifdef KIMBO_DEBUG
