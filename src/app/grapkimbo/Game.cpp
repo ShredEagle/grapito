@@ -21,7 +21,6 @@
 #include <iostream>
 
 namespace ad {
-bool pause = false;
 
 namespace grapkimbo {
 
@@ -121,10 +120,9 @@ bool Game::update(const aunteater::Timer & aTimer, const GameInputState & aInput
     InputState step = aInputState.get(Controller::Keyboard)[Command::Step];
     if (pauseInput.positiveEdge())
     {
-        pause = !pause;
     }
 
-    if (!pause || step.positiveEdge())
+    if (step.positiveEdge())
     {
         mSystemManager.pause(false);
         mSystemManager.update(aTimer, aInputState, timings);

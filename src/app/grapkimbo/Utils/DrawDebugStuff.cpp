@@ -37,38 +37,32 @@ namespace ad
 
             for (auto line : mLines)
             {
-                mDrawLine.addLine(
+                mTrivialLineStrip.addLine(
                     {
-                        line.origin * pixelsPerMeter,
-                        line.end * pixelsPerMeter,
-                        line.width,
-                        line.color,
+                    {line.origin * static_cast<GLfloat>(pixelsPerMeter), line.color},
+                    {line.end * static_cast<GLfloat>(pixelsPerMeter), line.color},
                     }
                 );
             }
 
             for (auto point : mPoints)
             {
-                mDrawLine.addLine(
+                mTrivialLineStrip.addLine(
                     {
-                        static_cast<math::Position<2, int>>(point.origin * pixelsPerMeter + math::Vec<2, double>{1.f, 1.f} * point.radius),
-                        static_cast<math::Position<2, int>>(point.origin * pixelsPerMeter + math::Vec<2, double>{-1.f, -1.f} * point.radius),
-                        2.f,
-                        point.color
+                    {point.origin * pixelsPerMeter + math::Vec<2, GLfloat>{1.f, 1.f} * point.radius, point.color},
+                    {point.origin * pixelsPerMeter + math::Vec<2, GLfloat>{-1.f, -1.f} * point.radius, point.color},
                     }
                 );
-                mDrawLine.addLine(
+                mTrivialLineStrip.addLine(
                     {
-                        static_cast<math::Position<2, int>>(point.origin * pixelsPerMeter + math::Vec<2, double>{1.f, -1.f} * point.radius),
-                        static_cast<math::Position<2, int>>(point.origin * pixelsPerMeter + math::Vec<2, double>{-1.f, 1.f} * point.radius),
-                        2.f,
-                        point.color
+                    {point.origin * pixelsPerMeter + math::Vec<2, GLfloat>{1.f, -1.f} * point.radius, point.color},
+                    {point.origin * pixelsPerMeter + math::Vec<2, GLfloat>{-1.f, 1.f} * point.radius, point.color},
                     }
                 );
             }
 
             mTrivialShaping.render();
-            mDrawLine.render();
+            mTrivialLineStrip.render();
             mRectangles.clear();
             mLines.clear();
             mPoints.clear();
@@ -78,7 +72,7 @@ namespace ad
         void DrawDebugStuff::clear()
         {
             mTrivialShaping.clearShapes();
-            mDrawLine.clearShapes();
+            mTrivialLineStrip.clearLines();
         }
     }
 }

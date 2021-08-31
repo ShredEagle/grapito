@@ -2,6 +2,8 @@
 #include "Components/Body.h"
 #include "Player.h"
 #include "Systems/AccelSolver.h"
+#include "Systems/ContactConstraintCreation.h"
+#include "Systems/ImpulseSolver.h"
 
 #include <Components/AccelAndSpeed.h>
 #include <Components/AnchorSelector.h>
@@ -25,6 +27,7 @@
 
 namespace ad {
 debug::DrawDebugStuff * debugDrawer;
+bool pause = false;
 namespace grapkimbo {
 
 
@@ -34,16 +37,21 @@ Game_pendulum::Game_pendulum(Application & aApplication)
 {
     debugDrawer = new debug::DrawDebugStuff(aApplication);
     mSystemManager.add<Control>();
-    mSystemManager.add<PendulumSimulation>();
     mSystemManager.add<Gravity>();
-    mSystemManager.add<AccelSolver>();
+    mSystemManager.add<PendulumSimulation>();
     mSystemManager.add<ControlAnchorSight>(); // it will position the sight, which might follow something impacted by speed resolution
+    mSystemManager.add<ContactConstraintCreation>();
+
+    mSystemManager.add<AccelSolver>();
+    mSystemManager.add<ImpulseSolver>();
+
     mSystemManager.add<Render>(aApplication); 
 
     // Environment anchors
     aunteater::weak_entity anchor_1 = mEntityManager.addEntity(
         aunteater::Entity()
             .add<Position>(math::Position<2, double>{4., 6.}, math::Size<2, double>{2., 2.} )
+            .add<AccelAndSpeed>()
             .add<Body>(
                 math::Rectangle<double>{{0., 0.}, {2., 2.}},
                 BodyType::STATIC,
@@ -55,6 +63,7 @@ Game_pendulum::Game_pendulum(Application & aApplication)
     aunteater::weak_entity anchor_2 = mEntityManager.addEntity(
         aunteater::Entity()
             .add<Position>(math::Position<2, double>{12., 5.}, math::Size<2, double>{2., 2.} )
+            .add<AccelAndSpeed>()
             .add<Body>(
                 math::Rectangle<double>{{0., 0.}, {2., 2.}},
                 BodyType::STATIC,
@@ -66,6 +75,7 @@ Game_pendulum::Game_pendulum(Application & aApplication)
     aunteater::weak_entity anchor_3 = mEntityManager.addEntity(
         aunteater::Entity()
             .add<Position>(math::Position<2, double>{24., 9.}, math::Size<2, double>{2., 2.} )
+            .add<AccelAndSpeed>()
             .add<Body>(
                 math::Rectangle<double>{{0., 0.}, {2., 2.}},
                 BodyType::STATIC,
@@ -92,8 +102,23 @@ Game_pendulum::Game_pendulum(Application & aApplication)
 bool Game_pendulum::update(const aunteater::Timer & aTimer, const GameInputState & aInputState)
 {
     aunteater::UpdateTiming<GameInputState> timings;
-    mSystemManager.update(aTimer, aInputState, timings);
+    InputState pauseInput = aInputState.get(Controller::Keyboard)[Command::Pause];
+    InputState step = aInputState.get(Controller::Keyboard)[Command::Step];
 
+    if (pauseInput.positiveEdge())
+    {
+        pause = !pause;
+    }
+
+    if (!pause || step.positiveEdge())
+    {
+        mSystemManager.pause(false);
+        mSystemManager.update(aTimer, aInputState, timings);
+    }
+    else 
+    {
+        mSystemManager.pause(true);
+    }
     return ! mSystemManager.isPaused();
 }
 

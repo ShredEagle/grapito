@@ -61,11 +61,8 @@ void Control::update(const aunteater::Timer aTimer, const GameInputState & aInpu
         if (inputs[Jump])
         {
             retractGrapple(
-                entity,
-                AccelAndSpeed{ math::Vec<2>{
-                    cos(pendular.angle) * pendular.length * pendular.angularSpeed.value(),
-                    sin(pendular.angle) * pendular.length * pendular.angularSpeed.value()
-            }});
+                entity
+            );
         }
     }
 

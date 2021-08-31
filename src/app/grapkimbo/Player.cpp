@@ -29,7 +29,15 @@ aunteater::Entity makePlayer(int aIndex,
         .add<GrappleControl>(aGrappleMode)
         .add<Pendular>(std::move(aPendular))
         .add<PlayerData>(aIndex, aColor)
+        .add<AccelAndSpeed>()
         .add<Position>(math::Position<2, double>{0., 0.}, player::gSize) // The position will be set by pendulum simulation
+        .add<Body>(
+            math::Rectangle<double>{{0., 0.}, player::gSize},
+            BodyType::DYNAMIC,
+            ShapeType::HULL,
+            1.,
+            0.
+            )
         .add<VisualRectangle>(aColor)
         .add<Mass>(player::gMass)
     ;
