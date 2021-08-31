@@ -27,6 +27,13 @@ aunteater::Entity makePlayer(int aIndex,
                              GrappleMode aGrappleMode)
 {
     aunteater::Entity player = aunteater::Entity()
+        // Needed for gravity
+        //.add<Body>(
+        //    math::Rectangle<double>{{0., 0.}, {2., 2.}},
+        //    BodyType::DYNAMIC,
+        //    ShapeType::HULL,
+        //    player::gMass,
+        //    0.)
         .add<Controllable>(aController)
         .add<GrappleControl>(aGrappleMode)
         .add<Pendular>(std::move(aPendular))

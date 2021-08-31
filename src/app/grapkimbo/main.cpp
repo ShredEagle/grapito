@@ -24,8 +24,8 @@ int main(int argc, const char * argv[])
         //
         // "Game" selection
         // 
-        grapkimbo::Game game{application};
-        //grapkimbo::Game_pendulum game{application};
+        //grapkimbo::Game game{application};
+        grapkimbo::Game_pendulum game{application};
 
         while(application.handleEvents())
         {

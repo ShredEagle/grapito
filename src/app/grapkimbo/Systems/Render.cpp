@@ -30,7 +30,6 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
     mTrivialShaping.clearShapes();
     mTrivialLineStrip.clearLines();
     debugDrawer->clear();
-    mApplication.getEngine()->clear();
     mEngine->clear();
 
     for(const auto [geometry, visualRectangle] : mRectangles)
@@ -40,8 +39,8 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
                 static_cast<math::Position<2, GLfloat>>(geometry.position),
                 static_cast<math::Size<2, GLfloat>>(geometry.dimension)  
             },
-            visualRectangle.angle,
-            visualRectangle.color
+            visualRectangle.color,
+            visualRectangle.angle
         });
     }
 
@@ -90,7 +89,7 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
 
     mTrivialLineStrip.render();
     mTrivialShaping.render();
-    debugDrawer->render(gPixelsPerMeter);
+    debugDrawer->render();
 }
 
 } // namespace ad

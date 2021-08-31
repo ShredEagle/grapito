@@ -25,9 +25,9 @@ namespace ad
                 color{aColor}
             {}
 
-            math::Position<2, int> origin;
-            math::Size<2, int> dimension;
-            float angle;
+            math::Position<2, GLfloat> origin;
+            math::Size<2, GLfloat> dimension;
+            math::Angle<float> angle;
             Color color;
         };
 
@@ -100,7 +100,7 @@ namespace ad
                 void drawPoint(Point aPoint);
                 //void drawArrow(Arrow aArrow);
                 //void drawPoint(Point aPoint);
-                void render(const int pixelsPerMeter);
+                void render();
                 void clear();
             private:
                 std::vector<Rectangle> mRectangles;
