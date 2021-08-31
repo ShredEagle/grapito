@@ -1,9 +1,10 @@
 #pragma once
 
 #include "engine/Application.h"
+#include "engine/TrivialLineStrip.h"
 #include "engine/commons.h"
+#include "math/Angle.h"
 #include <engine/TrivialShaping.h>
-#include <engine/DrawLine.h>
 
 #include <vector>
 
@@ -39,13 +40,13 @@ namespace ad
                 float aWidth,
                 const Color & aColor
             ) :
-                origin{static_cast<math::Position<2, int>>(aOrigin)},
-                end{static_cast<math::Position<2, int>>(aEnd)},
+                origin{static_cast<math::Position<2, float>>(aOrigin)},
+                end{static_cast<math::Position<2, float>>(aEnd)},
                 width{aWidth},
                 color{aColor}
             {}
-            math::Position<2, int> origin;
-            math::Position<2, int> end;
+            math::Position<2, GLfloat> origin;
+            math::Position<2, GLfloat> end;
             float width;
             Color color;
         };
@@ -83,7 +84,7 @@ namespace ad
                 radius{aRadius},
                 color{aColor}
             {}
-            math::Position<2, double> origin;
+            math::Position<2, GLfloat> origin;
             float radius;
             Color color;
         };
@@ -91,9 +92,10 @@ namespace ad
         class DrawDebugStuff
         {
             public:
-                DrawDebugStuff(const Application & aApplication) :
+                DrawDebugStuff(const Application & aApplication, const float aPixelsPerMeter) :
                     mTrivialShaping{aApplication.getEngine()->getWindowSize()},
-                    mDrawLine{aApplication.getEngine()->getWindowSize()}
+                    mTrivialLineStrip{aApplication.getEngine()->getWindowSize()},
+                    pixelsPerMeter{aPixelsPerMeter}
                 {}
                 void drawRectangle(Rectangle aRectangle);
                 void drawLine(Line aLine);
@@ -109,7 +111,8 @@ namespace ad
                 std::vector<Point> mPoints;
 
                 TrivialShaping mTrivialShaping;
-                DrawLine mDrawLine;
+                TrivialLineStrip mTrivialLineStrip;
+                float pixelsPerMeter;
         };
     }
     extern debug::DrawDebugStuff * debugDrawer;

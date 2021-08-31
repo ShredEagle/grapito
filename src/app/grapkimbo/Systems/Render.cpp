@@ -55,7 +55,7 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
         );
     }
 
-    for(const auto [pendular, geometry] : mPendulums)
+    for(const auto [pendular, geometry, aas] : mPendulums)
     {
         mTrivialLineStrip.addLine({
             {static_cast<math::Position<2, GLfloat>>(pendular.anchor), math::sdr::gRed},

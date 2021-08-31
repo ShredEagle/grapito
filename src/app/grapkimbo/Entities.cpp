@@ -38,7 +38,15 @@ aunteater::Entity makePlayer(int aIndex,
         .add<GrappleControl>(aGrappleMode)
         .add<Pendular>(std::move(aPendular))
         .add<PlayerData>(aIndex, aColor)
-        .add<Position>(math::Position<2, double>{0., 0.}, player::gSize) // The position will be set by pendulum simulation
+        .add<AccelAndSpeed>()
+        .add<Position>(math::Position<2, double>{0., 3.}, player::gSize) // The position will be set by pendulum simulation
+        .add<Body>(
+            math::Rectangle<double>{{0., 0.}, player::gSize},
+            BodyType::DYNAMIC,
+            ShapeType::HULL,
+            1.,
+            0.
+            )
         .add<VisualRectangle>(aColor)
         .add<Mass>(player::gMass)
     ;
@@ -66,6 +74,7 @@ aunteater::Entity makeAnchor(math::Position<2, double> aPosition, math::Size<2, 
             BodyType::STATIC,
             ShapeType::HULL)
         .add<Position>(aPosition, aSize)
+        .add<AccelAndSpeed>()
         .add<VisualRectangle>(anchor::gColor)
     ;
 }
@@ -74,7 +83,6 @@ aunteater::Entity makeAnchor(math::Position<2, double> aPosition, math::Size<2, 
 void connectGrapple(aunteater::weak_entity aEntity, Pendular aPendular)
 {
     (*aEntity)
-        .markComponentToRemove<AccelAndSpeed>()
         .add<Pendular>(std::move(aPendular))
         ;
 
@@ -83,7 +91,7 @@ void connectGrapple(aunteater::weak_entity aEntity, Pendular aPendular)
 }
 
 
-void retractGrapple(aunteater::weak_entity aEntity, AccelAndSpeed aForceAndSpeed)
+void retractGrapple(aunteater::weak_entity aEntity)
 {
     CameraGuide & guide = aEntity->get<Pendular>().connected->get<CameraGuide>();
     guide = CameraGuide{
@@ -93,7 +101,6 @@ void retractGrapple(aunteater::weak_entity aEntity, AccelAndSpeed aForceAndSpeed
 
     (*aEntity)
         .markComponentToRemove<Pendular>()
-        .add<AccelAndSpeed>(std::move(aForceAndSpeed))
         ;
 
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include "Components/Mass.h"
 #include "Configuration.h"
 #include "Input.h"
 
@@ -10,6 +11,7 @@
 #include "Components/PlayerData.h"
 
 #include <aunteater/EntityManager.h>
+#include <iostream>
 
 
 namespace ad {
@@ -55,7 +57,7 @@ inline Pendular makePendular(math::Position<2, double> aGrappleOrigin,
 void connectGrapple(aunteater::weak_entity aEntity, Pendular aPendular);
 
 
-void retractGrapple(aunteater::weak_entity aEntity, AccelAndSpeed aForceAndSpeed);
+void retractGrapple(aunteater::weak_entity aEntity);
 
 
 aunteater::weak_entity setGrappleMode(aunteater::weak_entity aEntity,

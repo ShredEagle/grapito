@@ -3,6 +3,7 @@
 #include "Utils/Contact.h"
 #include "Utils/CollisionBox.h"
 
+#include <algorithm>
 #include <aunteater/Component.h>
 
 namespace ad {
@@ -32,6 +33,8 @@ struct Body : public aunteater::Component<Body>
         bodyType{aBodyType},
         shapeType{aShapeType}
     {
+        radius = std::max(aBox.height(), aBox.width());
+
         if (bodyType != BodyType::DYNAMIC)
         {
             mass = 0.;
@@ -46,6 +49,7 @@ struct Body : public aunteater::Component<Body>
 
     double mass;
     double invMass;
+    double radius;
     BodyType bodyType;
     CollisionBox box;
     ShapeType shapeType;

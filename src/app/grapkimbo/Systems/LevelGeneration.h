@@ -72,8 +72,8 @@ private:
     math::Position<2, double> getCameraPosition() const;
 
     static constexpr math::Size<2, int> gTileDimension{
-        (int)(3*render::gViewedHeight),
-        (int)(3*render::gViewedHeight)
+        (int)(1*render::gViewedHeight),
+        (int)(1*render::gViewedHeight)
     };
 
     aunteater::EntityManager & mEntityManager; 

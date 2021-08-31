@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include "DebugUI.h"
 #include "Input.h"
 #include "Systems/Control.h"
 
@@ -14,7 +15,6 @@
 namespace ad {
 namespace grapkimbo {
 
-
 class Game_pendulum
 {
 public:
@@ -25,6 +25,7 @@ public:
 private:
     aunteater::EntityManager  mEntityManager;
     aunteater::SystemManager<GameInputState>  mSystemManager{mEntityManager};
+    DebugUI mUI;
 };
 
 

@@ -1,5 +1,5 @@
 #include "Game.h"
-#include "Components/VisualRectangle.h"
+#include "Configuration.h"
 #include "Input.h"
 
 #include <Systems/Render.h>
@@ -10,10 +10,11 @@
 #include "Systems/ImpulseSolver.h"
 #include <Utils/DrawDebugStuff.h>
 
-#include "Components/Body.h"
-#include <Components/Position.h>
-#include <Components/Controllable.h>
 #include <Components/AccelAndSpeed.h>
+#include "Components/Body.h"
+#include <Components/Controllable.h>
+#include <Components/Position.h>
+#include "Components/VisualRectangle.h"
 
 #include <aunteater/UpdateTiming.h>
 #include <aunteater/Entity.h>
@@ -21,13 +22,12 @@
 #include <iostream>
 
 namespace ad {
-bool pause = false;
 
 namespace grapkimbo {
 
 Game::Game(Application & aApplication)
 {
-    debugDrawer = new debug::DrawDebugStuff(aApplication);
+    debugDrawer = new debug::DrawDebugStuff(aApplication, render::gViewedHeight);
     mSystemManager.add<Gravity>();
     mSystemManager.add<Control>();
     mSystemManager.add<AccelSolver>();
@@ -121,10 +121,9 @@ bool Game::update(const aunteater::Timer & aTimer, const GameInputState & aInput
     InputState step = aInputState.get(Controller::Keyboard)[Command::Step];
     if (pauseInput.positiveEdge())
     {
-        pause = !pause;
     }
 
-    if (!pause || step.positiveEdge())
+    if (step.positiveEdge())
     {
         mSystemManager.pause(false);
         mSystemManager.update(aTimer, aInputState, timings);

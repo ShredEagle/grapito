@@ -1,4 +1,5 @@
 #include "Game_pendulum.h"
+#include "Configuration.h"
 #include "Entities.h"
 
 #include <Components/AccelAndSpeed.h>
@@ -14,9 +15,11 @@
 
 #include <Systems/AccelSolver.h>
 #include <Systems/CameraGuidedControl.h>
+#include "Systems/ContactConstraintCreation.h"
 #include <Systems/Control.h>
 #include <Systems/ControlAnchorSight.h>
 #include <Systems/Gravity.h>
+#include "Systems/ImpulseSolver.h"
 #include <Systems/LevelGeneration.h>
 #include <Systems/PendulumSimulation.h>
 #include <Systems/Render.h>
@@ -27,24 +30,26 @@
 
 namespace ad {
 
-
 debug::DrawDebugStuff * debugDrawer;
-
+bool pause = false;
 
 namespace grapkimbo {
 
-
 Game_pendulum::Game_pendulum(Application & aApplication)
 {
-    debugDrawer = new debug::DrawDebugStuff(aApplication);
+    debugDrawer = new debug::DrawDebugStuff(aApplication, render::gViewedHeight);
 
     mSystemManager.add<LevelGeneration>();
     mSystemManager.add<Control>();
-    mSystemManager.add<PendulumSimulation>();
     mSystemManager.add<Gravity>();
-    mSystemManager.add<AccelSolver>();
+    mSystemManager.add<PendulumSimulation>();
     mSystemManager.add<ControlAnchorSight>(); // it will position the sight, which might follow something impacted by speed resolution
     mSystemManager.add<CameraGuidedControl>();
+    mSystemManager.add<ContactConstraintCreation>();
+
+    mSystemManager.add<AccelSolver>();
+    mSystemManager.add<ImpulseSolver>();
+
     mSystemManager.add<Render>(aApplication); 
 
     // Camera
@@ -78,8 +83,24 @@ Game_pendulum::Game_pendulum(Application & aApplication)
 bool Game_pendulum::update(const aunteater::Timer & aTimer, const GameInputState & aInputState)
 {
     aunteater::UpdateTiming<GameInputState> timings;
-    mSystemManager.update(aTimer, aInputState, timings);
+    InputState pauseInput = aInputState.get(Controller::Keyboard)[Command::Pause];
+    InputState step = aInputState.get(Controller::Keyboard)[Command::Step];
 
+    if (pauseInput.positiveEdge())
+    {
+        pause = !pause;
+    }
+
+    if (!pause || step.positiveEdge())
+    {
+        mSystemManager.pause(false);
+        mSystemManager.update(aTimer, aInputState, timings);
+        mUI.broadcast(timings);
+    }
+    else 
+    {
+        mSystemManager.pause(true);
+    }
     return ! mSystemManager.isPaused();
 }
 

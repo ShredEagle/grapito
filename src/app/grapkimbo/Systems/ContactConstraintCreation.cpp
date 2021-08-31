@@ -1,10 +1,12 @@
 #include "ContactConstraintCreation.h"
 
 #include "Utils/CollisionBox.h"
+#include "aunteater/globals.h"
 #include "engine/commons.h"
 #include <cmath>
 #include <iostream>
 #include <limits>
+#include <tuple>
 #include <vector>
 
 namespace ad {
@@ -343,11 +345,12 @@ void getContactPoints(
 
 void ContactConstraintCreation::update(const aunteater::Timer aTimer, const GameInputState & aInputState)
 {
-    for(auto colliderA : mColliders)
+
+    std::vector<std::tuple<CollisionBox, math::Position<2, double>, Body, Body &, aunteater::weak_entity>> colliderVector;
+    for(auto & colliderA : mColliders)
     {
         Body & ecbA = colliderA->get<Body>();
         Position & posA = colliderA->get<Position>();
-        ecbA.collidingWith.clear();
 
         CollisionBox ecbTranslatedA{
             math::Rectangle<double>{
@@ -357,21 +360,58 @@ void ContactConstraintCreation::update(const aunteater::Timer aTimer, const Game
             ecbA.box.theta,
         };
 
-        for(auto colliderB : mColliders)
+        aunteater::weak_entity entityA = colliderA;
+        math::Position<2, double> center = ecbTranslatedA.mBox.center();
+
+        colliderVector.emplace_back(std::tie(ecbTranslatedA, center, ecbA, ecbA, entityA));
+    }
+
+    for (std::size_t i = 0; i != colliderVector.size() - 1; ++i)
+    {
+        auto & [ecbTranslatedA, centerA, ecbA, ecbARef, colliderA] = colliderVector.at(i);
+        ecbARef.collidingWith.clear();
+
+        for(std::size_t j = i + 1; j != colliderVector.size(); ++j)
         {
-            if (colliderB != colliderA)
+            auto & [ecbTranslatedB, centerB, ecbB, ecbBRef, colliderB] = colliderVector.at(j);
+
+            const double radiusSum = std::pow((ecbA.radius + ecbB.radius), 2);
+
+            // TODO This take way more time than it should even in O3
+            // There is definitely something fishy about it but I don't know what
+            // as a baseline line on 455 * 455 iteration this took more than 10ms
+            /*
+            const double distance = (ecbTranslatedA.mBox.center().as<math::Vec>() - ecbTranslatedB.mBox.center().as<math::Vec>()).getNormSquared();
+            
+            As a benchmark the code below runs in 145xxms
+            This is approximately 164 cycle per iteration on my (franz) computer
+
+            the code above runs in 175xxms
+            This is approximately 246 cycle per iteration on my (franz) computer
+
+            This is for "basically" 2 subtraction 2 addition and 2 multiplication
+
+            And without any of it it takes 23xxms
+
+            const math::Position<2, double> centerA = ecbTranslatedA.mBox.center();
+            const math::Position<2, double> centerB = ecbTranslatedB.mBox.center();
+            const double x1 = centerA.x();
+            const double y1 = centerA.y();
+            const double x2 = centerB.x();
+            const double y2 = centerB.y();
+
+            const double distance = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
+            */
+
+            const double x1 = centerA.x();
+            const double y1 = centerA.y();
+            const double x2 = centerB.x();
+            const double y2 = centerB.y();
+
+            const double distance = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
+
+            if (radiusSum > distance)
             {
-                Body & ecbB = colliderB->get<Body>();
-                Position & posB = colliderB->get<Position>();
-
-                CollisionBox ecbTranslatedB{
-                    math::Rectangle<double>{
-                        colliderB->get<Position>().position + colliderB->get<Body>().box.mBox.mPosition.as<math::Vec>(),
-                        colliderB->get<Body>().box.mBox.mDimension
-                    },
-                    ecbB.box.theta,
-                };
-
                 ContactQuery bestQuery{colliderB};
 
                 ReferenceFace face = getBestQuery(bestQuery, ecbA.shapeType, ecbB.shapeType, ecbTranslatedA, ecbTranslatedB);
@@ -387,7 +427,7 @@ void ContactConstraintCreation::update(const aunteater::Timer aTimer, const Game
                         getContactPoints(bestQuery, ecbTranslatedB, ecbTranslatedA);
                     }
 
-                    colliderA->get<Body>().collidingWith.push_back(bestQuery);
+                    ecbARef.collidingWith.push_back(bestQuery);
                 }
             }
         }
