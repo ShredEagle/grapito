@@ -7,6 +7,8 @@
 #include <aunteater/Component.h>
 
 namespace ad {
+namespace grapito
+{
 
 enum ShapeType
 {
@@ -57,4 +59,5 @@ struct Body : public aunteater::Component<Body>
 };
 
 
+} // namespace grapito
 } // namespace ad

@@ -9,12 +9,15 @@
 #include "Components/GrappleControl.h"
 #include "Components/Pendular.h"
 #include "Components/PlayerData.h"
+#include "commons.h"
 
 #include <aunteater/EntityManager.h>
 #include <iostream>
 
 
 namespace ad {
+namespace grapito
+{
 
 
 aunteater::Entity makePlayer(int aIndex,
@@ -34,16 +37,15 @@ Pendular makePendular(aunteater::weak_entity aConnected,
                       math::Radian<double> aInitialAngle = player::gInitialAngle);
 
 
-Pendular makePendular(math::Position<2, double> aGrappleOrigin,
-                      math::Position<2, double> aAnchorPoint,
+Pendular makePendular(Position2 aGrappleOrigin,
+                      Position2 aAnchorPoint,
                       aunteater::weak_entity aConnected,
                       math::Vec<2, double> aCartesianSpeed,
                       double aGrappleLength);
 
 
-
-inline Pendular makePendular(math::Position<2, double> aGrappleOrigin,
-                             math::Position<2, double> aAnchorPoint,
+inline Pendular makePendular(Position2 aGrappleOrigin,
+                             Position2 aAnchorPoint,
                              aunteater::weak_entity aConnected,
                              math::Vec<2, double> aCartesianSpeed)
 {
@@ -66,4 +68,5 @@ aunteater::weak_entity setGrappleMode(aunteater::weak_entity aEntity,
                                       aunteater::EntityManager & aEntityManager);
 
 
+} // namespace grapito
 } // namespace ad

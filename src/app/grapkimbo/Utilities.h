@@ -1,6 +1,8 @@
 #pragma once
 
 
+#include "commons.h"
+
 #include "Components/Position.h"
 
 #include <aunteater/FamilyHelp.h>
@@ -11,6 +13,8 @@
 
 
 namespace ad {
+namespace grapito
+{
 
 //using AnchorWrap = aunteater::FamilyHelp<AnchorElement>::const_Wrap;
 
@@ -19,15 +23,15 @@ template <class T_archetype>
 struct ClosestResult
 {
     typename aunteater::FamilyHelp<T_archetype>::const_Wrap entity;
-    math::Position<2, double> testedPosition;
+    Position2 testedPosition;
     double distance;
 };
 
 
 template <class T_archetype>
 bool isCloser(const typename aunteater::FamilyHelp<T_archetype>::const_Wrap &,
-              math::Position<2, double> aCandidate,
-              math::Position<2, double> aBasePosition,
+              Position2 aCandidate,
+              Position2 aBasePosition,
               double aNormSquared)
 {
     return (aCandidate - aBasePosition).getNormSquared() < aNormSquared;
@@ -38,18 +42,18 @@ template <class T_archetype, class T_positionProvider, class T_filter = decltype
 std::optional<ClosestResult<T_archetype>>
 getClosest(
         const aunteater::FamilyHelp<T_archetype> & aEntities,
-        const math::Position<2, double> aPosition,
+        const Position2 aPosition,
         T_positionProvider && aProvider,
         T_filter && aFilter = & isCloser<T_archetype>)
 {
     std::optional<typename aunteater::FamilyHelp<T_archetype>::const_Wrap> closest;
-    math::Position<2, double> position = math::Position<2, double>::Zero();
+    Position2 position = Position2::Zero();
     double normSquared = std::numeric_limits<double>::max();
 
     for (const auto entity : aEntities) 
     {
         const Position & geometry =  entity->template get<Position>();
-        math::Position<2, double> candidate = aProvider(geometry.rectangle());
+        Position2 candidate = aProvider(geometry.rectangle());
 
         if (aFilter(entity, candidate, aPosition, normSquared))
         {
@@ -69,4 +73,5 @@ getClosest(
     }
 }
 
+} // namespace grapito
 } // namespace ad

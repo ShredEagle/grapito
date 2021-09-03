@@ -19,6 +19,8 @@
 #include <utility>
 
 namespace ad {
+namespace grapito
+{
 
 typedef aunteater::Archetype<Controllable, Position, AccelAndSpeed, Mass> CartesianControlled;
 typedef aunteater::Archetype<Controllable, Position, Pendular, Mass> PolarControlled;
@@ -39,7 +41,7 @@ public:
     static constexpr double gAirControlAcceleration = 12.; // m/s
 
 private:
-    std::pair<math::Position<2, double>, double> anchor(const math::Position<2, double> aPosition);
+    std::pair<Position2, double> anchor(const Position2 aPosition);
 
     aunteater::EntityManager & mEntityManager;
     const aunteater::FamilyHelp<CartesianControlled> mCartesianControllables;
@@ -50,4 +52,5 @@ private:
 
 };
 
+} // namespace grapito
 } // namespace ad

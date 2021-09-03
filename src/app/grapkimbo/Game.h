@@ -13,7 +13,7 @@
 #include <iostream>
 
 namespace ad {
-namespace grapkimbo {
+namespace grapito {
 
 class Game
 {

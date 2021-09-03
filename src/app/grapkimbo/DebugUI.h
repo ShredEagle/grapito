@@ -6,6 +6,8 @@
 #include <websocket/WebSocket.h>
 
 namespace ad {
+namespace grapito
+{
 
 class DebugUI
 {
@@ -23,5 +25,6 @@ private:
     NetworkContext mNetworkContext;
 };
 
+} // namespace grapito
 } // namespace ad
 

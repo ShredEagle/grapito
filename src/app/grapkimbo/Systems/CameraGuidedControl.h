@@ -13,7 +13,8 @@
 
 
 namespace ad {
-
+namespace grapito
+{
 
 using Camera = aunteater::Archetype<CameraTag, Position>;
 using CameraPoints = aunteater::Archetype<CameraGuide, Position>;
@@ -32,5 +33,5 @@ private:
 
 };
 
-
+} // namespace grapito
 } // namespace ad

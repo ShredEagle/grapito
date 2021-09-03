@@ -5,7 +5,9 @@
 #include <cassert>
 
 
-namespace ad 
+namespace ad
+{
+namespace grapito
 {
 
 
@@ -178,4 +180,5 @@ math::Vec<2, float> GameInputState::asDirection(Controller aController,
     return candidate.getNorm() > aDeadZone ? candidate : math::Vec<2, float>::Zero();
 }
 
+} // namespace grapito
 } // namespace ad

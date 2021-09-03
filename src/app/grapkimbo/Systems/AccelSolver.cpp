@@ -1,6 +1,9 @@
 #include "AccelSolver.h"
+#include "commons.h"
 
 namespace ad {
+namespace grapito
+{
 
 AccelSolver::AccelSolver(aunteater::EntityManager & aEntityManager) :
     mAccellerated(aEntityManager)
@@ -23,8 +26,9 @@ void AccelSolver::update(const aunteater::Timer aTimer, const GameInputState & a
         aas.oldSpeed = aas.speed;
         aas.speed += aas.accel * aTimer.delta();
 
-        aas.accel = math::Vec<2, double>::Zero();
+        aas.accel = Vec2::Zero();
     }
 }
 
+} // namespace grapito
 } // namespace ad

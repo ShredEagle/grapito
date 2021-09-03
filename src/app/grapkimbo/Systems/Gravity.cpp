@@ -3,8 +3,10 @@
 #include <math/Vector.h>
 
 namespace ad {
+namespace grapito
+{
 
-const math::Vec<2, double> gravityVector = {0., - Gravity::gAcceleration};
+const Vec2 gravityVector = {0., - Gravity::gAcceleration};
 
 Gravity::Gravity(aunteater::EntityManager & aEntityManager) :
     mMassives(aEntityManager)
@@ -20,4 +22,5 @@ void Gravity::update(const aunteater::Timer aTimer, const GameInputState &)
         }
     }
 }
+} // namespace grapito
 } // namespace ad

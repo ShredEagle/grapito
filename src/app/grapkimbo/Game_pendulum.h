@@ -13,7 +13,7 @@
 
 
 namespace ad {
-namespace grapkimbo {
+namespace grapito {
 
 class Game_pendulum
 {
@@ -29,5 +29,5 @@ private:
 };
 
 
-} // namespace grapkimbo
+} // namespace grapito
 } // namespace ad

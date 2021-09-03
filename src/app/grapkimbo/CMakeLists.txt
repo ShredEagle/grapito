@@ -1,6 +1,7 @@
 set(TARGET_NAME grapkimbo)
 
 set(${TARGET_NAME}_HEADERS
+    commons.h
     Configuration.h
     DebugUI.h
     Game.h
@@ -37,6 +38,7 @@ set(${TARGET_NAME}_HEADERS
     Systems/ImpulseSolver.h
     Utils/CollisionBox.h
     Utils/DrawDebugStuff.h
+    Utils/HomogeneousTransformation.h
 )
 
 set(${TARGET_NAME}_SOURCES

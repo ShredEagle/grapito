@@ -4,6 +4,8 @@
 
 
 namespace ad {
+namespace grapito
+{
 
 
 enum class GrappleMode
@@ -37,4 +39,5 @@ struct GrappleControl : public aunteater::Component<GrappleControl>
 
 
 
+} // namespace grapito
 } // namespace ad

@@ -10,6 +10,8 @@
 
 
 namespace ad {
+namespace grapito
+{
 
 
 enum Command {
@@ -140,4 +142,5 @@ extern const KeyboardInputConfig gKeyboardConfig;
 extern const GamepadInputConfig gGamepadConfig;
 
 
+} // namespace grapito
 } // namespace ad

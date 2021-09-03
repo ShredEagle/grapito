@@ -10,6 +10,8 @@
 #include <aunteater/System.h>
 
 namespace ad {
+namespace grapito
+{
 
 typedef aunteater::Archetype<AccelAndSpeed, Body> Massive;
 
@@ -30,4 +32,5 @@ private:
 
 };
 
+} // namespace grapito
 } // namespace ad

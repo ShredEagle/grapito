@@ -13,12 +13,14 @@
 #include "Components/Mass.h"
 
 #include "Systems/ControlAnchorSight.h"
+#include "commons.h"
 
 #include <math/VectorUtilities.h>
 
 
 namespace ad {
-
+namespace grapito
+{
 
 aunteater::Entity makePlayer(int aIndex,
                              Controller aController,
@@ -39,7 +41,7 @@ aunteater::Entity makePlayer(int aIndex,
         .add<Pendular>(std::move(aPendular))
         .add<PlayerData>(aIndex, aColor)
         .add<AccelAndSpeed>()
-        .add<Position>(math::Position<2, double>{0., 3.}, player::gSize) // The position will be set by pendulum simulation
+        .add<Position>(Position2{0., 3.}, player::gSize) // The position will be set by pendulum simulation
         .add<Body>(
             math::Rectangle<double>{{0., 0.}, player::gSize},
             BodyType::DYNAMIC,
@@ -140,17 +142,17 @@ aunteater::weak_entity setGrappleMode(aunteater::weak_entity aEntity,
 }
 
 
-Pendular makePendular(math::Position<2, double> aGrappleOrigin,
-                      math::Position<2, double> aAnchorPoint,
+Pendular makePendular(Position2 aGrappleOrigin,
+                      Position2 aAnchorPoint,
                       aunteater::weak_entity aConnected,
-                      math::Vec<2, double> aCartesianSpeed,
+                      Vec2 aCartesianSpeed,
                       double aGrappleLength)
 {
-    math::Vec<2, double> grappleLine = aAnchorPoint - aGrappleOrigin;
+    Vec2 grappleLine = aAnchorPoint - aGrappleOrigin;
     // grapple line goes from origin to anchor, we need the angle with -Y
     math::Radian<double> angle{std::atan2(-grappleLine.x(), grappleLine.y())};
 
-    math::Vec<2, double> tangent{grappleLine.y(), - grappleLine.x()};
+    Vec2 tangent{grappleLine.y(), - grappleLine.x()};
     math::Radian<double> angularSpeed{ cos(math::getOrientedAngle(aCartesianSpeed, tangent)) 
                                        * aCartesianSpeed.getNorm() / aGrappleLength };
 
@@ -172,4 +174,5 @@ Pendular makePendular(aunteater::weak_entity aConnected,
 }
 
 
+} // namespace grapito
 } // namespace ad

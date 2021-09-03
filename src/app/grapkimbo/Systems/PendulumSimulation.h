@@ -11,6 +11,8 @@
 
 
 namespace ad {
+namespace grapito
+{
 
 
 using Pendulum = aunteater::Archetype<Pendular, Position, AccelAndSpeed>;
@@ -28,4 +30,5 @@ private:
 };
 
 
+} // namespace grapito
 } // namespace ad

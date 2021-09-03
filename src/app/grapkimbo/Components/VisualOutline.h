@@ -4,6 +4,8 @@
 
 
 namespace ad {
+namespace grapito
+{
 
 
 struct VisualOutline : public aunteater::Component<VisualOutline>
@@ -14,9 +16,10 @@ struct VisualOutline : public aunteater::Component<VisualOutline>
     {}
 
     Color color;
-    Vec2<double> overshoot;
+    Vec2 overshoot;
 };
 
 
 
+} // namespace grapito
 } // namespace ad

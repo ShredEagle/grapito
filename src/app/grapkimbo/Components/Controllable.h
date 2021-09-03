@@ -5,7 +5,8 @@
 #include <aunteater/Component.h>
 
 namespace ad {
-
+namespace grapito
+{
 
 struct Controllable : public aunteater::Component<Controllable>
 {
@@ -17,4 +18,5 @@ struct Controllable : public aunteater::Component<Controllable>
 };
 
 
+} // namespace grapito
 } // namespace ad

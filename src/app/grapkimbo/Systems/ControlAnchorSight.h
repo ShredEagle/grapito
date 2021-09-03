@@ -12,6 +12,8 @@
 
 
 namespace ad {
+namespace grapito
+{
 
 
 using AnchorSight = aunteater::Archetype<AnchorSelector, Controllable, Position>;
@@ -27,11 +29,12 @@ public:
 private:
     void positionSight(AnchorSelector & aSelector,
                        Position & aGeometry,
-                       math::Vec<2, double> aInputDirection) const;
+                       Vec2 aInputDirection) const;
 
     const aunteater::FamilyHelp<AnchorSight> mAnchorSights;
     const aunteater::FamilyHelp<AnchorElement> mAnchorables;
 };
 
 
+} // namespace grapito
 } // namespace ad

@@ -4,6 +4,7 @@
 
 #include "../Entities.h"
 #include "../Utilities.h"
+#include "commons.h"
 
 #include <Components/VisualRectangle.h>
 
@@ -11,6 +12,8 @@
 
 
 namespace ad {
+namespace grapito
+{
 
 
 Control::Control(aunteater::EntityManager & aEntityManager) :
@@ -34,11 +37,11 @@ void Control::update(const aunteater::Timer aTimer, const GameInputState & aInpu
         const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
 
         float horizontalAxis = aInputState.asAxis(controllable.controller, Left, Right, LeftHorizontalAxis);
-        aas.accel += math::Vec<2, double>{horizontalAxis * gAirControlAcceleration, 0.};
+        aas.accel += Vec2{horizontalAxis * gAirControlAcceleration, 0.};
 
         if (inputs[Jump])
         {
-            aas.accel += math::Vec<2, double>{0., + gAirControlAcceleration};
+            aas.accel += Vec2{0., + gAirControlAcceleration};
             break;
         }
     }
@@ -80,7 +83,7 @@ void Control::update(const aunteater::Timer aTimer, const GameInputState & aInpu
         case GrappleMode::Closest:
             if (inputs[Grapple])
             {
-                math::Position<2, double> grappleOrigin = geometry.center();
+                Position2 grappleOrigin = geometry.center();
                 auto closest = getClosest(mAnchorables,
                                           grappleOrigin,
                                           [grappleOrigin](math::Rectangle<double> aRectangle)
@@ -119,4 +122,5 @@ void Control::update(const aunteater::Timer aTimer, const GameInputState & aInpu
 }
 
 
+} // namespace grapito
 } // namespace ad

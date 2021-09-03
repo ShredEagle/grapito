@@ -2,11 +2,14 @@
 
 #include "../Entities.h"
 #include "../Utilities.h"
+#include "commons.h"
 
 #include <math/VectorUtilities.h>
 
 
 namespace ad {
+namespace grapito
+{
 
 
 ControlAnchorSight::ControlAnchorSight(aunteater::EntityManager & aEntityManager) :
@@ -20,7 +23,7 @@ using AnchorWrap = aunteater::FamilyHelp<AnchorElement>::const_Wrap;
 
 void ControlAnchorSight::positionSight(AnchorSelector & aSelector,
                                        Position & aGeometry,
-                                       math::Vec<2, double> aInputDirection) const
+                                       Vec2 aInputDirection) const
 {
     Position playerGeometry = aSelector.player->get<Position>();
 
@@ -29,7 +32,7 @@ void ControlAnchorSight::positionSight(AnchorSelector & aSelector,
         return aCandidate.center();
     };
 
-    auto filter = [&](const AnchorWrap & anchor, math::Position<2, double> aCandidate, math::Position<2, double> aBasePosition, double aNormSquared)
+    auto filter = [&](const AnchorWrap & anchor, Position2 aCandidate, Position2 aBasePosition, double aNormSquared)
     {
         math::Vec<2, double> vec = aCandidate - aBasePosition;
         return anchor != aSelector.anchor  // eliminate the currently selected anchor
@@ -42,12 +45,12 @@ void ControlAnchorSight::positionSight(AnchorSelector & aSelector,
             ;
     };
 
-    math::Position<2, double> basePosition = aSelector.anchor ?
+    Position2 basePosition = aSelector.anchor ?
         aSelector.anchor->get<Position>().center()
         : aSelector.player->get<Position>().center();
 
     // There is a deadzone, so it will be exactly zero when no direction is considered
-    if (aInputDirection != math::Vec<2, double>::Zero())
+    if (aInputDirection != Vec2::Zero())
     {
         auto nextAnchor = getClosest(mAnchorables, basePosition, positionProvider, filter);
 
@@ -81,7 +84,7 @@ void ControlAnchorSight::update(const aunteater::Timer aTimer, const GameInputSt
 {
     for (auto & [selector, controllable, geometry] : mAnchorSights)
     {
-        math::Vec<2, double> inputDirection{aInputState.getRightDirection(controllable.controller, 0.8f)};
+        Vec2 inputDirection{aInputState.getRightDirection(controllable.controller, 0.8f)};
         positionSight(selector, geometry, inputDirection);
 
         if (aInputState.get(controllable.controller)[Grapple])
@@ -90,8 +93,8 @@ void ControlAnchorSight::update(const aunteater::Timer aTimer, const GameInputSt
             aunteater::weak_entity player = selector.player;
             if (anchor && anchor->has<Position>() && player->has<Position>() && player->has<AccelAndSpeed>())
             {
-                math::Position<2, double> grappleOrigin = player->get<Position>().center();
-                math::Position<2, double> anchorPoint = 
+                Position2 grappleOrigin = player->get<Position>().center();
+                Position2 anchorPoint = 
                     anchor->get<Position>().rectangle().closestPoint(grappleOrigin);
 
                 connectGrapple(player,
@@ -102,4 +105,5 @@ void ControlAnchorSight::update(const aunteater::Timer aTimer, const GameInputSt
 }
 
 
+} // namespace grapito
 } // namespace ad

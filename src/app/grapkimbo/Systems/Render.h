@@ -22,6 +22,8 @@
 #include <engine/Application.h>
 
 namespace ad {
+namespace grapito
+{
 
 typedef aunteater::Archetype<Position, VisualRectangle> RenderedRectangle;
 typedef aunteater::Archetype<Position, VisualOutline> RenderedOutline;
@@ -53,4 +55,5 @@ private:
 
 };
 
+} // namespace grapito
 } // namespace ad

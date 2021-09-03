@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "commons.h"
 #include "Configuration.h"
 #include "Input.h"
 
@@ -23,7 +24,7 @@
 
 namespace ad {
 
-namespace grapkimbo {
+namespace grapito {
 
 Game::Game(Application & aApplication)
 {
@@ -37,7 +38,7 @@ Game::Game(Application & aApplication)
 
     mEntityManager.addEntity(
             aunteater::Entity()
-            .add<Position>(math::Position<2, double>{3., 10.}, math::Size<2, double>{2., 2.})
+            .add<Position>(Position2{3., 10.}, math::Size<2, double>{2., 2.})
             .add<Body>(
                 math::Rectangle<double>{{0., 0.}, {2., 2.}},
                 BodyType::DYNAMIC,
@@ -51,7 +52,7 @@ Game::Game(Application & aApplication)
 
     mEntityManager.addEntity(
             aunteater::Entity()
-            .add<Position>(math::Position<2, double>{2., 5.}, math::Size<2, double>{2., 2.})
+            .add<Position>(Position2{2., 5.}, math::Size<2, double>{2., 2.})
             .add<Mass>(1.)
             .add<Controllable>(Controller::Keyboard)
             .add<Body>(
@@ -68,7 +69,7 @@ Game::Game(Application & aApplication)
     mEntityManager.addEntity(
             aunteater::Entity()
             .add<AccelAndSpeed>()
-            .add<Position>(math::Position<2, double>{2.87, 2.}, math::Size<2, double>{.25, .5})
+            .add<Position>(Position2{2.87, 2.}, math::Size<2, double>{.25, .5})
             .add<VisualRectangle>(math::sdr::gCyan)
             .add<Body>(
                 math::Rectangle<double>{{0., 0.}, {.25, .5}},
@@ -78,7 +79,7 @@ Game::Game(Application & aApplication)
 
     mEntityManager.addEntity(
             aunteater::Entity()
-            .add<Position>(math::Position<2, double>{7., 3.}, math::Size<2, double>{2., 2.})
+            .add<Position>(Position2{7., 3.}, math::Size<2, double>{2., 2.})
             .add<VisualRectangle>(math::sdr::gCyan)
             .add<Body>(
                 math::Rectangle<double>{{0., 0.}, {2., 2.}},
@@ -91,7 +92,7 @@ Game::Game(Application & aApplication)
 
     mEntityManager.addEntity(
             aunteater::Entity()
-            .add<Position>(math::Position<2, double>{7., 10.}, math::Size<2, double>{2., 2.})
+            .add<Position>(Position2{7., 10.}, math::Size<2, double>{2., 2.})
             .add<VisualRectangle>(math::sdr::gCyan)
             .add<Body>(
                 math::Rectangle<double>{{0., 0.}, {2., 2.}},
@@ -105,7 +106,7 @@ Game::Game(Application & aApplication)
     mEntityManager.addEntity(
             aunteater::Entity()
             .add<AccelAndSpeed>()
-            .add<Position>(math::Position<2, double>{6., 2.}, math::Size<2, double>{4., .5})
+            .add<Position>(Position2{6., 2.}, math::Size<2, double>{4., .5})
             .add<VisualRectangle>(math::sdr::gCyan)
             .add<Body>(
                 math::Rectangle<double>{{0., 0.}, {4., .5}},

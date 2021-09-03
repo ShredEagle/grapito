@@ -1,10 +1,10 @@
 #pragma once
 
-
 #include <aunteater/Component.h>
 
-
 namespace ad {
+namespace grapito
+{
 
 
 struct PlayerData : public aunteater::Component<PlayerData>
@@ -19,4 +19,5 @@ struct PlayerData : public aunteater::Component<PlayerData>
 };
 
 
+} // namespace grapito
 } // namespace ad

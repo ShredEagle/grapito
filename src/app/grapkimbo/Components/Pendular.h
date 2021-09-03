@@ -1,5 +1,6 @@
 #pragma once
 
+#include "commons.h"
 #include <aunteater/Component.h>
 
 #include <math/Angle.h>
@@ -7,11 +8,13 @@
 
 
 namespace ad {
+namespace grapito
+{
 
 
 struct Pendular : public aunteater::Component<Pendular>
 {
-    Pendular(math::Position<2, double> aAnchor,
+    Pendular(Position2 aAnchor,
              aunteater::weak_entity aConnected,
              math::Radian<double> aAngle,
              double aLength,
@@ -23,7 +26,7 @@ struct Pendular : public aunteater::Component<Pendular>
         angularSpeed{aAngularSpeed}
     {}
 
-    math::Position<2, double> anchor;
+    Position2 anchor;
     aunteater::weak_entity connected;
     math::Radian<double> angle;
     double length;
@@ -33,4 +36,5 @@ struct Pendular : public aunteater::Component<Pendular>
 
 
 
+} // namespace grapito
 } // namespace ad

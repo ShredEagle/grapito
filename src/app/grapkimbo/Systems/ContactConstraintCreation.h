@@ -9,6 +9,8 @@
 #include <aunteater/System.h>
 
 namespace ad {
+namespace grapito
+{
 
 typedef aunteater::Archetype<Position, Body> BodyPosition;
 
@@ -45,4 +47,5 @@ private:
     > queryFunctions;
 };
 
+} // namespace grapito
 } // namespace ad

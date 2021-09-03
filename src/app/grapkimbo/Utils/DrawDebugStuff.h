@@ -1,5 +1,6 @@
 #pragma once
 
+#include "commons.h"
 #include "engine/Application.h"
 #include "engine/TrivialLineStrip.h"
 #include "engine/commons.h"
@@ -15,7 +16,7 @@ namespace ad
         struct Rectangle
         {
             Rectangle(
-                const math::Position<2, double> & aOrigin,
+                const grapito::Position2 & aOrigin,
                 const math::Size<2, double> & aDimension,
                 const float aAngle,
                 const Color & aColor
@@ -35,8 +36,8 @@ namespace ad
         struct Line
         {
             Line(
-                const math::Position<2, double> & aOrigin,
-                const math::Position<2, double> & aEnd,
+                const grapito::Position2 & aOrigin,
+                const grapito::Position2 & aEnd,
                 float aWidth,
                 const Color & aColor
             ) :
@@ -54,8 +55,8 @@ namespace ad
         struct Arrow
         {
             Arrow(
-                const math::Position<2, double> & aOrigin,
-                const math::Position<2, double> & aEnd,
+                const grapito::Position2 & aOrigin,
+                const grapito::Position2 & aEnd,
                 const math::Size<2, double> & aHeadDimension,
                 float aWidth,
                 const Color & aColor
@@ -76,7 +77,7 @@ namespace ad
         struct Point
         {
             Point(
-                const math::Position<2, double> & aOrigin,
+                const grapito::Position2 & aOrigin,
                 float aRadius,
                 const Color & aColor
             ) :

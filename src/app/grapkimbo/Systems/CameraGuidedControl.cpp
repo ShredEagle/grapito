@@ -2,7 +2,7 @@
 
 
 namespace ad {
-
+namespace grapito {
 
 CameraGuidedControl::CameraGuidedControl(aunteater::EntityManager & aEntityManager) :
     mCameras{aEntityManager},
@@ -37,5 +37,5 @@ void CameraGuidedControl::update(const aunteater::Timer aTimer, const GameInputS
     }
 }
 
-
+} // namespace grapito
 } // namespace ad

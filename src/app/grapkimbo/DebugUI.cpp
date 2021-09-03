@@ -4,6 +4,8 @@
 
 
 namespace ad {
+namespace grapito
+{
 
 DebugUI::DebugUI() :
     mNetworkContext("0.0.0.0", 4321, [this](WebSocket aWebsocket)
@@ -32,5 +34,6 @@ void DebugUI::broadcast(const aunteater::UpdateTiming<GameInputState> & aTimings
         }
     }
 }
+} // namespace grapito
 } // namespace ad
 

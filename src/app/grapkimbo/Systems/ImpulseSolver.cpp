@@ -6,12 +6,14 @@
 #include <iostream>
 
 namespace ad {
+namespace grapito
+{
 
 ImpulseSolver::ImpulseSolver(aunteater::EntityManager & aEntityManager) :
     mImpulsables(aEntityManager)
 {}
 
-void applyImpulse(Position & pos, AccelAndSpeed & aas, math::Vec<2, double> impVec, double delta)
+void applyImpulse(Position & pos, AccelAndSpeed & aas, Vec2 impVec, double delta)
 {
     pos.position += impVec * delta;
     aas.oldSpeed = aas.speed;
@@ -52,7 +54,7 @@ void ImpulseSolver::update(const aunteater::Timer aTimer, const GameInputState &
                     contact.impulse = newImpulse;
 
 
-                    math::Vec<2, double> impVec = lambda * query.normal * ecbA.invMass;
+                    Vec2 impVec = lambda * query.normal * ecbA.invMass;
 
                     applyImpulse(posA, aasA, impVec, aTimer.delta());
 
@@ -65,4 +67,5 @@ void ImpulseSolver::update(const aunteater::Timer aTimer, const GameInputState &
     }
 }
 
+} // namespace grapito
 } // namespace ad

@@ -3,6 +3,8 @@
 #include <aunteater/Component.h>
 
 namespace ad {
+namespace grapito
+{
 
 
 struct Mass : public aunteater::Component<Mass>
@@ -15,4 +17,5 @@ struct Mass : public aunteater::Component<Mass>
 };
 
 
+} // namespace grapito
 } // namespace ad

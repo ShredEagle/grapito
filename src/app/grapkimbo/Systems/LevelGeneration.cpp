@@ -4,7 +4,7 @@
 
 
 namespace ad {
-
+namespace grapito {
 
 LevelGeneration::LevelGeneration(aunteater::EntityManager & aEntityManager) :
     mEntityManager{aEntityManager},
@@ -131,5 +131,5 @@ math::Position<2, double> LevelGeneration::getCameraPosition() const
     return {0., 0.};
 }
 
-
+} //namespace grapito
 } // namespace ad

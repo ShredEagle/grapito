@@ -33,7 +33,7 @@ namespace ad {
 debug::DrawDebugStuff * debugDrawer;
 bool pause = false;
 
-namespace grapkimbo {
+namespace grapito {
 
 Game_pendulum::Game_pendulum(Application & aApplication)
 {
@@ -56,13 +56,13 @@ Game_pendulum::Game_pendulum(Application & aApplication)
     aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera());
     // Environment anchors
     aunteater::weak_entity anchor_1 = mEntityManager.addEntity(
-        makeAnchor(math::Position<2, double>{4., 6.}, math::Size<2, double>{2., 2.}));
+        makeAnchor(Position2{4., 6.}, math::Size<2, double>{2., 2.}));
 
     aunteater::weak_entity anchor_2 = mEntityManager.addEntity(
-        makeAnchor(math::Position<2, double>{12., 5.}, math::Size<2, double>{2., 2.} ));
+        makeAnchor(Position2{12., 5.}, math::Size<2, double>{2., 2.} ));
 
     aunteater::weak_entity anchor_3 = mEntityManager.addEntity(
-        makeAnchor(math::Position<2, double>{24., 9.}, math::Size<2, double>{2., 2.} ));
+        makeAnchor(Position2{24., 9.}, math::Size<2, double>{2., 2.} ));
 
     // Player 1
     Controller controller = isGamepadPresent(Controller::Gamepad_0) ?
@@ -104,5 +104,5 @@ bool Game_pendulum::update(const aunteater::Timer & aTimer, const GameInputState
     return ! mSystemManager.isPaused();
 }
 
-} // namespace grapkimbo
+} // namespace grapito
 } // namespace ad

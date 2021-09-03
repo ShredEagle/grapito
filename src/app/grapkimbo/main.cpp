@@ -8,7 +8,7 @@
 
 #include <iostream>
 
-using namespace ad;
+using namespace ad::grapito;
 
 
 int main(int argc, const char * argv[])
@@ -17,15 +17,15 @@ int main(int argc, const char * argv[])
     {
         GameInputState inputState;
 
-        Application application("grapkimbo", 1600, 900,
-                                Application::Window_Keep_Ratio);
+        ad::Application application("grapkimbo", 1600, 900,
+                                ad::Application::Window_Keep_Ratio);
         aunteater::Timer timer{glfwGetTime()};
 
         //
         // "Game" selection
         // 
-        //grapkimbo::Game game{application};
-        grapkimbo::Game_pendulum game{application};
+        //Game game{application};
+        Game_pendulum game{application};
 
         while(application.handleEvents())
         {

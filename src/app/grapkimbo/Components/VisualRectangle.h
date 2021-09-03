@@ -6,6 +6,8 @@
 
 
 namespace ad {
+namespace grapito
+{
 
 
 struct VisualRectangle : public aunteater::Component<VisualRectangle>
@@ -21,4 +23,5 @@ struct VisualRectangle : public aunteater::Component<VisualRectangle>
 
 
 
+} // namespace grapito
 } // namespace ad

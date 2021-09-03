@@ -1,5 +1,7 @@
 #pragma once
 
+#include "commons.h"
+
 #include "aunteater/globals.h"
 #include "math/Vector.h"
 #include "Utils/DrawDebugStuff.h"
@@ -8,9 +10,12 @@
 
 namespace ad
 {
+namespace grapito
+{
+
 struct Contact
 {
-    math::Position<2, double> point;
+    Position2 point;
     double impulse = 0.;
 };
 
@@ -61,8 +66,8 @@ struct ContactQuery
             );
             debugDrawer->drawLine(
                 {
-                    (origin + static_cast<math::Vec<2, double>>(end)) / 2,
-                    (origin + static_cast<math::Vec<2, double>>(end)) / 2 + normal * 20,
+                    (origin + static_cast<Vec2>(end)) / 2,
+                    (origin + static_cast<Vec2>(end)) / 2 + normal * 20,
                     2.f,
                     vecColor
                 }
@@ -82,15 +87,16 @@ struct ContactQuery
 #endif
 
 #ifdef KIMBO_DEBUG
-    math::Position<2, double> origin = math::Position<2, double>::Zero();
-    math::Position<2, double> end = math::Position<2, double>::Zero();
-    math::Position<2, double> point = math::Position<2, double>::Zero();
+    Position2 origin = Position2::Zero();
+    Position2 end = Position2::Zero();
+    Position2 point = Position2::Zero();
 #endif
 
     aunteater::weak_entity entity;
     double distance = 0.;
-    math::Vec<2, double> normal = math::Vec<2, double>::Zero();
+    Vec2 normal = Vec2::Zero();
     int index = -1;
     std::vector<Contact> contacts;
 };
-}
+} //namespace grapito
+} //namespace ad

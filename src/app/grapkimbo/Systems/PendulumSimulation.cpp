@@ -6,7 +6,8 @@
 
 
 namespace ad {
-
+namespace grapito
+{
 
 PendulumSimulation::PendulumSimulation(aunteater::EntityManager & aEntityManager) :
     mPendulums{aEntityManager}
@@ -26,10 +27,9 @@ void PendulumSimulation::update(const aunteater::Timer aTimer, const GameInputSt
         // Some people will ask why, and they would be right. The reason is that
         // you can't mess with mee position like that you know. That prevents the
         // ImpulseSolver from doing its job that's all.
-        math::Vec<2, double> pendularVec = geometry.position - pendular.anchor;
-        std::cout << "Length of rope :" << pendularVec.getNormSquared() << "\n";
+        Vec2 pendularVec = geometry.position - pendular.anchor;
         pendularVec.normalize();
-        math::Vec<2, double> pendularNormal = {-pendularVec.y(), pendularVec.x()};
+        Vec2 pendularNormal = {-pendularVec.y(), pendularVec.x()};
         aas.speed = aas.speed.dot(pendularNormal) * pendularNormal;
         aas.accel = aas.accel.dot(pendularNormal) * pendularNormal;
 
@@ -48,7 +48,7 @@ void PendulumSimulation::update(const aunteater::Timer aTimer, const GameInputSt
 
         geometry.position = 
             pendular.anchor 
-            + math::Vec<2, double>{sin(pendular.angle), -cos(pendular.angle)} * pendular.length
+            + Vec2{sin(pendular.angle), -cos(pendular.angle)} * pendular.length
             - (geometry.dimension / 2.).as<math::Vec>()
             ;
         */
@@ -56,4 +56,5 @@ void PendulumSimulation::update(const aunteater::Timer aTimer, const GameInputSt
 }
 
 
+} // namespace grapito
 } // namespace ad

@@ -10,6 +10,8 @@
 #include <aunteater/System.h>
 
 namespace ad {
+namespace grapito
+{
 
 typedef aunteater::Archetype<AccelAndSpeed, Position, Body> Impulsable;
 
@@ -26,4 +28,5 @@ private:
 
 };
 
+} // namespace grapito
 } // namespace ad

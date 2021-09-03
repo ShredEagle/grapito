@@ -10,6 +10,8 @@
 
 
 namespace ad {
+namespace grapito
+{
 
 Render::Render(aunteater::EntityManager & aEntityManager, Application & aApplication) :
     mEntityManager{aEntityManager},
@@ -92,4 +94,5 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
     debugDrawer->render();
 }
 
+} // namespace grapito
 } // namespace ad

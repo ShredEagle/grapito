@@ -19,22 +19,21 @@
 
 
 namespace ad {
-
+namespace grapito {
 
 typedef aunteater::Archetype<CameraGuide, Position> Guide;
 
-
 using TileIndex = math::Vec<2, int>;
 
-
+} // namespace grapito
 } // namespace ad 
 
 
 namespace std
 {
-    template<> struct less<ad::TileIndex>
+    template<> struct less<ad::grapito::TileIndex>
     {
-        bool operator() (const ad::TileIndex a, const ad::TileIndex b) const
+        bool operator() (const ad::grapito::TileIndex a, const ad::grapito::TileIndex b) const
         {
             return (a.y() < b.y()) || (a.y() == b.y() && a.x() < b.x());
         }
@@ -43,7 +42,7 @@ namespace std
 
 
 namespace ad {
-
+namespace grapito {
 
 struct IndexDifferences
 {
@@ -86,5 +85,5 @@ private:
     std::map<TileIndex, std::vector<aunteater::weak_entity>> mTiles;
 };
 
-
+} // namespace grapito
 } // namespace ad

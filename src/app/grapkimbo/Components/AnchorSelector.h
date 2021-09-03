@@ -6,6 +6,8 @@
 
 
 namespace ad {
+namespace grapito
+{
 
 
 struct AnchorSelector : public aunteater::Component<AnchorSelector>
@@ -42,4 +44,5 @@ struct AnchorSelector : public aunteater::Component<AnchorSelector>
 
 
 
+} // namespace grapito
 } // namespace ad
