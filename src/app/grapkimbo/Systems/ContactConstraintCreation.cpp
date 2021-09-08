@@ -1,9 +1,14 @@
 #include "ContactConstraintCreation.h"
 
-#include "Utils/CollisionBox.h"
-#include "aunteater/globals.h"
+#include "Utils/DrawDebugStuff.h"
 #include "commons.h"
+#include "../Utilities.h"
+
+#include "Utils/CollisionBox.h"
+
+#include "aunteater/globals.h"
 #include "engine/commons.h"
+
 #include <cmath>
 #include <iostream>
 #include <limits>
@@ -40,7 +45,15 @@ const double distanceToLine(Position2 point, Position2 origin, Position2 end, Ve
 // of collisionBoxA for all vertices of collisionBoxB
 // it returns the edgeIndex of collisionBoxB and the maximum distance
 // vertex of collisionBoxB
-void QueryFacePenetration(ContactQuery & query, const CollisionBox & collisionBoxA, const CollisionBox & collisionBoxB)
+void QueryFacePenetration(
+        ContactQuery & query,
+        const CollisionBox & collisionBoxA,
+        const CollisionBox & collisionBoxB,
+        const Position2 massCenterA,
+        const Position2 massCenterB,
+        const math::Radian<double> thetaA,
+        const math::Radian<double> thetaB
+        )
 {
     int bestIndex;
     double bestDistance = -std::numeric_limits<double>::max();
@@ -55,8 +68,8 @@ void QueryFacePenetration(ContactQuery & query, const CollisionBox & collisionBo
 
     for (int i = 0; i < collisionBoxA.mFaceCount; ++i)
     {
-        const Edge edgeA = collisionBoxA.getEdge(i);
-        const Position2 support = collisionBoxB.getSupport(-edgeA.normal);
+        const Edge edgeA = collisionBoxA.getEdge(i, thetaA, massCenterA);
+        const Position2 support = collisionBoxB.getSupport(-edgeA.normal, thetaB, massCenterB);
         const double distance = distanceToLine(support, edgeA.origin, edgeA.end, edgeA.normal);
 
         Color color = distance > 0 ? Color{0, 200, 0} : Color{200, 0, 0};
@@ -78,10 +91,12 @@ void QueryFacePenetration(ContactQuery & query, const CollisionBox & collisionBo
         }
     }
 
+
 #ifdef KIMBO_DEBUG
     query.origin = bestOrigin;
     query.end = bestEnd;
     query.point = bestPoint;
+    std::cout << bestDistance << "\n";
 #endif
     query.distance = bestDistance;
     query.normal = bestNormal;
@@ -98,15 +113,19 @@ ReferenceFace ContactConstraintCreation::getBestQuery(
     ContactQuery & bestQuery,
     ShapeType ecbAType,
     ShapeType ecbBType,
-    CollisionBox ecbA,
-    CollisionBox ecbB
+    const CollisionBox & ecbA,
+    const CollisionBox & ecbB,
+    const Position2 massCenterA,
+    const Position2 massCenterB,
+    const math::Radian<double> thetaA,
+    const math::Radian<double> thetaB
 )
 {
     ReferenceFace face = ReferenceFace::FACEA;
     ContactQuery queryA = bestQuery;
     ContactQuery queryB = bestQuery;
 
-    queryFunctions[ecbBType][ecbAType](queryA, ecbA, ecbB);
+    queryFunctions[ecbBType][ecbAType](queryA, ecbA, ecbB, massCenterA, massCenterB, thetaA, thetaB);
 
 
     if (queryA.distance > 0.f)
@@ -114,7 +133,7 @@ ReferenceFace ContactConstraintCreation::getBestQuery(
         return face;
     }
 
-    queryFunctions[ecbAType][ecbBType](queryB, ecbB, ecbA);
+    queryFunctions[ecbAType][ecbBType](queryB, ecbB, ecbA, massCenterB, massCenterA, thetaB, thetaA);
 
     if (queryB.distance > 0.f)
     {
@@ -143,22 +162,17 @@ struct Line
     Vec2 direction;
 };
 
-double intersectCross(Vec2 v, Vec2 w)
-{
-    return v.x() * w.y() - v.y() * w.x();
-}
-
 // This can only be used if we know lineA and lineB
 // intersect
 // see https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
 // where lineA is P->P+R and lineB is Q->Q+S
 bool findIntersectionPoint(Position2 & result, const Line lineA, const Line lineB)
 {
-    double rCrossS = intersectCross(lineA.direction, lineB.direction);
+    double rCrossS = twoDVectorCross(lineA.direction, lineB.direction);
 
     Vec2 base = lineB.origin - lineA.origin;
-    double t = intersectCross(base, lineB.direction) / rCrossS;
-    double u = intersectCross(base, lineA.direction) / rCrossS;
+    double t = twoDVectorCross(base, lineB.direction) / rCrossS;
+    double u = twoDVectorCross(base, lineA.direction) / rCrossS;
 
     if (t < 0. || t > 1. || u < 0. || u > 1)
     {
@@ -172,14 +186,18 @@ bool findIntersectionPoint(Position2 & result, const Line lineA, const Line line
 
 void getContactPoints(
     ContactQuery & query,
-    const CollisionBox referenceBox,
-    const CollisionBox incidentBox
+    const CollisionBox & referenceBox,
+    const CollisionBox & incidentBox,
+    const Position2 massCenterRef,
+    const Position2 massCenterInc,
+    const math::Radian<double> thetaRef,
+    const math::Radian<double> thetaInc
 )
 {
     std::vector<Contact> candidateContact;
     // TODO we should test and take into account the already found contactPoint query.contacts
 
-    Edge referenceEdge = referenceBox.getEdge(query.index);
+    Edge referenceEdge = referenceBox.getEdge(query.index, thetaRef, massCenterRef);
     Vec2 edgeDirection = {referenceEdge.normal.y(), -referenceEdge.normal.x()}; 
 
     Line lineA{referenceEdge.origin, -referenceEdge.normal * 20.};
@@ -195,7 +213,7 @@ void getContactPoints(
     // and we store the maximum
     for (int i = 0; i < incidentBox.mFaceCount; ++i)
     {
-        Edge edge = incidentBox.getEdge(i);
+        Edge edge = incidentBox.getEdge(i, thetaInc, massCenterInc);
         
         double dot = edgeDirection.dot(edge.end - edge.origin);
 
@@ -349,7 +367,7 @@ void getContactPoints(
 void ContactConstraintCreation::update(const aunteater::Timer aTimer, const GameInputState & aInputState)
 {
 
-    std::vector<std::tuple<CollisionBox, math::Position<2, double>, Body, Body &, aunteater::weak_entity>> colliderVector;
+    std::vector<std::tuple<CollisionBox, Position2, Position2, math::Radian<double>, Body, Body &, aunteater::weak_entity>> colliderVector;
     for(auto & colliderA : mColliders)
     {
         Body & ecbA = colliderA->get<Body>();
@@ -359,78 +377,93 @@ void ContactConstraintCreation::update(const aunteater::Timer aTimer, const Game
             math::Rectangle<double>{
                 posA.position + ecbA.box.mBox.mPosition.as<math::Vec>(),
                 ecbA.box.mBox.mDimension
-            },
-            ecbA.box.theta,
+            }
         };
 
         aunteater::weak_entity entityA = colliderA;
-        math::Position<2, double> center = ecbTranslatedA.mBox.center();
+        Position2 center = ecbTranslatedA.mBox.center();
+        Position2 massCenter = static_cast<Position2>(posA.position.as<math::Vec>() + ecbA.massCenter.as<math::Vec>());
 
-        colliderVector.emplace_back(std::tie(ecbTranslatedA, center, ecbA, ecbA, entityA));
+        colliderVector.emplace_back(std::tie(ecbTranslatedA, center, massCenter, ecbA.theta, ecbA, ecbA, entityA));
     }
 
     for (std::size_t i = 0; i != colliderVector.size() - 1; ++i)
     {
-        auto & [ecbTranslatedA, centerA, ecbA, ecbARef, colliderA] = colliderVector.at(i);
+        auto & [ecbTranslatedA, centerA, massCenterA, thetaA, ecbA, ecbARef, colliderA] = colliderVector.at(i);
         ecbARef.collidingWith.clear();
 
         for(std::size_t j = i + 1; j != colliderVector.size(); ++j)
         {
-            auto & [ecbTranslatedB, centerB, ecbB, ecbBRef, colliderB] = colliderVector.at(j);
+            auto & [ecbTranslatedB, centerB, massCenterB, thetaB, ecbB, ecbBRef, colliderB] = colliderVector.at(j);
 
-            const double radiusSum = std::pow((ecbA.radius + ecbB.radius), 2);
-
-            // TODO This take way more time than it should even in O3
-            // There is definitely something fishy about it but I don't know what
-            // as a baseline line on 455 * 455 iteration this took more than 10ms
-            /*
-            const double distance = (ecbTranslatedA.mBox.center().as<math::Vec>() - ecbTranslatedB.mBox.center().as<math::Vec>()).getNormSquared();
-            
-            As a benchmark the code below runs in 145xxms
-            This is approximately 164 cycle per iteration on my (franz) computer
-
-            the code above runs in 175xxms
-            This is approximately 246 cycle per iteration on my (franz) computer
-
-            This is for "basically" 2 subtraction 2 addition and 2 multiplication
-
-            And without any of it it takes 23xxms
-
-            const math::Position<2, double> centerA = ecbTranslatedA.mBox.center();
-            const math::Position<2, double> centerB = ecbTranslatedB.mBox.center();
-            const double x1 = centerA.x();
-            const double y1 = centerA.y();
-            const double x2 = centerB.x();
-            const double y2 = centerB.y();
-
-            const double distance = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
-            */
-
-            const double x1 = centerA.x();
-            const double y1 = centerA.y();
-            const double x2 = centerB.x();
-            const double y2 = centerB.y();
-
-            const double distance = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
-
-            if (radiusSum > distance)
+            if (ecbB.bodyType != BodyType::STATIC || ecbA.bodyType != BodyType::STATIC)
             {
-                ContactQuery bestQuery{colliderB};
 
-                ReferenceFace face = getBestQuery(bestQuery, ecbA.shapeType, ecbB.shapeType, ecbTranslatedA, ecbTranslatedB);
+                const double radiusSum = std::pow((ecbA.radius + ecbB.radius), 2);
 
-                if (bestQuery.index != -1)
+                // TODO This take way more time than it should even in O3
+                // There is definitely something fishy about it but I don't know what
+                // as a baseline line on 455 * 455 iteration this took more than 10ms
+                /*
+                const double distance = (ecbTranslatedA.mBox.center().as<math::Vec>() - ecbTranslatedB.mBox.center().as<math::Vec>()).getNormSquared();
+                
+                As a benchmark the code below runs in 145xxms
+                This is approximately 164 cycle per iteration on my (franz) computer
+
+                the code above runs in 175xxms
+                This is approximately 246 cycle per iteration on my (franz) computer
+
+                This is for "basically" 2 subtraction 2 addition and 2 multiplication
+
+                And without any of it it takes 23xxms
+
+                const math::Position<2, double> centerA = ecbTranslatedA.mBox.center();
+                const math::Position<2, double> centerB = ecbTranslatedB.mBox.center();
+                const double x1 = centerA.x();
+                const double y1 = centerA.y();
+                const double x2 = centerB.x();
+                const double y2 = centerB.y();
+
+                const double distance = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
+                */
+
+                const double x1 = centerA.x();
+                const double y1 = centerA.y();
+                const double x2 = centerB.x();
+                const double y2 = centerB.y();
+
+                const double distance = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
+
+                if (radiusSum > distance)
                 {
-                    if (face == ReferenceFace::FACEA)
-                    {
-                        getContactPoints(bestQuery, ecbTranslatedA, ecbTranslatedB);
-                    }
-                    else
-                    {
-                        getContactPoints(bestQuery, ecbTranslatedB, ecbTranslatedA);
-                    }
+                    ContactQuery bestQuery{colliderB};
 
-                    ecbARef.collidingWith.push_back(bestQuery);
+                    ReferenceFace face = getBestQuery(
+                            bestQuery,
+                            ecbA.shapeType,
+                            ecbB.shapeType,
+                            ecbTranslatedA,
+                            ecbTranslatedB,
+                            massCenterA,
+                            massCenterB,
+                            thetaA,
+                            thetaB
+                            );
+
+                    if (bestQuery.index != -1)
+                    {
+                        if (face == ReferenceFace::FACEA)
+                        {
+                            getContactPoints(bestQuery, ecbTranslatedA, ecbTranslatedB, massCenterA, massCenterB, thetaA, thetaB);
+                        }
+                        else
+                        {
+                            getContactPoints(bestQuery, ecbTranslatedB, ecbTranslatedA, massCenterB, massCenterA, thetaB, thetaA);
+                            bestQuery.normal = -bestQuery.normal;
+                        }
+
+                        ecbARef.collidingWith.push_back(bestQuery);
+                    }
                 }
             }
         }

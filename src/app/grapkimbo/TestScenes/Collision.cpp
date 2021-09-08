@@ -1,4 +1,6 @@
-#include "Game.h"
+#include "Collision.h"
+
+#include "Entities.h"
 #include "commons.h"
 #include "Configuration.h"
 #include "Input.h"
@@ -26,15 +28,18 @@ namespace ad {
 
 namespace grapito {
 
-Game::Game(Application & aApplication)
+bool pause = false;
+
+CollisionTest::CollisionTest(Application & aApplication)
 {
-    debugDrawer = new debug::DrawDebugStuff(aApplication, render::gViewedHeight);
     mSystemManager.add<Gravity>();
     mSystemManager.add<Control>();
     mSystemManager.add<AccelSolver>();
     mSystemManager.add<ContactConstraintCreation>();
     mSystemManager.add<ImpulseSolver>();
     mSystemManager.add<Render>(aApplication); 
+
+    aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera({10., 2.}));
 
     mEntityManager.addEntity(
             aunteater::Entity()
@@ -46,7 +51,7 @@ Game::Game(Application & aApplication)
                 1.,
                 1.
             )
-            .add<VisualRectangle>(math::sdr::gCyan, 1.)
+            .add<VisualRectangle>(math::sdr::gCyan)
             .add<AccelAndSpeed>()
             );
 
@@ -62,7 +67,7 @@ Game::Game(Application & aApplication)
                 1.,
                 0.
             )
-            .add<VisualRectangle>(math::sdr::gCyan, 0.)
+            .add<VisualRectangle>(math::sdr::gCyan)
             .add<AccelAndSpeed>()
             );
 
@@ -106,29 +111,45 @@ Game::Game(Application & aApplication)
     mEntityManager.addEntity(
             aunteater::Entity()
             .add<AccelAndSpeed>()
-            .add<Position>(Position2{6., 2.}, math::Size<2, double>{4., .5})
+            .add<Position>(Position2{6., 2.}, math::Size<2, double>{4.3, .5})
             .add<VisualRectangle>(math::sdr::gCyan)
             .add<Body>(
-                math::Rectangle<double>{{0., 0.}, {4., .5}},
+                math::Rectangle<double>{{0., 0.}, {4.3, .5}},
                 BodyType::STATIC,
                 ShapeType::HULL
             ));
+
+    mEntityManager.addEntity(
+            aunteater::Entity()
+            .add<Position>(Position2{10., 4.}, math::Size<2, double>{2., 2.})
+            .add<VisualRectangle>(math::sdr::gCyan)
+            .add<Body>(
+                math::Rectangle<double>{{0., 0.}, {2., 2.}},
+                BodyType::DYNAMIC,
+                ShapeType::HULL,
+                1.,
+                0.
+            )
+            .add<AccelAndSpeed>()
+            );
 }
 
-bool Game::update(const aunteater::Timer & aTimer, const GameInputState & aInputState)
+bool CollisionTest::update(const aunteater::Timer & aTimer, const GameInputState & aInputState)
 {
     aunteater::UpdateTiming<GameInputState> timings;
     InputState pauseInput = aInputState.get(Controller::Keyboard)[Command::Pause];
     InputState step = aInputState.get(Controller::Keyboard)[Command::Step];
+
     if (pauseInput.positiveEdge())
     {
+        pause = !pause;
     }
 
-    if (step.positiveEdge())
+    if (!pause || step.positiveEdge())
     {
         mSystemManager.pause(false);
         mSystemManager.update(aTimer, aInputState, timings);
-        mUI.broadcast(timings);
+        //mUI.broadcast(timings);
     }
     else 
     {

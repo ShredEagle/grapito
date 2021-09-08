@@ -11,6 +11,7 @@
 #include <engine/Application.h>
 
 #include <iostream>
+#include <string>
 
 namespace ad {
 namespace grapito {
@@ -18,13 +19,12 @@ namespace grapito {
 class Game
 {
 public:
-    Game(Application & aApplication);
+    virtual ~Game() {};
+    virtual bool update(const aunteater::Timer & aTimer, const GameInputState & aInputState) = 0;
 
-    bool update(const aunteater::Timer & aTimer, const GameInputState & aInputState);
-
-private:
+protected:
     aunteater::EntityManager mEntityManager;
     aunteater::SystemManager<GameInputState> mSystemManager{mEntityManager};
-    DebugUI mUI;
+    //DebugUI mUI;
 };
 }} // namespace ad::grapkimbo

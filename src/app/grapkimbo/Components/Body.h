@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Utilities.h"
 #include "Utils/Contact.h"
 #include "Utils/CollisionBox.h"
 
@@ -29,32 +30,92 @@ struct Body : public aunteater::Component<Body>
         BodyType aBodyType,
         ShapeType aShapeType,
         float aMass = 1,
-        float theta = 0.
+        double aTheta = 0.
     ) :
-        box{std::move(aBox), theta},
+        box{std::move(aBox)},
         bodyType{aBodyType},
         shapeType{aShapeType}
     {
         radius = std::max(aBox.height(), aBox.width());
 
+        double area = 0.;
+        Vec2 vecMassCenter = Vec2::Zero();
+        for (int i = 0; i < box.mFaceCount; ++i)
+        {
+            auto edge = box.getEdge(i);
+            auto vertexA = edge.origin.as<math::Vec>();
+            auto vertexB = edge.end.as<math::Vec>();
+            double areaStep = twoDVectorCross(vertexA, vertexB) / 2;
+            Vec2 centerStep = (vertexA + vertexB) / 3;
+            double moiStep = areaStep * (vertexA.dot(vertexA) + vertexB.dot(vertexB) + vertexA.dot(vertexB)) / 6;
+
+            std::cout << "area step" << area + areaStep << "\n";
+            if (area + areaStep != 0)
+            {
+                vecMassCenter = (vecMassCenter * area + centerStep * areaStep)/(area + areaStep);
+            }
+            area += areaStep;
+            moi += moiStep;
+        }
+
+        massCenter = static_cast<Position2>(vecMassCenter);
+        theta = math::Radian<double>{aTheta};
+
         if (bodyType != BodyType::DYNAMIC)
         {
             mass = 0.;
             invMass = 0.;
+            moi = 0.;
+            invMoi = 0.;
         }
         else
         {
             mass = aMass;
+            double density = aMass / area;
+            moi *= density;
+            moi -= aMass * vecMassCenter.dot(vecMassCenter);
             invMass = 1 / aMass;
+            invMoi = 1 / moi;
         }
+
+    }
+
+    void debugRender(Position2 pos)
+    {
+        for (int i = 0; i < box.mFaceCount; ++i)
+        {
+            auto vertex = box.getVertice(i);
+            debugDrawer->drawPoint({
+                    transformPosition(
+                            (Position2)pos.as<math::Vec>() + vertex.as<math::Vec>(),
+                            theta,
+                            (Position2)pos.as<math::Vec>() + massCenter.as<math::Vec>()
+                    ),
+                    .05,
+                    {255,255,0},
+            });
+        }
+        debugDrawer->drawPoint({
+                (Position2)pos.as<math::Vec>() + massCenter.as<math::Vec>(),
+                .05,
+                {255,100,0},
+        });
     }
 
     double mass;
     double invMass;
+    double moi;
+    double invMoi;
+    Position2 massCenter = {0., 0.};
+
     double radius;
-    BodyType bodyType;
+    math::Radian<double> theta;
+
     CollisionBox box;
+
+    BodyType bodyType;
     ShapeType shapeType;
+
     std::vector<ContactQuery> collidingWith;
 };
 

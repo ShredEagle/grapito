@@ -1,6 +1,9 @@
-#include "Game.h"
-#include "Game_pendulum.h"
 #include "Input.h"
+
+#include <DebugGui/SceneGui.h>
+
+#include "TestScenes/SceneChanger.h"
+#include "Utils/DrawDebugStuff.h"
 
 #include <aunteater/Timer.h>
 
@@ -10,6 +13,7 @@
 
 using namespace ad::grapito;
 
+std::unique_ptr<ad::debug::DrawDebugStuff> ad::debugDrawer;
 
 int main(int argc, const char * argv[])
 {
@@ -21,18 +25,23 @@ int main(int argc, const char * argv[])
                                 ad::Application::Window_Keep_Ratio);
         aunteater::Timer timer{glfwGetTime()};
 
+        setupImGui(application);
+
+        ad::debugDrawer = std::make_unique<ad::debug::DrawDebugStuff>(application);
         //
         // "Game" selection
         // 
         //Game game{application};
-        Game_pendulum game{application};
+        ChangeScene(GameList::CollisionTest, application);
 
         while(application.handleEvents())
         {
             inputState.readAll(application);
             timer.mark(glfwGetTime());
-            if (game.update(timer, inputState))
+            if (currentGame->update(timer, inputState))
             {
+                drawImGui(application);
+                renderImGui();
                 application.swapBuffers();
             }
         }

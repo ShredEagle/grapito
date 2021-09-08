@@ -5,6 +5,7 @@
 #include "engine/TrivialLineStrip.h"
 #include "engine/commons.h"
 #include "math/Angle.h"
+#include "math/Matrix.h"
 #include <engine/TrivialShaping.h>
 
 #include <vector>
@@ -18,18 +19,18 @@ namespace ad
             Rectangle(
                 const grapito::Position2 & aOrigin,
                 const math::Size<2, double> & aDimension,
-                const float aAngle,
+                const math::Matrix<3, 3> aTransform,
                 const Color & aColor
             ) :
                 origin{static_cast<math::Position<2, int>>(aOrigin)},
                 dimension{static_cast<math::Size<2, int>>(aDimension)},
-                angle{aAngle},
+                transform{aTransform},
                 color{aColor}
             {}
 
             math::Position<2, GLfloat> origin;
             math::Size<2, GLfloat> dimension;
-            math::Angle<float> angle;
+            math::Matrix<3, 3, float> transform;
             Color color;
         };
 
@@ -93,10 +94,9 @@ namespace ad
         class DrawDebugStuff
         {
             public:
-                DrawDebugStuff(const Application & aApplication, const float aPixelsPerMeter) :
+                DrawDebugStuff(const Application & aApplication) :
                     mTrivialShaping{aApplication.getEngine()->getWindowSize()},
-                    mTrivialLineStrip{aApplication.getEngine()->getWindowSize()},
-                    pixelsPerMeter{aPixelsPerMeter}
+                    mTrivialLineStrip{aApplication.getEngine()->getWindowSize()}
                 {}
                 void drawRectangle(Rectangle aRectangle);
                 void drawLine(Line aLine);
@@ -105,16 +105,14 @@ namespace ad
                 //void drawPoint(Point aPoint);
                 void render();
                 void clear();
+                TrivialShaping mTrivialShaping;
+                TrivialLineStrip mTrivialLineStrip;
             private:
                 std::vector<Rectangle> mRectangles;
                 std::vector<Line> mLines;
                 std::vector<Arrow> mArrows;
                 std::vector<Point> mPoints;
-
-                TrivialShaping mTrivialShaping;
-                TrivialLineStrip mTrivialLineStrip;
-                float pixelsPerMeter;
         };
     }
-    extern debug::DrawDebugStuff * debugDrawer;
+    extern std::unique_ptr<debug::DrawDebugStuff> debugDrawer;
 } // namespace

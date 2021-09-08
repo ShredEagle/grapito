@@ -2,6 +2,7 @@
 
 #include "engine/commons.h"
 #include "math/Color.h"
+#include "math/Matrix.h"
 #include <aunteater/Component.h>
 
 
@@ -12,13 +13,13 @@ namespace grapito
 
 struct VisualRectangle : public aunteater::Component<VisualRectangle>
 {
-    explicit VisualRectangle(Color aColor = math::sdr::gWhite, float aAngle = 0.) :
+    explicit VisualRectangle(Color aColor = math::sdr::gWhite, math::Matrix<3, 3, float> aTransform = math::Matrix<3, 3, float>::Identity()) :
         color{aColor},
-        angle{aAngle}
+        transform{aTransform}
     {}
 
     Color color;
-    math::Radian<float> angle;
+    math::Matrix<3, 3, float> transform;
 };
 
 

@@ -5,7 +5,6 @@ set(${TARGET_NAME}_HEADERS
     Configuration.h
     DebugUI.h
     Game.h
-    Game_pendulum.h
     Input.h
     Entities.h
     Utilities.h
@@ -36,17 +35,32 @@ set(${TARGET_NAME}_HEADERS
     Systems/Render.h
     Systems/AccelSolver.h
     Systems/ImpulseSolver.h
+
+    TestScenes/Collision.h
+    TestScenes/Game_pendulum.h
+    TestScenes/SceneChanger.h
+
     Utils/CollisionBox.h
     Utils/DrawDebugStuff.h
     Utils/HomogeneousTransformation.h
+
+    DebugGui/SceneGui.h
+
+    imgui/imgui.h
+    imgui/imgui_internal.h
+    imgui/imconfig.h
+    imgui/imgui_impl_glfw.h
+    imgui/imgui_impl_opengl3.h
+    imgui/imgui_impl_opengl3_loader.h
+    imgui/imstb_rectpack.h
+    imgui/imstb_textedit.h
+    imgui/imstb_truetype.h
 )
 
 set(${TARGET_NAME}_SOURCES
     main.cpp
 
     DebugUI.cpp
-    Game.cpp
-    Game_pendulum.cpp
     Input.cpp
     Entities.cpp
 
@@ -60,7 +74,19 @@ set(${TARGET_NAME}_SOURCES
     Systems/Render.cpp
     Systems/AccelSolver.cpp
     Systems/ImpulseSolver.cpp
+
+    TestScenes/Collision.cpp
+    TestScenes/Game_pendulum.cpp
+
+    Utils/CollisionBox.cpp
     Utils/DrawDebugStuff.cpp
+
+    imgui/imgui.cpp
+    imgui/imgui_draw.cpp
+    imgui/imgui_tables.cpp
+    imgui/imgui_widgets.cpp
+    imgui/imgui_impl_glfw.cpp
+    imgui/imgui_impl_opengl3.cpp
 )
 
 source_group(TREE ${CMAKE_CURRENT_LIST_DIR}

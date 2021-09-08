@@ -41,7 +41,7 @@ aunteater::Entity makePlayer(int aIndex,
         .add<Pendular>(std::move(aPendular))
         .add<PlayerData>(aIndex, aColor)
         .add<AccelAndSpeed>()
-        .add<Position>(Position2{0., 3.}, player::gSize) // The position will be set by pendulum simulation
+        .add<Position>(Position2{3., 3.}, player::gSize) // The position will be set by pendulum simulation
         .add<Body>(
             math::Rectangle<double>{{0., 0.}, player::gSize},
             BodyType::DYNAMIC,
@@ -59,11 +59,11 @@ aunteater::Entity makePlayer(int aIndex,
 }
 
 
-aunteater::Entity makeCamera()
+aunteater::Entity makeCamera(Position2 pos)
 {
     return aunteater::Entity()
         .add<CameraTag>()
-        .add<Position>()
+        .add<Position>(pos)
         ;
 }
 
@@ -72,11 +72,11 @@ aunteater::Entity makeAnchor(math::Position<2, double> aPosition, math::Size<2, 
 {
     return aunteater::Entity()
         .add<Body>(
-            math::Rectangle<double>{{0., 0.}, {2., 2.}},
+            math::Rectangle<double>{{0., 0.}, aSize},
             BodyType::STATIC,
             ShapeType::HULL)
         .add<Position>(aPosition, aSize)
-        .add<AccelAndSpeed>()
+        .add<AccelAndSpeed>(Vec2{0., 0.}, 1.)
         .add<VisualRectangle>(anchor::gColor)
     ;
 }

@@ -32,15 +32,27 @@ public:
         ContactQuery & bestQuery,
         ShapeType ecbAType,
         ShapeType ecbBType,
-        CollisionBox ecbA,
-        CollisionBox ecbB
+        const CollisionBox & ecbA,
+        const CollisionBox & ecbB,
+        const Position2 massCenterA,
+        const Position2 massCenterB,
+        const math::Radian<double> thetaA,
+        const math::Radian<double> thetaB
     );
 
 private:
     const aunteater::FamilyHelp<BodyPosition> mColliders;
     std::array<
         std::array<
-            std::function<void(ContactQuery & query, const CollisionBox & collisionBoxA, const CollisionBox & collisionBoxB)>,
+            std::function<void(
+                    ContactQuery & query,
+                    const CollisionBox & collisionBoxA,
+                    const CollisionBox & collisionBoxB,
+                    const Position2 massCenterA,
+                    const Position2 massCenterB,
+                    const math::Radian<double> thetaA,
+                    const math::Radian<double> thetaB
+                    )>,
             ShapeType::type_count
         >,
         ShapeType::type_count

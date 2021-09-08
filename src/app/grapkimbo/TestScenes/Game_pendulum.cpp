@@ -30,14 +30,12 @@
 
 namespace ad {
 
-debug::DrawDebugStuff * debugDrawer;
 bool pause = false;
 
 namespace grapito {
 
 Game_pendulum::Game_pendulum(Application & aApplication)
 {
-    debugDrawer = new debug::DrawDebugStuff(aApplication, render::gViewedHeight);
 
     mSystemManager.add<LevelGeneration>();
     mSystemManager.add<Control>();
@@ -56,7 +54,7 @@ Game_pendulum::Game_pendulum(Application & aApplication)
     aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera());
     // Environment anchors
     aunteater::weak_entity anchor_1 = mEntityManager.addEntity(
-        makeAnchor(Position2{4., 6.}, math::Size<2, double>{2., 2.}));
+        makeAnchor(Position2{-1., -1.}, math::Size<2, double>{2., 2.}));
 
     aunteater::weak_entity anchor_2 = mEntityManager.addEntity(
         makeAnchor(Position2{12., 5.}, math::Size<2, double>{2., 2.} ));
@@ -95,7 +93,7 @@ bool Game_pendulum::update(const aunteater::Timer & aTimer, const GameInputState
     {
         mSystemManager.pause(false);
         mSystemManager.update(aTimer, aInputState, timings);
-        mUI.broadcast(timings);
+        //mUI.broadcast(timings);
     }
     else 
     {

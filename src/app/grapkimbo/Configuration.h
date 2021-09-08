@@ -34,7 +34,7 @@ namespace player
 
 namespace render
 {
-    constexpr float gViewedHeight = 40.f;
+    constexpr float gViewedHeight = 20.f;
 } // namespace render
 
 

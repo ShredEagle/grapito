@@ -36,7 +36,7 @@ struct ContactQuery
             debugDrawer->drawPoint(
                 {
                     contact.point,
-                    2.f,
+                    .05,
                     Color{0, 0, 255}
                 }
             );

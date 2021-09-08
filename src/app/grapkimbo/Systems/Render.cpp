@@ -41,8 +41,8 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
                 static_cast<math::Position<2, GLfloat>>(geometry.position),
                 static_cast<math::Size<2, GLfloat>>(geometry.dimension)  
             },
+            visualRectangle.transform,
             visualRectangle.color,
-            visualRectangle.angle
         });
     }
 
@@ -74,18 +74,19 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
         }.centered();
         setViewedRectangle(mTrivialShaping, viewed);
         setViewedRectangle(mTrivialLineStrip, viewed);
+        setViewedRectangle(debugDrawer->mTrivialShaping, viewed);
+        setViewedRectangle(debugDrawer->mTrivialLineStrip, viewed);
     }
 
 #ifdef KIMBO_DEBUG
     for(auto collider : mColliders)
     {
         Color vecColor = Color{200,200,20};
-
+        collider->get<Body>().debugRender(collider->get<Position>().position);
         for (auto contact : collider->get<Body>().collidingWith)
         {
             contact.debugRender(vecColor);
         }
-
     }
 #endif
 

@@ -1,12 +1,16 @@
 #include "AccelSolver.h"
 #include "commons.h"
 
+#include "Utils/HomogeneousTransformation.h"
+#include "math/Matrix.h"
+
 namespace ad {
 namespace grapito
 {
 
 AccelSolver::AccelSolver(aunteater::EntityManager & aEntityManager) :
-    mAccellerated(aEntityManager)
+    mAccellerated(aEntityManager),
+    mRotationed(aEntityManager)
 {}
 
 void AccelSolver::update(const aunteater::Timer aTimer, const GameInputState & aInputState)
@@ -27,6 +31,17 @@ void AccelSolver::update(const aunteater::Timer aTimer, const GameInputState & a
         aas.speed += aas.accel * aTimer.delta();
 
         aas.accel = Vec2::Zero();
+    }
+
+    for(auto & [aas, body, vis, pos] : mRotationed)
+    {
+        body.theta += math::Radian<double>{aas.w * aTimer.delta()};
+        vis.transform = static_cast<math::Matrix<3, 3, float>>(
+                createPrefixedTransform(
+                    body.theta,
+                    static_cast<Position2>(pos.position.as<math::Vec>() + body.massCenter.as<math::Vec>())
+                    )
+                );
     }
 }
 

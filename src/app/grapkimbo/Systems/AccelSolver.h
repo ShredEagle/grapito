@@ -1,10 +1,13 @@
 #pragma once
 
 #include "Input.h"
-#include "aunteater/EntityManager.h"
-#include <Components/Position.h>
-#include <Components/AccelAndSpeed.h>
 
+#include <Components/AccelAndSpeed.h>
+#include "Components/Body.h"
+#include <Components/Position.h>
+#include "Components/VisualRectangle.h"
+
+#include "aunteater/EntityManager.h"
 #include <aunteater/Archetype.h>
 #include <aunteater/FamilyHelp.h>
 #include <aunteater/System.h>
@@ -14,6 +17,7 @@ namespace grapito
 {
 
 typedef aunteater::Archetype<AccelAndSpeed, Position> Accelerated;
+typedef aunteater::Archetype<AccelAndSpeed, Body, VisualRectangle, Position> Rotationed;
 
 class AccelSolver : public aunteater::System<GameInputState>
 {
@@ -25,6 +29,7 @@ public:
 
 private:
     const aunteater::FamilyHelp<Accelerated> mAccellerated;
+    const aunteater::FamilyHelp<Rotationed> mRotationed;
 
 };
 

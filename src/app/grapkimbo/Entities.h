@@ -26,7 +26,7 @@ aunteater::Entity makePlayer(int aIndex,
                              Pendular aPendular,
                              GrappleMode aGrappleMode = GrappleMode::Closest);
 
-aunteater::Entity makeCamera();
+aunteater::Entity makeCamera(Position2 pos = {0., 0.});
 
 
 aunteater::Entity makeAnchor(math::Position<2, double> aPosition, math::Size<2, double> aSize);

@@ -29,8 +29,8 @@ namespace ad
                             rectangle.origin,
                             rectangle.dimension,
                         },
+                        rectangle.transform,
                         rectangle.color,
-                        rectangle.angle
                     }
                 );
             }
@@ -39,8 +39,8 @@ namespace ad
             {
                 mTrivialLineStrip.addLine(
                     {
-                    {line.origin * static_cast<GLfloat>(pixelsPerMeter), line.color},
-                    {line.end * static_cast<GLfloat>(pixelsPerMeter), line.color},
+                    {line.origin, line.color},
+                    {line.end, line.color},
                     }
                 );
             }
@@ -49,14 +49,14 @@ namespace ad
             {
                 mTrivialLineStrip.addLine(
                     {
-                    {point.origin * pixelsPerMeter + math::Vec<2, GLfloat>{1.f, 1.f} * point.radius, point.color},
-                    {point.origin * pixelsPerMeter + math::Vec<2, GLfloat>{-1.f, -1.f} * point.radius, point.color},
+                    {point.origin + math::Vec<2, GLfloat>{1.f, 1.f} * point.radius, point.color},
+                    {point.origin + math::Vec<2, GLfloat>{-1.f, -1.f} * point.radius, point.color},
                     }
                 );
                 mTrivialLineStrip.addLine(
                     {
-                    {point.origin * pixelsPerMeter + math::Vec<2, GLfloat>{1.f, -1.f} * point.radius, point.color},
-                    {point.origin * pixelsPerMeter + math::Vec<2, GLfloat>{-1.f, 1.f} * point.radius, point.color},
+                    {point.origin + math::Vec<2, GLfloat>{1.f, -1.f} * point.radius, point.color},
+                    {point.origin + math::Vec<2, GLfloat>{-1.f, 1.f} * point.radius, point.color},
                     }
                 );
             }

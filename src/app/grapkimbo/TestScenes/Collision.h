@@ -1,33 +1,28 @@
 #pragma once
 
-
 #include "DebugUI.h"
+#include "Game.h"
 #include "Input.h"
 #include "Systems/Control.h"
 
 #include <aunteater/EntityManager.h>
-#include <aunteater/SystemManager.h>
 #include <aunteater/Timer.h>
+#include <aunteater/SystemManager.h>
 
 #include <engine/Application.h>
 
+#include <iostream>
 
 namespace ad {
 namespace grapito {
 
-class Game_pendulum
+class CollisionTest : public Game
 {
 public:
-    Game_pendulum(Application & aApplication);
+    CollisionTest(Application & aApplication);
+    ~CollisionTest() = default;
 
     bool update(const aunteater::Timer & aTimer, const GameInputState & aInputState);
-
-private:
-    aunteater::EntityManager  mEntityManager;
-    aunteater::SystemManager<GameInputState>  mSystemManager{mEntityManager};
-    DebugUI mUI;
 };
-
-
-} // namespace grapito
-} // namespace ad
+}
+}
