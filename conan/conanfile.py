@@ -25,7 +25,7 @@ class GrapitoConan(ConanFile):
         ("glad/0.1.34"),
 
         ("aunteater/7702f73a38@adnn/develop"),
-        ("graphics/2aaa23af7a@adnn/develop"),
+        ("graphics/4c1db118e3@adnn/develop"),
         ("math/be21b787d3@adnn/develop"),
         ("websocket/717708d463@adnn/develop"),
     )
