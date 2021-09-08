@@ -96,7 +96,6 @@ void QueryFacePenetration(
     query.origin = bestOrigin;
     query.end = bestEnd;
     query.point = bestPoint;
-    std::cout << bestDistance << "\n";
 #endif
     query.distance = bestDistance;
     query.normal = bestNormal;

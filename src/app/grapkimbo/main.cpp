@@ -32,7 +32,7 @@ int main(int argc, const char * argv[])
         // "Game" selection
         // 
         //Game game{application};
-        ChangeScene(GameList::CollisionTest, application);
+        ChangeScene(GameList::FrictionTest, application);
 
         while(application.handleEvents())
         {

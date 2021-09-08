@@ -17,6 +17,7 @@ struct Contact
 {
     Position2 point;
     double impulse = 0.;
+    double tangentImpulse = 0.;
 };
 
 struct ContactQuery

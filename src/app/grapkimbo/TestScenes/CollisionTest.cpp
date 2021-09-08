@@ -1,9 +1,11 @@
-#include "Collision.h"
+#include "CollisionTest.h"
 
 #include "Entities.h"
 #include "commons.h"
 #include "Configuration.h"
 #include "Input.h"
+
+#include "TestScenes/SceneChanger.h"
 
 #include <Systems/Render.h>
 #include <Systems/ContactConstraintCreation.h>
@@ -28,8 +30,6 @@ namespace ad {
 
 namespace grapito {
 
-bool pause = false;
-
 CollisionTest::CollisionTest(Application & aApplication)
 {
     mSystemManager.add<Gravity>();
@@ -49,7 +49,8 @@ CollisionTest::CollisionTest(Application & aApplication)
                 BodyType::DYNAMIC,
                 ShapeType::HULL,
                 1.,
-                1.
+                1.,
+                .5
             )
             .add<VisualRectangle>(math::sdr::gCyan)
             .add<AccelAndSpeed>()
@@ -65,7 +66,8 @@ CollisionTest::CollisionTest(Application & aApplication)
                 BodyType::DYNAMIC,
                 ShapeType::HULL,
                 1.,
-                0.
+                0.,
+                .5
             )
             .add<VisualRectangle>(math::sdr::gCyan)
             .add<AccelAndSpeed>()
@@ -79,7 +81,10 @@ CollisionTest::CollisionTest(Application & aApplication)
             .add<Body>(
                 math::Rectangle<double>{{0., 0.}, {.25, .5}},
                 BodyType::STATIC,
-                ShapeType::HULL
+                ShapeType::HULL,
+                0.,
+                0.,
+                .5
             ));
 
     mEntityManager.addEntity(
@@ -90,7 +95,9 @@ CollisionTest::CollisionTest(Application & aApplication)
                 math::Rectangle<double>{{0., 0.}, {2., 2.}},
                 BodyType::DYNAMIC,
                 ShapeType::HULL,
-                1.
+                1.,
+                0.,
+                .5
             )
             .add<AccelAndSpeed>()
             );
@@ -103,7 +110,9 @@ CollisionTest::CollisionTest(Application & aApplication)
                 math::Rectangle<double>{{0., 0.}, {2., 2.}},
                 BodyType::DYNAMIC,
                 ShapeType::HULL,
-                1.
+                1.,
+                0.,
+                .5
             )
             .add<AccelAndSpeed>()
             );
@@ -116,7 +125,10 @@ CollisionTest::CollisionTest(Application & aApplication)
             .add<Body>(
                 math::Rectangle<double>{{0., 0.}, {4.3, .5}},
                 BodyType::STATIC,
-                ShapeType::HULL
+                ShapeType::HULL,
+                0.,
+                0.,
+                .5
             ));
 
     mEntityManager.addEntity(
@@ -128,7 +140,8 @@ CollisionTest::CollisionTest(Application & aApplication)
                 BodyType::DYNAMIC,
                 ShapeType::HULL,
                 1.,
-                0.
+                0.,
+                .5
             )
             .add<AccelAndSpeed>()
             );

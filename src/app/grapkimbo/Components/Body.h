@@ -30,11 +30,13 @@ struct Body : public aunteater::Component<Body>
         BodyType aBodyType,
         ShapeType aShapeType,
         float aMass = 1,
-        double aTheta = 0.
+        double aTheta = 0.,
+        double aFriction = 0.
     ) :
         box{std::move(aBox)},
         bodyType{aBodyType},
-        shapeType{aShapeType}
+        shapeType{aShapeType},
+        friction{aFriction}
     {
         radius = std::max(aBox.height(), aBox.width());
 
@@ -49,7 +51,6 @@ struct Body : public aunteater::Component<Body>
             Vec2 centerStep = (vertexA + vertexB) / 3;
             double moiStep = areaStep * (vertexA.dot(vertexA) + vertexB.dot(vertexB) + vertexA.dot(vertexB)) / 6;
 
-            std::cout << "area step" << area + areaStep << "\n";
             if (area + areaStep != 0)
             {
                 vecMassCenter = (vecMassCenter * area + centerStep * areaStep)/(area + areaStep);
@@ -106,6 +107,7 @@ struct Body : public aunteater::Component<Body>
     double invMass;
     double moi;
     double invMoi;
+    double friction;
     Position2 massCenter = {0., 0.};
 
     double radius;

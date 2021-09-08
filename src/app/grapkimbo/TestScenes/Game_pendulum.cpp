@@ -2,6 +2,8 @@
 #include "Configuration.h"
 #include "Entities.h"
 
+#include "TestScenes/SceneChanger.h"
+
 #include <Components/AccelAndSpeed.h>
 #include <Components/AnchorSelector.h>
 #include <Components/Body.h>
@@ -29,8 +31,6 @@
 
 
 namespace ad {
-
-bool pause = false;
 
 namespace grapito {
 

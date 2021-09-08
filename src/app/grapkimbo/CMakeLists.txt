@@ -36,7 +36,8 @@ set(${TARGET_NAME}_HEADERS
     Systems/AccelSolver.h
     Systems/ImpulseSolver.h
 
-    TestScenes/Collision.h
+    TestScenes/CollisionTest.h
+    TestScenes/FrictionTest.h
     TestScenes/Game_pendulum.h
     TestScenes/SceneChanger.h
 
@@ -75,7 +76,8 @@ set(${TARGET_NAME}_SOURCES
     Systems/AccelSolver.cpp
     Systems/ImpulseSolver.cpp
 
-    TestScenes/Collision.cpp
+    TestScenes/CollisionTest.cpp
+    TestScenes/FrictionTest.cpp
     TestScenes/Game_pendulum.cpp
 
     Utils/CollisionBox.cpp

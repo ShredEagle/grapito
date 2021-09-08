@@ -2,6 +2,7 @@
 #include "Utils/DrawDebugStuff.h"
 #include "commons.h"
 #include "engine/commons.h"
+#include "math/Interpolation.h"
 #include "math/Vector.h"
 #include <algorithm>
 #include <iostream>
@@ -38,7 +39,7 @@ void ImpulseSolver::update(const aunteater::Timer aTimer, const GameInputState &
         }
     }
 
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 20; ++i)
     {
         for (auto & [aasA, posA, ecbA] : mImpulsables)
         {
@@ -55,8 +56,13 @@ void ImpulseSolver::update(const aunteater::Timer aTimer, const GameInputState &
                     Vec2 AngVecA = {-rA.y(), rA.x()};
                     Vec2 AngVecB = {-rB.y(), rB.x()};
 
-                    double normalSpeed = (aasA.speed + (AngVecA * aasA.w) - aasB.speed - (AngVecB * aasB.w)).dot(query.normal);
+                    Vec2 speed = aasA.speed + (AngVecA * aasA.w) - aasB.speed - (AngVecB * aasB.w);
+
                     double totalMass = ecbA.invMass + ecbB.invMass;
+
+
+                    double normalSpeed = speed.dot(query.normal);
+
                     double crossA = twoDVectorCross(rA, query.normal);
                     double crossB = twoDVectorCross(rB, query.normal);
                     double crossASquared = crossA * crossA;
@@ -72,25 +78,61 @@ void ImpulseSolver::update(const aunteater::Timer aTimer, const GameInputState &
                     Vec2 impVec = lambda * query.normal * ecbA.invMass;
                     double angularImpulse = lambda * crossA * ecbA.invMoi;
 
-                    std::cout << "lambda " <<  lambda << "\n";
-                    std::cout << "totalMass " <<  totalMass << "\n";
-                    std::cout << "totalAngularMass " <<  totalAngularMass << "\n";
-                    std::cout << "normalSpeed " <<  normalSpeed << "\n";
-                    std::cout << "aasSpeed " <<  aasA.speed << "\n";
-                    std::cout << "massA " <<  ecbA.invMass << "\n";
-                    std::cout << "contact impulse " <<  contact.impulse << "\n";
-                    debugDrawer->drawLine({
-                            contact.point, 
-                            static_cast<Position2>(contact.point.as<math::Vec>() + impVec),
-                            1.,
-                            {255, 0, 0}
-                            });
-
                     applyImpulse(posA, ecbA, aasA, impVec, angularImpulse, aTimer.delta());
 
                     impVec = -lambda * query.normal * ecbB.invMass;
                     angularImpulse = -lambda * crossB * ecbB.invMoi;
                     applyImpulse(posB, ecbB, aasB, impVec, angularImpulse, aTimer.delta());
+
+                    if (ecbB.friction > 0. && ecbA.friction > 0.)
+                    {
+                        double friction = ecbA.friction * ecbB.friction;
+                        Vec2 tangent = {query.normal.y(), -query.normal.x()};
+
+                        double tangentSpeed = speed.dot(tangent);
+
+                        debugDrawer->drawLine({
+                                contact.point,
+                                (Position2)contact.point.as<math::Vec>() + tangentSpeed * tangent,
+                                1.,
+                                {255,0,0},
+                                });
+
+                        double crossATangent = twoDVectorCross(rA, tangent);
+                        double crossBTangent = twoDVectorCross(rB, tangent);
+                        double crossATangentSquared = crossATangent * crossATangent;
+                        double crossBTangentSquared = crossBTangent * crossBTangent;
+
+                        double totalAngularTangentMass = ecbA.invMoi * crossATangentSquared + ecbB.invMoi * crossBTangentSquared;
+
+                        
+                        double lambda = -(1 / (totalMass + totalAngularTangentMass)) * (tangentSpeed);
+                        double maxFriction = friction * contact.impulse;
+                        double newImpulse = std::max(std::min(contact.tangentImpulse + lambda, maxFriction), -maxFriction);
+                        lambda = newImpulse - contact.tangentImpulse;
+
+                        Vec2 impVec = lambda * tangent * ecbA.invMass;
+                        double angularImpulse = lambda * crossATangent * ecbA.invMoi;
+
+                        debugDrawer->drawLine({
+                                contact.point,
+                                (Position2)contact.point.as<math::Vec>() + impVec,
+                                1.,
+                                {0, 255, 0},
+                                });
+
+                        applyImpulse(posA, ecbA, aasA, impVec, angularImpulse, aTimer.delta());
+
+                        impVec = -lambda * tangent * ecbB.invMass;
+                        angularImpulse = -lambda * crossBTangent * ecbB.invMoi;
+                        debugDrawer->drawLine({
+                                contact.point,
+                                (Position2)contact.point.as<math::Vec>() + impVec,
+                                1.,
+                                {0, 255, 0},
+                                });
+                        applyImpulse(posB, ecbB, aasB, impVec, angularImpulse, aTimer.delta());
+                    }
 
                     /*
                     debugDrawer->drawLine({

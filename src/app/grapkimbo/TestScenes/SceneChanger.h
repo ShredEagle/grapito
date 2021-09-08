@@ -1,19 +1,22 @@
 #pragma once
 
 #include "Game.h"
-#include "Game_pendulum.h"
-#include "TestScenes/Collision.h"
+#include "TestScenes/Game_pendulum.h"
+#include "TestScenes/CollisionTest.h"
+#include "TestScenes/FrictionTest.h"
 #include "aunteater/EntityManager.h"
 #include "engine/Application.h"
 namespace ad {
 namespace grapito {
 
 static std::unique_ptr<Game> currentGame;
+static bool pause = false;
 
 enum GameList
 {
     CollisionTest,
     GamePendulum,
+    FrictionTest
 };
 
 /*
@@ -36,6 +39,9 @@ static void ChangeScene(GameList aGameType, Application & aApplication)
         break;
     case GameList::GamePendulum:
         currentGame = std::make_unique<Game_pendulum>(aApplication);
+        break;
+    case GameList::FrictionTest:
+        currentGame = std::make_unique<class FrictionTest>(aApplication);
         break;
     }
 }

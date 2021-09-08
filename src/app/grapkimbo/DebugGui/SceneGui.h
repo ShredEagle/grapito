@@ -34,6 +34,8 @@ static void drawImGui(Application & aApplication)
         ChangeScene(GameList::CollisionTest, aApplication);
     if(ImGui::Button("Game_pendulum"))
         ChangeScene(GameList::GamePendulum, aApplication);
+    if(ImGui::Button("FrictionTest"))
+        ChangeScene(GameList::FrictionTest, aApplication);
     End();
 }
 
