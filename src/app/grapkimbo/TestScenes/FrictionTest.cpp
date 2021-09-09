@@ -50,7 +50,7 @@ void createFrictionTest(double height, double friction, aunteater::EntityManager
     mEntityManager.addEntity(
             aunteater::Entity()
             .add<AccelAndSpeed>()
-            .add<Position>(Position2{1., height - 1.}, math::Size<2, double>{12., 1.})
+            .add<Position>(Position2{1., height - 1.1}, math::Size<2, double>{12., 1.})
             .add<VisualRectangle>(math::sdr::gCyan)
             .add<Body>(
                 math::Rectangle<double>{{0., 0.}, {12., 1.}},
@@ -62,7 +62,8 @@ void createFrictionTest(double height, double friction, aunteater::EntityManager
             ));
 }
 
-FrictionTest::FrictionTest(Application & aApplication)
+FrictionTest::FrictionTest(Application & aApplication, DebugUI & aUI) :
+    mUI{aUI}
 {
     mSystemManager.add<Gravity>();
     mSystemManager.add<Control>();
@@ -73,8 +74,8 @@ FrictionTest::FrictionTest(Application & aApplication)
 
     aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera({10., 2.}));
 
-    createFrictionTest(0., .4, mEntityManager);
-    createFrictionTest(5., .25, mEntityManager);
+    createFrictionTest(5., .2, mEntityManager);
+    createFrictionTest(0., .75, mEntityManager);
     createFrictionTest(-5., 1., mEntityManager);
 }
 
@@ -93,7 +94,7 @@ bool FrictionTest::update(const aunteater::Timer & aTimer, const GameInputState 
     {
         mSystemManager.pause(false);
         mSystemManager.update(aTimer, aInputState, timings);
-        //mUI.broadcast(timings);
+        mUI.broadcast(timings);
     }
     else 
     {

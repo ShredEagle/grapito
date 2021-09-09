@@ -19,10 +19,12 @@ namespace grapito {
 class Game_pendulum : public Game
 {
 public:
-    Game_pendulum(Application & aApplication);
+    Game_pendulum(Application & aApplication, DebugUI & aUI);
     ~Game_pendulum() = default;
 
     bool update(const aunteater::Timer & aTimer, const GameInputState & aInputState);
+private:
+    DebugUI & mUI;
 };
 } // namespace grapito
 } // namespace ad

@@ -25,6 +25,5 @@ public:
 protected:
     aunteater::EntityManager mEntityManager;
     aunteater::SystemManager<GameInputState> mSystemManager{mEntityManager};
-    //DebugUI mUI;
 };
 }} // namespace ad::grapkimbo

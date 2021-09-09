@@ -34,7 +34,8 @@ namespace ad {
 
 namespace grapito {
 
-Game_pendulum::Game_pendulum(Application & aApplication)
+Game_pendulum::Game_pendulum(Application & aApplication, DebugUI & aUI) :
+    mUI{aUI}
 {
 
     mSystemManager.add<LevelGeneration>();
@@ -93,7 +94,7 @@ bool Game_pendulum::update(const aunteater::Timer & aTimer, const GameInputState
     {
         mSystemManager.pause(false);
         mSystemManager.update(aTimer, aInputState, timings);
-        //mUI.broadcast(timings);
+        mUI.broadcast(timings);
     }
     else 
     {

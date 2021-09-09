@@ -74,5 +74,16 @@ const Position2 CollisionBox::getSupport(const Vec2 direction) const
 {
     return getSupport(direction, math::Radian<double>{0.}, {0., 0.});
 }
+
+std::ostream &operator<<(std::ostream & os, const CollisionBox & box)
+{
+    return os << "{ CollisionBox\n    Box : " << box.mBox.mPosition << " " << box.mBox.mDimension << "\n    Face count : " << box.mFaceCount << "\n}\n";
+}
+
+std::ostream &operator<<(std::ostream & os, const Edge & edge)
+{
+    return os << "{ Edge\n    origin : " << edge.origin << "\n    end : " << edge.end << "\n    normal : " << edge.normal << "\n}\n";
+}
+
 }
 }

@@ -9,6 +9,7 @@
 #include "aunteater/globals.h"
 #include "engine/commons.h"
 
+#include <array>
 #include <cmath>
 #include <iostream>
 #include <limits>
@@ -183,27 +184,94 @@ bool findIntersectionPoint(Position2 & result, const Line lineA, const Line line
     return true;
 }
 
-void getContactPoints(
-    ContactQuery & query,
-    const CollisionBox & referenceBox,
+std::vector<Contact> CheckContactValidity(const Edge & referenceEdge, const Vec2 & edgeDirection, const std::vector<Contact> & contactPoints)
+{
+    std::vector<Contact> result;
+
+    // We use this algorithm to find all vertices with bit value (1|0)000
+    // https://www.csd.uwo.ca/~sbeauche/CS3388/CS3388-2D-Clipping.pdf
+    // Our y values are reversed because we use bottom right origin
+    // This tests gives us all point beyond our colliding axis
+    Position2 projectedReferenceOrigin = {
+        (referenceEdge.normal.y() * referenceEdge.origin.x() - referenceEdge.normal.x() * referenceEdge.origin.y()) /
+            (referenceEdge.normal.y() * edgeDirection.x() - referenceEdge.normal.x() * edgeDirection.y()),
+        (edgeDirection.y() * referenceEdge.origin.x() - edgeDirection.x() * referenceEdge.origin.y()) /
+            (referenceEdge.normal.x() * edgeDirection.y() - referenceEdge.normal.y() * edgeDirection.x())
+    };
+    Position2 projectedReferenceEnd = {
+        (referenceEdge.normal.y() * referenceEdge.end.x() - referenceEdge.normal.x() * referenceEdge.end.y()) /
+            (referenceEdge.normal.y() * edgeDirection.x() - referenceEdge.normal.x() * edgeDirection.y()),
+        (edgeDirection.y() * referenceEdge.end.x() - edgeDirection.x() * referenceEdge.end.y()) /
+            (referenceEdge.normal.x() * edgeDirection.y() - referenceEdge.normal.y() * edgeDirection.x())
+    };
+
+    Vec2 baseOrigin = Vec2{10., 10.};
+    /*
+    debugDrawer->drawPoint({
+            (Position2)baseOrigin + projectedReferenceEnd.as<math::Vec>(),
+            .07,
+            {200,100,20},
+        });
+    debugDrawer->drawPoint({
+            (Position2)baseOrigin + projectedReferenceOrigin.as<math::Vec>(),
+            .07,
+            {200,200,20},
+        });
+
+    debugDrawer->drawLine({
+            (Position2)baseOrigin,
+            (Position2)(edgeDirection * 100 + baseOrigin),
+            .07,
+            Color{200, 255, 200},
+            });
+
+    debugDrawer->drawLine({
+            (Position2)baseOrigin,
+            (Position2)(referenceEdge.normal * 100 + baseOrigin),
+            .07,
+            Color{255, 200, 200},
+            });
+            */
+    for (auto contact : contactPoints)
+    {
+        Position2 projectedPoint = {
+            (referenceEdge.normal.y() * contact.point.x() - referenceEdge.normal.x() * contact.point.y()) /
+                (referenceEdge.normal.y() * edgeDirection.x() - referenceEdge.normal.x() * edgeDirection.y()),
+            (edgeDirection.y() * contact.point.x() - edgeDirection.x() * contact.point.y()) /
+                (referenceEdge.normal.x() * edgeDirection.y() - referenceEdge.normal.y() * edgeDirection.x())
+        };
+        /*
+        debugDrawer->drawPoint({
+                (Position2) baseOrigin + projectedPoint.as<math::Vec>(),
+                .07,
+                {200,20,200},
+            });
+            */
+
+        if (
+                projectedPoint.y() <= projectedReferenceOrigin.y() &&
+                projectedPoint.x() <= projectedReferenceOrigin.x() &&
+                projectedPoint.x() >= projectedReferenceEnd.x()
+           )
+        {
+            result.push_back(contact);
+        }
+    }
+
+    return result;
+}
+
+int findIncidentEdge(
+    Edge & inEdge,
+    Edge & referenceEdge,
+    Vec2 edgeDirection,
     const CollisionBox & incidentBox,
-    const Position2 massCenterRef,
-    const Position2 massCenterInc,
-    const math::Radian<double> thetaRef,
-    const math::Radian<double> thetaInc
+    const Position2 & massCenter,
+    const math::Radian<double> theta
 )
 {
-    std::vector<Contact> candidateContact;
-    // TODO we should test and take into account the already found contactPoint query.contacts
-
-    Edge referenceEdge = referenceBox.getEdge(query.index, thetaRef, massCenterRef);
-    Vec2 edgeDirection = {referenceEdge.normal.y(), -referenceEdge.normal.x()}; 
-
-    Line lineA{referenceEdge.origin, -referenceEdge.normal * 20.};
-    Line lineB{referenceEdge.end, -referenceEdge.normal * 20.};
-
-    Edge bestEdge{{0.,0.}, {0.,0.}, {0.,0.}};
     double bestDot = -std::numeric_limits<double>::max();
+    int incidentIndex;
 
     // We want to find the most antiparallel edge to our referenceEdge
     // The edgeDirection direction is reversed according to the referenceEdge
@@ -212,23 +280,38 @@ void getContactPoints(
     // and we store the maximum
     for (int i = 0; i < incidentBox.mFaceCount; ++i)
     {
-        Edge edge = incidentBox.getEdge(i, thetaInc, massCenterInc);
+        Edge edge = incidentBox.getEdge(i, theta, massCenter);
         
         double dot = edgeDirection.dot(edge.end - edge.origin);
 
         if (dot > bestDot)
         {
             bestDot = dot;
-            bestEdge = edge;
+            inEdge = edge;
+            incidentIndex = i;
         }
     }
 
     // If the dot is 0 or less this means the two faces are either
     // orthogonal or back facing
     if (bestDot <= 0.)
-    {
-        return;
-    }
+        return -1;
+
+    return incidentIndex;
+}
+
+std::vector<Contact> getContactPoints(
+    const int index,
+    Edge & referenceEdge,
+    Vec2 & edgeDirection,
+    Edge & bestEdge
+)
+{
+    std::vector<Contact> candidateContact;
+    // TODO we should test and take into account the already found contactPoint query.contacts
+
+    Line lineA{referenceEdge.origin, -referenceEdge.normal * 20.};
+    Line lineB{referenceEdge.end, -referenceEdge.normal * 20.};
 
     // We then find all intersecting point between the clipping lines and the
     // best incident edge
@@ -249,53 +332,11 @@ void getContactPoints(
         candidateContact.push_back({intersectB});
     }
 
-    // We use this algorithm to find all vertices with bit value (1|0)000
-    // https://www.csd.uwo.ca/~sbeauche/CS3388/CS3388-2D-Clipping.pdf
-    // Our y values are reversed because we use bottom right origin
-    // This tests gives us all point beyond our colliding axis
-    Position2 projectedReferenceOrigin = {
-        (referenceEdge.normal.y() * referenceEdge.origin.x() - referenceEdge.normal.x() * referenceEdge.origin.y()) /
-            (referenceEdge.normal.y() * edgeDirection.x() - referenceEdge.normal.x() * edgeDirection.y()),
-        (edgeDirection.y() * referenceEdge.origin.x() - edgeDirection.x() * referenceEdge.origin.y()) /
-            (referenceEdge.normal.x() * edgeDirection.y() - referenceEdge.normal.y() * edgeDirection.x())
-    };
-    Position2 projectedReferenceEnd = {
-        (referenceEdge.normal.y() * referenceEdge.end.x() - referenceEdge.normal.x() * referenceEdge.end.y()) /
-            (referenceEdge.normal.y() * edgeDirection.x() - referenceEdge.normal.x() * edgeDirection.y()),
-        (edgeDirection.y() * referenceEdge.end.x() - edgeDirection.x() * referenceEdge.end.y()) /
-            (referenceEdge.normal.x() * edgeDirection.y() - referenceEdge.normal.y() * edgeDirection.x())
-    };
-    Position2 projectedOrigin = {
-        (referenceEdge.normal.y() * bestEdge.origin.x() - referenceEdge.normal.x() * bestEdge.origin.y()) /
-            (referenceEdge.normal.y() * edgeDirection.x() - referenceEdge.normal.x() * edgeDirection.y()),
-        (edgeDirection.y() * bestEdge.origin.x() - edgeDirection.x() * bestEdge.origin.y()) /
-            (referenceEdge.normal.x() * edgeDirection.y() - referenceEdge.normal.y() * edgeDirection.x())
-    };
-    Position2 projectedEnd = {
-        (referenceEdge.normal.y() * bestEdge.end.x() - referenceEdge.normal.x() * bestEdge.end.y()) /
-            (referenceEdge.normal.y() * edgeDirection.x() - referenceEdge.normal.x() * edgeDirection.y()),
-        (edgeDirection.y() * bestEdge.end.x() - edgeDirection.x() * bestEdge.end.y()) /
-            (referenceEdge.normal.x() * edgeDirection.y() - referenceEdge.normal.y() * edgeDirection.x())
-    };
-    if (
-            projectedOrigin.y() <= projectedReferenceOrigin.y() &&
-            projectedOrigin.x() <= projectedReferenceOrigin.x() &&
-            projectedOrigin.x() >= projectedReferenceEnd.x()
-       )
-    {
-        candidateContact.push_back({bestEdge.origin});
-    }
+    auto validContacts = CheckContactValidity(referenceEdge, edgeDirection, {{bestEdge.origin}, {bestEdge.end}});
 
-    if (
-            projectedEnd.y() <= projectedReferenceOrigin.y() &&
-            projectedEnd.x() <= projectedReferenceOrigin.x() &&
-            projectedEnd.x() >= projectedReferenceEnd.x()
-       )
-    {
-        candidateContact.push_back({bestEdge.end});
-    }
+    candidateContact.insert(candidateContact.end(), validContacts.begin(), validContacts.end());
 
-    query.contacts = candidateContact;
+    return candidateContact;
 
     /*
     debugDrawer->drawLine(
@@ -324,41 +365,6 @@ void getContactPoints(
             }
         );
 
-    Vec2 baseOrigin = Vec2{10., 10.};
-    debugDrawer->drawPoint({
-            (Position2) baseOrigin + projectedOrigin.as<math::Vec>(),
-            3.f,
-            {200,20,200},
-        });
-    debugDrawer->drawPoint({
-            (Position2) baseOrigin + projectedEnd.as<math::Vec>(),
-            3.f,
-            {200,20,200},
-        });
-    debugDrawer->drawPoint({
-            (Position2)baseOrigin + projectedReferenceEnd.as<math::Vec>(),
-            3.f,
-            {200,100,20},
-        });
-    debugDrawer->drawPoint({
-            (Position2)baseOrigin + projectedReferenceOrigin.as<math::Vec>(),
-            3.f,
-            {200,200,20},
-        });
-
-    debugDrawer->drawLine({
-            (Position2)baseOrigin,
-            (Position2)(edgeDirection * 100 + baseOrigin),
-            2.f,
-            Color{200, 255, 200},
-            });
-
-    debugDrawer->drawLine({
-            (Position2)baseOrigin,
-            (Position2)(referenceEdge.normal * 100 + baseOrigin),
-            2.f,
-            Color{255, 200, 200},
-            });
         */
 }
 
@@ -371,6 +377,7 @@ void ContactConstraintCreation::update(const aunteater::Timer aTimer, const Game
     {
         Body & ecbA = colliderA->get<Body>();
         Position & posA = colliderA->get<Position>();
+        ecbA.collidingWith.clear();
 
         CollisionBox ecbTranslatedA{
             math::Rectangle<double>{
@@ -381,15 +388,59 @@ void ContactConstraintCreation::update(const aunteater::Timer aTimer, const Game
 
         aunteater::weak_entity entityA = colliderA;
         Position2 center = ecbTranslatedA.mBox.center();
-        Position2 massCenter = static_cast<Position2>(posA.position.as<math::Vec>() + ecbA.massCenter.as<math::Vec>());
+        Position2 massCenterA = static_cast<Position2>(posA.position.as<math::Vec>() + ecbA.massCenter.as<math::Vec>());
 
-        colliderVector.emplace_back(std::tie(ecbTranslatedA, center, massCenter, ecbA.theta, ecbA, ecbA, entityA));
+        colliderVector.emplace_back(std::tie(ecbTranslatedA, center, massCenterA, ecbA.theta, ecbA, ecbA, entityA));
+
+        /*
+         * This cannot work right now
+         * We need a better way to store the state of collision
+        for (auto & query : ecbA.collidingWith)
+        {
+            Body & ecbB = query.entity->get<Body>();
+            Position & posB = query.entity->get<Position>();
+            math::Radian<double> thetaA = ecbA.theta;
+            math::Radian<double> thetaB = ecbB.theta;
+            Position2 massCenterB = static_cast<Position2>(posB.position.as<math::Vec>() + ecbB.massCenter.as<math::Vec>());
+
+            CollisionBox ecbTranslatedB{
+                math::Rectangle<double>{
+                    posB.position + ecbB.box.mBox.mPosition.as<math::Vec>(),
+                    ecbB.box.mBox.mDimension
+                }
+            };
+
+            if (query.face == ReferenceFace::FACEA)
+            {
+                Edge referenceEdge = ecbTranslatedA.getEdge(query.index, thetaA, massCenterA);
+                Vec2 refEdgeDir = {referenceEdge.normal.y(), -referenceEdge.normal.x()}; 
+                std::cout << referenceEdge << ecbTranslatedA << thetaA << "\n" << massCenterA << "\n" << "index" << query.index << "\n";
+
+                Edge incidentEdge = ecbTranslatedB.getEdge(query.incEdgeIndex, thetaB, massCenterB);
+                Vec2 incidentEdgeDir = {incidentEdge.normal.y(), -incidentEdge.normal.x()}; 
+
+                query.contacts = CheckContactValidity(referenceEdge, refEdgeDir, query.contacts);
+                query.contacts = CheckContactValidity(incidentEdge, incidentEdgeDir, query.contacts);
+            }
+            else
+            {
+                Edge referenceEdge = ecbTranslatedB.getEdge(query.index, thetaB, massCenterB);
+                Vec2 refEdgeDir = {referenceEdge.normal.y(), -referenceEdge.normal.x()}; 
+                std::cout << referenceEdge << ecbTranslatedB << thetaB << "\n" << massCenterB << "\n" << "index" << query.index << "\n";
+
+                Edge incidentEdge = ecbTranslatedA.getEdge(query.incEdgeIndex, thetaA, massCenterA);
+                Vec2 incidentEdgeDir = {incidentEdge.normal.y(), -incidentEdge.normal.x()}; 
+
+                query.contacts = CheckContactValidity(referenceEdge, refEdgeDir, query.contacts);
+                query.contacts = CheckContactValidity(incidentEdge, incidentEdgeDir, query.contacts);
+            }
+        }
+        */
     }
 
     for (std::size_t i = 0; i != colliderVector.size() - 1; ++i)
     {
         auto & [ecbTranslatedA, centerA, massCenterA, thetaA, ecbA, ecbARef, colliderA] = colliderVector.at(i);
-        ecbARef.collidingWith.clear();
 
         for(std::size_t j = i + 1; j != colliderVector.size(); ++j)
         {
@@ -424,6 +475,9 @@ void ContactConstraintCreation::update(const aunteater::Timer aTimer, const Game
                 const double y2 = centerB.y();
 
                 const double distance = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
+            
+                I'M DUMB THIS IS PROBABLY JUST BECAUSE MATH is not compiled in O3...
+                I'm keeping to remind me to not be dumb
                 */
 
                 const double x1 = centerA.x();
@@ -437,7 +491,7 @@ void ContactConstraintCreation::update(const aunteater::Timer aTimer, const Game
                 {
                     ContactQuery bestQuery{colliderB};
 
-                    ReferenceFace face = getBestQuery(
+                    bestQuery.face = getBestQuery(
                             bestQuery,
                             ecbA.shapeType,
                             ecbB.shapeType,
@@ -451,15 +505,37 @@ void ContactConstraintCreation::update(const aunteater::Timer aTimer, const Game
 
                     if (bestQuery.index != -1)
                     {
-                        if (face == ReferenceFace::FACEA)
+                        std::vector<Contact> contacts;
+
+                        if (bestQuery.face == ReferenceFace::FACEA)
                         {
-                            getContactPoints(bestQuery, ecbTranslatedA, ecbTranslatedB, massCenterA, massCenterB, thetaA, thetaB);
+                            Edge referenceEdge = ecbTranslatedA.getEdge(bestQuery.index, thetaA, massCenterA);
+                            Vec2 edgeDirection = {referenceEdge.normal.y(), -referenceEdge.normal.x()}; 
+
+                            Edge incidentEdge{{0.,0.}, {0.,0.}, {0.,0.}};
+
+                            bestQuery.incEdgeIndex = findIncidentEdge(incidentEdge, referenceEdge, edgeDirection, ecbTranslatedB, massCenterB, thetaB);
+                            if (bestQuery.incEdgeIndex != -1)
+                            {
+                                contacts = getContactPoints(bestQuery.index, referenceEdge, edgeDirection, incidentEdge);
+                            }
                         }
                         else
                         {
-                            getContactPoints(bestQuery, ecbTranslatedB, ecbTranslatedA, massCenterB, massCenterA, thetaB, thetaA);
+                            Edge referenceEdge = ecbTranslatedB.getEdge(bestQuery.index, thetaB, massCenterB);
+                            Vec2 edgeDirection = {referenceEdge.normal.y(), -referenceEdge.normal.x()}; 
+
+                            Edge incidentEdge{{0.,0.}, {0.,0.}, {0.,0.}};
+
+                            bestQuery.incEdgeIndex = findIncidentEdge(incidentEdge, referenceEdge, edgeDirection, ecbTranslatedA, massCenterA, thetaA);
+                            if (bestQuery.incEdgeIndex != -1)
+                            {
+                                contacts = getContactPoints(bestQuery.index, referenceEdge, edgeDirection, incidentEdge);
+                            }
                             bestQuery.normal = -bestQuery.normal;
                         }
+
+                        bestQuery.contacts.insert(bestQuery.contacts.begin(), contacts.begin(), contacts.end());
 
                         ecbARef.collidingWith.push_back(bestQuery);
                     }

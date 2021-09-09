@@ -20,6 +20,7 @@ int main(int argc, const char * argv[])
     try
     {
         GameInputState inputState;
+        DebugUI mUI;
 
         ad::Application application("grapkimbo", 1600, 900,
                                 ad::Application::Window_Keep_Ratio);
@@ -32,7 +33,7 @@ int main(int argc, const char * argv[])
         // "Game" selection
         // 
         //Game game{application};
-        ChangeScene(GameList::FrictionTest, application);
+        ChangeScene(GameList::FrictionTest, application, mUI);
 
         while(application.handleEvents())
         {
@@ -40,7 +41,7 @@ int main(int argc, const char * argv[])
             timer.mark(glfwGetTime());
             if (currentGame->update(timer, inputState))
             {
-                drawImGui(application);
+                drawImGui(application, mUI);
                 renderImGui();
                 application.swapBuffers();
             }

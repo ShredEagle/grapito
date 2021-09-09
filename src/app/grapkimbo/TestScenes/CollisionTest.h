@@ -19,10 +19,12 @@ namespace grapito {
 class CollisionTest : public Game
 {
 public:
-    CollisionTest(Application & aApplication);
+    CollisionTest(Application & aApplication, DebugUI & aUI);
     ~CollisionTest() = default;
 
     bool update(const aunteater::Timer & aTimer, const GameInputState & aInputState);
+private:
+    DebugUI & mUI;
 };
 }
 }

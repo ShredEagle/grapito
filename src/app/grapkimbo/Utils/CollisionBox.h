@@ -24,6 +24,9 @@ namespace grapito
         Position2 origin;
         Position2 end;
         Vec2 normal;
+
+        friend std::ostream &operator<<(std::ostream & os, const Edge & edge);
+
     };
 
     class CollisionBox
@@ -41,6 +44,8 @@ namespace grapito
             const Edge getEdge(const int index, const math::Radian<double> & theta, const Position2 & massCenter) const;
             const Position2 getSupport(const Vec2 direction, const math::Radian<double> & theta, const Position2 & massCenter) const;
             const Position2 getSupport(const Vec2 direction) const;
+
+            friend std::ostream & operator<<(std::ostream & os, const CollisionBox & box);
     };
 
 } // namespace grapito

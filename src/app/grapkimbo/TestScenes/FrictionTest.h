@@ -19,10 +19,12 @@ namespace grapito {
 class FrictionTest : public Game
 {
 public:
-    FrictionTest(Application & aApplication);
+    FrictionTest(Application & aApplication, DebugUI & aUI);
     ~FrictionTest() = default;
 
     bool update(const aunteater::Timer & aTimer, const GameInputState & aInputState);
+private:
+    DebugUI & mUI;
 };
 }
 }

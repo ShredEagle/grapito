@@ -76,7 +76,7 @@ aunteater::Entity makeAnchor(math::Position<2, double> aPosition, math::Size<2, 
             BodyType::STATIC,
             ShapeType::HULL)
         .add<Position>(aPosition, aSize)
-        .add<AccelAndSpeed>(Vec2{0., 0.}, 1.)
+        .add<AccelAndSpeed>()
         .add<VisualRectangle>(anchor::gColor)
     ;
 }

@@ -24,13 +24,52 @@
 #include <aunteater/UpdateTiming.h>
 #include <aunteater/Entity.h>
 
+#include <cmath>
 #include <iostream>
 
 namespace ad {
 
 namespace grapito {
 
-CollisionTest::CollisionTest(Application & aApplication)
+void createStaticPlatform(Position2 pos, math::Size<2, double> size, double angle, aunteater::EntityManager & mEntityManager)
+{
+    mEntityManager.addEntity(
+            aunteater::Entity()
+            .add<AccelAndSpeed>()
+            .add<Position>(pos, size)
+            .add<VisualRectangle>(math::sdr::gCyan)
+            .add<Body>(
+                math::Rectangle<double>{{0., 0.}, size},
+                BodyType::STATIC,
+                ShapeType::HULL,
+                0.,
+                angle,
+                .9
+            ));
+}
+
+void createBox(Position2 pos, math::Size<2, double> size, double angularSpeed, aunteater::EntityManager & mEntityManager)
+{
+    mEntityManager.addEntity(
+            aunteater::Entity()
+            .add<Position>(pos, size)
+            .add<Body>(
+                math::Rectangle<double>{{0., 0.}, size},
+                BodyType::DYNAMIC,
+                ShapeType::HULL,
+                1.,
+                1.,
+                .5
+            )
+            .add<VisualRectangle>(math::sdr::gCyan)
+            .add<AccelAndSpeed>(Vec2{0., 0.}, angularSpeed)
+            );
+}
+
+// This test is basically succesful given our current
+// contact solving. It cannot converge without contact persistence.
+CollisionTest::CollisionTest(Application & aApplication, DebugUI & aUI) :
+    mUI{aUI}
 {
     mSystemManager.add<Gravity>();
     mSystemManager.add<Control>();
@@ -41,110 +80,16 @@ CollisionTest::CollisionTest(Application & aApplication)
 
     aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera({10., 2.}));
 
-    mEntityManager.addEntity(
-            aunteater::Entity()
-            .add<Position>(Position2{3., 10.}, math::Size<2, double>{2., 2.})
-            .add<Body>(
-                math::Rectangle<double>{{0., 0.}, {2., 2.}},
-                BodyType::DYNAMIC,
-                ShapeType::HULL,
-                1.,
-                1.,
-                .5
-            )
-            .add<VisualRectangle>(math::sdr::gCyan)
-            .add<AccelAndSpeed>()
-            );
+    createStaticPlatform({-2., 0.}, {15., 2.}, -M_PI / 3, mEntityManager);
+    createStaticPlatform({6., 0.}, {15., 2.}, -2 * M_PI / 3, mEntityManager);
 
-    mEntityManager.addEntity(
-            aunteater::Entity()
-            .add<Position>(Position2{2., 5.}, math::Size<2, double>{2., 2.})
-            .add<Mass>(1.)
-            .add<Controllable>(Controller::Keyboard)
-            .add<Body>(
-                math::Rectangle<double>{{0., 0.}, {2., 2.}},
-                BodyType::DYNAMIC,
-                ShapeType::HULL,
-                1.,
-                0.,
-                .5
-            )
-            .add<VisualRectangle>(math::sdr::gCyan)
-            .add<AccelAndSpeed>()
-            );
-
-    mEntityManager.addEntity(
-            aunteater::Entity()
-            .add<AccelAndSpeed>()
-            .add<Position>(Position2{2.87, 2.}, math::Size<2, double>{.25, .5})
-            .add<VisualRectangle>(math::sdr::gCyan)
-            .add<Body>(
-                math::Rectangle<double>{{0., 0.}, {.25, .5}},
-                BodyType::STATIC,
-                ShapeType::HULL,
-                0.,
-                0.,
-                .5
-            ));
-
-    mEntityManager.addEntity(
-            aunteater::Entity()
-            .add<Position>(Position2{7., 3.}, math::Size<2, double>{2., 2.})
-            .add<VisualRectangle>(math::sdr::gCyan)
-            .add<Body>(
-                math::Rectangle<double>{{0., 0.}, {2., 2.}},
-                BodyType::DYNAMIC,
-                ShapeType::HULL,
-                1.,
-                0.,
-                .5
-            )
-            .add<AccelAndSpeed>()
-            );
-
-    mEntityManager.addEntity(
-            aunteater::Entity()
-            .add<Position>(Position2{7., 10.}, math::Size<2, double>{2., 2.})
-            .add<VisualRectangle>(math::sdr::gCyan)
-            .add<Body>(
-                math::Rectangle<double>{{0., 0.}, {2., 2.}},
-                BodyType::DYNAMIC,
-                ShapeType::HULL,
-                1.,
-                0.,
-                .5
-            )
-            .add<AccelAndSpeed>()
-            );
-
-    mEntityManager.addEntity(
-            aunteater::Entity()
-            .add<AccelAndSpeed>()
-            .add<Position>(Position2{6., 2.}, math::Size<2, double>{4.3, .5})
-            .add<VisualRectangle>(math::sdr::gCyan)
-            .add<Body>(
-                math::Rectangle<double>{{0., 0.}, {4.3, .5}},
-                BodyType::STATIC,
-                ShapeType::HULL,
-                0.,
-                0.,
-                .5
-            ));
-
-    mEntityManager.addEntity(
-            aunteater::Entity()
-            .add<Position>(Position2{10., 4.}, math::Size<2, double>{2., 2.})
-            .add<VisualRectangle>(math::sdr::gCyan)
-            .add<Body>(
-                math::Rectangle<double>{{0., 0.}, {2., 2.}},
-                BodyType::DYNAMIC,
-                ShapeType::HULL,
-                1.,
-                0.,
-                .5
-            )
-            .add<AccelAndSpeed>()
-            );
+    for (int i = 0; i < 6; ++i)
+    {
+        for (int j = 0; j < 10; ++j)
+        {
+            createBox({5. + i * 1.5, 5. + j * 1.5}, {1., 1.}, (j + i * 5) % 3, mEntityManager);
+        }
+    }
 }
 
 bool CollisionTest::update(const aunteater::Timer & aTimer, const GameInputState & aInputState)
@@ -162,7 +107,7 @@ bool CollisionTest::update(const aunteater::Timer & aTimer, const GameInputState
     {
         mSystemManager.pause(false);
         mSystemManager.update(aTimer, aInputState, timings);
-        //mUI.broadcast(timings);
+        mUI.broadcast(timings);
     }
     else 
     {

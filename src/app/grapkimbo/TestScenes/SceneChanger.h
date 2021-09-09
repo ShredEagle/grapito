@@ -31,17 +31,17 @@ static void setupSceneChanger()
 
 */
 
-static void ChangeScene(GameList aGameType, Application & aApplication)
+static void ChangeScene(GameList aGameType, Application & aApplication, DebugUI & aUI)
 {
     switch (aGameType) {
     case GameList::CollisionTest:
-        currentGame = std::make_unique<class CollisionTest>(aApplication);
+        currentGame = std::make_unique<class CollisionTest>(aApplication, aUI);
         break;
     case GameList::GamePendulum:
-        currentGame = std::make_unique<Game_pendulum>(aApplication);
+        currentGame = std::make_unique<Game_pendulum>(aApplication, aUI);
         break;
     case GameList::FrictionTest:
-        currentGame = std::make_unique<class FrictionTest>(aApplication);
+        currentGame = std::make_unique<class FrictionTest>(aApplication, aUI);
         break;
     }
 }

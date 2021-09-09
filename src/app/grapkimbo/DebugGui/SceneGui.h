@@ -24,18 +24,18 @@ static void setupImGui(Application & aApplication)
     ImGui_ImplOpenGL3_Init("#version 400");
 }
 
-static void drawImGui(Application & aApplication)
+static void drawImGui(Application & aApplication, DebugUI & aUI)
 {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     NewFrame();
     Begin("Hello world");
     if(ImGui::Button("Collision test"))
-        ChangeScene(GameList::CollisionTest, aApplication);
+        ChangeScene(GameList::CollisionTest, aApplication, aUI);
     if(ImGui::Button("Game_pendulum"))
-        ChangeScene(GameList::GamePendulum, aApplication);
+        ChangeScene(GameList::GamePendulum, aApplication, aUI);
     if(ImGui::Button("FrictionTest"))
-        ChangeScene(GameList::FrictionTest, aApplication);
+        ChangeScene(GameList::FrictionTest, aApplication, aUI);
     End();
 }
 

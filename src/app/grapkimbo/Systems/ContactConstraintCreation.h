@@ -14,12 +14,6 @@ namespace grapito
 
 typedef aunteater::Archetype<Position, Body> BodyPosition;
 
-enum ReferenceFace
-{
-    FACEA,
-    FACEB,
-};
-
 class ContactConstraintCreation : public aunteater::System<GameInputState>
 {
 

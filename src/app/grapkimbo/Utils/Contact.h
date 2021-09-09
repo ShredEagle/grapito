@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Utils/CollisionBox.h"
 #include "commons.h"
 
 #include "aunteater/globals.h"
@@ -12,6 +13,13 @@ namespace ad
 {
 namespace grapito
 {
+
+enum ReferenceFace
+{
+    FACEA,
+    FACEB,
+};
+
 
 struct Contact
 {
@@ -96,7 +104,11 @@ struct ContactQuery
     aunteater::weak_entity entity;
     double distance = 0.;
     Vec2 normal = Vec2::Zero();
+
     int index = -1;
+    int incEdgeIndex = -1;
+    ReferenceFace face;
+
     std::vector<Contact> contacts;
 };
 } //namespace grapito
