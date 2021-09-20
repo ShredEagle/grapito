@@ -80,8 +80,8 @@ CollisionTest::CollisionTest(Application & aApplication, DebugUI & aUI) :
 
     aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera({10., 2.}));
 
-    createStaticPlatform({-2., 0.}, {15., 2.}, -M_PI / 3, mEntityManager);
-    createStaticPlatform({6., 0.}, {15., 2.}, -2 * M_PI / 3, mEntityManager);
+    createStaticPlatform({-2., 0.}, {15., 2.}, -math::pi<double> / 3, mEntityManager);
+    createStaticPlatform({6., 0.}, {15., 2.}, -2 * math::pi<double> / 3, mEntityManager);
 
     for (int i = 0; i < 6; ++i)
     {

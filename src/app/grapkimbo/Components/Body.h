@@ -29,7 +29,7 @@ struct Body : public aunteater::Component<Body>
         math::Rectangle<double> aBox,
         BodyType aBodyType,
         ShapeType aShapeType,
-        float aMass = 1,
+        double aMass = 1.,
         double aTheta = 0.,
         double aFriction = 0.
     ) :
@@ -92,13 +92,13 @@ struct Body : public aunteater::Component<Body>
                             theta,
                             (Position2)pos.as<math::Vec>() + massCenter.as<math::Vec>()
                     ),
-                    .05,
+                    .05f,
                     {255,255,0},
             });
         }
         debugDrawer->drawPoint({
                 (Position2)pos.as<math::Vec>() + massCenter.as<math::Vec>(),
-                .05,
+                .05f,
                 {255,100,0},
         });
     }
