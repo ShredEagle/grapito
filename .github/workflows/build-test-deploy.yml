@@ -55,13 +55,13 @@ jobs:
       - name: Cache Conan local data
         uses: actions/cache@v2
         env:
-          cache-name: conancacho
+          cache-name: conancacha
         with:
           # Exclude opengl/system because its build is responsible to install opengl system-wide.
           # (required on current Linux runner)
           path: |
             ~/.conan/data
-            !~/.conan/data/opengl/system
+            !~/.conan/data/opengl
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('conan/conanfile.py') }}
           restore-keys: |
             ${{ runner.os }}-${{ env.cache-name }}
