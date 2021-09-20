@@ -8,6 +8,9 @@ env:
   CONAN_SYSREQUIRES_MODE: enabled
   # Custom variables used by the workflow
   CONAN_DEV_USER_CHANNEL: adnn/develop
+  # see: https://docs.conan.io/en/latest/reference/env_vars.html#conan-user-home-short
+  # Disable short paths on Windows, which ruins the cache@v2 actions.
+  CONAN_USER_HOME_SHORT: None
 #on:
 #  push:
 #    branches:
@@ -51,11 +54,17 @@ jobs:
 
       - name: Cache Conan local data
         uses: actions/cache@v2
+        env:
+          cache-name: conancacho
         with:
-          path: ~/.conan/data
-          key: ${{ runner.os }}-conancache-${{ hashFiles('conan/conanfile.py') }}
+          # Exclude opengl/system because its build is responsible to install opengl system-wide.
+          # (required on current Linux runner)
+          path: |
+            ~/.conan/data
+            !~/.conan/data/opengl/system
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('conan/conanfile.py') }}
           restore-keys: |
-            ${{ runner.os }}-conancache
+            ${{ runner.os }}-${{ env.cache-name }}
 
       - run: >
           conan create
