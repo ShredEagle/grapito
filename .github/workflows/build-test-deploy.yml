@@ -55,13 +55,16 @@ jobs:
       - name: Cache Conan local data
         uses: actions/cache@v2
         env:
-          cache-name: conancacha
+          cache-name: conancachb
         with:
           # Exclude opengl/system because its build is responsible to install opengl system-wide.
           # (required on current Linux runner)
+          #
+          # There is a bug with the exclude pattern.
+          # see workaround: https://github.com/actions/toolkit/issues/713#issuecomment-850321461
           path: |
-            ~/.conan/data
-            !~/.conan/data/opengl
+            ~/.conan/data/*/*
+            !~/.conan/data/opengl/system
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('conan/conanfile.py') }}
           restore-keys: |
             ${{ runner.os }}-${{ env.cache-name }}
