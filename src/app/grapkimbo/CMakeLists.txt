@@ -46,16 +46,6 @@ set(${TARGET_NAME}_HEADERS
     Utils/HomogeneousTransformation.h
 
     DebugGui/SceneGui.h
-
-    imgui/imgui.h
-    imgui/imgui_internal.h
-    imgui/imconfig.h
-    imgui/imgui_impl_glfw.h
-    imgui/imgui_impl_opengl3.h
-    imgui/imgui_impl_opengl3_loader.h
-    imgui/imstb_rectpack.h
-    imgui/imstb_textedit.h
-    imgui/imstb_truetype.h
 )
 
 set(${TARGET_NAME}_SOURCES
@@ -82,13 +72,6 @@ set(${TARGET_NAME}_SOURCES
 
     Utils/CollisionBox.cpp
     Utils/DrawDebugStuff.cpp
-
-    imgui/imgui.cpp
-    imgui/imgui_draw.cpp
-    imgui/imgui_tables.cpp
-    imgui/imgui_widgets.cpp
-    imgui/imgui_impl_glfw.cpp
-    imgui/imgui_impl_opengl3.cpp
 )
 
 source_group(TREE ${CMAKE_CURRENT_LIST_DIR}
@@ -102,11 +85,18 @@ find_package(Math CONFIG REQUIRED COMPONENTS math)
 find_package(Websocket CONFIG REQUIRED COMPONENTS websocket)
 
 find_package(glad REQUIRED)
+find_package(imgui REQUIRED)
 
 
 add_executable(${TARGET_NAME}
     ${${TARGET_NAME}_SOURCES}
     ${${TARGET_NAME}_HEADERS}
+
+    ${CMAKE_BINARY_DIR}/imgui_backends/imgui_impl_glfw.cpp
+    ${CMAKE_BINARY_DIR}/imgui_backends/imgui_impl_opengl3.cpp
+    ${CMAKE_BINARY_DIR}/imgui_backends/imgui_impl_glfw.h
+    ${CMAKE_BINARY_DIR}/imgui_backends/imgui_impl_opengl3.h
+    ${CMAKE_BINARY_DIR}/imgui_backends/imgui_impl_opengl3_loader.h
 )
 
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
@@ -118,7 +108,10 @@ endif()
 
 #target_compile_definitions(${TARGET_NAME} PRIVATE KIMBO_DEBUG)
 
-target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(${TARGET_NAME}
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
+            ${CMAKE_BINARY_DIR}/imgui_backends
+)
 
 target_link_libraries(${TARGET_NAME}
     PRIVATE
@@ -128,6 +121,7 @@ target_link_libraries(${TARGET_NAME}
         ad::websocket
 
         glad::glad
+        imgui::imgui
 )
 
 
