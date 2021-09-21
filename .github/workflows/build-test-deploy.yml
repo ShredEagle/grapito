@@ -36,9 +36,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
-          # The personal access token is available for the duration of the job.
-          # Notably allowing to access conan-config private repo.
-          token: ${{ secrets.SHREDROBOT_GITHUB_TOKEN }}
 
       - name: Prepare recipe info
         id: recipe
@@ -55,7 +52,7 @@ jobs:
 
       - name: Configure Conan
         # Remotes, profiles, and settings
-        run: conan config install git@github.com:ShredEagle/conan-config.git
+        run: conan config install https://${{ secrets.SHREDROBOT_GITHUB_TOKEN }}@github.com/ShredEagle/conan-config.git
 
       - name: Cache Conan local data
         uses: actions/cache@v2
