@@ -23,6 +23,7 @@ class GrapitoConan(ConanFile):
 
     requires = (
         ("glad/0.1.34"),
+        ("imgui/1.84.2"),
 
         ("aunteater/7702f73a38@adnn/develop"),
         ("graphics/4c1db118e3@adnn/develop"),
@@ -34,6 +35,9 @@ class GrapitoConan(ConanFile):
 
     generators = "cmake_paths", "cmake_find_package", "CMakeToolchain"
     build_policy = "missing"
+    # Otherwise, conan removes the imported imgui backends after build()
+    # they are still required for the CMake config phase of package()
+    keep_imports = True
 
     scm = {
         "type": "git",
@@ -75,3 +79,14 @@ class GrapitoConan(ConanFile):
     def package(self):
         cmake = self._configure_cmake()
         cmake.install()
+
+
+    def imports(self):
+        # see: https://blog.conan.io/2019/06/26/An-introduction-to-the-Dear-ImGui-library.html
+        # the imgui package is designed this way: consumer has to import desired backends.
+        self.copy("imgui_impl_glfw.cpp",         src="./res/bindings", dst="imgui_backends")
+        self.copy("imgui_impl_opengl3.cpp",      src="./res/bindings", dst="imgui_backends")
+        self.copy("imgui_impl_glfw.h",           src="./res/bindings", dst="imgui_backends")
+        self.copy("imgui_impl_opengl3.h",        src="./res/bindings", dst="imgui_backends")
+        self.copy("imgui_impl_opengl3_loader.h", src="./res/bindings", dst="imgui_backends")
+
