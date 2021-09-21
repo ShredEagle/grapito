@@ -457,15 +457,15 @@ void ContactConstraintCreation::update(const aunteater::Timer aTimer, const Game
                 /*
                 const double distance = (ecbTranslatedA.mBox.center().as<math::Vec>() - ecbTranslatedB.mBox.center().as<math::Vec>()).getNormSquared();
                 
-                As a benchmark the code below runs in 145xxms
+                As a benchmark the code below runs in 145xxus
                 This is approximately 164 cycle per iteration on my (franz) computer
 
-                the code above runs in 175xxms
+                the code above runs in 175xxus
                 This is approximately 246 cycle per iteration on my (franz) computer
 
                 This is for "basically" 2 subtraction 2 addition and 2 multiplication
 
-                And without any of it it takes 23xxms
+                And without any of it it takes 23xxus
 
                 const math::Position<2, double> centerA = ecbTranslatedA.mBox.center();
                 const math::Position<2, double> centerB = ecbTranslatedB.mBox.center();
