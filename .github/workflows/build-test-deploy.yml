@@ -5,12 +5,13 @@ env:
   # Apparently glfw/3.3.4 is not compatible with Conan v2
   #CONAN_V2_MODE: 1
   CONAN_SCM_TO_CONANDATA: 1
+  # Required at least for opengl/system on Linux runner, which must use the package manager.
   CONAN_SYSREQUIRES_MODE: enabled
+  # see: https://docs.conan.io/en/latest/reference/env_vars.html#conan-user-home-short
+  # Disable short paths on Windows, which otherwise ruins the cache@v2 actions.
+  CONAN_USER_HOME_SHORT: None
   # Custom variables used by the workflow
   CONAN_DEV_USER_CHANNEL: adnn/develop
-  # see: https://docs.conan.io/en/latest/reference/env_vars.html#conan-user-home-short
-  # Disable short paths on Windows, which ruins the cache@v2 actions.
-  CONAN_USER_HOME_SHORT: None
 #on:
 #  push:
 #    branches:
@@ -50,7 +51,8 @@ jobs:
         uses: turtlebrowser/get-conan@v1.0
 
       - name: Configure Conan
-        run: conan remote add adnn ${{ secrets.CONAN_REMOTE_URL }}
+        # Remotes, profiles, and settings
+        run: conan config install git@github.com:ShredEagle/conan-config.git
 
       - name: Cache Conan local data
         uses: actions/cache@v2
@@ -74,17 +76,19 @@ jobs:
           conan create
           --build=missing
           -o ${{ steps.recipe.outputs.name }}:build_tests=True
+          -pr game
           -s compiler.cppstd=${{ matrix.cppstd }}
           conan/ ${{ steps.recipe.outputs.reference }}@
 
-      - name: Prepare virtual run env
-        run: >
-          conan install -g virtualrunenv
-          -o ${{ steps.recipe.outputs.name }}:build_tests=True
-          -s compiler.cppstd=${{ matrix.cppstd }}
-          ${{ steps.recipe.outputs.reference }}@
-
       # No 'unit tests' application for the moment
+      #- name: Prepare virtual run env
+      #  run: >
+      #    conan install -g virtualrunenv
+      #    -o ${{ steps.recipe.outputs.name }}:build_tests=True
+      #    -pr game
+      #    -s compiler.cppstd=${{ matrix.cppstd }}
+      #    ${{ steps.recipe.outputs.reference }}@
+      #
       #- name: Run tests (bash)
       #  if: ${{ runner.os != 'Windows' }}
       #  run: |
