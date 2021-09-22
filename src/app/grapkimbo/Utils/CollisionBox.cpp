@@ -1,63 +1,34 @@
 #include "CollisionBox.h"
 #include "Utils/DrawDebugStuff.h"
+#include "Utils/Shape.h"
+#include "commons.h"
 #include "math/Angle.h"
 #include <iostream>
 
 namespace ad {
 namespace grapito {
-CollisionBox::CollisionBox(math::Rectangle<double> aBox) : 
-    mBox{aBox},
-    mFaceCount{4}
-{
-};
+CollisionBox::CollisionBox(Shape aShape) : 
+    shape(std::move(aShape))
+{};
+
+CollisionBox::CollisionBox(math::Rectangle<double> aRectangle) : 
+    shape(aRectangle)
+{};
+
 
 // TODO Due to this and the normal calculation 
 // we should not accept collision with negative width or height
 // This insures that edge are in trigo orientation
 // and makes normal computation easy
-const Position2 CollisionBox::getVertice(const int index, const math::Radian<double> & theta, const Position2 & massCenter) const
-{
-    Vec2 xVec{mBox.width(), 0.};
-    Vec2 yVec{0., mBox.height()};
-
-    auto vertice = mBox.origin() + ((index & 0x01) ^ index >> 1) * xVec + (index >> 1) * yVec;
-
-
-    return transformPosition(vertice, theta, massCenter);
-}
-
-const Position2 CollisionBox::getVertice(const int index) const
-{
-    return getVertice(index, math::Radian<double>{0.}, {0., 0.});
-}
-
-const Edge CollisionBox::getEdge(const int index, const math::Radian<double> & theta, const Position2 & massCenter) const
-{
-    Position2 origin = getVertice(index, theta, massCenter);
-    Position2 end = getVertice((index + 1) % (mFaceCount), theta, massCenter);
-
-    Vec2 edgeVector = end - origin;
-
-    Vec2 normal{edgeVector.y(), -edgeVector.x()};
-
-    return {origin, end, normal.normalize()};
-};
-
-const Edge CollisionBox::getEdge(const int index) const
-{
-    return getEdge(index, math::Radian<double>{0.}, {0., 0.});
-}
-
-
-const Position2 CollisionBox::getSupport(const Vec2 direction, const math::Radian<double> & theta, const Position2 & massCenter) const
+const Position2 CollisionBox::getSupport(const Vec2 direction) const
 {
     double bestProjection = -std::numeric_limits<double>::max();
     Position2 bestVertex{0.f, 0.f};
 
     //In 2D face count and vertex count are always the same
-    for (int i = 0; i < mFaceCount; ++i)
+    for (int i = 0; i < shape.mFaceCount; ++i)
     {
-        Position2 vertex = getVertice(i, theta, massCenter);
+        Position2 vertex = shape.getVertice(i);
         double projection = direction.dot(vertex.as<math::Vec>());
 
         if (projection > bestProjection)
@@ -70,14 +41,10 @@ const Position2 CollisionBox::getSupport(const Vec2 direction, const math::Radia
     return bestVertex;
 }
 
-const Position2 CollisionBox::getSupport(const Vec2 direction) const
-{
-    return getSupport(direction, math::Radian<double>{0.}, {0., 0.});
-}
-
 std::ostream &operator<<(std::ostream & os, const CollisionBox & box)
 {
-    return os << "{ CollisionBox\n    Box : " << box.mBox.mPosition << " " << box.mBox.mDimension << "\n    Face count : " << box.mFaceCount << "\n}\n";
+    //return os << "{ CollisionBox\n    Box : " << box.mBox.mPosition << " " << box.mBox.mDimension << "\n    Face count : " << box.mFaceCount << "\n}\n";
+    return os;
 }
 
 std::ostream &operator<<(std::ostream & os, const Edge & edge)

@@ -3,6 +3,7 @@
 #include "../Utilities.h"
 #include "Utils/Contact.h"
 #include "Utils/CollisionBox.h"
+#include "Utils/Shape.h"
 
 #include <algorithm>
 #include <aunteater/Component.h>
@@ -10,6 +11,8 @@
 namespace ad {
 namespace grapito
 {
+
+struct ConstructedBody;
 
 enum ShapeType
 {
@@ -43,7 +46,7 @@ struct Body : public aunteater::Component<Body>
         double aTheta = 0.,
         double aFriction = 0.
     ) :
-        box{std::move(aBox)},
+        shape{aBox},
         bodyType{aBodyType},
         shapeType{aShapeType},
         collisionType{aCollisionType},
@@ -53,9 +56,9 @@ struct Body : public aunteater::Component<Body>
 
         double area = 0.;
         Vec2 vecMassCenter = Vec2::Zero();
-        for (int i = 0; i < box.mFaceCount; ++i)
+        for (int i = 0; i < shape.mFaceCount; ++i)
         {
-            auto edge = box.getEdge(i);
+            auto edge = shape.getEdge(i);
             auto vertexA = edge.origin.as<math::Vec>();
             auto vertexB = edge.end.as<math::Vec>();
             double areaStep = twoDVectorCross(vertexA, vertexB) / 2;
@@ -94,9 +97,9 @@ struct Body : public aunteater::Component<Body>
 
     void debugRender(Position2 pos)
     {
-        for (int i = 0; i < box.mFaceCount; ++i)
+        for (int i = 0; i < shape.mFaceCount; ++i)
         {
-            auto vertex = box.getVertice(i);
+            auto vertex = shape.getVertice(i);
             debugDrawer->drawPoint({
                     transformPosition(
                             (Position2)pos.as<math::Vec>() + vertex.as<math::Vec>(),
@@ -124,13 +127,13 @@ struct Body : public aunteater::Component<Body>
     double radius;
     math::Radian<double> theta;
 
-    CollisionBox box;
+    Shape shape;
 
     BodyType bodyType;
     ShapeType shapeType;
     CollisionType collisionType;
 
-    std::vector<ContactQuery> collidingWith;
+    std::list<ConstructedBody>::iterator constructedBodyIt;
 };
 
 

@@ -44,6 +44,7 @@ set(${TARGET_NAME}_HEADERS
     Utils/CollisionBox.h
     Utils/DrawDebugStuff.h
     Utils/HomogeneousTransformation.h
+    Utils/Shape.h
 
     DebugGui/SceneGui.h
 )
@@ -72,6 +73,14 @@ set(${TARGET_NAME}_SOURCES
 
     Utils/CollisionBox.cpp
     Utils/DrawDebugStuff.cpp
+    Utils/Shape.cpp
+
+    imgui/imgui.cpp
+    imgui/imgui_draw.cpp
+    imgui/imgui_tables.cpp
+    imgui/imgui_widgets.cpp
+    imgui/imgui_impl_glfw.cpp
+    imgui/imgui_impl_opengl3.cpp
 )
 
 source_group(TREE ${CMAKE_CURRENT_LIST_DIR}

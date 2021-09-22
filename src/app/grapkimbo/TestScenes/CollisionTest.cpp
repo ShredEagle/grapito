@@ -87,9 +87,9 @@ CollisionTest::CollisionTest(Application & aApplication, DebugUI & aUI) :
 
     for (int i = 0; i < 6; ++i)
     {
-        for (int j = 0; j < 10; ++j)
+        for (int j = 0; j < 50; ++j)
         {
-            createBox({5. + i * 1.5, 5. + j * 1.5}, {1., 1.}, (j + i * 5) % 3, mEntityManager);
+            createBox({5. + i * 1.5, 5. + j * 1.5}, {.25, .25}, (j + i * 5) % 3, mEntityManager);
         }
     }
 }
