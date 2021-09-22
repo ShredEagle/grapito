@@ -1,5 +1,6 @@
 #include "ContactConstraintCreation.h"
 
+#include "Utils/Contact.h"
 #include "Utils/DrawDebugStuff.h"
 #include "commons.h"
 #include "../Utilities.h"
@@ -106,7 +107,7 @@ void QueryFacePenetration(
 ContactConstraintCreation::ContactConstraintCreation(aunteater::EntityManager & aEntityManager) :
     mColliders(aEntityManager)
 {
-    queryFunctions[ShapeType::HULL][ShapeType::HULL] = QueryFacePenetration;
+    queryFunctions[ShapeType_Hull][ShapeType_Hull] = QueryFacePenetration;
 }
 
 ReferenceFace ContactConstraintCreation::getBestQuery(
@@ -446,7 +447,7 @@ void ContactConstraintCreation::update(const aunteater::Timer aTimer, const Game
         {
             auto & [ecbTranslatedB, centerB, massCenterB, thetaB, ecbB, ecbBRef, colliderB] = colliderVector.at(j);
 
-            if (ecbB.bodyType != BodyType::STATIC || ecbA.bodyType != BodyType::STATIC)
+            if (ecbB.bodyType != BodyType_Static || ecbA.bodyType != BodyType_Static)
             {
 
                 const double radiusSum = std::pow((ecbA.radius + ecbB.radius), 2);

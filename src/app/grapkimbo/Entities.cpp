@@ -44,8 +44,9 @@ aunteater::Entity makePlayer(int aIndex,
         .add<Position>(Position2{3., 3.}, player::gSize) // The position will be set by pendulum simulation
         .add<Body>(
             math::Rectangle<double>{{0., 0.}, player::gSize},
-            BodyType::DYNAMIC,
-            ShapeType::HULL,
+            BodyType_Dynamic,
+            ShapeType_Hull,
+            CollisionType_Moving_Env,
             1.,
             0.
             )
@@ -73,8 +74,10 @@ aunteater::Entity makeAnchor(math::Position<2, double> aPosition, math::Size<2, 
     return aunteater::Entity()
         .add<Body>(
             math::Rectangle<double>{{0., 0.}, aSize},
-            BodyType::STATIC,
-            ShapeType::HULL)
+            BodyType_Static,
+            ShapeType_Hull,
+            CollisionType_Static_Env
+            )
         .add<Position>(aPosition, aSize)
         .add<AccelAndSpeed>()
         .add<VisualRectangle>(anchor::gColor)

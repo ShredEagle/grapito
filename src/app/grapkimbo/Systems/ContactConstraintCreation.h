@@ -47,9 +47,9 @@ private:
                     const math::Radian<double> thetaA,
                     const math::Radian<double> thetaB
                     )>,
-            ShapeType::type_count
+            ShapeType_count
         >,
-        ShapeType::type_count
+        ShapeType_count
     > queryFunctions;
 };
 

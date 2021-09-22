@@ -40,8 +40,9 @@ void createStaticPlatform(Position2 pos, math::Size<2, double> size, double angl
             .add<VisualRectangle>(math::sdr::gCyan)
             .add<Body>(
                 math::Rectangle<double>{{0., 0.}, size},
-                BodyType::STATIC,
-                ShapeType::HULL,
+                BodyType_Static,
+                ShapeType_Hull,
+                CollisionType_Static_Env,
                 0.,
                 angle,
                 .9
@@ -55,8 +56,9 @@ void createBox(Position2 pos, math::Size<2, double> size, double angularSpeed, a
             .add<Position>(pos, size)
             .add<Body>(
                 math::Rectangle<double>{{0., 0.}, size},
-                BodyType::DYNAMIC,
-                ShapeType::HULL,
+                BodyType_Dynamic,
+                ShapeType_Hull,
+                CollisionType_Moving_Env,
                 1.,
                 1.,
                 .5

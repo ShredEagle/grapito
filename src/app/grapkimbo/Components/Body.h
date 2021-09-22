@@ -13,14 +13,23 @@ namespace grapito
 
 enum ShapeType
 {
-    HULL,
-    type_count,
+    ShapeType_Hull,
+    ShapeType_count,
+};
+
+enum CollisionType
+{
+    CollisionType_Player,
+    CollisionType_Moving_Env,
+    CollisionType_Floor,
+    CollisionType_Static_Env,
+    CollisionType_count,
 };
 
 enum BodyType
 {
-    STATIC,
-    DYNAMIC,
+    BodyType_Static,
+    BodyType_Dynamic,
 };
 
 struct Body : public aunteater::Component<Body>
@@ -29,13 +38,15 @@ struct Body : public aunteater::Component<Body>
         math::Rectangle<double> aBox,
         BodyType aBodyType,
         ShapeType aShapeType,
-        double aMass = 1.,
+        CollisionType aCollisionType,
+        float aMass = 1.,
         double aTheta = 0.,
         double aFriction = 0.
     ) :
         box{std::move(aBox)},
         bodyType{aBodyType},
         shapeType{aShapeType},
+        collisionType{aCollisionType},
         friction{aFriction}
     {
         radius = std::max(aBox.height(), aBox.width());
@@ -62,7 +73,7 @@ struct Body : public aunteater::Component<Body>
         massCenter = static_cast<Position2>(vecMassCenter);
         theta = math::Radian<double>{aTheta};
 
-        if (bodyType != BodyType::DYNAMIC)
+        if (bodyType != BodyType_Dynamic)
         {
             mass = 0.;
             invMass = 0.;
@@ -117,6 +128,7 @@ struct Body : public aunteater::Component<Body>
 
     BodyType bodyType;
     ShapeType shapeType;
+    CollisionType collisionType;
 
     std::vector<ContactQuery> collidingWith;
 };

@@ -37,8 +37,9 @@ void createFrictionTest(double height, double friction, aunteater::EntityManager
             .add<Position>(Position2{3., height}, math::Size<2, double>{2., 2.})
             .add<Body>(
                 math::Rectangle<double>{{0., 0.}, {2., 2.}},
-                BodyType::DYNAMIC,
-                ShapeType::HULL,
+                BodyType_Dynamic,
+                ShapeType_Hull,
+                CollisionType_Static_Env,
                 1.,
                 0.,
                 friction
@@ -54,8 +55,9 @@ void createFrictionTest(double height, double friction, aunteater::EntityManager
             .add<VisualRectangle>(math::sdr::gCyan)
             .add<Body>(
                 math::Rectangle<double>{{0., 0.}, {12., 1.}},
-                BodyType::STATIC,
-                ShapeType::HULL,
+                BodyType_Static,
+                ShapeType_Hull,
+                CollisionType_Moving_Env,
                 0.,
                 0.,
                 friction

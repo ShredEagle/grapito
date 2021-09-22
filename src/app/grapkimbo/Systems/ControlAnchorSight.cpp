@@ -37,6 +37,7 @@ void ControlAnchorSight::positionSight(AnchorSelector & aSelector,
         math::Vec<2, double> vec = aCandidate - aBasePosition;
         return anchor != aSelector.anchor  // eliminate the currently selected anchor
                // The candidate must be within the player's reach distance
+               && anchor->get<Body>().bodyType == BodyType_Static
                && (aCandidate - playerGeometry.position).getNormSquared() < aSelector.reachDistanceSquared 
                // The candidate must be better than the previously selected candidate (i.e. closer to basePosition)
                && vec.getNormSquared() < aNormSquared
