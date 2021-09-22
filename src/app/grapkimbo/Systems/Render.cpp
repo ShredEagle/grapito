@@ -85,7 +85,7 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
         collider->get<Body>().debugRender(collider->get<Position>().position);
         for (auto contact : collider->get<Body>().collidingWith)
         {
-            contact.debugRender(vecColor);
+            //contact.debugRender(vecColor);
         }
     }
 #endif
