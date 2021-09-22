@@ -92,11 +92,11 @@ add_executable(${TARGET_NAME}
     ${${TARGET_NAME}_SOURCES}
     ${${TARGET_NAME}_HEADERS}
 
-    ${CMAKE_BINARY_DIR}/imgui_backends/imgui_impl_glfw.cpp
-    ${CMAKE_BINARY_DIR}/imgui_backends/imgui_impl_opengl3.cpp
-    ${CMAKE_BINARY_DIR}/imgui_backends/imgui_impl_glfw.h
-    ${CMAKE_BINARY_DIR}/imgui_backends/imgui_impl_opengl3.h
-    ${CMAKE_BINARY_DIR}/imgui_backends/imgui_impl_opengl3_loader.h
+    ${PROJECT_BINARY_DIR}/imgui_backends/imgui_impl_glfw.cpp
+    ${PROJECT_BINARY_DIR}/imgui_backends/imgui_impl_opengl3.cpp
+    ${PROJECT_BINARY_DIR}/imgui_backends/imgui_impl_glfw.h
+    ${PROJECT_BINARY_DIR}/imgui_backends/imgui_impl_opengl3.h
+    ${PROJECT_BINARY_DIR}/imgui_backends/imgui_impl_opengl3_loader.h
 )
 
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
@@ -110,7 +110,7 @@ endif()
 
 target_include_directories(${TARGET_NAME}
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
-            ${CMAKE_BINARY_DIR}/imgui_backends
+            ${PROJECT_BINARY_DIR}/imgui_backends
 )
 
 target_link_libraries(${TARGET_NAME}
