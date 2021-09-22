@@ -1,4 +1,5 @@
 #include "Physics.h"
+#include "Components/Body.h"
 
 namespace ad {
 namespace grapito
@@ -6,7 +7,8 @@ namespace grapito
 
 Physics::Physics(aunteater::EntityManager & aEntityManager)
 {
-    aEntityManager.getFamily<PhysicalBody>().registerObserver
+    observer = std::make_shared<PhysicalBodyObserver>();
+    aEntityManager.getFamily<PhysicalBody>().registerObserver(observer)
 }
 
 void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInputState)
@@ -35,7 +37,25 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
                aabbA.x() + aabbA.width() > aabbB.x() &&
                aabbA.y() < aabbB.y() + aabbB.height() &&
                aabbA.y() + aabbA.height() > aabbB.y() &&
+               (bodyA.bodyType != BodyType::BodyType_Static || bodyB.bodyType != BodyType_Static)
+               )
             {
+                for (auto contact : bodyA.bodyRef.contactList)
+                {
+                    if (
+                        (bodyA.entity == contact.bodyA.entity && bodyB.entity == contact.bodyB.entity) ||
+                        (bodyA.entity == contact.bodyB.entity && bodyB.entity == contact.bodyA.entity)
+                    )
+                    {
+                        //contact already exists so we get out
+                    }
+                }
+
+                CollisionPair contactPair = {bodyA, bodyB};
+
+                bodyA.bodyRef.contactList.emplace_back(contactPair);
+                bodyB.bodyRef.contactList.emplace_back(contactPair);
+
                 collidingBodies.push_back({bodyA, bodyB});
             }
         }

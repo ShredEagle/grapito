@@ -59,7 +59,7 @@ struct ContactManifold
 class ConstructedBody
 {
     public:
-    ConstructedBody(Body & aBody, Position & aPos) :
+    ConstructedBody(Body & aBody, Position & aPos, aunteater::weak_entity aEntity) :
         mass{aBody.mass},
         invMass{aBody.invMass},
         moi{aBody.moi},
@@ -71,6 +71,7 @@ class ConstructedBody
         shapeType{aBody.shapeType},
         bodyRef{aBody},
         posRef{aPos},
+        entity{aEntity},
         box{createTransformedCollisionBox(aBody, aPos)}
     {
     }
@@ -106,9 +107,9 @@ class ConstructedBody
 
     BodyType bodyType;
     ShapeType shapeType;
-    std::vector<ContactManifold> manifolds;
     Body & bodyRef;
     Position & posRef;
+    aunteater::weak_entity entity;
 };
 
 /*
@@ -195,6 +196,12 @@ struct ContactQuery
 };
 */
 
+struct CollisionPair
+{
+    ConstructedBody & bodyA;
+    ConstructedBody & bodyB;
+};
+
 class Physics : public aunteater::System<GameInputState>
 {
 
@@ -211,7 +218,7 @@ private:
             aEntity.get<Body>().constructedBodyIt =
                 constructedBodies.insert(
                         constructedBodies.end(),
-                        ConstructedBody{aEntity.get<Body>(), aEntity.get<Position>()}
+                        ConstructedBody{aEntity.get<Body>(), aEntity.get<Position>(), &aEntity}
                         );
         }
 
@@ -220,9 +227,11 @@ private:
             constructedBodies.erase(aEntity.get<Body>().constructedBodyIt);
         }
     };
+    
+    std::shared_ptr<PhysicalBodyObserver> observer;
 
     static std::list<ConstructedBody> constructedBodies;
-    static std::vector<std::array<ConstructedBody&, 2>> collidingBodies;
+    static std::vector<CollisionPair> collidingBodies;
     static std::vector<ContactManifold> contactManifolds;
 };
 

@@ -13,6 +13,7 @@ namespace grapito
 {
 
 struct ConstructedBody;
+struct CollisionPair;
 
 enum ShapeType
 {
@@ -134,6 +135,7 @@ struct Body : public aunteater::Component<Body>
     CollisionType collisionType;
 
     std::list<ConstructedBody>::iterator constructedBodyIt;
+    std::vector<CollisionPair>  contactList;
 };
 
 
