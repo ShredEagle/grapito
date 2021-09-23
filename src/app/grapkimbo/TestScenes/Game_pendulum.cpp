@@ -2,6 +2,7 @@
 #include "Configuration.h"
 #include "Entities.h"
 
+#include "Systems/Physics.h"
 #include "TestScenes/SceneChanger.h"
 
 #include <Components/AccelAndSpeed.h>
@@ -17,11 +18,9 @@
 
 #include <Systems/AccelSolver.h>
 #include <Systems/CameraGuidedControl.h>
-#include "Systems/ContactConstraintCreation.h"
 #include <Systems/Control.h>
 #include <Systems/ControlAnchorSight.h>
 #include <Systems/Gravity.h>
-#include "Systems/ImpulseSolver.h"
 #include <Systems/LevelGeneration.h>
 #include <Systems/PendulumSimulation.h>
 #include <Systems/Render.h>
@@ -44,10 +43,9 @@ Game_pendulum::Game_pendulum(Application & aApplication, DebugUI & aUI) :
     mSystemManager.add<PendulumSimulation>();
     mSystemManager.add<ControlAnchorSight>(); // it will position the sight, which might follow something impacted by speed resolution
     mSystemManager.add<CameraGuidedControl>();
-    mSystemManager.add<ContactConstraintCreation>();
 
     mSystemManager.add<AccelSolver>();
-    mSystemManager.add<ImpulseSolver>();
+    mSystemManager.add<Physics>();
 
     mSystemManager.add<Render>(aApplication); 
 

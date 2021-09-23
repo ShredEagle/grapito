@@ -28,13 +28,12 @@ set(${TARGET_NAME}_HEADERS
     Systems/Control.h
     Systems/ControlAnchorSight.h
     Systems/Control.h
-    Systems/ContactConstraintCreation.h
     Systems/Gravity.h
     Systems/LevelGeneration.h
     Systems/PendulumSimulation.h
     Systems/Render.h
     Systems/AccelSolver.h
-    Systems/ImpulseSolver.h
+    Systems/Physics.h
 
     TestScenes/CollisionTest.h
     TestScenes/FrictionTest.h
@@ -59,13 +58,12 @@ set(${TARGET_NAME}_SOURCES
     Systems/CameraGuidedControl.cpp
     Systems/Control.cpp
     Systems/ControlAnchorSight.cpp
-    Systems/ContactConstraintCreation.cpp
     Systems/Gravity.cpp
     Systems/LevelGeneration.cpp
     Systems/PendulumSimulation.cpp
     Systems/Render.cpp
     Systems/AccelSolver.cpp
-    Systems/ImpulseSolver.cpp
+    Systems/Physics.cpp
 
     TestScenes/CollisionTest.cpp
     TestScenes/FrictionTest.cpp
@@ -74,13 +72,6 @@ set(${TARGET_NAME}_SOURCES
     Utils/CollisionBox.cpp
     Utils/DrawDebugStuff.cpp
     Utils/Shape.cpp
-
-    imgui/imgui.cpp
-    imgui/imgui_draw.cpp
-    imgui/imgui_tables.cpp
-    imgui/imgui_widgets.cpp
-    imgui/imgui_impl_glfw.cpp
-    imgui/imgui_impl_opengl3.cpp
 )
 
 source_group(TREE ${CMAKE_CURRENT_LIST_DIR}
@@ -88,10 +79,10 @@ source_group(TREE ${CMAKE_CURRENT_LIST_DIR}
 )
 
 
-find_package(Aunteater CONFIG REQUIRED COMPONENTS aunteater)
-find_package(Graphics CONFIG REQUIRED COMPONENTS engine)
-find_package(Math CONFIG REQUIRED COMPONENTS math)
-find_package(Websocket CONFIG REQUIRED COMPONENTS websocket)
+find_package(aunteater CONFIG REQUIRED COMPONENTS aunteater)
+find_package(graphics CONFIG REQUIRED COMPONENTS engine)
+find_package(math CONFIG REQUIRED COMPONENTS math)
+find_package(websocket CONFIG REQUIRED COMPONENTS websocket)
 
 find_package(glad REQUIRED)
 find_package(imgui REQUIRED)

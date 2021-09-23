@@ -1,6 +1,7 @@
 #include "CollisionTest.h"
 
 #include "Entities.h"
+#include "Systems/Physics.h"
 #include "commons.h"
 #include "Configuration.h"
 #include "Input.h"
@@ -8,11 +9,9 @@
 #include "TestScenes/SceneChanger.h"
 
 #include <Systems/Render.h>
-#include <Systems/ContactConstraintCreation.h>
 #include <Systems/Control.h>
 #include <Systems/Gravity.h>
 #include "Systems/AccelSolver.h"
-#include "Systems/ImpulseSolver.h"
 #include <Utils/DrawDebugStuff.h>
 
 #include <Components/AccelAndSpeed.h>
@@ -76,8 +75,7 @@ CollisionTest::CollisionTest(Application & aApplication, DebugUI & aUI) :
     mSystemManager.add<Gravity>();
     mSystemManager.add<Control>();
     mSystemManager.add<AccelSolver>();
-    mSystemManager.add<ContactConstraintCreation>();
-    mSystemManager.add<ImpulseSolver>();
+    mSystemManager.add<Physics>();
     mSystemManager.add<Render>(aApplication); 
 
     aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera({10., 2.}));

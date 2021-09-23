@@ -15,6 +15,7 @@ public:
         Position2 origin;
         Position2 end;
         Vec2 normal;
+        Vec2 direction;
 
         friend std::ostream &operator<<(std::ostream & os, const Edge & edge);
 
@@ -31,7 +32,7 @@ public:
     const Edge getEdge(const int index) const;
     const math::Rectangle<double> getAABB() const;
 
-    int mFaceCount;
+    uint8_t mFaceCount;
     std::vector<Position2> vertices;
 };
 

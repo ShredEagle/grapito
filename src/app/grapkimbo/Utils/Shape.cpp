@@ -23,7 +23,7 @@ const Position2 Shape::getVertice(const int index) const
     return vertices.at(index);
 }
 
-const Edge Shape::getEdge(const int index) const
+const Shape::Edge Shape::getEdge(const int index) const
 {
     Position2 origin = getVertice(index);
     Position2 end = getVertice((index + 1) % (mFaceCount));
@@ -32,7 +32,7 @@ const Edge Shape::getEdge(const int index) const
 
     Vec2 normal{edgeVector.y(), -edgeVector.x()};
 
-    return {origin, end, normal.normalize()};
+    return {origin, end, normal.normalize(), edgeVector};
 };
 
 const math::Rectangle<double> Shape::getAABB() const
