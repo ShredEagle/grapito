@@ -32,6 +32,9 @@ public:
     const Edge getEdge(const int index) const;
     const math::Rectangle<double> getAABB() const;
 
+    friend std::ostream &operator<<(std::ostream & os, const Shape & shape);
+
+
     uint8_t mFaceCount;
     std::vector<Position2> vertices;
 };

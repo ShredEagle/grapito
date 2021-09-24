@@ -1,9 +1,10 @@
 #pragma once
 
 #include "../Utilities.h"
-#include "Utils/Contact.h"
+#include "Components/AccelAndSpeed.h"
 #include "Utils/CollisionBox.h"
 #include "Utils/Shape.h"
+#include "Utils/PhysicsStructs.h"
 
 #include <algorithm>
 #include <aunteater/Component.h>
@@ -11,30 +12,6 @@
 namespace ad {
 namespace grapito
 {
-
-struct ConstructedBody;
-struct CollisionPair;
-
-enum ShapeType
-{
-    ShapeType_Hull,
-    ShapeType_count,
-};
-
-enum CollisionType
-{
-    CollisionType_Player,
-    CollisionType_Moving_Env,
-    CollisionType_Floor,
-    CollisionType_Static_Env,
-    CollisionType_count,
-};
-
-enum BodyType
-{
-    BodyType_Static,
-    BodyType_Dynamic,
-};
 
 struct Body : public aunteater::Component<Body>
 {
@@ -137,7 +114,6 @@ struct Body : public aunteater::Component<Body>
     std::list<ConstructedBody>::iterator constructedBodyIt;
     std::vector<CollisionPair>  contactList;
 };
-
 
 } // namespace grapito
 } // namespace ad

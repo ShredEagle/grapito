@@ -3,6 +3,7 @@
 
 #include "Utils/HomogeneousTransformation.h"
 #include "math/Matrix.h"
+#include <iostream>
 
 namespace ad {
 namespace grapito

@@ -3,8 +3,8 @@
 #include "Input.h"
 
 #include <Components/AccelAndSpeed.h>
-#include "Components/Body.h"
 #include <Components/Position.h>
+#include <Components/Body.h>
 #include "Components/VisualRectangle.h"
 
 #include "Utils/CollisionBox.h"
@@ -21,162 +21,6 @@ namespace grapito
 
 typedef aunteater::Archetype<Position, Body, AccelAndSpeed> PhysicalBody;
 
-struct ContactFeature
-{
-    enum Type : uint8_t
-    {
-        vertex,
-        face
-    };
-    
-    Type typeReference;
-    Type typeIncident;
-    uint8_t indexReference; 
-    uint8_t indexIncident; 
-
-    Position2 contactPoint = Position2::Zero();
-    float normalImpulse;
-    float tangentImpulse;
-};
-
-struct ContactManifold
-{
-    enum ReferenceFace
-    {
-        FACEA,
-        FACEB,
-    };
-
-    ReferenceFace face;
-    uint_fast8_t referenceEdgeIndex;
-    uint_fast8_t incidentEdgeIndex;
-
-    Vec2 normal = Vec2::Zero();
-    double separation = -std::numeric_limits<double>::max();
-
-    std::vector<ContactFeature> contacts;
-};
-
-struct Line
-{
-    Position2 origin;
-    Vec2 direction;
-};
-
-struct LightBody
-{
-
-};
-
-class ConstructedBody
-{
-    public:
-    ConstructedBody(Body & aBody, Position & aPos, AccelAndSpeed & aAas, aunteater::weak_entity aEntity) :
-        mass{aBody.mass},
-        invMass{aBody.invMass},
-        moi{aBody.moi},
-        invMoi{aBody.invMoi},
-        friction{aBody.friction},
-        speed{aAas.speed},
-        w{aAas.w},
-        massCenter{aBody.massCenter},
-        position{aPos.position},
-        theta{aBody.theta},
-        radius{aBody.radius},
-        box{createTransformedCollisionBox(aBody, aPos)},
-        bodyType{aBody.bodyType},
-        shapeType{aBody.shapeType},
-        bodyRef{aBody},
-        posRef{aPos},
-        aasRef{aAas},
-        entity{aEntity}
-    {
-    }
-
-    static std::vector<Position2> createTransformedCollisionBox(Body & aBody, Position & pos)
-    {
-        std::vector<Position2> transformedVertices;
-
-        for (auto vertex : aBody.shape.vertices)
-        {
-            auto transformedPos = transformPosition(vertex, aBody.theta, pos.position);
-            transformedVertices.emplace_back(transformedPos);
-        }
-
-        return transformedVertices;
-    }
-
-    void synchronize()
-    {
-        box = CollisionBox{createTransformedCollisionBox(bodyRef, posRef)};
-    }
-
-    void updateEntity()
-    {
-        bodyRef.theta = theta;
-        aasRef.speed = speed;
-        aasRef.w = w;
-        posRef.position = position;
-    }
-
-    double mass;
-    double invMass;
-    double moi;
-    double invMoi;
-    double friction;
-    Vec2 speed;
-    double w;
-    Position2 massCenter;
-
-    Position2 position;
-    math::Radian<double> theta;
-
-    double radius;
-
-    CollisionBox box;
-
-    BodyType bodyType;
-    ShapeType shapeType;
-
-    std::vector<std::reference_wrapper<ContactManifold>> persistedManifold;
-
-    Body & bodyRef;
-    Position & posRef;
-    AccelAndSpeed & aasRef;
-    aunteater::weak_entity entity;
-};
-
-struct VelocityConstraint
-{
-    Vec2 vA;
-    double wA;
-    double invMassA;
-    double invMoiA;
-    double tangentSpeedA;
-
-    Vec2 vB;
-    double wB;
-    double invMassB;
-    double invMoiB;
-    double tangentSpeedB;
-
-    double friction;
-    double restitution;
-    Vec2 normal; 
-
-    ContactFeature & cf;
-    ConstructedBody * cbA;
-    ConstructedBody * cbB;
-};
-
-struct CollisionPair
-{
-    ConstructedBody & bodyA;
-    ConstructedBody & bodyB;
-
-    ContactManifold manifold;
-};
-
 static inline void addPair(ConstructedBody & bodyA, ConstructedBody & bodyB, std::list<CollisionPair> & pairs)
 {
     for (auto contact : bodyA.bodyRef.contactList)
@@ -186,12 +30,13 @@ static inline void addPair(ConstructedBody & bodyA, ConstructedBody & bodyB, std
             (bodyA.entity == contact.bodyB.entity && bodyB.entity == contact.bodyA.entity)
         )
         {
+            contact.cold = false;
             //contact already exists so we get out
             return;
         }
     }
 
-    CollisionPair contactPair = {bodyA, bodyB};
+    CollisionPair contactPair = {bodyA, bodyB, false};
 
     bodyA.bodyRef.contactList.emplace_back(contactPair);
     bodyB.bodyRef.contactList.emplace_back(contactPair);
@@ -231,16 +76,44 @@ static inline ContactManifold QueryFacePenetration(
     return resultManifold;
 };
 
-static inline void applyImpulse(Vec2 impVec, double angularImpulse, ConstructedBody * body, double delta)
+static inline void applyImpulse(
+        Vec2 impVecA,
+        double angularImpulseA,
+        Vec2 impVecB,
+        double angularImpulseB,
+        VelocityConstraint & constraint,
+        double delta
+        )
 {
-    body->position += impVec * delta;
-    body->theta += math::Radian<double>{angularImpulse * delta};
-    body->speed += impVec;
+    constraint.cA += impVecA * delta;
+    constraint.pA += impVecA * delta;
+    constraint.vA += impVecA;
+    constraint.aA += math::Radian<double>{angularImpulseA * delta};
+    constraint.wA += angularImpulseA;
 
-    body->w += angularImpulse;
+    constraint.cB += impVecB * delta;
+    constraint.pB += impVecB * delta;
+    constraint.vB += impVecB;
+    constraint.aB += math::Radian<double>{angularImpulseB * delta};
+    constraint.wB += angularImpulseB;
 }
 
-class Physics : public aunteater::System<GameInputState>
+
+static constexpr int maxNormalConstraintIteration = 5;
+static constexpr int maxTangentConstraintIteration = 5;
+static std::array<
+    std::array<
+        std::function<ContactManifold(
+                const ConstructedBody & bodyA,
+                const ConstructedBody & bodyB
+                )>,
+        ShapeType_count
+    >,
+    ShapeType_count
+> queryFunctions;
+
+
+class Physics : public aunteater::System<GameInputState>, public aunteater::FamilyObserver
 {
 
 public:
@@ -249,44 +122,25 @@ public:
     void update(const aunteater::Timer aTimer, const GameInputState & aInputState) override;
 
 
-    static std::array<
-        std::array<
-            std::function<ContactManifold(
-                    const ConstructedBody & bodyA,
-                    const ConstructedBody & bodyB
-                    )>,
-            ShapeType_count
-        >,
-        ShapeType_count
-    > queryFunctions;
-
 private:
-    class PhysicalBodyObserver : public aunteater::FamilyObserver
+    void addedEntity(aunteater::LiveEntity & aEntity) override
     {
-        void addedEntity(aunteater::LiveEntity & aEntity)
-        {
-            aEntity.get<Body>().constructedBodyIt =
-                constructedBodies.insert(
-                        constructedBodies.end(),
-                        ConstructedBody{aEntity.get<Body>(), aEntity.get<Position>(), aEntity.get<AccelAndSpeed>(), &aEntity}
-                        );
-        }
+        ConstructedBody body = ConstructedBody{aEntity.get<Body>(), aEntity.get<Position>(), aEntity.get<AccelAndSpeed>(), &aEntity};
+        aEntity.get<Body>().constructedBodyIt =
+            constructedBodies.insert(
+                    constructedBodies.end(),
+                    body);
+    }
 
-        void removedEntity(aunteater::LiveEntity & aEntity)
-        {
-            constructedBodies.erase(aEntity.get<Body>().constructedBodyIt);
-        }
-    };
+    void removedEntity(aunteater::LiveEntity & aEntity) override
+    {
+        constructedBodies.erase(aEntity.get<Body>().constructedBodyIt);
+    }
     
-    PhysicalBodyObserver observer;
-
+    std::list<ConstructedBody> constructedBodies;
+    std::list<CollisionPair> collidingBodies;
+    std::vector<VelocityConstraint> velocityConstraints;
     //Think of putting in place a pool_allocator from foonathan/memory of from boost
-    static std::list<ConstructedBody> constructedBodies;
-    static std::list<CollisionPair> collidingBodies;
-    static std::vector<VelocityConstraint> velocityConstraints;
-
-    static constexpr int maxNormalConstraintIteration = 5;
-    static constexpr int maxTangentConstraintIteration = 5;
 };
 
 

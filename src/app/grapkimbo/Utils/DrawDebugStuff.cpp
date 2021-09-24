@@ -1,4 +1,5 @@
 #include "DrawDebugStuff.h"
+#include "commons.h"
 
 namespace ad
 {
@@ -7,6 +8,34 @@ namespace ad
         void DrawDebugStuff::drawRectangle(Rectangle aRectangle)
         {
             mRectangles.push_back(aRectangle);
+        }
+
+        void DrawDebugStuff::drawOutline(Rectangle aRectangle)
+        {
+            mLines.push_back({
+                static_cast<grapito::Position2>(aRectangle.origin),
+                static_cast<grapito::Position2>(static_cast<grapito::Vec2>(aRectangle.origin) + grapito::Vec2{aRectangle.dimension.width(), 0.}),
+                0.,
+                aRectangle.color,
+            });
+            mLines.push_back({
+                static_cast<grapito::Position2>(aRectangle.origin),
+                static_cast<grapito::Position2>(static_cast<grapito::Vec2>(aRectangle.origin) + grapito::Vec2{0., aRectangle.dimension.height()}),
+                0.,
+                aRectangle.color,
+            });
+            mLines.push_back({
+                static_cast<grapito::Position2>(static_cast<grapito::Vec2>(aRectangle.origin) + grapito::Vec2{0., aRectangle.dimension.height()}),
+                static_cast<grapito::Position2>(static_cast<grapito::Vec2>(aRectangle.origin) + grapito::Vec2{aRectangle.dimension.width(), aRectangle.dimension.height()}),
+                0.,
+                aRectangle.color,
+            });
+            mLines.push_back({
+                static_cast<grapito::Position2>(static_cast<grapito::Vec2>(aRectangle.origin) + grapito::Vec2{aRectangle.dimension.width(), 0.}),
+                static_cast<grapito::Position2>(static_cast<grapito::Vec2>(aRectangle.origin) + grapito::Vec2{aRectangle.dimension.width(), aRectangle.dimension.height()}),
+                0.,
+                aRectangle.color,
+            });
         }
 
         void DrawDebugStuff::drawLine(Line aLine)

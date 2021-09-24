@@ -78,18 +78,6 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
         setViewedRectangle(debugDrawer->mTrivialLineStrip, viewed);
     }
 
-#ifdef KIMBO_DEBUG
-    for(auto collider : mColliders)
-    {
-        Color vecColor = Color{200,200,20};
-        collider->get<Body>().debugRender(collider->get<Position>().position);
-        for (auto contact : collider->get<Body>().collidingWith)
-        {
-            //contact.debugRender(vecColor);
-        }
-    }
-#endif
-
     mTrivialLineStrip.render();
     mTrivialShaping.render();
     debugDrawer->render();

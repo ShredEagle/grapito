@@ -1,5 +1,7 @@
 #include "Physics.h"
 #include "Components/Body.h"
+#include "math/Matrix.h"
+#include <iostream>
 #include <variant>
 
 namespace ad {
@@ -12,11 +14,7 @@ static inline bool getBestQuery(
     const ConstructedBody & bodyB
 )
 {
-    ContactManifold::ReferenceFace face = ContactManifold::ReferenceFace::FACEA;
-    ContactManifold queryA;
-    ContactManifold queryB;
-
-    queryA = Physics::queryFunctions[bodyA.shapeType][bodyB.shapeType](bodyA, bodyB);
+    ContactManifold queryA = queryFunctions[bodyA.shapeType][bodyB.shapeType](bodyA, bodyB);
 
 
     if (queryA.separation > 0.f)
@@ -24,7 +22,7 @@ static inline bool getBestQuery(
         return false;
     }
 
-    queryB = Physics::queryFunctions[bodyB.shapeType][bodyA.shapeType](bodyB, bodyA);
+    ContactManifold queryB = queryFunctions[bodyB.shapeType][bodyA.shapeType](bodyB, bodyA);
 
     if (queryB.separation > 0.f)
     {
@@ -35,13 +33,13 @@ static inline bool getBestQuery(
     // negative !
     if (queryB.separation > queryA.separation)
     {
-        queryB.face = ContactManifold::FACEB;
         resultManifold = queryB;
+        resultManifold.face = ContactManifold::FACEB;
     }
     else 
     {
-        queryA.face = ContactManifold::FACEB;
         resultManifold = queryA;
+        resultManifold.face = ContactManifold::FACEA;
     }
 
     return true;
@@ -237,7 +235,7 @@ static inline std::vector<ContactFeature> getContactPoints(
 
 Physics::Physics(aunteater::EntityManager & aEntityManager)
 {
-    aEntityManager.getFamily<PhysicalBody>().registerObserver(static_cast<aunteater::FamilyObserver *>(&observer));
+    aEntityManager.getFamily<PhysicalBody>().registerObserver(this);
 
     //Initiliazing the query functions
     queryFunctions[ShapeType_Hull][ShapeType_Hull] = QueryFacePenetration;
@@ -246,25 +244,40 @@ Physics::Physics(aunteater::EntityManager & aEntityManager)
 void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInputState)
 {
     //Updating all the positions of the proxy bodies
-    for (auto body : constructedBodies)
+    for (auto & body : constructedBodies)
     {
         body.synchronize();
+        body.debugRender();
     }
     // Broad phase
     // This should be done with a tree of hierarchical aabb for fastest aabb queries
     for (auto bodyAIt = constructedBodies.begin(); bodyAIt != --constructedBodies.end(); ++bodyAIt)
     {
-        auto bodyA = *bodyAIt;
+        auto & bodyA = *bodyAIt;
 
         auto bodyBIt = bodyAIt;
         bodyBIt++;
 
         for (; bodyBIt != constructedBodies.end(); ++bodyBIt)
         {
-            auto bodyB = *bodyBIt;
+            auto & bodyB = *bodyBIt;
 
             auto aabbA = bodyA.box.shape.getAABB();
             auto aabbB = bodyB.box.shape.getAABB();
+
+            debugDrawer->drawOutline({
+                    aabbA.mPosition,
+                    aabbA.mDimension,
+                    math::Matrix<3, 3>::Identity(),
+                    {0,255,255}
+            });
+
+            debugDrawer->drawOutline({
+                    aabbB.mPosition,
+                    aabbB.mDimension,
+                    math::Matrix<3, 3>::Identity(),
+                    {0,255,255}
+            });
 
             //Basic SAT for AABB
             if (aabbA.x() <= aabbB.x() + aabbB.width() &&
@@ -282,12 +295,13 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
     //Collide pairs
     for (auto pairIt = collidingBodies.begin(); pairIt != collidingBodies.end(); ++pairIt)
     {
-        auto collisionPair = *pairIt;
+        auto & collisionPair = *pairIt;
+        collisionPair.debugRender();
         auto & bodyA = collisionPair.bodyA;
         auto & bodyB = collisionPair.bodyB;
         const auto oldManifold = collisionPair.manifold;
 
-        ContactManifold manifold;
+        ContactManifold & manifold = collisionPair.manifold;
         bool isTouching = getBestQuery(manifold, bodyA, bodyB);
 
         if (isTouching)
@@ -298,10 +312,10 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
             ConstructedBody * bodyRef = &bodyB;
             ConstructedBody * bodyInc = &bodyA;
 
-            if (manifold.face == ContactManifold::FACEA)
+            if (manifold.face == ContactManifold::ReferenceFace::FACEA)
             {
-                bodyRef = &bodyB;
-                bodyInc = &bodyA;
+                bodyRef = &bodyA;
+                bodyInc = &bodyB;
             }
 
             Shape::Edge refEdge = bodyRef->box.shape.getEdge(manifold.referenceEdgeIndex);
@@ -338,15 +352,21 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
 
             //Now we create the different contact constraints
             //We need to put everything back in the right order for this to work
-            for (auto contact : manifold.contacts)
+            for (auto & contact : manifold.contacts)
             {
                 velocityConstraints.emplace_back(VelocityConstraint{
                         bodyRef->speed,
+                        bodyRef->massCenter,
+                        bodyRef->position,
+                        bodyRef->theta,
                         bodyRef->w,
                         bodyRef->invMass,
                         bodyRef->invMoi,
                         0.,
                         bodyInc->speed,
+                        bodyInc->massCenter,
+                        bodyInc->position,
+                        bodyInc->theta,
                         bodyInc->w,
                         bodyInc->invMass,
                         bodyInc->invMoi,
@@ -365,48 +385,54 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
         else
         {
             //Destroy pair here
-            collidingBodies.erase(pairIt);
+            //collidingBodies.erase(pairIt++);
         }
     }
     
 
     //Solve constraints
-    for (VelocityConstraint constraint : velocityConstraints)
+    for (VelocityConstraint & constraint : velocityConstraints)
     {
+        constraint.debugRender();
         // Warm starting the constraint
-        ContactFeature cf = constraint.cf;
-        Vec2 rA = cf.contactPoint.as<math::Vec>() - (constraint.cbA->massCenter.as<math::Vec>());
-        Vec2 rB = cf.contactPoint.as<math::Vec>() - (constraint.cbB->massCenter.as<math::Vec>());
+        ContactFeature & cf = constraint.cf;
+        Vec2 rA = cf.contactPoint.as<math::Vec>() - (constraint.cA.as<math::Vec>());
+        Vec2 rB = cf.contactPoint.as<math::Vec>() - (constraint.cB.as<math::Vec>());
 
         double crossA = twoDVectorCross(rA, constraint.normal);
         double crossB = twoDVectorCross(rB, constraint.normal);
 
-        Vec2 impulseVec = cf.normalImpulse * constraint.normal * constraint.invMassA;
-        double angularImpulse = constraint.cf.normalImpulse * crossA * constraint.invMoiA;
+        Vec2 impulseVecA = cf.normalImpulse * constraint.normal * constraint.invMassA;
+        double angularImpulseA = cf.normalImpulse * crossA * constraint.invMoiA;
 
-        applyImpulse(impulseVec, angularImpulse, constraint.cbA, aTimer.delta());
 
-        impulseVec = -cf.normalImpulse * constraint.normal * constraint.invMassB;
-        angularImpulse = -constraint.cf.normalImpulse * crossB * constraint.invMoiB;
+        Vec2 impulseVecB = -cf.normalImpulse * constraint.normal * constraint.invMassB;
+        double angularImpulseB = -cf.normalImpulse * crossB * constraint.invMoiB;
 
-        applyImpulse(impulseVec, angularImpulse, constraint.cbB, aTimer.delta());
+        applyImpulse(
+                impulseVecA,
+                angularImpulseA,
+                impulseVecB,
+                angularImpulseB,
+                constraint,
+                aTimer.delta()
+                );
     }
 
-    for (int i = 0; i < Physics::maxNormalConstraintIteration; i++)
+    for (int i = 0; i < maxNormalConstraintIteration; i++)
     {
-        for (VelocityConstraint constraint : velocityConstraints)
+        for (VelocityConstraint & constraint : velocityConstraints)
         {
 
-            ContactFeature cf = constraint.cf;
-            Vec2 rA = cf.contactPoint.as<math::Vec>() - (constraint.cbA->massCenter.as<math::Vec>());
-            Vec2 rB = cf.contactPoint.as<math::Vec>() - (constraint.cbB->massCenter.as<math::Vec>());
+            ContactFeature & cf = constraint.cf;
+            Vec2 rA = cf.contactPoint.as<math::Vec>() - (constraint.cA.as<math::Vec>());
+            Vec2 rB = cf.contactPoint.as<math::Vec>() - (constraint.cB.as<math::Vec>());
             Vec2 AngVecA = {-rA.y(), rA.x()};
             Vec2 AngVecB = {-rB.y(), rB.x()};
 
             Vec2 speed = constraint.vA + (AngVecA * constraint.wA) - constraint.vB - (AngVecB * constraint.wB);
 
             double totalMass = constraint.invMassA + constraint.invMassB;
-
 
             double normalSpeed = speed.dot(constraint.normal);
 
@@ -417,19 +443,24 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
             double totalAngularMass = constraint.invMoiA * crossASquared + constraint.invMoiB * crossBSquared;
 
             double lambda = -(1 / (totalMass + totalAngularMass)) * (normalSpeed);
-            double newImpulse = std::max(constraint.cf.normalImpulse + lambda, 0.);
-            lambda = newImpulse - constraint.cf.normalImpulse;
-            constraint.cf.normalImpulse = newImpulse;
+            double newImpulse = std::max(cf.normalImpulse + lambda, 0.);
+            lambda = newImpulse - cf.normalImpulse;
+            cf.normalImpulse = newImpulse;
 
-            Vec2 impulseVec = cf.normalImpulse * constraint.normal * constraint.invMassA;
-            double angularImpulse = constraint.cf.normalImpulse * crossA * constraint.invMoiA;
+            Vec2 impulseVecA = cf.normalImpulse * constraint.normal * constraint.invMassA;
+            double angularImpulseA = cf.normalImpulse * crossA * constraint.invMoiA;
 
-            applyImpulse(impulseVec, angularImpulse, constraint.cbA, aTimer.delta());
+            Vec2 impulseVecB = -cf.normalImpulse * constraint.normal * constraint.invMassB;
+            double angularImpulseB = cf.normalImpulse * crossB * constraint.invMoiB;
 
-            impulseVec = -cf.normalImpulse * constraint.normal * constraint.invMassB;
-            angularImpulse = -constraint.cf.normalImpulse * crossB * constraint.invMoiB;
-
-            applyImpulse(impulseVec, angularImpulse, constraint.cbB, aTimer.delta());
+            applyImpulse(
+                    impulseVecA,
+                    angularImpulseA,
+                    impulseVecB,
+                    angularImpulseB,
+                    constraint,
+                    aTimer.delta()
+                    );
 
             if (constraint.friction > 0.)
             {
@@ -445,27 +476,46 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
                 double totalAngularTangentMass = constraint.invMoiA * crossATangentSquared + constraint.invMoiB * crossBTangentSquared;
 
                 double lambda = -(1 / (totalMass + totalAngularTangentMass)) * (tangentSpeed);
-                double maxFriction = constraint.friction * constraint.cf.normalImpulse;
-                double newImpulse = std::max(std::min(constraint.cf.tangentImpulse + lambda, maxFriction), -maxFriction);
-                lambda = newImpulse - constraint.cf.tangentImpulse;
-                constraint.cf.tangentImpulse = newImpulse;
+                double maxFriction = constraint.friction * cf.normalImpulse;
+                double newImpulse = std::max(std::min(cf.tangentImpulse + lambda, maxFriction), -maxFriction);
+                lambda = newImpulse - cf.tangentImpulse;
+                cf.tangentImpulse = newImpulse;
 
 
-                Vec2 impVec = lambda * tangent * constraint.invMassA;
-                double angularImpulse = lambda * crossATangent * constraint.invMoiA;
+                Vec2 impVecA = lambda * tangent * constraint.invMassA;
+                double angularImpulseA = lambda * crossATangent * constraint.invMoiA;
 
-                applyImpulse(impulseVec, angularImpulse, constraint.cbA, aTimer.delta());
 
-                impVec = -lambda * tangent * constraint.invMassB;
-                angularImpulse = -lambda * crossBTangent * constraint.invMoiB;
+                Vec2 impVecB = -lambda * tangent * constraint.invMassB;
+                double angularImpulseB = -lambda * crossBTangent * constraint.invMoiB;
 
-                applyImpulse(impulseVec, angularImpulse, constraint.cbB, aTimer.delta());
+                applyImpulse(
+                        impulseVecA,
+                        angularImpulseA,
+                        impulseVecB,
+                        angularImpulseB,
+                        constraint,
+                        aTimer.delta()
+                        );
             }
         }
     }
 
+    for (VelocityConstraint & constraint : velocityConstraints)
+    {
+        constraint.cbA->position = constraint.pA;
+        constraint.cbA->theta = constraint.aA;
+        constraint.cbA->speed = constraint.vA;
+        constraint.cbA->w = constraint.wA;
+
+        constraint.cbB->position = constraint.pB;
+        constraint.cbB->theta = constraint.aB;
+        constraint.cbB->speed = constraint.vB;
+        constraint.cbB->w = constraint.wB;
+    }
+
     //Update entities body
-    for (auto body : constructedBodies)
+    for (auto & body : constructedBodies)
     {
         body.updateEntity();
     }

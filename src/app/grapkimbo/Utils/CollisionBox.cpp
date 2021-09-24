@@ -15,6 +15,10 @@ CollisionBox::CollisionBox(math::Rectangle<double> aRectangle) :
     shape(aRectangle)
 {};
 
+CollisionBox::CollisionBox(std::vector<Position2> vertices) : 
+    shape(vertices)
+{};
+
 
 // TODO Due to this and the normal calculation 
 // we should not accept collision with negative width or height
@@ -43,13 +47,14 @@ const Position2 CollisionBox::getSupport(const Vec2 direction) const
 
 std::ostream &operator<<(std::ostream & os, const CollisionBox & box)
 {
-    //return os << "{ CollisionBox\n    Box : " << box.mBox.mPosition << " " << box.mBox.mDimension << "\n    Face count : " << box.mFaceCount << "\n}\n";
+    os << "{ CollisionBox\n";
+    os << "    Box :\n";
+    for (int i = 0; i < box.shape.mFaceCount; i++)
+    {
+        os << "    " << box.shape.getVertice(i) << "\n";
+    }
+    os << "   Face count : " << box.shape.mFaceCount << "\n}\n";
     return os;
-}
-
-std::ostream &operator<<(std::ostream & os, const Edge & edge)
-{
-    return os << "{ Edge\n    origin : " << edge.origin << "\n    end : " << edge.end << "\n    normal : " << edge.normal << "\n}\n";
 }
 
 }
