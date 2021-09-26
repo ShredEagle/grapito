@@ -31,6 +31,7 @@ public:
     const Position2 getVertice(const int index) const;
     const Edge getEdge(const int index) const;
     const math::Rectangle<double> getAABB() const;
+    void debugRender();
 
     friend std::ostream &operator<<(std::ostream & os, const Shape & shape);
 

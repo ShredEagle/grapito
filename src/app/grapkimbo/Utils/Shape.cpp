@@ -60,6 +60,19 @@ const math::Rectangle<double> Shape::getAABB() const
     return {{minX, minY}, {maxX - minX, maxY -minY}};
 }
 
+void Shape::debugRender()
+{
+    for (int i = 0; i < mFaceCount; ++i)
+    {
+        debugDrawer->drawLine({
+                getVertice(i),
+                getVertice((i + 1) % mFaceCount),
+                0.,
+                {255,0,255}
+                });
+    }
+}
+
 std::ostream &operator<<(std::ostream & os, const Shape & shape)
 {
     auto aabb = shape.getAABB();

@@ -9,6 +9,7 @@ namespace ad {
 namespace grapito {
 
 struct Body;
+struct CollisionPair;
 
 enum ShapeType
 {
@@ -47,6 +48,7 @@ struct ContactFeature
     Position2 contactPoint = Position2::Zero();
     float normalImpulse;
     float tangentImpulse;
+    friend std::ostream &operator<<(std::ostream & os, const ContactFeature & cm);
 };
 
 struct ContactManifold
@@ -74,34 +76,56 @@ struct Line
     Vec2 direction;
 };
 
+struct Velocity
+{
+    explicit Velocity(Vec2 aV, double aW) :
+        v{aV},
+        w{aW}
+    {}
+
+    Vec2 v;
+    double w;
+};
+
+struct BodyPosition
+{
+    explicit BodyPosition(Position2 aP, Position2 aC, math::Radian<double> aA) :
+        p{aP},
+        c{aC},
+        a{aA}
+    {}
+
+    Position2 p;
+    Position2 c;
+    math::Radian<double> a;
+};
+
 class ConstructedBody
 {
     public:
     ConstructedBody(Body & aBody, Position & aPos, AccelAndSpeed & aAas, aunteater::weak_entity aEntity);
 
-    static std::vector<Position2> createTransformedCollisionBox(Body & aBody, Position & pos);
-
     void debugRender();
 
-    void synchronize();
+    void synchronize(std::vector<Velocity> & velocities, std::vector<BodyPosition> & bodyPoses, std::vector<CollisionBox> & collisionBoxes, int index);
 
-    void updateEntity();
+    void updateEntity(double delta);
 
     double mass;
     double invMass;
     double moi;
     double invMoi;
     double friction;
-    Vec2 speed;
-    double w;
-    Position2 massCenter;
 
-    Position2 position;
-    math::Radian<double> theta;
+    //non owning pointer to Physics system vector
+    Velocity * velocity;
+    BodyPosition * bodyPos;
+    CollisionBox * box;
 
     double radius;
 
-    CollisionBox box;
+    //non owning pointer to Physics system vector
+    std::list<CollisionPair *>  contactList;
 
     BodyType bodyType;
     ShapeType shapeType;
@@ -116,9 +140,12 @@ class ConstructedBody
 
 struct CollisionPair
 {
+    bool cold;
+
     ConstructedBody & bodyA;
     ConstructedBody & bodyB;
-    bool cold;
+    std::list<CollisionPair *>::iterator iteratorA;
+    std::list<CollisionPair *>::iterator iteratorB;
 
     ContactManifold manifold;
 
@@ -127,20 +154,18 @@ struct CollisionPair
 
 struct VelocityConstraint
 {
-    Vec2 vA;
-    Position2 cA;
-    Position2 pA;
-    math::Radian<double> aA;
-    double wA;
+    //non owning pointer to Physics system vector
+    Velocity * velocityA;
+    BodyPosition * bodyPosA;
+    Vec2 rA;
     double invMassA;
     double invMoiA;
     double tangentSpeedA;
 
-    Vec2 vB;
-    Position2 cB;
-    Position2 pB;
-    math::Radian<double> aB;
-    double wB;
+    //non owning pointer to Physics system vector
+    Velocity * velocityB;
+    BodyPosition * bodyPosB;
+    Vec2 rB;
     double invMassB;
     double invMoiB;
     double tangentSpeedB;

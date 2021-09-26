@@ -2,6 +2,7 @@
 #include "Components/Body.h"
 #include "Components/Position.h"
 
+#include "Utils/CollisionBox.h"
 #include "Utils/DrawDebugStuff.h"
 #include "math/Vector.h"
 #include <iostream>
@@ -16,13 +17,7 @@ ConstructedBody::ConstructedBody(Body & aBody, Position & aPos, AccelAndSpeed & 
     moi{aBody.moi},
     invMoi{aBody.invMoi},
     friction{aBody.friction},
-    speed{aAas.speed},
-    w{aAas.w},
-    massCenter{static_cast<Position2>(aBody.massCenter.as<math::Vec>() + aPos.position.as<math::Vec>())},
-    position{aPos.position},
-    theta{aBody.theta},
     radius{aBody.radius},
-    box{createTransformedCollisionBox(aBody, aPos)},
     bodyType{aBody.bodyType},
     shapeType{aBody.shapeType},
     bodyRef{aBody},
@@ -32,46 +27,31 @@ ConstructedBody::ConstructedBody(Body & aBody, Position & aPos, AccelAndSpeed & 
 {
 }
 
-void ConstructedBody::synchronize()
+void ConstructedBody::synchronize(
+        std::vector<Velocity> & velocities,
+        std::vector<BodyPosition> & bodyPoses,
+        std::vector<CollisionBox> & collisionBoxes,
+        int index
+)
 {
-    box = CollisionBox{createTransformedCollisionBox(bodyRef, posRef)};
-    position = posRef.position;
-    theta = bodyRef.theta;
-    speed = aasRef.speed;
-    w = aasRef.w;
-    massCenter = static_cast<Position2>(bodyRef.massCenter.as<math::Vec>() + posRef.position.as<math::Vec>());
+    box = &collisionBoxes.at(index);
+    velocity = &velocities.at(index);
+    bodyPos = &bodyPoses.at(index);
 }
 
-void ConstructedBody::updateEntity()
+void ConstructedBody::updateEntity(double delta)
 {
-    bodyRef.theta = theta;
-    aasRef.speed = speed;
-    aasRef.w = w;
-    posRef.position = position;
-}
-
-std::vector<Position2> ConstructedBody::createTransformedCollisionBox(Body & aBody, Position & aPos)
-{
-    std::vector<Position2> transformedVertices;
-
-    for (auto vertex : aBody.shape.vertices)
-    {
-        auto transformedPos = transformPosition(
-                static_cast<Position2>(vertex.as<math::Vec>() + aPos.position.as<math::Vec>()),
-                aBody.theta,
-                static_cast<Position2>(aBody.massCenter.as<math::Vec>() + aPos.position.as<math::Vec>())
-                );
-        transformedVertices.emplace_back(transformedPos);
-    }
-
-    return transformedVertices;
+    bodyRef.theta = bodyPos->a;
+    aasRef.speed = velocity->v;
+    aasRef.w = velocity->w;
+    posRef.position = bodyPos->p;
 }
 
 void ConstructedBody::debugRender()
 {
-    for (int i = 0; i < box.shape.mFaceCount; ++i)
+    for (int i = 0; i < box->shape.mFaceCount; ++i)
     {
-        auto vertex = box.shape.getVertice(i);
+        auto vertex = box->shape.getVertice(i);
         debugDrawer->drawPoint({
                 vertex,
                 .05f,
@@ -79,7 +59,7 @@ void ConstructedBody::debugRender()
         });
     }
     debugDrawer->drawPoint({
-            massCenter,
+            bodyPos->c,
             .05f,
             {255,100,0},
     });
@@ -88,8 +68,8 @@ void ConstructedBody::debugRender()
 void CollisionPair::debugRender()
 {
     debugDrawer->drawLine({
-            bodyA.massCenter,
-            bodyB.massCenter,
+            bodyA.bodyPos->c,
+            bodyB.bodyPos->c,
             0.,
             {255,0,255},
     });
@@ -100,14 +80,33 @@ void VelocityConstraint::debugRender()
     debugDrawer->drawPoint({
             cf.contactPoint,
             .05,
-            {255,0,0},
+            {0,0,255},
     });
+    /*
     debugDrawer->drawLine({
             cf.contactPoint,
             static_cast<Position2>(cf.contactPoint.as<math::Vec>() + normal * 3),
             .05,
             {255,0,0},
     });
+    debugDrawer->drawLine({
+            cf.contactPoint,
+            static_cast<Position2>(cf.contactPoint.as<math::Vec>() + cf.normalImpulse * normal * 3),
+            .05,
+            {150,150,200},
+    });
+
+    Vec2 AngVecA = {-rA.y(), rA.x()};
+    Vec2 AngVecB = {-rB.y(), rB.x()};
+    Vec2 speed = velocityA->v + (AngVecA * velocityA->w) - velocityB->v - (AngVecB * velocityB->w);
+
+    debugDrawer->drawLine({
+            cf.contactPoint,
+            static_cast<Position2>(cf.contactPoint.as<math::Vec>() + speed.dot(normal) * normal),
+            .05,
+            {0,200,0},
+    });
+    */
 }
 
 std::ostream &operator<<(std::ostream & os, const VelocityConstraint & vc)
@@ -116,11 +115,19 @@ std::ostream &operator<<(std::ostream & os, const VelocityConstraint & vc)
     os << "    contact : {\n";
     os << "        x : " << vc.cf.contactPoint.x() << "\n";
     os << "        y : " << vc.cf.contactPoint.y() << "\n";
+    os << "        nI : " << vc.cf.normalImpulse << "\n";
+    os << "        tI : " << vc.cf.tangentImpulse << "\n";
     os << "    }\n";
-    os << "    vA : " << vc.vA << "\n";
-    os << "    vB : " << vc.vB << "\n";
+    os << "    x : " << vc.normal.x() << "\n";
+    os << "    y : " << vc.normal.y() << "\n";
+    os << "    vA : " << vc.velocityA->v << "\n";
+    os << "    vB : " << vc.velocityB->v << "\n";
+    os << "    wA : " << vc.velocityA->w << "\n";
+    os << "    wB : " << vc.velocityB->w << "\n";
     os << "    invMassA : " << vc.invMassA << "\n";
     os << "    invMassB : " << vc.invMassB << "\n";
+    os << "    invMoiA : " << vc.invMoiA << "\n";
+    os << "    invMoiB : " << vc.invMoiB << "\n";
     os << "}\n";
     return os;
 }
@@ -128,10 +135,10 @@ std::ostream &operator<<(std::ostream & os, const VelocityConstraint & vc)
 std::ostream &operator<<(std::ostream & os, const ConstructedBody & cb)
 {
     os << "{ ConstructedBody\n";
-    os << "    x : " << cb.position.x() << "\n";
-    os << "    y : " << cb.position.y() << "\n";
-    os << "    speed : " << cb.speed << "\n";
-    os << "    w : " << cb.w << "\n";
+    os << "    x : " << cb.bodyPos->p.x() << "\n";
+    os << "    y : " << cb.bodyPos->p.y() << "\n";
+    os << "    speed : " << cb.velocity->v << "\n";
+    os << "    w : " << cb.velocity->w << "\n";
     os << "    bodyType : " << cb.bodyType << "\n";
     os << "}\n";
     return os;
@@ -146,6 +153,17 @@ std::ostream &operator<<(std::ostream & os, const ContactManifold & cm)
     os << "    separation : " << cm.separation << "\n";
     os << "    normal : " << cm.normal << "\n";
     os << "    contacts # : " << cm.contacts.size() << "\n";
+    os << "}\n";
+    return os;
+}
+
+std::ostream &operator<<(std::ostream & os, const ContactFeature & cm)
+{
+    os << "{ ContactFeature\n";
+    os << "    refIndex : " << unsigned(cm.indexReference) << "\n";
+    os << "    incIndex : " << unsigned(cm.indexIncident) << "\n";
+    os << "    typeReference : " << unsigned(cm.typeReference) << "\n";
+    os << "    typeIncident : " << unsigned(cm.typeIncident) << "\n";
     os << "}\n";
     return os;
 }

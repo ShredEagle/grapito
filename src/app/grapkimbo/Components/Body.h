@@ -112,7 +112,6 @@ struct Body : public aunteater::Component<Body>
     CollisionType collisionType;
 
     std::list<ConstructedBody>::iterator constructedBodyIt;
-    std::vector<CollisionPair>  contactList;
 };
 
 } // namespace grapito

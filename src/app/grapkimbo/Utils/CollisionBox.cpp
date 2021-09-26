@@ -8,15 +8,15 @@
 namespace ad {
 namespace grapito {
 CollisionBox::CollisionBox(Shape aShape) : 
-    shape(std::move(aShape))
+    shape{std::move(aShape)}
 {};
 
 CollisionBox::CollisionBox(math::Rectangle<double> aRectangle) : 
-    shape(aRectangle)
+    shape{aRectangle}
 {};
 
 CollisionBox::CollisionBox(std::vector<Position2> vertices) : 
-    shape(vertices)
+    shape{vertices}
 {};
 
 
@@ -53,7 +53,7 @@ std::ostream &operator<<(std::ostream & os, const CollisionBox & box)
     {
         os << "    " << box.shape.getVertice(i) << "\n";
     }
-    os << "   Face count : " << box.shape.mFaceCount << "\n}\n";
+    os << "   Face count : " << unsigned(box.shape.mFaceCount) << "\n}\n";
     return os;
 }
 

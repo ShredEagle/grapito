@@ -105,7 +105,7 @@ add_executable(${TARGET_NAME}
 
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
     target_compile_options(${TARGET_NAME}
-        PRIVATE "-fno-omit-frame-pointer" "-fsanitize=address" "-fsanitize=undefined")
+        PRIVATE "-fsanitize=address" "-fsanitize=undefined" "-O3")
     target_link_options(${TARGET_NAME}
         PRIVATE "-fsanitize=address" "-fsanitize=undefined")
 endif()
