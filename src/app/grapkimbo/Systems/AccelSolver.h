@@ -17,7 +17,7 @@ namespace grapito
 {
 
 typedef aunteater::Archetype<AccelAndSpeed, Position> Accelerated;
-typedef aunteater::Archetype<AccelAndSpeed, Body, VisualRectangle, Position> Rotationed;
+typedef aunteater::Archetype<AccelAndSpeed, Body> Rotationed;
 
 class AccelSolver : public aunteater::System<GameInputState>
 {

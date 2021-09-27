@@ -34,15 +34,9 @@ void AccelSolver::update(const aunteater::Timer aTimer, const GameInputState & a
         aas.accel = Vec2::Zero();
     }
 
-    for(auto & [aas, body, vis, pos] : mRotationed)
+    for(auto & [aas, body] : mRotationed)
     {
         body.theta += math::Radian<double>{aas.w * aTimer.delta()};
-        vis.transform = static_cast<math::Matrix<3, 3, float>>(
-                createPrefixedTransform(
-                    body.theta,
-                    static_cast<Position2>(pos.position.as<math::Vec>() + body.massCenter.as<math::Vec>())
-                    )
-                );
     }
 }
 

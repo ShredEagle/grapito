@@ -6,9 +6,7 @@
 #include <Components/Position.h>
 #include <Components/VisualOutline.h>
 #include <Components/VisualRectangle.h>
-#ifdef KIMBO_DEBUG
 #include <Components/Body.h>
-#endif
 
 #include <Systems/CameraGuidedControl.h>
 
@@ -26,6 +24,7 @@ namespace grapito
 {
 
 typedef aunteater::Archetype<Position, VisualRectangle> RenderedRectangle;
+typedef aunteater::Archetype<Position, Body, VisualRectangle> RenderedBodyRectangle;
 typedef aunteater::Archetype<Position, VisualOutline> RenderedOutline;
 
 #ifdef KIMBO_DEBUG
@@ -43,6 +42,7 @@ public:
 private:
     aunteater::EntityManager & mEntityManager;
     const aunteater::FamilyHelp<RenderedRectangle> mRectangles;
+    const aunteater::FamilyHelp<RenderedBodyRectangle> mBodyRectangles;
     const aunteater::FamilyHelp<RenderedOutline> mOutlines;
     const aunteater::FamilyHelp<Pendulum> mPendulums;
     const aunteater::FamilyHelp<Camera> mCameras;

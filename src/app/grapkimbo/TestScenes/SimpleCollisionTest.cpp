@@ -29,13 +29,21 @@ namespace ad {
 
 namespace grapito {
 
-void createSimpleCollisionTest(double widthA, double widthB, int qty, int index, aunteater::EntityManager & mEntityManager)
+void createSimpleCollisionTest(
+        double widthA,
+        double widthB,
+        double baseHeight,
+        int qty,
+        int index,
+        double w,
+        aunteater::EntityManager & mEntityManager
+        )
 {
     for (int i = 0; i < qty; ++i)
     {
         mEntityManager.addEntity(
                 aunteater::Entity()
-                .add<Position>(Position2{index * 4 - widthA / 2,4 + i * 2.1}, math::Size<2, double>{widthA, 2.})
+                .add<Position>(Position2{index * 4 - widthA / 2, baseHeight + i * 2.1}, math::Size<2, double>{widthA, 2.})
                 .add<Body>(
                     math::Rectangle<double>{{0., 0.}, {widthA, 2.}},
                     BodyType_Dynamic,
@@ -43,10 +51,10 @@ void createSimpleCollisionTest(double widthA, double widthB, int qty, int index,
                     CollisionType_Static_Env,
                     1.,
                     0.,
-                    1.
+                    .2
                 )
                 .add<VisualRectangle>(math::sdr::gCyan)
-                .add<AccelAndSpeed>(Vec2{0., 0.}, 0.)
+                .add<AccelAndSpeed>(Vec2{0., 0.}, w)
                 );
     }
 
@@ -62,7 +70,7 @@ void createSimpleCollisionTest(double widthA, double widthB, int qty, int index,
                 CollisionType_Moving_Env,
                 0.,
                 0.,
-                1.
+                .7
             ));
 }
 
@@ -77,9 +85,9 @@ SimpleCollisionTest::SimpleCollisionTest(Application & aApplication, DebugUI & a
 
     aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera({10., 2.}));
 
-    createSimpleCollisionTest(2., 6., 1, 1, mEntityManager);
-    createSimpleCollisionTest(2., .5, 2, 2, mEntityManager);
-    createSimpleCollisionTest(2., .5, 10, 3, mEntityManager);
+    createSimpleCollisionTest(2., 6., 20., 1, 1, -25.5, mEntityManager);
+    createSimpleCollisionTest(2., .5, 4., 2, 2, 0., mEntityManager);
+    createSimpleCollisionTest(2., .5, 4., 10, 3, 0., mEntityManager);
 }
 
 bool SimpleCollisionTest::update(const aunteater::Timer & aTimer, const GameInputState & aInputState)

@@ -207,7 +207,7 @@ static inline std::vector<ContactFeature> getContactPoints(
         auto contactFeature = ContactFeature{
             ContactFeature::vertex,
             ContactFeature::face,
-            referenceEdgeIndex,
+            static_cast<uint8_t>((referenceEdgeIndex + 1) % refShape.mFaceCount),
             incidentEdgeIndex,
             incidentEdge.origin,
         };
@@ -372,16 +372,23 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
             //We need to put everything back in the right order for this to work
             for (auto & contact : manifold.contacts)
             {
+                Vec2 rA = contact.contactPoint.as<math::Vec>() - (bodyRef->bodyPos->c.as<math::Vec>());
+                Vec2 rB = contact.contactPoint.as<math::Vec>() - (bodyInc->bodyPos->c.as<math::Vec>());
+                Vec2 tangent = {manifold.normal.y(), -manifold.normal.x()};
                 velocityConstraints.emplace_back(VelocityConstraint{
                         bodyRef->velocity,
                         bodyRef->bodyPos,
-                        contact.contactPoint.as<math::Vec>() - (bodyRef->bodyPos->c.as<math::Vec>()),
+                        rA,
+                        twoDVectorCross(rA, manifold.normal),
+                        twoDVectorCross(rA, tangent),
                         bodyRef->invMass,
                         bodyRef->invMoi,
                         0.,
                         bodyInc->velocity,
                         bodyInc->bodyPos,
-                        contact.contactPoint.as<math::Vec>() - (bodyInc->bodyPos->c.as<math::Vec>()),
+                        rB,
+                        twoDVectorCross(rB, manifold.normal),
+                        twoDVectorCross(rB, tangent),
                         bodyInc->invMass,
                         bodyInc->invMoi,
                         0.,
@@ -389,6 +396,7 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
                         sqrt(bodyRef->friction * bodyInc->friction),
                         std::max(bodyRef->friction, bodyInc->friction),
                         manifold.normal,
+                        tangent,
                         
                         contact,
                         bodyRef,
@@ -452,23 +460,18 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
             double totalMass = constraint.invMassA + constraint.invMassB;
 
 
-            double crossA = twoDVectorCross(constraint.rA, constraint.normal);
-            double crossB = twoDVectorCross(constraint.rB, constraint.normal);
-            double crossASquared = crossA * crossA;
-            double crossBSquared = crossB * crossB;
+            double crossASquared = constraint.crossA * constraint.crossA;
+            double crossBSquared = constraint.crossB * constraint.crossB;
             double totalAngularMass = constraint.invMoiA * crossASquared + constraint.invMoiB * crossBSquared;
 
             if (constraint.friction > 0.)
             {
                 Vec2 speed = constraint.velocityA->v + (AngVecA * constraint.velocityA->w) - constraint.velocityB->v - (AngVecB * constraint.velocityB->w);
-                Vec2 tangent = {constraint.normal.y(), -constraint.normal.x()};
 
-                double tangentSpeed = speed.dot(tangent);
+                double tangentSpeed = speed.dot(constraint.tangent);
 
-                double crossATangent = twoDVectorCross(constraint.rA, tangent);
-                double crossBTangent = twoDVectorCross(constraint.rB, tangent);
-                double crossATangentSquared = crossATangent * crossATangent;
-                double crossBTangentSquared = crossBTangent * crossBTangent;
+                double crossATangentSquared = constraint.crossATangent * constraint.crossATangent;
+                double crossBTangentSquared = constraint.crossBTangent * constraint.crossBTangent;
 
                 double totalAngularTangentMass = constraint.invMoiA * crossATangentSquared + constraint.invMoiB * crossBTangentSquared;
 
@@ -479,12 +482,12 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
                 cf.tangentImpulse = newImpulseTangent;
 
 
-                Vec2 impVecA = lambda * tangent * constraint.invMassA;
-                double angularImpulseA = lambda * crossATangent * constraint.invMoiA;
+                Vec2 impVecA = lambda * constraint.tangent * constraint.invMassA;
+                double angularImpulseA = lambda * constraint.crossATangent * constraint.invMoiA;
 
 
-                Vec2 impVecB = -lambda * tangent * constraint.invMassB;
-                double angularImpulseB = -lambda * crossBTangent * constraint.invMoiB;
+                Vec2 impVecB = -lambda * constraint.tangent * constraint.invMassB;
+                double angularImpulseB = -lambda * constraint.crossBTangent * constraint.invMoiB;
 
                 //std::cout << "pre tangent impulse";
                 //std::cout << constraint;
@@ -509,10 +512,10 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
             cf.normalImpulse = newImpulse;
 
             Vec2 impulseVecA = lambda * constraint.normal * constraint.invMassA;
-            double angularImpulseA = lambda * crossA * constraint.invMoiA;
+            double angularImpulseA = lambda * constraint.crossA * constraint.invMoiA;
 
             Vec2 impulseVecB = -lambda * constraint.normal * constraint.invMassB;
-            double angularImpulseB = -lambda * crossB * constraint.invMoiB;
+            double angularImpulseB = -lambda * constraint.crossB * constraint.invMoiB;
 
             //std::cout << "pre normal impulse";
             //std::cout << constraint;

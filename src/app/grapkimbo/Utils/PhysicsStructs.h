@@ -158,6 +158,8 @@ struct VelocityConstraint
     Velocity * velocityA;
     BodyPosition * bodyPosA;
     Vec2 rA;
+    double crossA;
+    double crossATangent;
     double invMassA;
     double invMoiA;
     double tangentSpeedA;
@@ -166,6 +168,8 @@ struct VelocityConstraint
     Velocity * velocityB;
     BodyPosition * bodyPosB;
     Vec2 rB;
+    double crossB;
+    double crossBTangent;
     double invMassB;
     double invMoiB;
     double tangentSpeedB;
@@ -173,6 +177,7 @@ struct VelocityConstraint
     double friction;
     double restitution;
     Vec2 normal; 
+    Vec2 tangent;
 
     ContactFeature & cf;
     ConstructedBody * cbA;

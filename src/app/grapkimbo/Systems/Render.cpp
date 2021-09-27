@@ -16,6 +16,7 @@ namespace grapito
 Render::Render(aunteater::EntityManager & aEntityManager, Application & aApplication) :
     mEntityManager{aEntityManager},
     mRectangles{mEntityManager},
+    mBodyRectangles{mEntityManager},
     mOutlines{mEntityManager},
     mPendulums{mEntityManager},
     mCameras{mEntityManager},
@@ -33,6 +34,16 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
     mTrivialLineStrip.clearLines();
     debugDrawer->clear();
     mEngine->clear();
+
+    for (auto & [geometry, body, visualRectangle] : mBodyRectangles)
+    {
+        visualRectangle.transform = static_cast<math::Matrix<3, 3, float>>(
+                createPrefixedTransform(
+                    body.theta,
+                    static_cast<Position2>(geometry.position.as<math::Vec>() + body.massCenter.as<math::Vec>())
+                    )
+                );
+    }
 
     for(const auto [geometry, visualRectangle] : mRectangles)
     {
