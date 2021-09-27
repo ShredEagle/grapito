@@ -79,44 +79,23 @@ static inline int findIncidentEdge(
     return incidentIndex;
 }
 
-std::vector<ContactFeature> CheckContactValidity(const Shape::Edge & referenceEdge, const Vec2 & edgeDirection, std::array<ContactFeature, 2> points)
+std::vector<ContactFeature> CheckContactValidity(const Shape::Edge & referenceEdge, std::array<ContactFeature, 2> points)
 {
     std::vector<ContactFeature> result;
 
-    // We use this algorithm to find all vertices with bit value (1|0)000
-    // https://www.csd.uwo.ca/~sbeauche/CS3388/CS3388-2D-Clipping.pdf
-    // Our y values are reversed because we use bottom right origin
-    // This tests gives us all point beyond our colliding axis
-    Position2 projectedReferenceOrigin = {
-        (referenceEdge.normal.y() * referenceEdge.origin.x() - referenceEdge.normal.x() * referenceEdge.origin.y()) /
-            (referenceEdge.normal.y() * edgeDirection.x() - referenceEdge.normal.x() * edgeDirection.y()),
-        (edgeDirection.y() * referenceEdge.origin.x() - edgeDirection.x() * referenceEdge.origin.y()) /
-            (referenceEdge.normal.x() * edgeDirection.y() - referenceEdge.normal.y() * edgeDirection.x())
-    };
-    Position2 projectedReferenceEnd = {
-        (referenceEdge.normal.y() * referenceEdge.end.x() - referenceEdge.normal.x() * referenceEdge.end.y()) /
-            (referenceEdge.normal.y() * edgeDirection.x() - referenceEdge.normal.x() * edgeDirection.y()),
-        (edgeDirection.y() * referenceEdge.end.x() - edgeDirection.x() * referenceEdge.end.y()) /
-            (referenceEdge.normal.x() * edgeDirection.y() - referenceEdge.normal.y() * edgeDirection.x())
-    };
-    //std::cout << "projectOrigin" << projectedReferenceOrigin << "\n";
-    //std::cout << "projectEnd" << projectedReferenceEnd << "\n";
+    double separation = std::numeric_limits<double>::max();
+
+    separation = std::min(separation, referenceEdge.origin.as<math::Vec>().dot(referenceEdge.normal));
+    separation = std::min(separation, referenceEdge.end.as<math::Vec>().dot(referenceEdge.normal));
 
     for (auto contact : points)
     {
-        Position2 projectedPoint = {
-            (referenceEdge.normal.y() * contact.contactPoint.x() - referenceEdge.normal.x() * contact.contactPoint.y()) /
-                (referenceEdge.normal.y() * edgeDirection.x() - referenceEdge.normal.x() * edgeDirection.y()),
-            (edgeDirection.y() * contact.contactPoint.x() - edgeDirection.x() * contact.contactPoint.y()) /
-                (referenceEdge.normal.x() * edgeDirection.y() - referenceEdge.normal.y() * edgeDirection.x())
-        };
+        double candidateSeparation = contact.contactPoint.as<math::Vec>().dot(referenceEdge.normal);
         //std::cout << "projectPoint" << projectedPoint << "\n";
 
         //This is sad that we get fucked by smaller than difference 0.01mm
         if (
-                projectedPoint.y() <= projectedReferenceOrigin.y() + 0.00001 &&
-                projectedPoint.x() <= projectedReferenceOrigin.x() + 0.00001 &&
-                projectedPoint.x() >= projectedReferenceEnd.x() - 0.00001
+                candidateSeparation < separation + 0.00001
            )
         {
             result.emplace_back(contact);
@@ -235,7 +214,7 @@ static inline std::vector<ContactFeature> getContactPoints(
         candidate[1] = contactFeature;
     }
 
-    auto validContacts = CheckContactValidity(referenceEdge, -referenceEdge.direction, candidate);
+    auto validContacts = CheckContactValidity(referenceEdge, candidate);
 
     return validContacts;
 }
@@ -334,7 +313,7 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
     for (auto pairIt = collidingBodies.begin(); pairIt != collidingBodies.end(); ++pairIt)
     {
         auto & collisionPair = *pairIt;
-        collisionPair.debugRender();
+        //collisionPair.debugRender();
         auto & bodyA = collisionPair.bodyA;
         auto & bodyB = collisionPair.bodyB;
         const auto oldManifold = collisionPair.manifold;
@@ -370,7 +349,6 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
             //Now we check for persisted contact equivalence
             for (auto & oldContact : oldManifold.contacts)
             {
-                bool keptContact = false;
                 for (auto & newContact : manifold.contacts)
                 {
                     if (
@@ -380,15 +358,9 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
                             newContact.typeReference == oldContact.typeReference
                        )
                     {
-                        keptContact = true;
                         newContact.normalImpulse = oldContact.normalImpulse;
                         newContact.tangentImpulse = oldContact.tangentImpulse;
                     }
-                }
-                
-                if (!keptContact)
-                {
-                    std::cout << "new contact..." << "\n";
                 }
             }
 
@@ -443,7 +415,7 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
     }
     
 
-    std::cout << velocityConstraints.size() << "\n";
+    //std::cout << velocityConstraints.size() << "\n";
     //Solve constraints
     for (VelocityConstraint & constraint : velocityConstraints)
     {

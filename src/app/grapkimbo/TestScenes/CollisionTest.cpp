@@ -74,8 +74,8 @@ CollisionTest::CollisionTest(Application & aApplication, DebugUI & aUI) :
 {
     mSystemManager.add<Gravity>();
     mSystemManager.add<Control>();
-    mSystemManager.add<Physics>();
     mSystemManager.add<AccelSolver>();
+    mSystemManager.add<Physics>();
     mSystemManager.add<Render>(aApplication); 
 
     aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera({10., 2.}));
@@ -87,7 +87,7 @@ CollisionTest::CollisionTest(Application & aApplication, DebugUI & aUI) :
     {
         for (int j = 0; j < 50; ++j)
         {
-            createBox({5. + i * 1.5, 5. + j * 1.5}, {.25, .25}, (j + i * 5) % 3, mEntityManager);
+            createBox({5. + i * 1.5, 5. + j * 1.5}, {.5, .35}, (j + i * 5) % 3, mEntityManager);
         }
     }
 }
