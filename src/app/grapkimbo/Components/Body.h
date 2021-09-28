@@ -100,6 +100,7 @@ struct Body : public aunteater::Component<Body>
     double moi;
     double invMoi;
     double friction;
+    double restitution;
     Position2 massCenter = {0., 0.};
 
     double radius;

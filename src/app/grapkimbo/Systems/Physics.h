@@ -43,16 +43,10 @@ static inline void addPair(ConstructedBody & bodyA, ConstructedBody & bodyB, std
         bodyB,
     };
 
-    pairs.push_back(contactPair);
+    pairs.push_back(std::move(contactPair));
 
-    contactPair.iteratorA = bodyA.contactList.insert(bodyA.contactList.end(), &(pairs.back()));
-    contactPair.iteratorB = bodyB.contactList.insert(bodyB.contactList.end(), &(pairs.back()));
-
-    if (*contactPair.iteratorA == nullptr)
-    {
-        throw "no";
-    }
-
+    pairs.back().iteratorA = bodyA.contactList.insert(bodyA.contactList.end(), &(pairs.back()));
+    pairs.back().iteratorB = bodyB.contactList.insert(bodyB.contactList.end(), &(pairs.back()));
 }
 
 static inline const double distanceToLine(Position2 point, Position2 origin, Position2 end, Vec2 normal)
@@ -155,6 +149,7 @@ private:
     std::vector<CollisionBox> collisionBoxes;
 
     std::vector<VelocityConstraint> velocityConstraints;
+    std::vector<PlayerEnvironmentConstraint> playerConstraints;
     //Think of putting in place a pool_allocator from foonathan/memory of from boost
 };
 

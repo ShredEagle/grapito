@@ -310,10 +310,11 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
     }
 
     //Collide pairs
-    for (auto pairIt = collidingBodies.begin(); pairIt != collidingBodies.end(); ++pairIt)
+    auto pairIt = collidingBodies.begin();
+
+    while (pairIt != collidingBodies.end())
     {
         auto & collisionPair = *pairIt;
-        //collisionPair.debugRender();
         auto & bodyA = collisionPair.bodyA;
         auto & bodyB = collisionPair.bodyB;
         const auto oldManifold = collisionPair.manifold;
@@ -370,12 +371,18 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
 
             //Now we create the different contact constraints
             //We need to put everything back in the right order for this to work
-            for (auto & contact : manifold.contacts)
+
+            if (collisionPair.bodyA.collisionType == CollisionType_Player)
             {
-                Vec2 rA = contact.contactPoint.as<math::Vec>() - (bodyRef->bodyPos->c.as<math::Vec>());
-                Vec2 rB = contact.contactPoint.as<math::Vec>() - (bodyInc->bodyPos->c.as<math::Vec>());
-                Vec2 tangent = {manifold.normal.y(), -manifold.normal.x()};
-                velocityConstraints.emplace_back(VelocityConstraint{
+            }
+            else
+            {
+                for (auto & contact : manifold.contacts)
+                {
+                    Vec2 rA = contact.contactPoint.as<math::Vec>() - (bodyRef->bodyPos->c.as<math::Vec>());
+                    Vec2 rB = contact.contactPoint.as<math::Vec>() - (bodyInc->bodyPos->c.as<math::Vec>());
+                    Vec2 tangent = {manifold.normal.y(), -manifold.normal.x()};
+                    velocityConstraints.emplace_back(
                         bodyRef->velocity,
                         bodyRef->bodyPos,
                         rA,
@@ -401,13 +408,13 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
                         contact,
                         bodyRef,
                         bodyInc
-                });
+                    );
+                }
             }
         }
 
         if (collisionPair.cold == true)
         {
-            /*std::cout << collisionPair;
             //Destroy pair here
             collisionPair.bodyA.contactList.erase(
                     collisionPair.iteratorA
@@ -415,11 +422,14 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
             collisionPair.bodyB.contactList.erase(
                     collisionPair.iteratorB
                     );
-            collidingBodies.erase(pairIt++);
-            */
+            pairIt = collidingBodies.erase(pairIt);
         }
-
-        collisionPair.cold = true;
+        else 
+        {
+            collisionPair.cold = true;
+            collisionPair.debugRender();
+            ++pairIt;
+        }
     }
     
 
@@ -433,9 +443,7 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
         // apply it to the bodies
         ContactFeature & cf = constraint.cf;
 
-        Vec2 tangent = {constraint.normal.y(), -constraint.normal.x()};
-
-        Vec2 impulseVec = cf.normalImpulse * constraint.normal + cf.tangentImpulse * tangent;
+        Vec2 impulseVec = cf.normalImpulse * constraint.normal + cf.tangentImpulse * constraint.tangent;
 
         applyImpulse(
                 impulseVec * constraint.invMassA,
@@ -482,19 +490,16 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
                 cf.tangentImpulse = newImpulseTangent;
 
 
-                Vec2 impVecA = lambda * constraint.tangent * constraint.invMassA;
+                Vec2 impulse = lambda * constraint.tangent;
                 double angularImpulseA = lambda * constraint.crossATangent * constraint.invMoiA;
-
-
-                Vec2 impVecB = -lambda * constraint.tangent * constraint.invMassB;
                 double angularImpulseB = -lambda * constraint.crossBTangent * constraint.invMoiB;
 
                 //std::cout << "pre tangent impulse";
                 //std::cout << constraint;
                 applyImpulse(
-                        impVecA,
+                        impulse * constraint.invMassA,
                         angularImpulseA,
-                        impVecB,
+                        -impulse * constraint.invMassB,
                         angularImpulseB,
                         constraint,
                         aTimer.delta()
@@ -511,18 +516,17 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
             lambda = newImpulse - cf.normalImpulse;
             cf.normalImpulse = newImpulse;
 
-            Vec2 impulseVecA = lambda * constraint.normal * constraint.invMassA;
+            Vec2 impulse = lambda * constraint.normal;
             double angularImpulseA = lambda * constraint.crossA * constraint.invMoiA;
 
-            Vec2 impulseVecB = -lambda * constraint.normal * constraint.invMassB;
             double angularImpulseB = -lambda * constraint.crossB * constraint.invMoiB;
 
             //std::cout << "pre normal impulse";
             //std::cout << constraint;
             applyImpulse(
-                    impulseVecA,
+                    impulse * constraint.invMassA,
                     angularImpulseA,
-                    impulseVecB,
+                    -impulse * constraint.invMassB,
                     angularImpulseB,
                     constraint,
                     aTimer.delta()

@@ -129,6 +129,7 @@ class ConstructedBody
 
     BodyType bodyType;
     ShapeType shapeType;
+    CollisionType collisionType;
 
     Body & bodyRef;
     Position & posRef;
@@ -137,6 +138,8 @@ class ConstructedBody
 
     friend std::ostream &operator<<(std::ostream & os, const ConstructedBody & cb);
 };
+
+struct CollisionPair;
 
 struct CollisionPair
 {
@@ -186,6 +189,10 @@ struct VelocityConstraint
     void debugRender();
 
     friend std::ostream &operator<<(std::ostream & os, const VelocityConstraint & vc);
+};
+
+struct PlayerEnvironmentConstraint
+{
 };
 }
 }

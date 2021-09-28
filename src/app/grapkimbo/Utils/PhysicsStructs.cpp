@@ -20,6 +20,7 @@ ConstructedBody::ConstructedBody(Body & aBody, Position & aPos, AccelAndSpeed & 
     radius{aBody.radius},
     bodyType{aBody.bodyType},
     shapeType{aBody.shapeType},
+    collisionType{aBody.collisionType},
     bodyRef{aBody},
     posRef{aPos},
     aasRef{aAas},
