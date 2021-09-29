@@ -3,6 +3,7 @@
 // a shape is a polygon
 #include "commons.h"
 #include "math/Rectangle.h"
+#include <vector>
 
 namespace ad {
 namespace grapito {

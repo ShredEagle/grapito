@@ -4,7 +4,6 @@
 #include "Utils/CollisionBox.h"
 #include "commons.h"
 #include "math/Angle.h"
-#include <bits/stdint-uintn.h>
 namespace ad {
 namespace grapito {
 
