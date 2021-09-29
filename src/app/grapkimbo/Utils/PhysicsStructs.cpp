@@ -40,7 +40,7 @@ void ConstructedBody::synchronize(
     bodyPos = &bodyPoses.at(index);
 }
 
-void ConstructedBody::updateEntity(double delta)
+void ConstructedBody::updateEntity()
 {
     bodyRef.theta = bodyPos->a;
     aasRef.speed = velocity->v;

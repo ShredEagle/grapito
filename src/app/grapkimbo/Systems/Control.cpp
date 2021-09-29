@@ -33,19 +33,29 @@ void Control::update(const aunteater::Timer aTimer, const GameInputState & aInpu
     //
     // Air
     //
-    for(auto entity :  mCartesianControllables)
+    for(auto & [controllable, geometry, aas, mass, playerData] :  mCartesianControllables)
     {
-        auto & [controllable, geometry, aas, weight] = entity;
         const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
-
         float horizontalAxis = aInputState.asAxis(controllable.controller, Left, Right, LeftHorizontalAxis);
-        aas.accel += Vec2{horizontalAxis * gAirControlAcceleration, 0.};
 
-        if (inputs[Jump])
+        if (playerData.state == PlayerCollisionState_Grounded)
         {
-            aas.accel += Vec2{0., + gAirControlAcceleration};
-            break;
+            std::cout << "Grounded\n";
+            aas.speed += PlayerWalkingSpeed * horizontalAxis;
+
+            if (inputs[Jump])
+            {
+                aas.speed += Vec2{0., + gJumpImpulse};
+            }
         }
+        else
+        {
+
+            aas.accel += Vec2{horizontalAxis * gAirControlAcceleration, 0.};
+
+        }
+
+        playerData.state = PlayerCollisionState_Jumping;
     }
 
     //

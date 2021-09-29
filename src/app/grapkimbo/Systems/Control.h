@@ -22,7 +22,7 @@ namespace ad {
 namespace grapito
 {
 
-typedef aunteater::Archetype<Controllable, Position, AccelAndSpeed, Mass> CartesianControlled;
+typedef aunteater::Archetype<Controllable, Position, AccelAndSpeed, Mass, PlayerData> CartesianControlled;
 typedef aunteater::Archetype<Controllable, Position, Pendular, Mass> PolarControlled;
 typedef aunteater::Archetype<Controllable, AccelAndSpeed, GrappleControl, Position> Grappler;
 typedef aunteater::Archetype<Controllable, GrappleControl, PlayerData> ModeSelectable; // est une bande de mecs sympas
@@ -39,6 +39,7 @@ public:
 
     static constexpr double gPendularControlAccelerationFactor = 1./6.;
     static constexpr double gAirControlAcceleration = 12.; // m/s
+    static constexpr double gJumpImpulse = 10.; // m/s
 
 private:
     std::pair<Position2, double> anchor(const Position2 aPosition);

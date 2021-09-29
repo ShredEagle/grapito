@@ -109,7 +109,7 @@ class ConstructedBody
 
     void synchronize(std::vector<Velocity> & velocities, std::vector<BodyPosition> & bodyPoses, std::vector<CollisionBox> & collisionBoxes, int index);
 
-    void updateEntity(double delta);
+    void updateEntity();
 
     double mass;
     double invMass;
@@ -193,6 +193,10 @@ struct VelocityConstraint
 
 struct PlayerEnvironmentConstraint
 {
+    Vec2 normal; 
+    double separation;
+
+    ConstructedBody * cPlayer;
 };
 }
 }

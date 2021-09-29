@@ -46,7 +46,7 @@ aunteater::Entity makePlayer(int aIndex,
             math::Rectangle<double>{{0., 0.}, player::gSize},
             BodyType_Dynamic,
             ShapeType_Hull,
-            CollisionType_Moving_Env,
+            CollisionType_Player,
             1.,
             0.
             )

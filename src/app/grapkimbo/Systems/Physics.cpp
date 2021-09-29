@@ -1,5 +1,6 @@
 #include "Physics.h"
 #include "Components/Body.h"
+#include "Components/PlayerData.h"
 #include "math/Matrix.h"
 #include <iostream>
 #include <variant>
@@ -372,8 +373,20 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
             //Now we create the different contact constraints
             //We need to put everything back in the right order for this to work
 
-            if (collisionPair.bodyA.collisionType == CollisionType_Player)
+            if (
+                    (bodyRef->collisionType == CollisionType_Player &&
+                    bodyInc->collisionType == CollisionType_Static_Env) || 
+                    (bodyInc->collisionType == CollisionType_Player &&
+                    bodyRef->collisionType == CollisionType_Static_Env)
+               )
             {
+                ConstructedBody * bodyPlayer = bodyRef->collisionType == CollisionType_Player ? bodyRef : bodyInc;
+                Vec2 normal = bodyRef->collisionType == CollisionType_Player ? -manifold.normal : manifold.normal;
+                playerConstraints.emplace_back(PlayerEnvironmentConstraint{
+                        normal,
+                        manifold.separation,
+                        bodyPlayer
+                        });
             }
             else
             {
@@ -382,7 +395,7 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
                     Vec2 rA = contact.contactPoint.as<math::Vec>() - (bodyRef->bodyPos->c.as<math::Vec>());
                     Vec2 rB = contact.contactPoint.as<math::Vec>() - (bodyInc->bodyPos->c.as<math::Vec>());
                     Vec2 tangent = {manifold.normal.y(), -manifold.normal.x()};
-                    velocityConstraints.emplace_back(
+                    velocityConstraints.emplace_back(VelocityConstraint{
                         bodyRef->velocity,
                         bodyRef->bodyPos,
                         rA,
@@ -408,7 +421,7 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
                         contact,
                         bodyRef,
                         bodyInc
-                    );
+                    });
                 }
             }
         }
@@ -537,16 +550,37 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
         }
     }
 
+    for (auto constraint : playerConstraints)
+    {
+        Position2 oldP = constraint.cPlayer->bodyPos->p;
+        constraint.cPlayer->bodyPos->p += constraint.separation * constraint.normal;
+        constraint.cPlayer->velocity->v = constraint.cPlayer->bodyPos->p - oldP;
+
+        std::cout << constraint.normal.dot(PlayerGroundedNormal) << "\n";
+        if (-constraint.normal.dot(PlayerGroundedNormal) > PlayerGroundedSlopeDotValue)
+        {
+            //Set player as grounded
+            constraint.cPlayer->velocity->v *= PlayerGroundFriction;
+            constraint.cPlayer->entity->get<PlayerData>().state = PlayerCollisionState_Grounded;
+        }
+        else if (constraint.normal.dot(PlayerWalledNormal) > PlayerWallSlopeDotValue || constraint.normal.dot(PlayerWalledNormal) < -PlayerWallSlopeDotValue)
+        {
+            //Set player as walled
+            constraint.cPlayer->entity->get<PlayerData>().state = PlayerCollisionState_Walled;
+        }
+    }
+
     //Update entities body
     for (auto & body : constructedBodies)
     {
         //std::cout << body;
-        body.updateEntity(aTimer.delta());
+        body.updateEntity();
         body.box->shape.debugRender();
     }
 
     //Cleaning up
     velocityConstraints.clear();
+    playerConstraints.clear();
 }
 
 } // namespace grapito

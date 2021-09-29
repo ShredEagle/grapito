@@ -103,7 +103,6 @@ static inline void applyImpulse(
 
 
 static constexpr int maxNormalConstraintIteration = 8;
-static constexpr int maxTangentConstraintIteration = 2;
 static std::array<
     std::array<
         std::function<ContactManifold(
