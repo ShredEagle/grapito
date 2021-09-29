@@ -22,8 +22,8 @@ namespace ad
                 const math::Matrix<3, 3> aTransform,
                 const Color & aColor
             ) :
-                origin{static_cast<math::Position<2, int>>(aOrigin)},
-                dimension{static_cast<math::Size<2, int>>(aDimension)},
+                origin{static_cast<math::Position<2, float>>(aOrigin)},
+                dimension{static_cast<math::Size<2, float>>(aDimension)},
                 transform{aTransform},
                 color{aColor}
             {}
@@ -99,6 +99,7 @@ namespace ad
                     mTrivialLineStrip{aApplication.getEngine()->getWindowSize()}
                 {}
                 void drawRectangle(Rectangle aRectangle);
+                void drawOutline(Rectangle aRectangle);
                 void drawLine(Line aLine);
                 void drawPoint(Point aPoint);
                 //void drawArrow(Arrow aArrow);

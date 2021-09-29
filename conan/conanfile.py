@@ -25,10 +25,11 @@ class GrapitoConan(ConanFile):
         ("glad/0.1.34"),
         ("imgui/1.84.2"),
 
-        ("aunteater/7702f73a38@adnn/develop"),
-        ("graphics/4c1db118e3@adnn/develop"),
-        ("math/be21b787d3@adnn/develop"),
-        ("websocket/717708d463@adnn/develop"),
+        ("aunteater/bcd4c5dc43@adnn/develop"),
+        ("graphics/15abb1adc9@adnn/develop"),
+        ("math/51c3947279@adnn/develop"),
+        ("websocket/60baf7b620@adnn/develop"),
+        
     )
 
     build_requires = ("cmake/3.20.4")

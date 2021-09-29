@@ -28,22 +28,24 @@ set(${TARGET_NAME}_HEADERS
     Systems/Control.h
     Systems/ControlAnchorSight.h
     Systems/Control.h
-    Systems/ContactConstraintCreation.h
     Systems/Gravity.h
     Systems/LevelGeneration.h
     Systems/PendulumSimulation.h
     Systems/Render.h
     Systems/AccelSolver.h
-    Systems/ImpulseSolver.h
+    Systems/Physics.h
 
     TestScenes/CollisionTest.h
     TestScenes/FrictionTest.h
+    TestScenes/SimpleCollisionTest.h
     TestScenes/Game_pendulum.h
     TestScenes/SceneChanger.h
 
     Utils/CollisionBox.h
     Utils/DrawDebugStuff.h
     Utils/HomogeneousTransformation.h
+    Utils/Shape.h
+    Utils/PhysicsStructs.h
 
     DebugGui/SceneGui.h
 )
@@ -58,20 +60,22 @@ set(${TARGET_NAME}_SOURCES
     Systems/CameraGuidedControl.cpp
     Systems/Control.cpp
     Systems/ControlAnchorSight.cpp
-    Systems/ContactConstraintCreation.cpp
     Systems/Gravity.cpp
     Systems/LevelGeneration.cpp
     Systems/PendulumSimulation.cpp
     Systems/Render.cpp
     Systems/AccelSolver.cpp
-    Systems/ImpulseSolver.cpp
+    Systems/Physics.cpp
 
     TestScenes/CollisionTest.cpp
     TestScenes/FrictionTest.cpp
+    TestScenes/SimpleCollisionTest.cpp
     TestScenes/Game_pendulum.cpp
 
     Utils/CollisionBox.cpp
     Utils/DrawDebugStuff.cpp
+    Utils/Shape.cpp
+    Utils/PhysicsStructs.cpp
 )
 
 source_group(TREE ${CMAKE_CURRENT_LIST_DIR}
@@ -101,7 +105,7 @@ add_executable(${TARGET_NAME}
 
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
     target_compile_options(${TARGET_NAME}
-        PRIVATE "-fno-omit-frame-pointer" "-fsanitize=address" "-fsanitize=undefined" "-D KIMBO_DEBUG")
+        PRIVATE "-fsanitize=address" "-fsanitize=undefined")
     target_link_options(${TARGET_NAME}
         PRIVATE "-fsanitize=address" "-fsanitize=undefined")
 endif()

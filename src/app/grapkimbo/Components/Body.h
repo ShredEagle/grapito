@@ -1,8 +1,10 @@
 #pragma once
 
 #include "../Utilities.h"
-#include "Utils/Contact.h"
+#include "Components/AccelAndSpeed.h"
 #include "Utils/CollisionBox.h"
+#include "Utils/Shape.h"
+#include "Utils/PhysicsStructs.h"
 
 #include <algorithm>
 #include <aunteater/Component.h>
@@ -11,40 +13,30 @@ namespace ad {
 namespace grapito
 {
 
-enum ShapeType
-{
-    HULL,
-    type_count,
-};
-
-enum BodyType
-{
-    STATIC,
-    DYNAMIC,
-};
-
 struct Body : public aunteater::Component<Body>
 {
     explicit Body(
         math::Rectangle<double> aBox,
         BodyType aBodyType,
         ShapeType aShapeType,
-        double aMass = 1.,
+        CollisionType aCollisionType,
+        float aMass = 1.,
         double aTheta = 0.,
         double aFriction = 0.
     ) :
-        box{std::move(aBox)},
+        shape{aBox},
         bodyType{aBodyType},
         shapeType{aShapeType},
+        collisionType{aCollisionType},
         friction{aFriction}
     {
         radius = std::max(aBox.height(), aBox.width());
 
         double area = 0.;
         Vec2 vecMassCenter = Vec2::Zero();
-        for (int i = 0; i < box.mFaceCount; ++i)
+        for (int i = 0; i < shape.mFaceCount; ++i)
         {
-            auto edge = box.getEdge(i);
+            auto edge = shape.getEdge(i);
             auto vertexA = edge.origin.as<math::Vec>();
             auto vertexB = edge.end.as<math::Vec>();
             double areaStep = twoDVectorCross(vertexA, vertexB) / 2;
@@ -62,7 +54,7 @@ struct Body : public aunteater::Component<Body>
         massCenter = static_cast<Position2>(vecMassCenter);
         theta = math::Radian<double>{aTheta};
 
-        if (bodyType != BodyType::DYNAMIC)
+        if (bodyType != BodyType_Dynamic)
         {
             mass = 0.;
             invMass = 0.;
@@ -83,9 +75,9 @@ struct Body : public aunteater::Component<Body>
 
     void debugRender(Position2 pos)
     {
-        for (int i = 0; i < box.mFaceCount; ++i)
+        for (int i = 0; i < shape.mFaceCount; ++i)
         {
-            auto vertex = box.getVertice(i);
+            auto vertex = shape.getVertice(i);
             debugDrawer->drawPoint({
                     transformPosition(
                             (Position2)pos.as<math::Vec>() + vertex.as<math::Vec>(),
@@ -108,19 +100,20 @@ struct Body : public aunteater::Component<Body>
     double moi;
     double invMoi;
     double friction;
+    double restitution;
     Position2 massCenter = {0., 0.};
 
     double radius;
     math::Radian<double> theta;
 
-    CollisionBox box;
+    Shape shape;
 
     BodyType bodyType;
     ShapeType shapeType;
+    CollisionType collisionType;
 
-    std::vector<ContactQuery> collidingWith;
+    std::list<ConstructedBody>::iterator constructedBodyIt;
 };
-
 
 } // namespace grapito
 } // namespace ad
