@@ -23,7 +23,6 @@ namespace grapito
 aunteater::Entity makePlayer(int aIndex,
                              Controller aController,
                              Color aColor,
-                             Pendular aPendular,
                              GrappleMode aGrappleMode = GrappleMode::Closest);
 
 aunteater::Entity makeCamera(Position2 pos = {0., 0.});

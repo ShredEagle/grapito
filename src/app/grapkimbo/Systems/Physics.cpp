@@ -92,7 +92,6 @@ std::vector<ContactFeature> CheckContactValidity(const Shape::Edge & referenceEd
     for (auto contact : points)
     {
         double candidateSeparation = contact.contactPoint.as<math::Vec>().dot(referenceEdge.normal);
-        //std::cout << "projectPoint" << projectedPoint << "\n";
 
         //This is sad that we get fucked by smaller than difference 0.01mm
         if (
@@ -157,7 +156,6 @@ static inline std::vector<ContactFeature> getContactPoints(
 
     if (hasInterA)
     {
-        //std::cout << "hasInterA" << "\n";
         auto contactFeature = ContactFeature{
             ContactFeature::vertex,
             ContactFeature::face,
@@ -169,7 +167,6 @@ static inline std::vector<ContactFeature> getContactPoints(
     }
     else 
     {
-        //std::cout << "incident.end" << "\n";
         // If the line passing by referenceEdge.origin does not clip the incidentEdge
         // it's the end of the incidentEdge that will possibly be inside
         // the referenceBox
@@ -187,7 +184,6 @@ static inline std::vector<ContactFeature> getContactPoints(
 
     if (hasInterB)
     {
-        //std::cout << "hasInterB" << "\n";
         auto contactFeature = ContactFeature{
             ContactFeature::vertex,
             ContactFeature::face,
@@ -200,7 +196,6 @@ static inline std::vector<ContactFeature> getContactPoints(
     }
     else
     {
-        //std::cout << "incident.origin" << "\n";
         // If the line passing by referenceEdge.end does not clip the incidentEdge
         // it's the origin of the incidentEdge that will possibly be inside
         // the referenceBox
@@ -368,7 +363,6 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
 
 
             collisionPair.manifold = manifold;
-            //std::cout << manifold.contacts.size() << "\n";
 
             //Now we create the different contact constraints
             //We need to put everything back in the right order for this to work
@@ -446,7 +440,6 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
     }
     
 
-    //std::cout << velocityConstraints.size() << "\n";
     //Solve constraints
     for (VelocityConstraint & constraint : velocityConstraints)
     {
@@ -507,8 +500,6 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
                 double angularImpulseA = lambda * constraint.crossATangent * constraint.invMoiA;
                 double angularImpulseB = -lambda * constraint.crossBTangent * constraint.invMoiB;
 
-                //std::cout << "pre tangent impulse";
-                //std::cout << constraint;
                 applyImpulse(
                         impulse * constraint.invMassA,
                         angularImpulseA,
@@ -517,8 +508,6 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
                         constraint,
                         aTimer.delta()
                         );
-                //std::cout << "post tangent impulse";
-                //std::cout << constraint;
             }
 
             Vec2 speed = constraint.velocityA->v + (AngVecA * constraint.velocityA->w) - constraint.velocityB->v - (AngVecB * constraint.velocityB->w);
@@ -534,8 +523,6 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
 
             double angularImpulseB = -lambda * constraint.crossB * constraint.invMoiB;
 
-            //std::cout << "pre normal impulse";
-            //std::cout << constraint;
             applyImpulse(
                     impulse * constraint.invMassA,
                     angularImpulseA,
@@ -544,8 +531,6 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
                     constraint,
                     aTimer.delta()
                     );
-            //std::cout << "pre normal impulse";
-            //std::cout << constraint;
             constraint.debugRender();
         }
     }
@@ -554,9 +539,9 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
     {
         Position2 oldP = constraint.cPlayer->bodyPos->p;
         constraint.cPlayer->bodyPos->p += constraint.separation * constraint.normal;
-        constraint.cPlayer->velocity->v = constraint.cPlayer->bodyPos->p - oldP;
+        Vec2 tangent = {-constraint.normal.y(), constraint.normal.x()};
+        constraint.cPlayer->velocity->v = constraint.cPlayer->velocity->v.dot(tangent) * tangent;
 
-        std::cout << constraint.normal.dot(PlayerGroundedNormal) << "\n";
         if (-constraint.normal.dot(PlayerGroundedNormal) > PlayerGroundedSlopeDotValue)
         {
             //Set player as grounded
@@ -573,7 +558,6 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
     //Update entities body
     for (auto & body : constructedBodies)
     {
-        //std::cout << body;
         body.updateEntity();
         body.box->shape.debugRender();
     }

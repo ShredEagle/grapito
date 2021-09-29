@@ -40,7 +40,6 @@ void Control::update(const aunteater::Timer aTimer, const GameInputState & aInpu
 
         if (playerData.state == PlayerCollisionState_Grounded)
         {
-            std::cout << "Grounded\n";
             aas.speed += PlayerWalkingSpeed * horizontalAxis;
 
             if (inputs[Jump])

@@ -52,8 +52,6 @@ Game_pendulum::Game_pendulum(Application & aApplication, DebugUI & aUI) :
     // Camera
     aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera());
     // Environment anchors
-    aunteater::weak_entity anchor_1 = mEntityManager.addEntity(
-        makeAnchor(Position2{-1., -1.}, math::Size<2, double>{2., 2.}));
 
     aunteater::weak_entity anchor_2 = mEntityManager.addEntity(
         makeAnchor(Position2{12., 5.}, math::Size<2, double>{2., 2.} ));
@@ -61,19 +59,22 @@ Game_pendulum::Game_pendulum(Application & aApplication, DebugUI & aUI) :
     aunteater::weak_entity anchor_3 = mEntityManager.addEntity(
         makeAnchor(Position2{24., 9.}, math::Size<2, double>{2., 2.} ));
 
+    aunteater::weak_entity floor = mEntityManager.addEntity(
+        makeAnchor(Position2{-20., -4.}, math::Size<2, double>{40., 2.} ));
+
     // Player 1
     Controller controller = isGamepadPresent(Controller::Gamepad_0) ?
                             Controller::Gamepad_0 : Controller::Keyboard;
 
     mEntityManager.addEntity(
-        makePlayer(0, controller, math::sdr::gCyan, makePendular(anchor_1))
+        makePlayer(0, controller, math::sdr::gCyan)
             .add<CameraGuide>(1.0));
 
     // Player 2
     if (isGamepadPresent(Controller::Gamepad_1))
     {
         mEntityManager.addEntity(
-            makePlayer(1, Controller::Gamepad_1, math::sdr::gMagenta, makePendular(anchor_3)));
+            makePlayer(1, Controller::Gamepad_1, math::sdr::gMagenta));
     }
 }
 

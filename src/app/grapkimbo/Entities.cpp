@@ -25,7 +25,6 @@ namespace grapito
 aunteater::Entity makePlayer(int aIndex,
                              Controller aController,
                              Color aColor,
-                             Pendular aPendular,
                              GrappleMode aGrappleMode)
 {
     aunteater::Entity player = aunteater::Entity()
@@ -38,7 +37,6 @@ aunteater::Entity makePlayer(int aIndex,
         //    0.)
         .add<Controllable>(aController)
         .add<GrappleControl>(aGrappleMode)
-        .add<Pendular>(std::move(aPendular))
         .add<PlayerData>(aIndex, aColor)
         .add<AccelAndSpeed>()
         .add<Position>(Position2{3., 3.}, player::gSize) // The position will be set by pendulum simulation
@@ -54,7 +52,7 @@ aunteater::Entity makePlayer(int aIndex,
         .add<Mass>(player::gMass)
     ;
 
-    aPendular.connected->add<CameraGuide>(math::makeInterpolation<math::ease::SmoothStep>(0., 1., 0.3));
+    //aPendular.connected->add<CameraGuide>(math::makeInterpolation<math::ease::SmoothStep>(0., 1., 0.3));
 
     return player;
 }
