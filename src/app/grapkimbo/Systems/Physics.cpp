@@ -62,18 +62,18 @@ void PivotObserver::addedEntity(aunteater::LiveEntity & aEntity)
     auto pivotJointIt = mPhysicsSystem->pivotJointConstraints.insert(
         mPhysicsSystem->pivotJointConstraints.end(),
         PivotJointConstraint{
-            .invMassA = bodyA.invMass,
-            .invMoiA = bodyA.invMoi,
-            .localAnchorA = pivotJoint.localAnchorA,
+             bodyA.invMass,
+             bodyA.invMoi,
+             pivotJoint.localAnchorA,
 
-            .invMassB = bodyB.invMass,
-            .invMoiB = bodyB.invMoi,
-            .localAnchorB = pivotJoint.localAnchorB,
+             bodyB.invMass,
+             bodyB.invMoi,
+             pivotJoint.localAnchorB,
 
-            .cbA = &bodyA,
-            .cbB = &bodyB,
+             &bodyA,
+             &bodyB,
 
-            .pivotJointEntity = &aEntity,
+             &aEntity,
         }
     );
 

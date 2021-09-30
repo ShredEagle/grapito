@@ -222,6 +222,31 @@ struct PlayerEnvironmentConstraint
 
 struct PivotJointConstraint
 {
+    explicit PivotJointConstraint(
+            double aInvMassA,
+            double aInvMoiA,
+            Position2 aLocalAnchorA,
+
+            double aInvMassB,
+            double aInvMoiB,
+            Position2 aLocalAnchorB,
+
+            ConstructedBody * aCbA,
+            ConstructedBody * aCbB,
+
+            aunteater::weak_entity aEntity
+            ) :
+        invMassA{aInvMassA},
+        invMoiA{aInvMoiA},
+        localAnchorA{aLocalAnchorA},
+        invMassB{aInvMassB},
+        invMoiB{aInvMoiB},
+        localAnchorB{aLocalAnchorB},
+        cbA{aCbA},
+        cbB{aCbB},
+        pivotJointEntity{aEntity}
+    {}
+
     Velocity * velocityA;
     BodyPosition * bodyPosA;
     double invMassA;

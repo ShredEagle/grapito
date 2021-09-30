@@ -61,7 +61,7 @@ static inline ContactManifold QueryFacePenetration(
     const ConstructedBody & bodyB
 )
 {
-    ContactManifold resultManifold{.localPoint = Vec2::Zero()};
+    ContactManifold resultManifold;
 
     for (int i = 0; i < bodyA.box->shape.mFaceCount; ++i)
     {
