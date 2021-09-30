@@ -1,4 +1,4 @@
-#include "CollisionTest.h"
+#include "PivotTest.h"
 
 #include "Entities.h"
 #include "Systems/Physics.h"
@@ -23,53 +23,59 @@
 #include <aunteater/UpdateTiming.h>
 #include <aunteater/Entity.h>
 
-#include <cmath>
 #include <iostream>
 
 namespace ad {
 
 namespace grapito {
 
-void createStaticPlatform(Position2 pos, math::Size<2, double> size, double angle, aunteater::EntityManager & mEntityManager)
+void createPivotTest(double height, aunteater::EntityManager & mEntityManager)
 {
-    mEntityManager.addEntity(
-            aunteater::Entity()
-            .add<AccelAndSpeed>()
-            .add<Position>(pos, size)
-            .add<VisualRectangle>(math::sdr::gCyan)
-            .add<Body>(
-                math::Rectangle<double>{{0., 0.}, size},
-                BodyType_Static,
-                ShapeType_Hull,
-                CollisionType_Static_Env,
-                0.,
-                angle,
-                .9
-            ));
-}
 
-void createBox(Position2 pos, math::Size<2, double> size, double angularSpeed, aunteater::EntityManager & mEntityManager)
-{
-    mEntityManager.addEntity(
+    aunteater::weak_entity bodyB = mEntityManager.addEntity(
             aunteater::Entity()
-            .add<Position>(pos, size)
+            .add<Position>(Position2{5., height}, math::Size<2, double>{3., 1.})
+            .add<PlayerData>(0, math::sdr::gMagenta)
             .add<Body>(
-                math::Rectangle<double>{{0., 0.}, size},
+                math::Rectangle<double>{{0., 0.}, {3., 1.}},
                 BodyType_Dynamic,
                 ShapeType_Hull,
-                CollisionType_Moving_Env,
+                CollisionType_Floor,
                 1.,
-                1.,
-                .5
+                0.,
+                0.
             )
-            .add<VisualRectangle>(math::sdr::gCyan)
-            .add<AccelAndSpeed>(Vec2{0., 0.}, angularSpeed)
+            .add<VisualRectangle>(math::sdr::gMagenta)
+            .add<AccelAndSpeed>()
             );
+
+    aunteater::weak_entity bodyA = mEntityManager.addEntity(
+            aunteater::Entity()
+            .add<AccelAndSpeed>()
+            .add<Position>(Position2{-0., height}, math::Size<2, double>{5., 1.})
+            .add<PlayerData>(0, math::sdr::gRed)
+            .add<VisualRectangle>(math::sdr::gRed)
+            .add<Body>(
+                math::Rectangle<double>{{0., 0.}, {5., 1.}},
+                BodyType_Static,
+                ShapeType_Hull,
+                CollisionType_Floor,
+                1.,
+                0.,
+                0.
+            ));
+    mEntityManager.addEntity(
+            aunteater::Entity()
+            .add<PivotJoint>(
+                Position2{5., .5},
+                Position2{0., .5},
+                bodyA,
+                bodyB
+            ));
+
 }
 
-// This test is basically succesful given our current
-// contact solving. It cannot converge without contact persistence.
-CollisionTest::CollisionTest(Application & aApplication, DebugUI & aUI) :
+PivotTest::PivotTest(Application & aApplication, DebugUI & aUI) :
     mUI{aUI}
 {
     mSystemManager.add<Gravity>();
@@ -80,19 +86,10 @@ CollisionTest::CollisionTest(Application & aApplication, DebugUI & aUI) :
 
     aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera({10., 2.}));
 
-    createStaticPlatform({-2., 0.}, {15., 2.}, -math::pi<double> / 3, mEntityManager);
-    createStaticPlatform({6., 0.}, {15., 2.}, -2 * math::pi<double> / 3, mEntityManager);
-
-    for (int i = 0; i < 6; ++i)
-    {
-        for (int j = 0; j < 50; ++j)
-        {
-            createBox({5. + i * 1.5, 5. + j * 1.5}, {.5, .5}, (j + i * 5) % 3, mEntityManager);
-        }
-    }
+    createPivotTest(5., mEntityManager);
 }
 
-bool CollisionTest::update(const aunteater::Timer & aTimer, const GameInputState & aInputState)
+bool PivotTest::update(const aunteater::Timer & aTimer, const GameInputState & aInputState)
 {
     aunteater::UpdateTiming<GameInputState> timings;
     InputState pauseInput = aInputState.get(Controller::Keyboard)[Command::Pause];

@@ -17,6 +17,7 @@ set(${TARGET_NAME}_HEADERS
     Components/GrappleControl.h
     Components/Mass.h
     Components/Pendular.h
+    Components/PivotJoint.h
     Components/PlayerData.h
     Components/Position.h
     Components/VisualOutline.h
@@ -37,6 +38,7 @@ set(${TARGET_NAME}_HEADERS
 
     TestScenes/CollisionTest.h
     TestScenes/FrictionTest.h
+    TestScenes/PivotTest.h
     TestScenes/SimpleCollisionTest.h
     TestScenes/Game_pendulum.h
     TestScenes/SceneChanger.h
@@ -70,6 +72,7 @@ set(${TARGET_NAME}_SOURCES
     TestScenes/CollisionTest.cpp
     TestScenes/FrictionTest.cpp
     TestScenes/SimpleCollisionTest.cpp
+    TestScenes/PivotTest.cpp
     TestScenes/Game_pendulum.cpp
 
     Utils/CollisionBox.cpp

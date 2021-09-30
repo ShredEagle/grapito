@@ -46,5 +46,10 @@ namespace sight
     constexpr double gBaseOutlineOffset = 0.25;
 } // namespace sight
 
+namespace physic
+{
+    constexpr double linearSlop = 0.00001;
+}
+
 
 } // namespace ad

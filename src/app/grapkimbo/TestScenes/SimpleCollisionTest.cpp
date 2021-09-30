@@ -48,7 +48,7 @@ void createSimpleCollisionTest(
                     math::Rectangle<double>{{0., 0.}, {widthA, 2.}},
                     BodyType_Dynamic,
                     ShapeType_Hull,
-                    CollisionType_Static_Env,
+                    CollisionType_Moving_Env,
                     1.,
                     0.,
                     .2
@@ -85,9 +85,9 @@ SimpleCollisionTest::SimpleCollisionTest(Application & aApplication, DebugUI & a
 
     aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera({10., 2.}));
 
-    createSimpleCollisionTest(2., 6., 20., 1, 1, -25.5, mEntityManager);
+    createSimpleCollisionTest(2., 6., 20., 1, 1, 0., mEntityManager);
     createSimpleCollisionTest(2., .5, 4., 2, 2, 0., mEntityManager);
-    createSimpleCollisionTest(2., .5, 4., 10, 3, 0., mEntityManager);
+    createSimpleCollisionTest(2., .5, 4., 4, 3, 0., mEntityManager);
 }
 
 bool SimpleCollisionTest::update(const aunteater::Timer & aTimer, const GameInputState & aInputState)

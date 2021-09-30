@@ -65,6 +65,10 @@ static void drawImGui(Application & aApplication, DebugUI & aUI)
         {
             ChangeScene(GameList::SimpleCollisionTest, aApplication, aUI);
         }
+        if(ImGui::Button("PivotTest"))
+        {
+            ChangeScene(GameList::PivotTest, aApplication, aUI);
+        }
         End();
     }
 }
