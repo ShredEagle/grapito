@@ -4,11 +4,13 @@
 #include "Utils/CollisionBox.h"
 #include "commons.h"
 #include "math/Angle.h"
+#include "math/Matrix.h"
 namespace ad {
 namespace grapito {
 
 struct Body;
 struct CollisionPair;
+struct PivotJointConstraint;
 
 enum ShapeType
 {
@@ -31,6 +33,10 @@ enum BodyType
     BodyType_Dynamic,
 };
 
+//This is the structure that stores the identification of a
+//contact point between two body
+//It also stores the impulse for that contact for persistence
+//between frames
 struct ContactFeature
 {
     enum Type : uint8_t
@@ -50,6 +56,10 @@ struct ContactFeature
     friend std::ostream &operator<<(std::ostream & os, const ContactFeature & cm);
 };
 
+//A contact manifold the data for a collision between two
+//body, which body is the reference body and the
+//indexes of the face colliding
+//It contains the list of the contact point
 struct ContactManifold
 {
     enum ReferenceFace : int
@@ -61,6 +71,7 @@ struct ContactManifold
     ReferenceFace face;
     int referenceEdgeIndex;
     int incidentEdgeIndex;
+    Vec2 localPoint = Vec2::Zero();
 
     Vec2 normal = Vec2::Zero();
     double separation = -std::numeric_limits<double>::max();
@@ -75,6 +86,10 @@ struct Line
     Vec2 direction;
 };
 
+//The structures that hold the velocity of a body
+//This is stored in a vector in the physics system
+//Its purpose is to make the velocities of the body
+//contiguous in memory
 struct Velocity
 {
     explicit Velocity(Vec2 aV, double aW) :
@@ -86,6 +101,7 @@ struct Velocity
     double w;
 };
 
+//Same as velocity but for the position of a body
 struct BodyPosition
 {
     explicit BodyPosition(Position2 aP, Position2 aC, math::Radian<double> aA) :
@@ -99,6 +115,9 @@ struct BodyPosition
     math::Radian<double> a;
 };
 
+//A ConstructedBody is a proxy representation of a Body component
+//It's created when a Body component is added to an entity
+//This is the central structure for physics resolution for the physics system
 class ConstructedBody
 {
     public:
@@ -125,6 +144,7 @@ class ConstructedBody
 
     //non owning pointer to Physics system vector
     std::list<CollisionPair *>  contactList;
+    std::list<std::list<PivotJointConstraint>::iterator> pivotJointItList;
 
     BodyType bodyType;
     ShapeType shapeType;
@@ -138,8 +158,7 @@ class ConstructedBody
     friend std::ostream &operator<<(std::ostream & os, const ConstructedBody & cb);
 };
 
-struct CollisionPair;
-
+//A pair of constructed body colliding. This is persisted between frame
 struct CollisionPair
 {
     bool cold;
@@ -165,6 +184,7 @@ struct VelocityConstraint
     double invMassA;
     double invMoiA;
     double tangentSpeedA;
+    math::Radian<double> angleBaseA;
 
     //non owning pointer to Physics system vector
     Velocity * velocityB;
@@ -175,15 +195,16 @@ struct VelocityConstraint
     double invMassB;
     double invMoiB;
     double tangentSpeedB;
+    math::Radian<double> angleBaseB;
 
     double friction;
     double restitution;
     Vec2 normal; 
     Vec2 tangent;
 
+    Vec2 clipPoint;
+
     ContactFeature & cf;
-    ConstructedBody * cbA;
-    ConstructedBody * cbB;
 
     void debugRender();
 
@@ -195,7 +216,61 @@ struct PlayerEnvironmentConstraint
     Vec2 normal; 
     double separation;
 
+    //Non owning pointer to the constructed body of the player
     ConstructedBody * cPlayer;
+};
+
+struct PivotJointConstraint
+{
+    explicit PivotJointConstraint(
+            double aInvMassA,
+            double aInvMoiA,
+            Position2 aLocalAnchorA,
+
+            double aInvMassB,
+            double aInvMoiB,
+            Position2 aLocalAnchorB,
+
+            ConstructedBody * aCbA,
+            ConstructedBody * aCbB,
+
+            aunteater::weak_entity aEntity
+            ) :
+        invMassA{aInvMassA},
+        invMoiA{aInvMoiA},
+        localAnchorA{aLocalAnchorA},
+        invMassB{aInvMassB},
+        invMoiB{aInvMoiB},
+        localAnchorB{aLocalAnchorB},
+        cbA{aCbA},
+        cbB{aCbB},
+        pivotJointEntity{aEntity}
+    {}
+
+    Velocity * velocityA;
+    BodyPosition * bodyPosA;
+    double invMassA;
+    double invMoiA;
+    Position2 localAnchorA;
+    Vec2 rA = Vec2::Zero();
+    Vec2 angVecA = Vec2::Zero();
+
+    Velocity * velocityB;
+    BodyPosition * bodyPosB;
+    double invMassB;
+    double invMoiB;
+    Position2 localAnchorB;
+    Vec2 rB = Vec2::Zero();
+    Vec2 angVecB = Vec2::Zero();
+
+    Vec2 impulse = Vec2::Zero();
+    double axialMass;
+    math::Matrix<2, 2, double> k = math::Matrix<2, 2>::Zero();
+
+    ConstructedBody * cbA;
+    ConstructedBody * cbB;
+
+    aunteater::weak_entity pivotJointEntity;
 };
 }
 }

@@ -4,6 +4,7 @@
 #include "TestScenes/Game_pendulum.h"
 #include "TestScenes/CollisionTest.h"
 #include "TestScenes/FrictionTest.h"
+#include "TestScenes/PivotTest.h"
 #include "TestScenes/SimpleCollisionTest.h"
 #include "aunteater/EntityManager.h"
 #include "engine/Application.h"
@@ -18,7 +19,8 @@ enum GameList
     CollisionTest,
     GamePendulum,
     FrictionTest,
-    SimpleCollisionTest
+    SimpleCollisionTest,
+    PivotTest,
 };
 
 /*
@@ -47,6 +49,9 @@ static void ChangeScene(GameList aGameType, Application & aApplication, DebugUI 
         break;
     case GameList::SimpleCollisionTest:
         currentGame = std::make_unique<class SimpleCollisionTest>(aApplication, aUI);
+        break;
+    case GameList::PivotTest:
+        currentGame = std::make_unique<class PivotTest>(aApplication, aUI);
         break;
     }
 }

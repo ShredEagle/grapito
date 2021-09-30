@@ -3,6 +3,7 @@
 #include "Input.h"
 
 #include <Components/AccelAndSpeed.h>
+#include <Components/PivotJoint.h>
 #include <Components/Position.h>
 #include <Components/Body.h>
 #include "Components/VisualRectangle.h"
@@ -21,6 +22,7 @@ namespace grapito
 {
 
 typedef aunteater::Archetype<Position, Body, AccelAndSpeed> PhysicalBody;
+typedef aunteater::Archetype<PivotJoint> Pivotable;
 
 static inline void addPair(ConstructedBody & bodyA, ConstructedBody & bodyB, std::list<CollisionPair> & pairs)
 {
@@ -75,11 +77,32 @@ static inline ContactManifold QueryFacePenetration(
             resultManifold.separation = distance;
             resultManifold.referenceEdgeIndex = i;
             resultManifold.normal = -edgeA.normal;
+            resultManifold.localPoint = edgeA.origin - bodyA.bodyPos->c;
         }
     }
 
     return resultManifold;
 };
+
+static inline void applyImpulse(
+        Vec2 impVecA,
+        double angularImpulseA,
+        Vec2 impVecB,
+        double angularImpulseB,
+        PivotJointConstraint & constraint,
+        double delta
+        )
+{
+    constraint.bodyPosA->p += impVecA * delta;
+    constraint.bodyPosA->a += math::Radian<double>{angularImpulseA * delta};
+    constraint.velocityA->v += impVecA;
+    constraint.velocityA->w += angularImpulseA;
+
+    constraint.bodyPosB->p += impVecB * delta;
+    constraint.bodyPosB->a += math::Radian<double>{angularImpulseB * delta};
+    constraint.velocityB->v += impVecB;
+    constraint.velocityB->w += angularImpulseB;
+}
 
 static inline void applyImpulse(
         Vec2 impVecA,
@@ -114,8 +137,35 @@ static std::array<
     ShapeType_count
 > queryFunctions;
 
+class Physics;
 
-class Physics : public aunteater::System<GameInputState>, public aunteater::FamilyObserver
+class BodyObserver : public aunteater::FamilyObserver
+{
+    public:
+
+    BodyObserver(Physics * aPhysicsSystem);
+
+    void addedEntity(aunteater::LiveEntity & aEntity) override;
+
+    void removedEntity(aunteater::LiveEntity & aEntity) override;
+
+    Physics * mPhysicsSystem;
+};
+
+class PivotObserver : public aunteater::FamilyObserver
+{
+    public:
+
+    PivotObserver(Physics * aPhysicsSystem);
+
+    void addedEntity(aunteater::LiveEntity & aEntity) override;
+
+    void removedEntity(aunteater::LiveEntity & aEntity) override;
+
+    Physics * mPhysicsSystem;
+};
+
+class Physics : public aunteater::System<GameInputState>
 {
 
 public:
@@ -125,22 +175,13 @@ public:
 
 
 private:
-    void addedEntity(aunteater::LiveEntity & aEntity) override
-    {
-        ConstructedBody body = ConstructedBody{aEntity.get<Body>(), aEntity.get<Position>(), aEntity.get<AccelAndSpeed>(), &aEntity};
-        aEntity.get<Body>().constructedBodyIt =
-            constructedBodies.insert(
-                    constructedBodies.end(),
-                    body);
-    }
+    friend BodyObserver;
+    friend PivotObserver;
 
-    void removedEntity(aunteater::LiveEntity & aEntity) override
-    {
-        constructedBodies.erase(aEntity.get<Body>().constructedBodyIt);
-    }
-    
+    BodyObserver bodyObserver;
+    PivotObserver pivotObserver;
+
     std::list<ConstructedBody> constructedBodies;
-
     std::list<CollisionPair> collidingBodies;
 
     std::vector<Velocity> velocities;
@@ -149,6 +190,11 @@ private:
 
     std::vector<VelocityConstraint> velocityConstraints;
     std::vector<PlayerEnvironmentConstraint> playerConstraints;
+
+    //This is a list for the moment because it is easier to remove stuff
+    //from it if it is
+    //And there will probably not be that much joint constraint in it
+    std::list<PivotJointConstraint> pivotJointConstraints;
     //Think of putting in place a pool_allocator from foonathan/memory of from boost
 };
 

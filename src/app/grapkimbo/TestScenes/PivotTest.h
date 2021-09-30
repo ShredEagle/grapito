@@ -15,11 +15,14 @@
 namespace ad {
 namespace grapito {
 
-class MassCenterTest : public Game
+class PivotTest : public Game
 {
 public:
-    MassCenterTest(Application & aApplication);
+    PivotTest(Application & aApplication, DebugUI & aUI);
+    ~PivotTest() = default;
 
     bool update(const aunteater::Timer & aTimer, const GameInputState & aInputState);
+private:
+    DebugUI & mUI;
 };
 }} // namespace ad::grapkimbo

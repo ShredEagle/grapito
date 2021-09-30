@@ -28,25 +28,28 @@ struct Body : public aunteater::Component<Body>
         bodyType{aBodyType},
         shapeType{aShapeType},
         collisionType{aCollisionType},
-        friction{aFriction}
+        friction{aFriction},
+        moi{0.}
     {
         radius = std::max(aBox.height(), aBox.width());
 
         double area = 0.;
+
         Vec2 vecMassCenter = Vec2::Zero();
         for (int i = 0; i < shape.mFaceCount; ++i)
         {
-            auto edge = shape.getEdge(i);
-            auto vertexA = edge.origin.as<math::Vec>();
-            auto vertexB = edge.end.as<math::Vec>();
-            double areaStep = twoDVectorCross(vertexA, vertexB) / 2;
-            Vec2 centerStep = (vertexA + vertexB) / 3;
-            double moiStep = areaStep * (vertexA.dot(vertexA) + vertexB.dot(vertexB) + vertexA.dot(vertexB)) / 6;
+            Shape::Edge edge = shape.getEdge(i);
+            Vec2 vertexA = edge.origin.as<math::Vec>();
+            Vec2 vertexB = edge.end.as<math::Vec>();
+            double areaStep = twoDVectorCross(vertexA, vertexB) / 2.;
+            Vec2 centerStep = (vertexA + vertexB) / 3.;
+            double moiStep = areaStep * (vertexA.dot(vertexA) + vertexB.dot(vertexB) + vertexA.dot(vertexB)) / 6.;
 
-            if (area + areaStep != 0)
+            if (area + areaStep != 0.)
             {
                 vecMassCenter = (vecMassCenter * area + centerStep * areaStep)/(area + areaStep);
             }
+
             area += areaStep;
             moi += moiStep;
         }
