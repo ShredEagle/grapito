@@ -33,7 +33,7 @@ int main(int argc, const char * argv[])
         // "Game" selection
         // 
         //Game game{application};
-        ChangeScene(GameList::PivotTest, application, mUI);
+        ChangeScene(GameList::CollisionTest, application, mUI);
 
         while(application.handleEvents())
         {
