@@ -6,6 +6,7 @@
 #include "TestScenes/FrictionTest.h"
 #include "TestScenes/PivotTest.h"
 #include "TestScenes/SimpleCollisionTest.h"
+#include "TestScenes/SetPositionTest.h"
 #include "aunteater/EntityManager.h"
 #include "engine/Application.h"
 namespace ad {
@@ -21,6 +22,7 @@ enum GameList
     FrictionTest,
     SimpleCollisionTest,
     PivotTest,
+    SetPositionTest,
 };
 
 /*
@@ -52,6 +54,9 @@ static void ChangeScene(GameList aGameType, Application & aApplication, DebugUI 
         break;
     case GameList::PivotTest:
         currentGame = std::make_unique<class PivotTest>(aApplication, aUI);
+        break;
+    case GameList::SetPositionTest:
+        currentGame = std::make_unique<class SetPositionTest>(aApplication, aUI);
         break;
     }
 }

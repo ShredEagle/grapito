@@ -8,11 +8,14 @@
 #include "Components/Pendular.h"
 #include "Components/PlayerData.h"
 #include "Components/Position.h"
+#include "Components/RopeCreator.h"
 #include "Components/VisualOutline.h"
 #include "Components/VisualRectangle.h"
 #include "Components/Mass.h"
 
 #include "Systems/ControlAnchorSight.h"
+#include "Utils/PhysicsStructs.h"
+#include "aunteater/EntityManager.h"
 #include "commons.h"
 
 #include <math/VectorUtilities.h>
@@ -42,7 +45,7 @@ aunteater::Entity makePlayer(int aIndex,
         .add<Position>(Position2{3., 3.}, player::gSize) // The position will be set by pendulum simulation
         .add<Body>(
             math::Rectangle<double>{{0., 0.}, player::gSize},
-            BodyType_Dynamic,
+            BodyType_Kinematic,
             ShapeType_Hull,
             CollisionType_Player,
             1.,
@@ -74,7 +77,10 @@ aunteater::Entity makeAnchor(math::Position<2, double> aPosition, math::Size<2, 
             math::Rectangle<double>{{0., 0.}, aSize},
             BodyType_Static,
             ShapeType_Hull,
-            CollisionType_Static_Env
+            CollisionType_Static_Env,
+            0.,
+            0.,
+            1.
             )
         .add<Position>(aPosition, aSize)
         .add<AccelAndSpeed>()
@@ -172,6 +178,59 @@ Pendular makePendular(aunteater::weak_entity aConnected,
         aInitialAngle,
         aRopeLength
     };
+}
+
+aunteater::Entity createRopeSegment(Position2 origin, Position2 end)
+{
+    Vec2 ropeVector = end - origin;
+    double length = ropeVector.getNorm();
+    math::Radian<double> angle{atan2(ropeVector.y(), ropeVector.x())};
+    math::Size<2, double> size{length, .1};
+    aunteater::Entity rope = aunteater::Entity()
+            .add<Position>(
+                Position2::Zero(),
+                size
+                )
+            .add<Body>(
+                math::Rectangle<double>{{0., 0.}, size},
+                BodyType_Dynamic,
+                ShapeType_Hull,
+                CollisionType_Moving_Env,
+                1.,
+                angle.value(),
+                1.,
+                std::vector<CollisionType>{CollisionType_Static_Env}
+                )
+            .add<VisualRectangle>(math::sdr::gGreen)
+            .add<AccelAndSpeed>();
+
+    setLocalPointToWorldPos(rope, {0., 0.05}, origin);
+    return rope;
+}
+
+void throwGrapple(aunteater::weak_entity aEntity, aunteater::EntityManager & aEntityManager)
+{
+    math::Size<2, double> size{.25, .25};
+    Position2 playerPos = static_cast<Position2>(aEntity->get<Position>().position.as<math::Vec>() + aEntity->get<Body>().massCenter.as<math::Vec>() + Vec2{.5, .5});
+    aEntityManager.addEntity(aunteater::Entity()
+            .add<Position>(
+                playerPos,
+                size
+                )
+            .add<Body>(
+                math::Rectangle<double>{{0., 0.}, size},
+                BodyType_Dynamic,
+                ShapeType_Hull,
+                CollisionType_Moving_Env,
+                5.,
+                0.,
+                1.,
+                std::vector<CollisionType>{CollisionType_Static_Env}
+                )
+            .add<VisualRectangle>(math::sdr::gYellow)
+            .add<AccelAndSpeed>(Vec2{20., 20.}, 0.)
+            .add<RopeCreator>(aEntity)
+            );
 }
 
 

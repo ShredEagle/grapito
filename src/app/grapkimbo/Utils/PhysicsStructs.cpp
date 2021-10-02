@@ -17,15 +17,23 @@ ConstructedBody::ConstructedBody(Body & aBody, Position & aPos, AccelAndSpeed & 
     moi{aBody.moi},
     invMoi{aBody.invMoi},
     friction{aBody.friction},
-    radius{aBody.radius},
     bodyType{aBody.bodyType},
     shapeType{aBody.shapeType},
     collisionType{aBody.collisionType},
     bodyRef{aBody},
     posRef{aPos},
     aasRef{aAas},
-    entity{aEntity}
+    entity{aEntity},
+    acceptedCollision{aBody.acceptedCollision}
 {
+}
+
+void ConstructedBody::forceUpdateData(Body * body)
+{
+    mass = body->mass;
+    invMass = body->invMass;
+    moi = body->moi;
+    invMoi = body->invMoi;
 }
 
 void ConstructedBody::synchronize(
@@ -46,6 +54,18 @@ void ConstructedBody::updateEntity()
     aasRef.speed = velocity->v;
     aasRef.w = velocity->w;
     posRef.position = bodyPos->p;
+}
+
+bool ConstructedBody::shouldCollide(ConstructedBody & body)
+{
+    if (body.acceptedCollision.size() == 0 && acceptedCollision.size() == 0)
+    {
+        return true;
+    }
+    bool result = true;
+    result = result && std::find(body.acceptedCollision.begin(), body.acceptedCollision.end(), collisionType) != body.acceptedCollision.end();
+    result = result && std::find(acceptedCollision.begin(), acceptedCollision.end(), body.collisionType) != body.acceptedCollision.end();
+    return result;
 }
 
 void ConstructedBody::debugRender()

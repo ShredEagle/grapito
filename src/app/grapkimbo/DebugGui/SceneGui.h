@@ -69,6 +69,10 @@ static void drawImGui(Application & aApplication, DebugUI & aUI)
         {
             ChangeScene(GameList::PivotTest, aApplication, aUI);
         }
+        if(ImGui::Button("SetPositionTest"))
+        {
+            ChangeScene(GameList::SetPositionTest, aApplication, aUI);
+        }
         End();
     }
 }

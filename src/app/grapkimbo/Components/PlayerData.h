@@ -35,7 +35,7 @@ struct PlayerData : public aunteater::Component<PlayerData>
 
     int id;
     Color color;
-    PlayerCollisionState state;
+    PlayerCollisionState state = PlayerCollisionState_Jumping;
 };
 
 

@@ -92,30 +92,9 @@ void Control::update(const aunteater::Timer aTimer, const GameInputState & aInpu
         switch (grappleControl.mode)
         {
         case GrappleMode::Closest:
-            if (inputs[Grapple])
+            if (inputs[Grapple].positiveEdge())
             {
-                auto filter = [&](const AnchorWrap & anchor, Position2 aCandidate, Position2 aBasePosition, double aNormSquared)
-                {
-                    math::Vec<2, double> vec = aCandidate - aBasePosition;
-                    return anchor->get<Body>().bodyType == BodyType_Static
-                           // The candidate must be better than the previously selected candidate (i.e. closer to basePosition)
-                           && vec.getNormSquared() < aNormSquared;
-                };
-                Position2 grappleOrigin = geometry.center();
-                auto closest = getClosest(mAnchorables,
-                                          grappleOrigin,
-                                          [grappleOrigin](math::Rectangle<double> aRectangle)
-                                          {
-                                               return aRectangle.closestPoint(grappleOrigin);
-                                          },
-                                          filter);
-
-                connectGrapple(entity, 
-                               makePendular(grappleOrigin,
-                                            closest->testedPosition,
-                                            closest->entity,
-                                            aas.speed,
-                                            closest->distance));
+                throwGrapple(entity, mEntityManager);
             }
             break;
 

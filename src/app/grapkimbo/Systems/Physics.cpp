@@ -32,6 +32,7 @@ void BodyObserver::addedEntity(aunteater::LiveEntity & aEntity)
         mPhysicsSystem->constructedBodies.insert(
                 mPhysicsSystem->constructedBodies.end(),
                 body);
+
 }
 
 void BodyObserver::removedEntity(aunteater::LiveEntity & aEntity)
@@ -45,6 +46,7 @@ void BodyObserver::removedEntity(aunteater::LiveEntity & aEntity)
     }
 
     mPhysicsSystem->constructedBodies.erase(aEntity.get<Body>().constructedBodyIt);
+    //TODO(franz): Need to delete collisionPair also
 }
 
 PivotObserver::PivotObserver(Physics * aPhysicsSystem) :
@@ -512,6 +514,11 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
         {
             auto & bodyB = *bodyBIt;
 
+            if (!bodyA.shouldCollide(bodyB))
+            {
+                continue;
+            }
+
             auto aabbA = bodyA.box->shape.getAABB();
             auto aabbB = bodyB.box->shape.getAABB();
 
@@ -530,7 +537,6 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
                     {210,100,255}
             });
             */
-
             //Basic SAT for AABB
             if (aabbA.x() <= aabbB.x() + aabbB.width() &&
                aabbA.x() + aabbA.width() >= aabbB.x() &&
@@ -622,8 +628,9 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
                         });
             }
             else if (
-                    bodyRef->collisionType == CollisionType_Moving_Env ||
-                    bodyInc->collisionType == CollisionType_Moving_Env
+                    (bodyRef->collisionType == CollisionType_Moving_Env ||
+                    bodyInc->collisionType == CollisionType_Moving_Env ) &&
+                    !(bodyRef->collisionType == CollisionType_Player || bodyInc->collisionType == CollisionType_Player)
                )
             {
                 for (auto & contact : manifold.contacts)
@@ -704,14 +711,15 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
 
     for (int i = 0; i < maxVelocityConstraintIteration; i++)
     {
-        for (VelocityConstraint & constraint : velocityConstraints)
-        {
-            solveContactVelocityConstraint(constraint, aTimer);
-        }
-
         for (PivotJointConstraint & pjConstraint : pivotJointConstraints)
         {
             solvePivotJointVelocityConstraint(pjConstraint, aTimer);
+        }
+
+        for (VelocityConstraint & constraint : velocityConstraints)
+        {
+            constraint.debugRender();
+            solveContactVelocityConstraint(constraint, aTimer);
         }
     }
 
