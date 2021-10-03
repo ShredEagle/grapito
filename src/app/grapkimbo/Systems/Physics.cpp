@@ -39,6 +39,33 @@ void BodyObserver::removedEntity(aunteater::LiveEntity & aEntity)
 {
     ConstructedBody & body = *aEntity.get<Body>().constructedBodyIt;
 
+    auto collisionPairIt = body.contactList.begin();
+    //Removing collision pairs involving this body
+    while (collisionPairIt != body.contactList.end())
+    {
+        auto collisionPair = *collisionPairIt;
+        if (collisionPair == *collisionPair->iteratorA)
+        {
+            collisionPairIt = collisionPair->bodyA.contactList.erase(
+                    collisionPair->iteratorA
+                    );
+            collisionPair->bodyB.contactList.erase(
+                    collisionPair->iteratorB
+                    );
+        }
+        else
+        {
+            collisionPair->bodyA.contactList.erase(
+                    collisionPair->iteratorA
+                    );
+            collisionPairIt = collisionPair->bodyB.contactList.erase(
+                    collisionPair->iteratorB
+                    );
+        }
+
+        collisionPair->toRemove = true;
+    }
+
     for (auto pjcIt : body.pivotJointItList)
     {
         PivotJointConstraint & pjc = *pjcIt;
@@ -556,6 +583,14 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
     while (pairIt != collidingBodies.end())
     {
         auto & collisionPair = *pairIt;
+
+        if (collisionPair.toRemove)
+        {
+            //Destroy pair here
+            pairIt = collidingBodies.erase(pairIt);
+            continue;
+        }
+
         auto & bodyA = collisionPair.bodyA;
         auto & bodyB = collisionPair.bodyB;
         const auto oldManifold = collisionPair.manifold;

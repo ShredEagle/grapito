@@ -147,6 +147,7 @@ class ConstructedBody
 
 
     //non owning pointer to Physics system vector
+    std::list<CollisionPair>::iterator collisionPairIt;
     std::list<CollisionPair *> contactList;
     std::list<std::list<PivotJointConstraint>::iterator> pivotJointItList;
 
@@ -174,6 +175,7 @@ struct CollisionPair
     std::list<CollisionPair *>::iterator iteratorB;
 
     ContactManifold manifold;
+    bool toRemove;
 
     void debugRender();
 };

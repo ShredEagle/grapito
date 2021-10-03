@@ -23,8 +23,8 @@ namespace grapito
 {
 
 typedef aunteater::Archetype<Controllable, Position, AccelAndSpeed, Mass, PlayerData> CartesianControlled;
-typedef aunteater::Archetype<Controllable, Position, Pendular, Mass> PolarControlled;
-typedef aunteater::Archetype<Controllable, AccelAndSpeed, GrappleControl, Position> Grappler;
+typedef aunteater::Archetype<Controllable, PlayerData> PolarControlled;
+typedef aunteater::Archetype<Controllable, AccelAndSpeed, GrappleControl, Position, PlayerData> Grappler;
 typedef aunteater::Archetype<Controllable, GrappleControl, PlayerData> ModeSelectable; // est une bande de mecs sympas
 // Currently using EnvironmentCollisionBox as a tag, because it is not correctly positioned...
 typedef aunteater::Archetype<Position, Body> AnchorElement;

@@ -67,6 +67,9 @@ aunteater::Entity createRopeSegment(Position2 origin, Position2 endRR);
 
 void throwGrapple(aunteater::weak_entity aEntity, aunteater::EntityManager & aEntityManager);
 
+void attachPlayerToGrapple(aunteater::weak_entity aPlayer, aunteater::EntityManager & aEntityManager);
+
+void detachPlayerFromGrapple(aunteater::weak_entity aPlayer);
 
 aunteater::weak_entity setGrappleMode(aunteater::weak_entity aEntity,
                                       const PlayerData & aPlayerData,
@@ -94,6 +97,11 @@ inline void setLocalPointToWorldPos(aunteater::Entity & aEntity, Position2 local
     Position & pos = aEntity.get<Position>();
     Body & body = aEntity.get<Body>();
     setLocalPointToWorldPos(body, pos, localPos, worldPos);
+}
+
+inline Position2 getLocalPointInWorld(Body & body, Position & pos, Position2 localPos)
+{
+    return transformPosition(pos.position + localPos.as<math::Vec>(), body.theta, pos.position + body.massCenter.as<math::Vec>());
 }
 
 } // namespace grapito
