@@ -44,7 +44,7 @@ void BodyObserver::removedEntity(aunteater::LiveEntity & aEntity)
     while (collisionPairIt != body.contactList.end())
     {
         auto collisionPair = *collisionPairIt;
-        if (collisionPair == *collisionPair->iteratorA)
+        if (&body == &collisionPair->bodyA)
         {
             collisionPairIt = collisionPair->bodyA.contactList.erase(
                     collisionPair->iteratorA
@@ -116,14 +116,13 @@ void PivotObserver::addedEntity(aunteater::LiveEntity & aEntity)
     );
 
     aEntity.get<PivotJoint>().constraintIt = pivotJointIt;
-    aEntity.get<PivotJoint>().constructedBodyConstraintItB = itA;
-    aEntity.get<PivotJoint>().constructedBodyConstraintItA = itB;
+    aEntity.get<PivotJoint>().constructedBodyConstraintItB = itB;
+    aEntity.get<PivotJoint>().constructedBodyConstraintItA = itA;
 }
 
 void PivotObserver::removedEntity(aunteater::LiveEntity & aEntity)
 {
     PivotJoint & pivot = aEntity.get<PivotJoint>();
-    mPhysicsSystem->pivotJointConstraints.erase(pivot.constraintIt);
 
     if (aEntity.get<PivotJoint>().bodyA->has<Body>())
     {
@@ -135,7 +134,7 @@ void PivotObserver::removedEntity(aunteater::LiveEntity & aEntity)
         ConstructedBody & bodyB = *aEntity.get<PivotJoint>().bodyB->get<Body>().constructedBodyIt;
         bodyB.pivotJointItList.erase(pivot.constructedBodyConstraintItB);
     }
-
+    mPhysicsSystem->pivotJointConstraints.erase(pivot.constraintIt);
 }
 
 static inline bool getBestQuery(

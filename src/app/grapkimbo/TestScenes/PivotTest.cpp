@@ -72,7 +72,6 @@ void createPivotTest(double height, aunteater::EntityManager & mEntityManager)
                 bodyA,
                 bodyB
             ));
-
 }
 
 PivotTest::PivotTest(Application & aApplication, DebugUI & aUI) :

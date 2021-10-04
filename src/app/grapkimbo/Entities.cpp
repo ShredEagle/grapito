@@ -251,7 +251,7 @@ void attachPlayerToGrapple(aunteater::weak_entity aPlayer, aunteater::EntityMana
     grappleBody.updateConstructedBody();
 
     Body & playerBody = aPlayer->get<Body>();
-    playerBody.mass = .5;
+    playerBody.mass = 15.;
     playerBody.updateData();
     playerBody.updateConstructedBody();
 
