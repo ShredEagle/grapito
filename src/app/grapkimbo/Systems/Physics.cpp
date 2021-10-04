@@ -388,7 +388,7 @@ static inline void solveContactVelocityConstraint(VelocityConstraint & constrain
         double totalAngularTangentMass = constraint.invMoiA * crossATangentSquared + constraint.invMoiB * crossBTangentSquared;
 
         double lambda = -(1 / (totalMass + totalAngularTangentMass)) * (tangentSpeed);
-        double maxFriction = constraint.friction * cf.normalImpulse;
+        double maxFriction = constraint.noMaxFriction ? std::numeric_limits<double>::max() : constraint.friction * cf.normalImpulse;
         double newImpulseTangent = std::max(std::min(cf.tangentImpulse + lambda, maxFriction), -maxFriction);
         lambda = newImpulseTangent - cf.tangentImpulse;
         cf.tangentImpulse = newImpulseTangent;
@@ -694,6 +694,7 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
                         math::Radian<double>(0.),
 
                         sqrt(bodyRef->friction * bodyInc->friction),
+                        bodyRef->noMaxFriction || bodyInc->noMaxFriction,
                         std::max(bodyRef->friction, bodyInc->friction),
                         manifold.normal,
                         tangent,
@@ -833,7 +834,7 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
             constraint.bodyPosB->p += constraint.invMassB * impulse;
             constraint.bodyPosB->a += math::Radian<double>{constraint.invMoiB * twoDVectorCross(rB, impulse)};
 
-            jointOkay = jointOkay && separation >= -3. * physic::linearSlop;
+            jointOkay = jointOkay && separation >= -4. * physic::linearSlop;
         }
 
         if (jointOkay)

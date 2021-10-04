@@ -23,6 +23,7 @@ struct Body : public aunteater::Component<Body>
         float aMass = 1.,
         double aTheta = 0.,
         double aFriction = 0.,
+        bool noMaxFriction = false,
         std::vector<CollisionType> aAcceptedCollision = {}
     ) :
         shape{aBox},
@@ -30,6 +31,7 @@ struct Body : public aunteater::Component<Body>
         shapeType{aShapeType},
         collisionType{aCollisionType},
         friction{aFriction},
+        noMaxFriction{noMaxFriction},
         moi{0.},
         theta{math::Radian<double>{aTheta}},
         mass{aMass},
@@ -117,9 +119,11 @@ struct Body : public aunteater::Component<Body>
     double invMass;
     double moi;
     double invMoi;
+    Position2 massCenter = {0., 0.};
+
     double friction;
     double restitution;
-    Position2 massCenter = {0., 0.};
+    bool noMaxFriction;
 
     math::Radian<double> theta;
 

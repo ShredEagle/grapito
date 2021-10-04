@@ -17,6 +17,7 @@ ConstructedBody::ConstructedBody(Body & aBody, Position & aPos, AccelAndSpeed & 
     moi{aBody.moi},
     invMoi{aBody.invMoi},
     friction{aBody.friction},
+    noMaxFriction{aBody.noMaxFriction},
     bodyType{aBody.bodyType},
     shapeType{aBody.shapeType},
     collisionType{aBody.collisionType},
@@ -58,13 +59,9 @@ void ConstructedBody::updateEntity()
 
 bool ConstructedBody::shouldCollide(ConstructedBody & body)
 {
-    if (body.acceptedCollision.size() == 0 && acceptedCollision.size() == 0)
-    {
-        return true;
-    }
     bool result = true;
-    result = result && std::find(body.acceptedCollision.begin(), body.acceptedCollision.end(), collisionType) != body.acceptedCollision.end();
-    result = result && std::find(acceptedCollision.begin(), acceptedCollision.end(), body.collisionType) != body.acceptedCollision.end();
+    result = result && std::find(body.acceptedCollision.begin(), body.acceptedCollision.end(), collisionType) != body.acceptedCollision.end() || body.acceptedCollision.size() == 0;
+    result = result && std::find(acceptedCollision.begin(), acceptedCollision.end(), body.collisionType) != acceptedCollision.end() || acceptedCollision.size() == 0;
     return result;
 }
 

@@ -138,7 +138,9 @@ class ConstructedBody
     double invMass;
     double moi;
     double invMoi;
+
     double friction;
+    bool noMaxFriction;
 
     //non owning pointer to Physics system vector
     Velocity * velocity;
@@ -205,6 +207,7 @@ struct VelocityConstraint
     math::Radian<double> angleBaseB;
 
     double friction;
+    bool noMaxFriction;
     double restitution;
     Vec2 normal; 
     Vec2 tangent;

@@ -84,8 +84,8 @@ static inline ContactManifold QueryFacePenetration(
     return resultManifold;
 };
 
-static constexpr int maxVelocityConstraintIteration = 8;
-static constexpr int maxPositionConstraintIteration = 3;
+static constexpr int maxVelocityConstraintIteration = 16;
+static constexpr int maxPositionConstraintIteration = 16;
 static std::array<
     std::array<
         std::function<ContactManifold(

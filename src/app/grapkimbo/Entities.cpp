@@ -52,6 +52,7 @@ aunteater::Entity makePlayer(int aIndex,
             15.,
             0.,
             0.,
+            false,
             std::vector<CollisionType>{CollisionType_Static_Env}
             )
         .add<VisualRectangle>(aColor)
@@ -188,7 +189,7 @@ aunteater::Entity createRopeSegment(Position2 origin, Position2 end)
     Vec2 ropeVector = end - origin;
     double length = ropeVector.getNorm();
     math::Radian<double> angle{atan2(ropeVector.y(), ropeVector.x())};
-    math::Size<2, double> size{length, .1};
+    math::Size<2, double> size{length, rope::ropeWidth};
     aunteater::Entity rope = aunteater::Entity()
             .add<Position>(
                 Position2::Zero(),
@@ -199,15 +200,16 @@ aunteater::Entity createRopeSegment(Position2 origin, Position2 end)
                 BodyType_Dynamic,
                 ShapeType_Hull,
                 CollisionType_Moving_Env,
-                1.,
+                0.5,
                 angle.value(),
                 0.,
+                false,
                 std::vector<CollisionType>{CollisionType_Static_Env}
                 )
             .add<VisualRectangle>(math::sdr::gGreen)
             .add<AccelAndSpeed>();
 
-    setLocalPointToWorldPos(rope, {0., 0.05}, origin);
+    setLocalPointToWorldPos(rope, {0., rope::ropeHalfwidth}, origin);
     return rope;
 }
 
@@ -225,13 +227,14 @@ void throwGrapple(aunteater::weak_entity aEntity, aunteater::EntityManager & aEn
                 BodyType_Dynamic,
                 ShapeType_Hull,
                 CollisionType_Moving_Env,
-                5.,
+                4.,
                 0.,
                 1.,
+                true,
                 std::vector<CollisionType>{CollisionType_Static_Env}
                 )
             .add<VisualRectangle>(math::sdr::gYellow)
-            .add<AccelAndSpeed>(Vec2{20., 20.}, 0.)
+            .add<AccelAndSpeed>(Vec2{40., 40.}, 0.)
             .add<RopeCreator>(aEntity)
             );
 }
@@ -242,6 +245,15 @@ void attachPlayerToGrapple(aunteater::weak_entity aPlayer, aunteater::EntityMana
 
     aunteater::weak_entity & grapple = aPlayer->get<PlayerData>().grapple;
     RopeCreator & ropeCreator = grapple->get<RopeCreator>();
+    Body & grappleBody = grapple->get<Body>();
+    grappleBody.mass = 0.5;
+    grappleBody.updateData();
+    grappleBody.updateConstructedBody();
+
+    Body & playerBody = aPlayer->get<Body>();
+    playerBody.mass = .5;
+    playerBody.updateData();
+    playerBody.updateConstructedBody();
 
     aunteater::weak_entity lastSegment = ropeCreator.mRopeSegments.back();
     Position2 end = static_cast<Position2>(aPlayer->get<Position>().position.as<math::Vec>() + aPlayer->get<Body>().massCenter.as<math::Vec>());

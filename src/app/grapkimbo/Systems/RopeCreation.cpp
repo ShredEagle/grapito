@@ -50,7 +50,7 @@ void RopeCreation::addedEntity(aunteater::LiveEntity & aEntity)
     mEntityManager.addEntity(
             aunteater::Entity()
             .add<PivotJoint>(
-                Position2{0., 0.05},
+                Position2{0., rope::ropeHalfwidth},
                 body.massCenter,
                 link,
                 &aEntity
@@ -72,10 +72,10 @@ void RopeCreation::update(const aunteater::Timer aTimer, const GameInputState &)
         {
             aunteater::weak_entity lastSegment = ropeCreator.mRopeSegments.back();
             Position2 end = static_cast<Position2>(player->get<Position>().position.as<math::Vec>() + player->get<Body>().massCenter.as<math::Vec>());
-            Position2 origin = static_cast<Position2>(getLocalPointInWorld(lastSegment->get<Body>(), lastSegment->get<Position>(), {lastSegment->get<Position>().dimension.width(), 0.05}));
+            Position2 origin = static_cast<Position2>(getLocalPointInWorld(lastSegment->get<Body>(), lastSegment->get<Position>(), {lastSegment->get<Position>().dimension.width(), rope::ropeHalfwidth}));
             double length = (end - origin).getNorm();
 
-            if (length > 1.)
+            if (length > .4)
             {
                 aunteater::weak_entity link = mEntityManager.addEntity(createRopeSegment(
                     origin,
@@ -85,8 +85,8 @@ void RopeCreation::update(const aunteater::Timer aTimer, const GameInputState &)
                 mEntityManager.addEntity(
                         aunteater::Entity()
                         .add<PivotJoint>(
-                            Position2{0., 0.05},
-                            Position2{lastSegment->get<Position>().dimension.width(), 0.05},
+                            Position2{0., rope::ropeHalfwidth},
+                            Position2{lastSegment->get<Position>().dimension.width(), rope::ropeHalfwidth},
                             link,
                             lastSegment
                         ));
