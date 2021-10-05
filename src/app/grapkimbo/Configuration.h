@@ -34,7 +34,7 @@ namespace player
 
 namespace render
 {
-    constexpr float gViewedHeight = 20.f;
+    constexpr float gViewedHeight = 50.f;
 } // namespace render
 
 
@@ -48,7 +48,13 @@ namespace sight
 
 namespace physic
 {
-    constexpr double linearSlop = 0.00001;
+    constexpr double linearSlop = 0.0001;
+}
+
+namespace rope
+{
+    constexpr double ropeWidth = .2;
+    constexpr double ropeHalfwidth = ropeWidth / 2 ;
 }
 
 

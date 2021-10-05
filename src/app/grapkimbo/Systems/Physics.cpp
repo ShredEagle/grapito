@@ -32,11 +32,39 @@ void BodyObserver::addedEntity(aunteater::LiveEntity & aEntity)
         mPhysicsSystem->constructedBodies.insert(
                 mPhysicsSystem->constructedBodies.end(),
                 body);
+
 }
 
 void BodyObserver::removedEntity(aunteater::LiveEntity & aEntity)
 {
     ConstructedBody & body = *aEntity.get<Body>().constructedBodyIt;
+
+    auto collisionPairIt = body.contactList.begin();
+    //Removing collision pairs involving this body
+    while (collisionPairIt != body.contactList.end())
+    {
+        auto collisionPair = *collisionPairIt;
+        if (&body == &collisionPair->bodyA)
+        {
+            collisionPairIt = collisionPair->bodyA.contactList.erase(
+                    collisionPair->iteratorA
+                    );
+            collisionPair->bodyB.contactList.erase(
+                    collisionPair->iteratorB
+                    );
+        }
+        else
+        {
+            collisionPair->bodyA.contactList.erase(
+                    collisionPair->iteratorA
+                    );
+            collisionPairIt = collisionPair->bodyB.contactList.erase(
+                    collisionPair->iteratorB
+                    );
+        }
+
+        collisionPair->toRemove = true;
+    }
 
     for (auto pjcIt : body.pivotJointItList)
     {
@@ -45,6 +73,7 @@ void BodyObserver::removedEntity(aunteater::LiveEntity & aEntity)
     }
 
     mPhysicsSystem->constructedBodies.erase(aEntity.get<Body>().constructedBodyIt);
+    //TODO(franz): Need to delete collisionPair also
 }
 
 PivotObserver::PivotObserver(Physics * aPhysicsSystem) :
@@ -87,14 +116,13 @@ void PivotObserver::addedEntity(aunteater::LiveEntity & aEntity)
     );
 
     aEntity.get<PivotJoint>().constraintIt = pivotJointIt;
-    aEntity.get<PivotJoint>().constructedBodyConstraintItB = itA;
-    aEntity.get<PivotJoint>().constructedBodyConstraintItA = itB;
+    aEntity.get<PivotJoint>().constructedBodyConstraintItB = itB;
+    aEntity.get<PivotJoint>().constructedBodyConstraintItA = itA;
 }
 
 void PivotObserver::removedEntity(aunteater::LiveEntity & aEntity)
 {
     PivotJoint & pivot = aEntity.get<PivotJoint>();
-    mPhysicsSystem->pivotJointConstraints.erase(pivot.constraintIt);
 
     if (aEntity.get<PivotJoint>().bodyA->has<Body>())
     {
@@ -106,7 +134,7 @@ void PivotObserver::removedEntity(aunteater::LiveEntity & aEntity)
         ConstructedBody & bodyB = *aEntity.get<PivotJoint>().bodyB->get<Body>().constructedBodyIt;
         bodyB.pivotJointItList.erase(pivot.constructedBodyConstraintItB);
     }
-
+    mPhysicsSystem->pivotJointConstraints.erase(pivot.constraintIt);
 }
 
 static inline bool getBestQuery(
@@ -359,7 +387,7 @@ static inline void solveContactVelocityConstraint(VelocityConstraint & constrain
         double totalAngularTangentMass = constraint.invMoiA * crossATangentSquared + constraint.invMoiB * crossBTangentSquared;
 
         double lambda = -(1 / (totalMass + totalAngularTangentMass)) * (tangentSpeed);
-        double maxFriction = constraint.friction * cf.normalImpulse;
+        double maxFriction = constraint.noMaxFriction ? std::numeric_limits<double>::max() : constraint.friction * cf.normalImpulse;
         double newImpulseTangent = std::max(std::min(cf.tangentImpulse + lambda, maxFriction), -maxFriction);
         lambda = newImpulseTangent - cf.tangentImpulse;
         cf.tangentImpulse = newImpulseTangent;
@@ -367,16 +395,12 @@ static inline void solveContactVelocityConstraint(VelocityConstraint & constrain
 
         Vec2 impulse = lambda * constraint.tangent;
         double angularImpulseA = lambda * constraint.crossATangent * constraint.invMoiA;
-        double angularImpulseB = -lambda * constraint.crossBTangent * constraint.invMoiB;
+        double angularImpulseB = lambda * constraint.crossBTangent * constraint.invMoiB;
 
-        applyImpulse(
-                impulse * constraint.invMassA,
-                angularImpulseA,
-                -impulse * constraint.invMassB,
-                angularImpulseB,
-                constraint,
-                aTimer.delta()
-                );
+        constraint.velocityA->v += impulse * constraint.invMassA;
+        constraint.velocityA->w += angularImpulseA;
+        constraint.velocityB->v -= impulse * constraint.invMassB;
+        constraint.velocityB->w -= angularImpulseB;
     }
 
     Vec2 speed = constraint.velocityA->v + (AngVecA * constraint.velocityA->w) - constraint.velocityB->v - (AngVecB * constraint.velocityB->w);
@@ -390,16 +414,12 @@ static inline void solveContactVelocityConstraint(VelocityConstraint & constrain
     Vec2 impulse = lambda * constraint.normal;
     double angularImpulseA = lambda * constraint.crossA * constraint.invMoiA;
 
-    double angularImpulseB = -lambda * constraint.crossB * constraint.invMoiB;
+    double angularImpulseB = lambda * constraint.crossB * constraint.invMoiB;
 
-    applyImpulse(
-            impulse * constraint.invMassA,
-            angularImpulseA,
-            -impulse * constraint.invMassB,
-            angularImpulseB,
-            constraint,
-            aTimer.delta()
-            );
+    constraint.velocityA->v += impulse * constraint.invMassA;
+    constraint.velocityA->w += angularImpulseA;
+    constraint.velocityB->v -= impulse * constraint.invMassB;
+    constraint.velocityB->w -= angularImpulseB;
 }
 
 static inline void solvePivotJointVelocityConstraint(PivotJointConstraint & constraint, const aunteater::Timer & aTimer)
@@ -410,14 +430,10 @@ static inline void solvePivotJointVelocityConstraint(PivotJointConstraint & cons
 
     constraint.impulse += impulse;
 
-    applyImpulse(
-            -constraint.invMassA * impulse,
-            -constraint.invMoiA * twoDVectorCross(constraint.rA, impulse),
-            constraint.invMassB * impulse,
-            constraint.invMoiB * twoDVectorCross(constraint.rB, impulse),
-            constraint,
-            aTimer.delta()
-            );
+    constraint.velocityA->v -= impulse * constraint.invMassA;
+    constraint.velocityA->w -= constraint.invMoiA * twoDVectorCross(constraint.rA, impulse);
+    constraint.velocityB->v += impulse * constraint.invMassB;
+    constraint.velocityB->w += constraint.invMoiB * twoDVectorCross(constraint.rB, impulse);
 }
 
 static inline bool solvePivotJointPositionConstraint(PivotJointConstraint & constraint)
@@ -475,14 +491,10 @@ static inline void initializePivotJointConstraint(PivotJointConstraint & constra
         constraint.k.at(1,1) = mA + mB + rA.x() * rA.x() * iA + rB.x() * rB.x() * iB;
 
         //warm start constraint
-        applyImpulse(
-                -constraint.invMassA * constraint.impulse,
-                -constraint.invMoiA * twoDVectorCross(constraint.rA, constraint.impulse),
-                constraint.invMassB * constraint.impulse,
-                constraint.invMoiB * twoDVectorCross(constraint.rB, constraint.impulse),
-                constraint,
-                aTimer.delta()
-                );
+        constraint.velocityA->v -= constraint.impulse * constraint.invMassA;
+        constraint.velocityA->w -= constraint.invMoiA * twoDVectorCross(constraint.rA, constraint.impulse);
+        constraint.velocityB->v += constraint.impulse * constraint.invMassB;
+        constraint.velocityB->w += constraint.invMoiB * twoDVectorCross(constraint.rB, constraint.impulse);
 }
 
 Physics::Physics(aunteater::EntityManager & aEntityManager) :
@@ -528,6 +540,11 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
         {
             auto & bodyB = *bodyBIt;
 
+            if (!bodyA.shouldCollide(bodyB))
+            {
+                continue;
+            }
+
             auto aabbA = bodyA.box->shape.getAABB();
             auto aabbB = bodyB.box->shape.getAABB();
 
@@ -546,7 +563,6 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
                     {210,100,255}
             });
             */
-
             //Basic SAT for AABB
             if (aabbA.x() <= aabbB.x() + aabbB.width() &&
                aabbA.x() + aabbA.width() >= aabbB.x() &&
@@ -566,6 +582,14 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
     while (pairIt != collidingBodies.end())
     {
         auto & collisionPair = *pairIt;
+
+        if (collisionPair.toRemove)
+        {
+            //Destroy pair here
+            pairIt = collidingBodies.erase(pairIt);
+            continue;
+        }
+
         auto & bodyA = collisionPair.bodyA;
         auto & bodyB = collisionPair.bodyB;
         const auto oldManifold = collisionPair.manifold;
@@ -638,8 +662,9 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
                         });
             }
             else if (
-                    bodyRef->collisionType == CollisionType_Moving_Env ||
-                    bodyInc->collisionType == CollisionType_Moving_Env
+                    (bodyRef->collisionType == CollisionType_Moving_Env ||
+                    bodyInc->collisionType == CollisionType_Moving_Env ) &&
+                    !(bodyRef->collisionType == CollisionType_Player || bodyInc->collisionType == CollisionType_Player)
                )
             {
                 for (auto & contact : manifold.contacts)
@@ -668,6 +693,7 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
                         math::Radian<double>(0.),
 
                         sqrt(bodyRef->friction * bodyInc->friction),
+                        bodyRef->noMaxFriction || bodyInc->noMaxFriction,
                         std::max(bodyRef->friction, bodyInc->friction),
                         manifold.normal,
                         tangent,
@@ -712,36 +738,67 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
 
         Vec2 impulseVec = cf.normalImpulse * constraint.normal + cf.tangentImpulse * constraint.tangent;
 
-        applyImpulse(
-                impulseVec * constraint.invMassA,
-                twoDVectorCross(constraint.rA, impulseVec) * constraint.invMoiA,
-                -impulseVec * constraint.invMassB,
-                -twoDVectorCross(constraint.rB, impulseVec) * constraint.invMassB,
-                constraint,
-                aTimer.delta()
-                );
+        constraint.velocityA->v += impulseVec * constraint.invMassA;
+        constraint.velocityA->w += twoDVectorCross(constraint.rA, impulseVec) * constraint.invMoiA;
+        constraint.velocityB->v -= impulseVec * constraint.invMassB;
+        constraint.velocityB->w -= twoDVectorCross(constraint.rB, impulseVec) * constraint.invMassB;
     }
 
-    for (int i = 0; i < maxNormalConstraintIteration; i++)
+    for (int i = 0; i < maxVelocityConstraintIteration; i++)
     {
-        for (VelocityConstraint & constraint : velocityConstraints)
-        {
-            solveContactVelocityConstraint(constraint, aTimer);
-        }
-
         for (PivotJointConstraint & pjConstraint : pivotJointConstraints)
         {
             solvePivotJointVelocityConstraint(pjConstraint, aTimer);
+        }
+
+        for (VelocityConstraint & constraint : velocityConstraints)
+        {
+            constraint.debugRender();
+            solveContactVelocityConstraint(constraint, aTimer);
         }
     }
 
     for (VelocityConstraint & constraint : velocityConstraints)
     {
+        constexpr double maxRotation = 0.5 * math::pi<double>;
+        Vec2 v = constraint.velocityA->v;
+        Vec2 translation = v * aTimer.delta();
+        double w = constraint.velocityA->w;
+        double rotation = constraint.velocityA->w * aTimer.delta();
+        if (translation.dot(translation) > 4.)
+        {
+            v *= 2. / translation.getNorm();
+        }
+        if (rotation * rotation > maxRotation * maxRotation)
+        {
+            w *= maxRotation / std::abs(rotation);
+        }
+
+        constraint.bodyPosA->p += v * aTimer.delta();
+        constraint.bodyPosA->c += v * aTimer.delta();
+        constraint.bodyPosA->a += math::Radian<double>{w * aTimer.delta()};
+
+        v = constraint.velocityB->v;
+        translation = v * aTimer.delta();
+        w = constraint.velocityB->w;
+        rotation = constraint.velocityB->w * aTimer.delta();
+        if (translation.dot(translation) > 4.)
+        {
+            v *= 2. / translation.getNorm();
+        }
+        if (rotation * rotation > maxRotation * maxRotation)
+        {
+            w *= maxRotation / std::abs(rotation);
+        }
+        constraint.bodyPosB->p += v * aTimer.delta();
+        constraint.bodyPosB->c += v * aTimer.delta();
+        constraint.bodyPosB->a += math::Radian<double>{w * aTimer.delta()};
+
         constraint.angleBaseA = constraint.bodyPosA->a;
         constraint.angleBaseB = constraint.bodyPosB->a;
     }
 
-    for (int i = 0; i < maxNormalConstraintIteration; i++)
+    for (int i = 0; i < maxPositionConstraintIteration; i++)
     {
         bool jointOkay = true;
         for (PivotJointConstraint & constraint : pivotJointConstraints)
@@ -776,7 +833,7 @@ void Physics::update(const aunteater::Timer aTimer, const GameInputState & aInpu
             constraint.bodyPosB->p += constraint.invMassB * impulse;
             constraint.bodyPosB->a += math::Radian<double>{constraint.invMoiB * twoDVectorCross(rB, impulse)};
 
-            jointOkay = jointOkay && separation >= -3. * physic::linearSlop;
+            jointOkay = jointOkay && separation >= -4. * physic::linearSlop;
         }
 
         if (jointOkay)

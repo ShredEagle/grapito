@@ -31,6 +31,7 @@ enum BodyType
 {
     BodyType_Static,
     BodyType_Dynamic,
+    BodyType_Kinematic,
 };
 
 //This is the structure that stores the identification of a
@@ -69,8 +70,8 @@ struct ContactManifold
     };
 
     ReferenceFace face;
-    int referenceEdgeIndex;
-    int incidentEdgeIndex;
+    int referenceEdgeIndex = 0;
+    int incidentEdgeIndex = 0;
     Vec2 localPoint = Vec2::Zero();
 
     Vec2 normal = Vec2::Zero();
@@ -129,26 +130,33 @@ class ConstructedBody
 
     void updateEntity();
 
+    void forceUpdateData(Body * body);
+
+    bool shouldCollide(ConstructedBody & body);
+
     double mass;
     double invMass;
     double moi;
     double invMoi;
+
     double friction;
+    bool noMaxFriction;
 
     //non owning pointer to Physics system vector
     Velocity * velocity;
     BodyPosition * bodyPos;
     CollisionBox * box;
 
-    double radius;
 
     //non owning pointer to Physics system vector
-    std::list<CollisionPair *>  contactList;
+    std::list<CollisionPair>::iterator collisionPairIt;
+    std::list<CollisionPair *> contactList;
     std::list<std::list<PivotJointConstraint>::iterator> pivotJointItList;
 
     BodyType bodyType;
     ShapeType shapeType;
     CollisionType collisionType;
+    std::vector<CollisionType> acceptedCollision;
 
     Body & bodyRef;
     Position & posRef;
@@ -169,6 +177,7 @@ struct CollisionPair
     std::list<CollisionPair *>::iterator iteratorB;
 
     ContactManifold manifold;
+    bool toRemove;
 
     void debugRender();
 };
@@ -198,6 +207,7 @@ struct VelocityConstraint
     math::Radian<double> angleBaseB;
 
     double friction;
+    bool noMaxFriction;
     double restitution;
     Vec2 normal; 
     Vec2 tangent;

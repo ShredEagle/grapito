@@ -2,7 +2,6 @@
 #include "Configuration.h"
 #include "Entities.h"
 
-#include "Systems/Physics.h"
 #include "TestScenes/SceneChanger.h"
 
 #include <Components/AccelAndSpeed.h>
@@ -24,6 +23,8 @@
 #include <Systems/LevelGeneration.h>
 #include <Systems/PendulumSimulation.h>
 #include <Systems/Render.h>
+#include "Systems/Physics.h"
+#include "Systems/RopeCreation.h"
 
 #include <aunteater/Entity.h>
 #include <aunteater/UpdateTiming.h>
@@ -40,6 +41,7 @@ Game_pendulum::Game_pendulum(Application & aApplication, DebugUI & aUI) :
     mSystemManager.add<LevelGeneration>();
     mSystemManager.add<Control>();
     mSystemManager.add<Gravity>();
+    mSystemManager.add<RopeCreation>();
     mSystemManager.add<PendulumSimulation>();
     mSystemManager.add<ControlAnchorSight>(); // it will position the sight, which might follow something impacted by speed resolution
     mSystemManager.add<CameraGuidedControl>();

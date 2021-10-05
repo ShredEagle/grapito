@@ -22,17 +22,26 @@ struct Body : public aunteater::Component<Body>
         CollisionType aCollisionType,
         float aMass = 1.,
         double aTheta = 0.,
-        double aFriction = 0.
+        double aFriction = 0.,
+        bool noMaxFriction = false,
+        std::vector<CollisionType> aAcceptedCollision = {}
     ) :
         shape{aBox},
         bodyType{aBodyType},
         shapeType{aShapeType},
         collisionType{aCollisionType},
         friction{aFriction},
-        moi{0.}
+        noMaxFriction{noMaxFriction},
+        moi{0.},
+        theta{math::Radian<double>{aTheta}},
+        mass{aMass},
+        acceptedCollision{aAcceptedCollision}
     {
-        radius = std::max(aBox.height(), aBox.width());
+        updateData();
+    }
 
+    void updateData()
+    {
         double area = 0.;
 
         Vec2 vecMassCenter = Vec2::Zero();
@@ -55,25 +64,33 @@ struct Body : public aunteater::Component<Body>
         }
 
         massCenter = static_cast<Position2>(vecMassCenter);
-        theta = math::Radian<double>{aTheta};
 
-        if (bodyType != BodyType_Dynamic)
+        if (bodyType == BodyType_Static)
         {
             mass = 0.;
             invMass = 0.;
             moi = 0.;
             invMoi = 0.;
         }
+        else if (bodyType == BodyType_Kinematic)
+        {
+            //Kinematic object are affected by gravity but not physic collision
+            invMass = 0.;
+            invMoi = 0.;
+        }
         else
         {
-            mass = aMass;
-            double density = aMass / area;
+            double density = mass / area;
             moi *= density;
-            moi -= aMass * vecMassCenter.dot(vecMassCenter);
-            invMass = 1 / aMass;
+            moi -= mass * vecMassCenter.dot(vecMassCenter);
+            invMass = 1 / mass;
             invMoi = 1 / moi;
         }
+    }
 
+    void updateConstructedBody()
+    {
+        (*constructedBodyIt).forceUpdateData(this);
     }
 
     void debugRender(Position2 pos)
@@ -102,11 +119,12 @@ struct Body : public aunteater::Component<Body>
     double invMass;
     double moi;
     double invMoi;
-    double friction;
-    double restitution;
     Position2 massCenter = {0., 0.};
 
-    double radius;
+    double friction;
+    double restitution;
+    bool noMaxFriction;
+
     math::Radian<double> theta;
 
     Shape shape;
@@ -114,6 +132,7 @@ struct Body : public aunteater::Component<Body>
     BodyType bodyType;
     ShapeType shapeType;
     CollisionType collisionType;
+    std::vector<CollisionType> acceptedCollision;
 
     std::list<ConstructedBody>::iterator constructedBodyIt;
 };

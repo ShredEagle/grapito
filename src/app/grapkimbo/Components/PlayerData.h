@@ -17,6 +17,12 @@ enum PlayerCollisionState
     PlayerCollisionState_OffGrapple,
 };
 
+typedef int ControlStateFlags;
+typedef int ControlStateFlag;
+
+constexpr ControlStateFlag ControlState_Throwing = 0b1;
+constexpr ControlStateFlag ControlState_Attached = 0b10;
+
 constexpr Vec2 PlayerGroundedNormal = {0., 1.};
 constexpr Vec2 PlayerWalledNormal = {1., 0.};
 constexpr double PlayerGroundedSlopeDotValue = 0.6;
@@ -35,7 +41,10 @@ struct PlayerData : public aunteater::Component<PlayerData>
 
     int id;
     Color color;
-    PlayerCollisionState state;
+    PlayerCollisionState state = PlayerCollisionState_Jumping;
+    ControlStateFlags controlState = 0;
+    aunteater::weak_entity grapple;
+    aunteater::weak_entity grappleAttachment;
 };
 
 

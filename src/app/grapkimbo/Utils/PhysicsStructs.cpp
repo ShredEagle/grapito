@@ -17,15 +17,24 @@ ConstructedBody::ConstructedBody(Body & aBody, Position & aPos, AccelAndSpeed & 
     moi{aBody.moi},
     invMoi{aBody.invMoi},
     friction{aBody.friction},
-    radius{aBody.radius},
+    noMaxFriction{aBody.noMaxFriction},
     bodyType{aBody.bodyType},
     shapeType{aBody.shapeType},
     collisionType{aBody.collisionType},
     bodyRef{aBody},
     posRef{aPos},
     aasRef{aAas},
-    entity{aEntity}
+    entity{aEntity},
+    acceptedCollision{aBody.acceptedCollision}
 {
+}
+
+void ConstructedBody::forceUpdateData(Body * body)
+{
+    mass = body->mass;
+    invMass = body->invMass;
+    moi = body->moi;
+    invMoi = body->invMoi;
 }
 
 void ConstructedBody::synchronize(
@@ -46,6 +55,14 @@ void ConstructedBody::updateEntity()
     aasRef.speed = velocity->v;
     aasRef.w = velocity->w;
     posRef.position = bodyPos->p;
+}
+
+bool ConstructedBody::shouldCollide(ConstructedBody & body)
+{
+    bool result = true;
+    result = result && std::find(body.acceptedCollision.begin(), body.acceptedCollision.end(), collisionType) != body.acceptedCollision.end() || body.acceptedCollision.size() == 0;
+    result = result && std::find(acceptedCollision.begin(), acceptedCollision.end(), body.collisionType) != acceptedCollision.end() || acceptedCollision.size() == 0;
+    return result;
 }
 
 void ConstructedBody::debugRender()
@@ -119,8 +136,18 @@ std::ostream &operator<<(std::ostream & os, const VelocityConstraint & vc)
     os << "        nI : " << vc.cf.normalImpulse << "\n";
     os << "        tI : " << vc.cf.tangentImpulse << "\n";
     os << "    }\n";
-    os << "    x : " << vc.normal.x() << "\n";
-    os << "    y : " << vc.normal.y() << "\n";
+    os << "    normal : {\n";
+    os << "        x : " << vc.normal.x() << "\n";
+    os << "        y : " << vc.normal.y() << "\n";
+    os << "    }\n";
+    os << "    position A : {\n";
+    os << "        x : " << vc.bodyPosA->p.x() << "\n";
+    os << "        y : " << vc.bodyPosA->p.y() << "\n";
+    os << "    }\n";
+    os << "    position B : {\n";
+    os << "        x : " << vc.bodyPosB->p.x() << "\n";
+    os << "        y : " << vc.bodyPosB->p.y() << "\n";
+    os << "    }\n";
     os << "    vA : " << vc.velocityA->v << "\n";
     os << "    vB : " << vc.velocityB->v << "\n";
     os << "    wA : " << vc.velocityA->w << "\n";

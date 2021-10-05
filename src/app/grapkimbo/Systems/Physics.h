@@ -84,48 +84,8 @@ static inline ContactManifold QueryFacePenetration(
     return resultManifold;
 };
 
-static inline void applyImpulse(
-        Vec2 impVecA,
-        double angularImpulseA,
-        Vec2 impVecB,
-        double angularImpulseB,
-        PivotJointConstraint & constraint,
-        double delta
-        )
-{
-    constraint.bodyPosA->p += impVecA * delta;
-    constraint.bodyPosA->a += math::Radian<double>{angularImpulseA * delta};
-    constraint.velocityA->v += impVecA;
-    constraint.velocityA->w += angularImpulseA;
-
-    constraint.bodyPosB->p += impVecB * delta;
-    constraint.bodyPosB->a += math::Radian<double>{angularImpulseB * delta};
-    constraint.velocityB->v += impVecB;
-    constraint.velocityB->w += angularImpulseB;
-}
-
-static inline void applyImpulse(
-        Vec2 impVecA,
-        double angularImpulseA,
-        Vec2 impVecB,
-        double angularImpulseB,
-        VelocityConstraint & constraint,
-        double delta
-        )
-{
-    constraint.bodyPosA->p += impVecA * delta;
-    constraint.bodyPosA->a += math::Radian<double>{angularImpulseA * delta};
-    constraint.velocityA->v += impVecA;
-    constraint.velocityA->w += angularImpulseA;
-
-    constraint.bodyPosB->p += impVecB * delta;
-    constraint.bodyPosB->a += math::Radian<double>{angularImpulseB * delta};
-    constraint.velocityB->v += impVecB;
-    constraint.velocityB->w += angularImpulseB;
-}
-
-
-static constexpr int maxNormalConstraintIteration = 8;
+static constexpr int maxVelocityConstraintIteration = 16;
+static constexpr int maxPositionConstraintIteration = 16;
 static std::array<
     std::array<
         std::function<ContactManifold(

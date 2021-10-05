@@ -62,67 +62,37 @@ void Control::update(const aunteater::Timer aTimer, const GameInputState & aInpu
     //
     for(auto & entity : mPolarControllables)
     {
-        auto & [controllable, geometry, pendular, weight] = entity;
-        pendular.angularAccelerationControl = math::Radian<double>{0.};
-
+        auto & [controllable, playerData] = entity;
         const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
 
-        float horizontalAxis = aInputState.asAxis(controllable.controller, Left, Right, LeftHorizontalAxis);
-        pendular.angularAccelerationControl = 
-            math::Radian<double>{horizontalAxis * Gravity::gAcceleration / pendular.length 
-                                 * gPendularControlAccelerationFactor};
-
-        if (inputs[Jump])
+        if (inputs[Jump].positiveEdge() && playerData.controlState & ControlState_Attached)
         {
-            retractGrapple(
-                entity
-            );
+            detachPlayerFromGrapple(entity);
+            playerData.controlState &= ~ControlState_Attached;
         }
     }
 
     //
     // Grapple candidates
     //
-    for(const auto & entity : mGrapplers)
+    for(auto & entity : mGrapplers)
     {
-        auto & [controllable, aas, grappleControl, geometry] = entity;
+        auto & [controllable, aas, grappleControl, geometry, playerData] = entity;
         const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
 
 
-        switch (grappleControl.mode)
+        if (inputs[Grapple].positiveEdge() && !(playerData.controlState & ControlState_Attached))
         {
-        case GrappleMode::Closest:
-            if (inputs[Grapple])
-            {
-                auto filter = [&](const AnchorWrap & anchor, Position2 aCandidate, Position2 aBasePosition, double aNormSquared)
-                {
-                    math::Vec<2, double> vec = aCandidate - aBasePosition;
-                    return anchor->get<Body>().bodyType == BodyType_Static
-                           // The candidate must be better than the previously selected candidate (i.e. closer to basePosition)
-                           && vec.getNormSquared() < aNormSquared;
-                };
-                Position2 grappleOrigin = geometry.center();
-                auto closest = getClosest(mAnchorables,
-                                          grappleOrigin,
-                                          [grappleOrigin](math::Rectangle<double> aRectangle)
-                                          {
-                                               return aRectangle.closestPoint(grappleOrigin);
-                                          },
-                                          filter);
-
-                connectGrapple(entity, 
-                               makePendular(grappleOrigin,
-                                            closest->testedPosition,
-                                            closest->entity,
-                                            aas.speed,
-                                            closest->distance));
-            }
-            break;
-
-        case GrappleMode::AnchorSight:
-            // Handled by ControlAnchorSight system
-            break;
+            throwGrapple(entity, mEntityManager);
+            playerData.controlState |= ControlState_Throwing;
         }
+        if (inputs[Grapple].negativeEdge() && playerData.controlState & ControlState_Throwing)
+        {
+            attachPlayerToGrapple(entity, mEntityManager);
+            playerData.controlState &= ~ControlState_Throwing;
+            playerData.controlState |= ControlState_Attached;
+        }
+
     }
 
     //
