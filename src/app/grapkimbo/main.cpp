@@ -16,7 +16,6 @@
 
 using namespace ad::grapito;
 
-
 int main(int argc, const char * argv[])
 {
     try

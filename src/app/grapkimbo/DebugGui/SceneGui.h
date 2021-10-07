@@ -2,6 +2,7 @@
 
 #include "../TestScenes/SceneChanger.h"
 #include "../Utils/DrawDebugStuff.h"
+#include "../Configuration.h"
 
 #include <graphics/ApplicationGlfw.h>
 
@@ -12,6 +13,14 @@
 #include <cstdio>
 
 namespace ad {
+extern float player::gAcceleration;
+extern float player::gPlayerWalkingSpeed;
+extern float player::gWalkingSpeedAccelFactor;
+extern float player::gPlayerGroundFriction;
+extern float player::gPlayerJumpImpulse;
+extern float player::gAirControlAcceleration;
+extern float player::gAirSpeedAccelFactor;
+extern float player::gAirFriction;
 namespace grapito {
 
 using namespace ImGui;
@@ -31,6 +40,7 @@ static void setupImGui(graphics::ApplicationGlfw & aApplication)
 }
 
 static bool showDebugWindow = false;
+static bool showTuningWindow = true;
 
 struct ImguiState
 {
@@ -126,6 +136,22 @@ static void drawImGui(graphics::ApplicationGlfw & aApplication, DebugUI & aUI, I
             ChangeScene(GameList::SetPositionTest, aApplication, aUI);
         }
         End();
+    }
+
+    if (showTuningWindow)
+    {
+        ImGui::SetNextWindowPos(ImVec2(main_viewport->WorkPos.x + 20, main_viewport->WorkPos.y + 120), ImGuiCond_Once);
+        Begin("Player physic tuning", &showTuningWindow, ImGuiWindowFlags_AlwaysAutoResize);
+        SliderFloat("Player max speed", &player::gPlayerWalkingSpeed, 20., 45.);
+        SliderFloat("Player accel factor", &player::gWalkingSpeedAccelFactor, 0.05, .5);
+        SliderFloat("Player impulse strength", &player::gPlayerJumpImpulse, 20., 35.);
+        SliderFloat("Player ground friction", &player::gPlayerGroundFriction, 0.10, 0.5);
+        SliderFloat("Player air speed", &player::gAirControlAcceleration, 30., 60.);
+        SliderFloat("Player air accel factor", &player::gAirSpeedAccelFactor, 0.05, 0.5);
+        SliderFloat("Player air friction", &player::gAirFriction, .10, .5);
+        SliderFloat("Gravity", &player::gAcceleration, 45., 70.);
+        End();
+
     }
 }
 

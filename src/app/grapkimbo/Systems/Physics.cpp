@@ -16,8 +16,10 @@
 #include <math/Matrix.h>
 
 #include <iostream>
+#include <ostream>
 
 namespace ad {
+extern float player::gPlayerGroundFriction;
 namespace grapito
 {
 
@@ -408,9 +410,9 @@ static std::vector<Position2> createTransformedCollisionBox(Body & aBody, Positi
     for (auto vertex : aBody.shape.vertices)
     {
         auto transformedPos = transformPosition(
-                static_cast<Position2>(vertex.as<math::Vec>() + aPos.position.as<math::Vec>()),
+                vertex + aPos.position.as<math::Vec>(),
                 aBody.theta,
-                static_cast<Position2>(aBody.massCenter.as<math::Vec>() + aPos.position.as<math::Vec>())
+                aBody.massCenter + aPos.position.as<math::Vec>()
                 );
         transformedVertices.emplace_back(transformedPos);
     }
@@ -909,7 +911,7 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
         if (-constraint.normal.dot(PlayerGroundedNormal) > PlayerGroundedSlopeDotValue)
         {
             //Set player as grounded
-            constraint.cPlayer->velocity->v *= player::gPlayerGroundFriction;
+            constraint.cPlayer->velocity->v *= (1 - player::gPlayerGroundFriction);
             constraint.cPlayer->entity->get<PlayerData>().state = PlayerCollisionState_Grounded;
         }
         else if (constraint.normal.dot(PlayerWalledNormal) > PlayerWallSlopeDotValue || constraint.normal.dot(PlayerWalledNormal) < -PlayerWallSlopeDotValue)

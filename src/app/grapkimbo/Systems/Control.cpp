@@ -1,5 +1,6 @@
 #include "Control.h"
 
+#include "Configuration.h"
 #include "Gravity.h"
 
 #include "../Entities.h"
@@ -41,12 +42,12 @@ void Control::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
                 aas.speed += horizontalAxisSign * (1.f / (1.f - player::gPlayerGroundFriction)) * player::gPlayerWalkingSpeed * player::gWalkingSpeedAccelFactor * Vec2{1.f, 0.f};
             }
 
-            if (inputs[Jump])
+            if (inputs[Jump].positiveEdge())
             {
                 aas.speed += Vec2{0.f, + player::gPlayerJumpImpulse};
             }
         }
-        else
+        else if (playerData.state == PlayerCollisionState_Jumping)
         {
             if (std::abs(aas.speed.x()) < player::gPlayerWalkingSpeed && std::abs(horizontalAxis) > 0.)
             {
