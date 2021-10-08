@@ -1,7 +1,8 @@
 #include "Render.h"
 
-#include "Utils/DrawDebugStuff.h"
-#include "Configuration.h"
+#include "../Configuration.h"
+#include "../Utils/DrawDebugStuff.h"
+#include "../Utils/RopeUtilities.h"
 
 #include <engine/CameraUtilities.h>
 
@@ -19,13 +20,15 @@ Render::Render(aunteater::EntityManager & aEntityManager, Application & aApplica
     mBodyRectangles{mEntityManager},
     mOutlines{mEntityManager},
     mPendulums{mEntityManager},
+    mRopes{mEntityManager},
     mCameras{mEntityManager},
     mEngine(aApplication.getEngine()),
 #ifdef KIMBO_DEBUG
     mColliders{mEntityManager},
 #endif
     mTrivialShaping{aApplication.getEngine()->getWindowSize()},
-    mTrivialLineStrip{aApplication.getEngine()->getWindowSize()}
+    mTrivialLineStrip{aApplication.getEngine()->getWindowSize()},
+    mCurving{render::gBezierSubdivisions}
 {}
 
 void Render::update(const aunteater::Timer aTimer, const GameInputState &)
@@ -76,6 +79,11 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
         });
     }
 
+    Spline beziers;
+    for (const auto [ropeCreator, _position, _body] : mRopes)
+    {
+        appendRopeSpline(ropeCreator, std::back_inserter(beziers));
+    }
 
     for(const auto & [cameraTag, geometry] : mCameras)
     {
@@ -85,12 +93,14 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
         }.centered();
         setViewedRectangle(mTrivialShaping, viewed);
         setViewedRectangle(mTrivialLineStrip, viewed);
+        setViewedRectangle(mCurving, viewed);
         setViewedRectangle(debugDrawer->mTrivialShaping, viewed);
         setViewedRectangle(debugDrawer->mTrivialLineStrip, viewed);
     }
 
     mTrivialLineStrip.render();
     mTrivialShaping.render();
+    mCurving.render(beziers);
     debugDrawer->render();
 }
 

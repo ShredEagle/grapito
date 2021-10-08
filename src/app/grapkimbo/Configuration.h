@@ -35,6 +35,7 @@ namespace player
 namespace render
 {
     constexpr float gViewedHeight = 50.f;
+    constexpr GLsizei gBezierSubdivisions = 30;
 } // namespace render
 
 
@@ -53,8 +54,9 @@ namespace physic
 
 namespace rope
 {
-    constexpr double ropeWidth = .2;
-    constexpr double ropeHalfwidth = ropeWidth / 2 ;
+    constexpr GLfloat ropeWidth = .2f;
+    constexpr GLfloat ropeHalfwidth = ropeWidth / 2 ;
+    constexpr GLfloat curveTension = 0.f; // I.e. Catmull Rom
 }
 
 

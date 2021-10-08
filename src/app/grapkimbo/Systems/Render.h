@@ -1,6 +1,9 @@
 #pragma once
 
+#include "CameraGuidedControl.h" // for Camera archetype
 #include "PendulumSimulation.h" // for pendulum archetype
+#include "RopeCreation.h" // for RopeCreator archetype
+
 
 #include <Components/CameraTag.h>
 #include <Components/Position.h>
@@ -8,16 +11,16 @@
 #include <Components/VisualRectangle.h>
 #include <Components/Body.h>
 
-#include <Systems/CameraGuidedControl.h>
-
 #include <aunteater/Archetype.h>
 #include <aunteater/FamilyHelp.h>
 #include <aunteater/System.h>
 
+#include <engine/Application.h>
+#include <engine/Curving.h>
+#include <engine/DrawLine.h>
 #include <engine/TrivialLineStrip.h>
 #include <engine/TrivialShaping.h>
-#include <engine/DrawLine.h>
-#include <engine/Application.h>
+
 
 namespace ad {
 namespace grapito
@@ -45,10 +48,13 @@ private:
     const aunteater::FamilyHelp<RenderedBodyRectangle> mBodyRectangles;
     const aunteater::FamilyHelp<RenderedOutline> mOutlines;
     const aunteater::FamilyHelp<Pendulum> mPendulums;
+    const aunteater::FamilyHelp<RopeCreatorType> mRopes;
     const aunteater::FamilyHelp<Camera> mCameras;
+
     std::shared_ptr<Engine> mEngine;
     TrivialShaping mTrivialShaping;
     TrivialLineStrip mTrivialLineStrip;
+    Curving mCurving;
 #ifdef KIMBO_DEBUG
     const aunteater::FamilyHelp<Collider> mColliders;
 #endif
