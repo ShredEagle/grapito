@@ -2,7 +2,9 @@
 
 #include "../commons.h"
 #include "../configuration.h"
+#include "../Entities.h"
 
+#include "../Components/Body.h"
 #include "../Components/Position.h"
 
 #include <math/Curves/CardinalCubic.h>
@@ -12,31 +14,47 @@ namespace ad {
 namespace grapito {
 
 
-math::Position<3, GLfloat> getSegmentKnotPosition(aunteater::weak_entity aSegment)
+math::Position<3, GLfloat> getSegmentKnotPosition(aunteater::weak_entity aSegment,
+                                                  Position2 aOffsetLocal)
 {
     return {
-        static_cast<math::Position<2, GLfloat>>(aSegment->get<Position>().position + Vec2{0., rope::ropeHalfwidth}),
-        0.f
-    };
+        static_cast<math::Position<2, GLfloat>>(
+            getLocalPointInWorld(aSegment->get<Body>(),
+                                 aSegment->get<Position>(),
+                                 aOffsetLocal)),
+        0.f};
 }
 
 
-void appendRopeSpline(const RopeCreator & aRope, std::back_insert_iterator<Spline> aOutputIterator)
+math::Position<3, GLfloat> getSegmentKnotPositionFront(aunteater::weak_entity aSegment)
+{
+    return getSegmentKnotPosition(aSegment, {0., rope::ropeHalfwidth});
+}
+
+
+void appendRopeSpline(const RopeCreator & aRope,
+                      std::back_insert_iterator<Spline> aOutputIterator)
 {
     // TODO could be lazily evaluated instead of assigning a vector of Position2
     // Reserve the initial point extension.
     std::vector<math::Position<3,GLfloat>> knots{math::Position<3,GLfloat>::Zero()};
     std::transform(
         aRope.mRopeSegments.begin(), aRope.mRopeSegments.end(), std::back_inserter(knots),
-        &getSegmentKnotPosition);
+        &getSegmentKnotPositionFront);
 
     // A cardinal cubic spline draws the curve between all points except first and last
-    // Extend it
-    // Note: there is an initial small rope segment, we rely on it to be enough not to extend
-    // on the tail side.
+    // The beginning of the curve is on the grapple side (opposite of player)
     if (aRope.mRopeSegments.size() > 1)
     {
+        // project the second point back accross the first
         knots.front() = knots.at(1) + (knots.at(1) - knots.at(2));
+        auto previousKnot = knots.back();
+        // Add a point representing the end of the last segment (cannot use player, if rope is detached)
+        knots.push_back(getSegmentKnotPosition(
+            aRope.mRopeSegments.back(), 
+            {aRope.mRopeSegments.back()->get<Position>().dimension.width(), rope::ropeHalfwidth}));
+        // project the second to last point across the list point
+        knots.push_back(knots.back() + (knots.back() - previousKnot));
     }
 
     Spline result;

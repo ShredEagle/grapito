@@ -91,6 +91,10 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
         setViewedRectangle(mTrivialShaping, viewed);
         setViewedRectangle(mTrivialLineStrip, viewed);
         setViewedRectangle(mCurving, viewed);
+        setOrthographicView(mCurving,
+                            // TODO FPASS
+                            {static_cast<math::Position<2, GLfloat>>(geometry.position), 0.f},
+                            getViewVolume(mEngine->getWindowSize(), render::gViewedHeight, 1.f, 2.f));
         setViewedRectangle(debugDrawer->mTrivialShaping, viewed);
         setViewedRectangle(debugDrawer->mTrivialLineStrip, viewed);
     }
