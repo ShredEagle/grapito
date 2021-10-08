@@ -30,10 +30,9 @@ void RopeCreation::addedEntity(aunteater::LiveEntity & aEntity)
     Position & pos = aEntity.get<Position>();
     aunteater::weak_entity player = ropeCreator.mTargetEntity;
 
-    Position2 end = static_cast<Position2>(player->get<Position>().position.as<math::Vec>() + player->get<Body>().massCenter.as<math::Vec>());
-    Position2 origin = static_cast<Position2>(pos.position.as<math::Vec>() + body.massCenter.as<math::Vec>());
+    Position2 end = player->get<Position>().position + player->get<Body>().massCenter.as<math::Vec>();
+    Position2 origin = pos.position + body.massCenter.as<math::Vec>();
 
-    double length = (end - origin).getNorm();
     aunteater::weak_entity link = mEntityManager.addEntity(createRopeSegment(
         origin,
         end
