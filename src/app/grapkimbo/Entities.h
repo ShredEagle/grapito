@@ -78,9 +78,8 @@ aunteater::weak_entity setGrappleMode(aunteater::weak_entity aEntity,
 
 inline void setLocalPointToWorldPos(Body & body, Position & pos, Position2 localPos, Position2 worldPos)
 {
-    Position2 massCenterWorldPos = static_cast<Position2>(pos.position.as<math::Vec>() + body.massCenter.as<math::Vec>());
-    Vec2 relativeLocalPointVector = transformPosition(localPos, body.theta, body.massCenter) - body.massCenter;
-    Vec2 posVectorDifference = worldPos - (massCenterWorldPos + relativeLocalPointVector);
+    Position2 relativeLocalPoint= transformPosition(localPos, body.theta, body.massCenter);
+    Vec2 posVectorDifference = worldPos - (pos.position + relativeLocalPoint.as<math::Vec>());
 
     pos.position += posVectorDifference;
 }
