@@ -41,11 +41,8 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
     for (auto & [geometry, body, visualRectangle] : mBodyRectangles)
     {
         visualRectangle.transform = static_cast<math::Matrix<3, 3, float>>(
-                createPrefixedTransform(
-                    body.theta,
-                    static_cast<Position2>(geometry.position.as<math::Vec>() + body.massCenter.as<math::Vec>())
-                    )
-                );
+            math::trans2d::rotateAbout(body.theta, geometry.position + body.massCenter.as<math::Vec>())
+        );
     }
 
     for(const auto [geometry, visualRectangle] : mRectangles)
