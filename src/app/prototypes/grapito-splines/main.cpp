@@ -1,6 +1,6 @@
 #include "Scene.h"
 
-#include <engine/Application.h>
+#include <graphics/Application.h>
 
 #include <math/Color.h>
 

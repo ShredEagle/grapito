@@ -1,9 +1,9 @@
 #pragma once
 
 
-#include <engine/CameraUtilities.h>
-#include <engine/Curving.h>
-#include <engine/TrivialLineStrip.h>
+#include <graphics/CameraUtilities.h>
+#include <graphics/Curving.h>
+#include <graphics/TrivialLineStrip.h>
 
 #include <math/Transformations.h>
 #include <math/Curves/Bezier.h>

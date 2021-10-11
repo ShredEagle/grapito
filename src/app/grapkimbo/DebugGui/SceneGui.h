@@ -3,7 +3,7 @@
 #include "../TestScenes/SceneChanger.h"
 #include "../Utils/DrawDebugStuff.h"
 
-#include <engine/Application.h>
+#include <graphics/Application.h>
 
 #include <imgui.h>
 #include <imgui_impl_glfw.h>

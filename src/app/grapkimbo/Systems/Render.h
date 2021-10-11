@@ -15,11 +15,11 @@
 #include <aunteater/FamilyHelp.h>
 #include <aunteater/System.h>
 
-#include <engine/Application.h>
-#include <engine/Curving.h>
-#include <engine/DrawLine.h>
-#include <engine/TrivialLineStrip.h>
-#include <engine/TrivialShaping.h>
+#include <graphics/Application.h>
+#include <graphics/Curving.h>
+#include <graphics/DrawLine.h>
+#include <graphics/TrivialLineStrip.h>
+#include <graphics/TrivialShaping.h>
 
 
 namespace ad {

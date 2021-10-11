@@ -8,7 +8,9 @@
 #include "TestScenes/SimpleCollisionTest.h"
 #include "TestScenes/SetPositionTest.h"
 #include "aunteater/EntityManager.h"
-#include "engine/Application.h"
+
+#include <graphics/Application.h>
+
 namespace ad {
 namespace grapito {
 

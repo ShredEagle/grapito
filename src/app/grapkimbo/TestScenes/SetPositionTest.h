@@ -10,7 +10,7 @@
 #include <aunteater/Timer.h>
 #include <aunteater/SystemManager.h>
 
-#include <engine/Application.h>
+#include <graphics/Application.h>
 
 namespace ad {
 namespace grapito {

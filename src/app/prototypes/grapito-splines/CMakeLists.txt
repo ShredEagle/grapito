@@ -13,7 +13,7 @@ source_group(TREE ${CMAKE_CURRENT_LIST_DIR}
 )
 
 
-find_package(Graphics CONFIG REQUIRED COMPONENTS engine)
+find_package(Graphics CONFIG REQUIRED COMPONENTS graphics)
 find_package(Math CONFIG REQUIRED COMPONENTS math)
 
 find_package(glad REQUIRED)
@@ -30,7 +30,7 @@ target_include_directories(${TARGET_NAME}
 
 target_link_libraries(${TARGET_NAME}
     PRIVATE
-        ad::engine
+        ad::graphics
         ad::math
 
         glad::glad

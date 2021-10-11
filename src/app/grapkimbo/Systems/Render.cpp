@@ -4,7 +4,7 @@
 #include "../Utils/DrawDebugStuff.h"
 #include "../Utils/RopeUtilities.h"
 
-#include <engine/CameraUtilities.h>
+#include <graphics/CameraUtilities.h>
 
 #include <math/Transformations.h>
 #include <math/VectorUtilities.h>

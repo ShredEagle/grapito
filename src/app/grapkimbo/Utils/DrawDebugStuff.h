@@ -1,12 +1,14 @@
 #pragma once
 
 #include "commons.h"
-#include "engine/Application.h"
-#include "engine/TrivialLineStrip.h"
-#include "engine/commons.h"
-#include "math/Angle.h"
-#include "math/Matrix.h"
-#include <engine/TrivialShaping.h>
+
+#include <graphics/Application.h>
+#include <graphics/commons.h>
+#include <graphics/TrivialLineStrip.h>
+#include <graphics/TrivialShaping.h>
+
+#include <math/Angle.h>
+#include <math/Matrix.h>
 
 #include <vector>
 

@@ -3,7 +3,7 @@
 
 #include "../Components/RopeCreator.h"
 
-#include <engine/Curving.h>
+#include <graphics/Curving.h>
 
 #include <math/Curves/Bezier.h>
 
