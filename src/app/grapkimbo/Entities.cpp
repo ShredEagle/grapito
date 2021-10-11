@@ -206,7 +206,7 @@ aunteater::Entity createRopeSegment(Position2 origin, Position2 end)
                 false,
                 std::vector<CollisionType>{CollisionType_Static_Env}
                 )
-            .add<VisualRectangle>(math::sdr::gGreen)
+            .add<VisualRectangle>(math::sdr::gGreen, VisualRectangle::Scope::RopeStructure)
             .add<AccelAndSpeed>();
 
     setLocalPointToWorldPos(rope, {0., rope::ropeHalfwidth}, origin);
@@ -235,8 +235,11 @@ void throwGrapple(aunteater::weak_entity aEntity, aunteater::EntityManager & aEn
                 )
             .add<VisualRectangle>(math::sdr::gYellow)
             .add<AccelAndSpeed>(Vec2{40., 40.}, 0.)
-            .add<RopeCreator>(aEntity)
             );
+
+    // IMPORTANT: bugfix by adding RopeCreator only after Body has been added.
+    // It is required that Body observers are visited
+    aEntity->get<PlayerData>().grapple->add<RopeCreator>(aEntity);
 }
 
 void attachPlayerToGrapple(aunteater::weak_entity aPlayer, aunteater::EntityManager & aEntityManager)

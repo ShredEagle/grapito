@@ -108,6 +108,9 @@ namespace ad
                 void clear();
                 TrivialShaping mTrivialShaping;
                 TrivialLineStrip mTrivialLineStrip;
+
+                bool mShown{false};
+
             private:
                 std::vector<Rectangle> mRectangles;
                 std::vector<Line> mLines;
@@ -115,5 +118,9 @@ namespace ad
                 std::vector<Point> mPoints;
         };
     }
-    extern std::unique_ptr<debug::DrawDebugStuff> debugDrawer;
+
+    /// RFP I actually don't even know if I would prefer a singleton over a mutable global.
+    /// (it might only matter when we go down the concurrency path)
+    /// TODO rename to gDebugDrawer
+    inline std::unique_ptr<debug::DrawDebugStuff> debugDrawer;
 } // namespace

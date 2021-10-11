@@ -50,6 +50,11 @@ namespace ad
 
         void DrawDebugStuff::render()
         {
+            if (! mShown)
+            {
+                return;
+            }
+
             for (auto rectangle : mRectangles)
             {
                 mTrivialShaping.addRectangle(

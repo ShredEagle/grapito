@@ -48,6 +48,7 @@ set(${TARGET_NAME}_HEADERS
 
     Utils/CollisionBox.h
     Utils/DrawDebugStuff.h
+    Utils/RopeUtilities.h
     Utils/HomogeneousTransformation.h
     Utils/Shape.h
     Utils/PhysicsStructs.h
@@ -82,6 +83,7 @@ set(${TARGET_NAME}_SOURCES
 
     Utils/CollisionBox.cpp
     Utils/DrawDebugStuff.cpp
+    Utils/RopeUtilities.cpp
     Utils/Shape.cpp
     Utils/PhysicsStructs.cpp
 )

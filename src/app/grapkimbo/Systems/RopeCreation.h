@@ -1,14 +1,15 @@
 #pragma once
 
-#include "Components/Body.h"
-#include "Components/Position.h"
-#include "Input.h"
+#include "../Input.h"
 
+#include <Components/Body.h>
+#include <Components/Position.h>
 #include <Components/RopeCreator.h>
 
 #include <aunteater/Archetype.h>
 #include <aunteater/FamilyHelp.h>
 #include <aunteater/System.h>
+
 
 namespace ad {
 namespace grapito
@@ -29,10 +30,12 @@ public:
     void removedEntity(aunteater::LiveEntity & aEntity) override;
 
 private:
+    void handleThrow(RopeCreator & aRopeCreator);
+
     const aunteater::FamilyHelp<RopeCreatorType> mRopeCreator;
     aunteater::EntityManager & mEntityManager;
-
 };
+
 
 } // namespace grapito
 } // namespace ad

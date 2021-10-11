@@ -30,10 +30,9 @@ void RopeCreation::addedEntity(aunteater::LiveEntity & aEntity)
     Position & pos = aEntity.get<Position>();
     aunteater::weak_entity player = ropeCreator.mTargetEntity;
 
-    Position2 end = static_cast<Position2>(player->get<Position>().position.as<math::Vec>() + player->get<Body>().massCenter.as<math::Vec>());
-    Position2 origin = static_cast<Position2>(pos.position.as<math::Vec>() + body.massCenter.as<math::Vec>());
+    Position2 end = player->get<Position>().position + player->get<Body>().massCenter.as<math::Vec>();
+    Position2 origin = pos.position + body.massCenter.as<math::Vec>();
 
-    double length = (end - origin).getNorm();
     aunteater::weak_entity link = mEntityManager.addEntity(createRopeSegment(
         origin,
         end
@@ -62,17 +61,16 @@ void RopeCreation::removedEntity(aunteater::LiveEntity & aEntity)
 {
 }
 
-void RopeCreation::update(const aunteater::Timer aTimer, const GameInputState &)
+void RopeCreation::handleThrow(RopeCreator & aRopeCreator)
 {
-    for (auto & ropeCreatorEntity : mRopeCreator)
-    {
-        RopeCreator & ropeCreator = ropeCreatorEntity->get<RopeCreator>();
-        aunteater::weak_entity player = ropeCreator.mTargetEntity;
+        aunteater::weak_entity player = aRopeCreator.mTargetEntity;
         if (player != nullptr && player->get<PlayerData>().controlState & ControlState_Throwing)
         {
-            aunteater::weak_entity lastSegment = ropeCreator.mRopeSegments.back();
-            Position2 end = static_cast<Position2>(player->get<Position>().position.as<math::Vec>() + player->get<Body>().massCenter.as<math::Vec>());
-            Position2 origin = static_cast<Position2>(getLocalPointInWorld(lastSegment->get<Body>(), lastSegment->get<Position>(), {lastSegment->get<Position>().dimension.width(), rope::ropeHalfwidth}));
+            aunteater::weak_entity lastSegment = aRopeCreator.mRopeSegments.back();
+            Position2 end = player->get<Position>().position + player->get<Body>().massCenter.as<math::Vec>();
+            Position2 origin = getLocalPointInWorld(lastSegment->get<Body>(), lastSegment->get<Position>(),
+                                                    {lastSegment->get<Position>().dimension.width(),
+                                                    rope::ropeHalfwidth});
             double length = (end - origin).getNorm();
 
             if (length > .4)
@@ -91,10 +89,21 @@ void RopeCreation::update(const aunteater::Timer aTimer, const GameInputState &)
                             lastSegment
                         ));
 
-                ropeCreator.mRopeSegments.push_back(link);
+                aRopeCreator.mRopeSegments.push_back(link);
             }
         }
+}
+
+
+void RopeCreation::update(const aunteater::Timer aTimer, const GameInputState &)
+{
+    for (auto & ropeCreatorEntity : mRopeCreator)
+    {
+        RopeCreator & ropeCreator = ropeCreatorEntity->get<RopeCreator>();
+        handleThrow(ropeCreator);
     }
 }
+
+
 } // namespace grapito
 } // namespace ad

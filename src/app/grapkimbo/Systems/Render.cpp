@@ -1,7 +1,8 @@
 #include "Render.h"
 
-#include "Utils/DrawDebugStuff.h"
-#include "Configuration.h"
+#include "../Configuration.h"
+#include "../Utils/DrawDebugStuff.h"
+#include "../Utils/RopeUtilities.h"
 
 #include <engine/CameraUtilities.h>
 
@@ -19,13 +20,15 @@ Render::Render(aunteater::EntityManager & aEntityManager, Application & aApplica
     mBodyRectangles{mEntityManager},
     mOutlines{mEntityManager},
     mPendulums{mEntityManager},
+    mRopes{mEntityManager},
     mCameras{mEntityManager},
     mEngine(aApplication.getEngine()),
 #ifdef KIMBO_DEBUG
     mColliders{mEntityManager},
 #endif
     mTrivialShaping{aApplication.getEngine()->getWindowSize()},
-    mTrivialLineStrip{aApplication.getEngine()->getWindowSize()}
+    mTrivialLineStrip{aApplication.getEngine()->getWindowSize()},
+    mCurving{render::gBezierSubdivisions}
 {}
 
 void Render::update(const aunteater::Timer aTimer, const GameInputState &)
@@ -38,15 +41,14 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
     for (auto & [geometry, body, visualRectangle] : mBodyRectangles)
     {
         visualRectangle.transform = static_cast<math::Matrix<3, 3, float>>(
-                createPrefixedTransform(
-                    body.theta,
-                    static_cast<Position2>(geometry.position.as<math::Vec>() + body.massCenter.as<math::Vec>())
-                    )
-                );
+            math::trans2d::rotateAbout(body.theta, geometry.position + body.massCenter.as<math::Vec>())
+        );
     }
 
     for(const auto [geometry, visualRectangle] : mRectangles)
     {
+        // TODO should control drawing of Scope::RopeStructure rectangles
+        // based on Imgui widgets.
         mTrivialShaping.addRectangle({
             {
                 static_cast<math::Position<2, GLfloat>>(geometry.position),
@@ -76,6 +78,11 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
         });
     }
 
+    Spline beziers;
+    for (const auto [ropeCreator, _position, _body] : mRopes)
+    {
+        appendRopeSpline(ropeCreator, std::back_inserter(beziers));
+    }
 
     for(const auto & [cameraTag, geometry] : mCameras)
     {
@@ -85,12 +92,17 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
         }.centered();
         setViewedRectangle(mTrivialShaping, viewed);
         setViewedRectangle(mTrivialLineStrip, viewed);
+        setOrthographicView(mCurving,
+                            // TODO FPASS
+                            {static_cast<math::Position<2, GLfloat>>(geometry.position), 0.f},
+                            getViewVolume(mEngine->getWindowSize(), render::gViewedHeight, 1.f, 2.f));
         setViewedRectangle(debugDrawer->mTrivialShaping, viewed);
         setViewedRectangle(debugDrawer->mTrivialLineStrip, viewed);
     }
 
     mTrivialLineStrip.render();
     mTrivialShaping.render();
+    mCurving.render(beziers);
     debugDrawer->render();
 }
 

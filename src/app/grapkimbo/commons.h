@@ -7,8 +7,12 @@ namespace ad
 {
 namespace grapito
 {
+
 typedef math::Vec<2, double> Vec2;
+typedef math::Vec<3, float> Vec3;
 typedef math::Position<2, double> Position2;
+typedef math::Position<3, double> Position3;
+
 
 static inline double twoDVectorCross(Vec2 v, Vec2 w)
 {
