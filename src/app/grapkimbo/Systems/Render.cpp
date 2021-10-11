@@ -47,6 +47,8 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
 
     for(const auto [geometry, visualRectangle] : mRectangles)
     {
+        // TODO should control drawing of Scope::RopeStructure rectangles
+        // based on Imgui widgets.
         mTrivialShaping.addRectangle({
             {
                 static_cast<math::Position<2, GLfloat>>(geometry.position),

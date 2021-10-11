@@ -206,7 +206,7 @@ aunteater::Entity createRopeSegment(Position2 origin, Position2 end)
                 false,
                 std::vector<CollisionType>{CollisionType_Static_Env}
                 )
-            .add<VisualRectangle>(math::sdr::gGreen)
+            .add<VisualRectangle>(math::sdr::gGreen, VisualRectangle::Scope::RopeStructure)
             .add<AccelAndSpeed>();
 
     setLocalPointToWorldPos(rope, {0., rope::ropeHalfwidth}, origin);

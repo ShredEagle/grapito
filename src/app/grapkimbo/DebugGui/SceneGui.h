@@ -1,16 +1,21 @@
 #pragma once
 
-#include "TestScenes/SceneChanger.h"
-#include "engine/Application.h"
-#include <cstdio>
+#include "../TestScenes/SceneChanger.h"
+#include "../Utils/DrawDebugStuff.h"
+
+#include <engine/Application.h>
+
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+
+#include <cstdio>
 
 namespace ad {
 namespace grapito {
 
 using namespace ImGui;
+
 
 static void setupImGui(Application & aApplication)
 {
@@ -27,7 +32,12 @@ static void setupImGui(Application & aApplication)
 
 static bool showDebugWindow = false;
 
-static void drawImGui(Application & aApplication, DebugUI & aUI)
+struct ImguiState
+{
+    bool showRopeStructure{false};
+};
+
+static void drawImGui(Application & aApplication, DebugUI & aUI, ImguiState & aState)
 {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -36,8 +46,8 @@ static void drawImGui(Application & aApplication, DebugUI & aUI)
     const ImGuiViewport * main_viewport = ImGui::GetMainViewport();
 
     ImGui::SetNextWindowPos(ImVec2(main_viewport->WorkPos.x + 20, main_viewport->WorkPos.y + 10), ImGuiCond_Once);
-    Begin("Hello world");
-    if(ImGui::Button("Open debug scene window"))
+    Begin("Hello");
+    if(ImGui::Button("Debug scenes"))
     {
         showDebugWindow = !showDebugWindow;
     }
@@ -46,6 +56,9 @@ static void drawImGui(Application & aApplication, DebugUI & aUI)
         ChangeScene(GameList::GamePendulum, aApplication, aUI);
     }
 
+    ImGui::Checkbox("Debug draw", &debugDrawer->mShown);
+
+    ImGui::Checkbox("Show rope structure (not implemented)", &aState.showRopeStructure);
     End();
 
     if (showDebugWindow)
@@ -79,7 +92,7 @@ static void drawImGui(Application & aApplication, DebugUI & aUI)
 
 static void renderImGui()
 {
-    Render();
+    ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(GetDrawData());
 }
 

@@ -13,14 +13,13 @@
 
 using namespace ad::grapito;
 
-std::unique_ptr<ad::debug::DrawDebugStuff> ad::debugDrawer;
 
 int main(int argc, const char * argv[])
 {
     try
     {
         GameInputState inputState;
-        DebugUI mUI;
+        DebugUI debugUI;
 
         ad::Application application("grapkimbo", 1600, 900,
                                 ad::Application::Window_Keep_Ratio);
@@ -29,11 +28,12 @@ int main(int argc, const char * argv[])
         setupImGui(application);
 
         ad::debugDrawer = std::make_unique<ad::debug::DrawDebugStuff>(application);
+        ad::grapito::ImguiState imguiState;
         //
         // "Game" selection
         // 
         //Game game{application};
-        ChangeScene(GameList::GamePendulum, application, mUI);
+        ChangeScene(GameList::GamePendulum, application, debugUI);
 
         while(application.handleEvents())
         {
@@ -41,7 +41,7 @@ int main(int argc, const char * argv[])
             timer.mark(glfwGetTime());
             if (currentGame->update(timer, inputState))
             {
-                drawImGui(application, mUI);
+                drawImGui(application, debugUI, imguiState);
                 renderImGui();
                 application.swapBuffers();
             }
