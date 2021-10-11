@@ -1,7 +1,7 @@
 #include "RopeUtilities.h"
 
 #include "../commons.h"
-#include "../configuration.h"
+#include "../Configuration.h"
 #include "../Entities.h"
 
 #include "../Components/Body.h"
