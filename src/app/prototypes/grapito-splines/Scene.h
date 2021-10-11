@@ -13,6 +13,8 @@ namespace ad {
 
 
 constexpr int gWindowHeight = 500;
+constexpr int gNear = 500;
+constexpr int gDepth = 2*gNear;
 constexpr GLfloat gCardinalTension = 0.f;
 constexpr int gSubdivisions = 100;
 constexpr int gBezierSubdivisions = 100;
@@ -55,19 +57,25 @@ inline Bezier toBezier(const CardinalCubic & aCardinal, GLfloat aTension)
 }
 
 
-auto getProjection(Size2<int> aRenderResolution)
+auto get2dProjection(Size2<int> aRenderResolution)
 {
     return math::trans2d::orthographicProjection(getViewRectangle(aRenderResolution, gWindowHeight));
 }
+
+auto get3dProjection(Size2<int> aRenderResolution, GLfloat aNear = gNear, GLfloat aDepth = gDepth)
+{
+    return math::trans3d::orthographicProjection(getViewVolume(aRenderResolution, gWindowHeight, aNear, aDepth));
+}
+
 
 
 struct Scene
 {
     Scene(Size2<int> aRenderResolution) :
         mTrivialLineStrip{aRenderResolution},
-        mCurving{gBezierSubdivisions, getProjection(aRenderResolution)}
+        mCurving{gBezierSubdivisions, get3dProjection(aRenderResolution)}
     {
-        mTrivialLineStrip.setProjectionTransformation(getProjection(aRenderResolution));
+        mTrivialLineStrip.setProjectionTransformation(get2dProjection(aRenderResolution));
     }
 
     void step()

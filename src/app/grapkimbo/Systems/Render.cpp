@@ -90,7 +90,6 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
         }.centered();
         setViewedRectangle(mTrivialShaping, viewed);
         setViewedRectangle(mTrivialLineStrip, viewed);
-        setViewedRectangle(mCurving, viewed);
         setOrthographicView(mCurving,
                             // TODO FPASS
                             {static_cast<math::Position<2, GLfloat>>(geometry.position), 0.f},

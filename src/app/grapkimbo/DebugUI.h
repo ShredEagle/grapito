@@ -5,6 +5,8 @@
 
 #include <websocket/WebSocket.h>
 
+#include <mutex>
+
 namespace ad {
 namespace grapito
 {
