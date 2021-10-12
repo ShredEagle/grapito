@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Input.h"
+#include "commons.h"
 #include <aunteater/UpdateTiming.h>
 
 #include <websocket/WebSocket.h>
@@ -19,7 +20,7 @@ public:
     // Non-movable, non-copyable (captures this)
     DebugUI(const DebugUI &) = delete;
 
-    void broadcast(const aunteater::UpdateTiming<GameInputState> & aTimings);
+    void broadcast(const aunteater::UpdateTiming<GrapitoTimer, GameInputState> & aTimings);
 
 private:
     std::mutex mSessionsMutex;

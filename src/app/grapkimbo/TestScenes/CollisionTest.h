@@ -22,7 +22,7 @@ public:
     CollisionTest(graphics::ApplicationGlfw & aApplication, DebugUI & aUI);
     ~CollisionTest() = default;
 
-    bool update(const aunteater::Timer & aTimer, const GameInputState & aInputState);
+    bool update(const GrapitoTimer & aTimer, const GameInputState & aInputState);
 private:
     DebugUI & mUI;
 };

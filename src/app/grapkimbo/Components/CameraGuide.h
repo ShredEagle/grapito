@@ -14,7 +14,7 @@ namespace ad {
 
 struct CameraGuide : public aunteater::Component<CameraGuide>
 {
-    using Interpolation_type = math::Interpolation<double, double, math::ease::SmoothStep<double>>;
+    using Interpolation_type = math::Interpolation<float, float, math::ease::SmoothStep<float>>;
 
     enum class OnCompletion
     {
@@ -22,7 +22,7 @@ struct CameraGuide : public aunteater::Component<CameraGuide>
         Keep,
     };
 
-    CameraGuide(double aInfluence) :
+    CameraGuide(float aInfluence) :
         influence{aInfluence}
     {}
 
@@ -33,7 +33,7 @@ struct CameraGuide : public aunteater::Component<CameraGuide>
     {}
 
 
-    double influence;
+    float influence;
     std::optional<Interpolation_type> influenceInterpolation;
     OnCompletion completionBehaviour{OnCompletion::Keep};
 };

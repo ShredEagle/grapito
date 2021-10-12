@@ -20,7 +20,7 @@ namespace ad
         {
             Rectangle(
                 const grapito::Position2 & aOrigin,
-                const math::Size<2, double> & aDimension,
+                const math::Size<2, float> & aDimension,
                 const math::Matrix<3, 3> aTransform,
                 const math::sdr::Rgb & aColor
             ) :
@@ -60,7 +60,7 @@ namespace ad
             Arrow(
                 const grapito::Position2 & aOrigin,
                 const grapito::Position2 & aEnd,
-                const math::Size<2, double> & aHeadDimension,
+                const math::Size<2, float> & aHeadDimension,
                 float aWidth,
                 const math::sdr::Rgb & aColor
             ) :

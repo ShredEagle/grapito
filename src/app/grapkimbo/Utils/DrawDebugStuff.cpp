@@ -14,24 +14,24 @@ namespace ad
         {
             mLines.push_back({
                 static_cast<grapito::Position2>(aRectangle.origin),
-                static_cast<grapito::Position2>(static_cast<grapito::Vec2>(aRectangle.origin) + grapito::Vec2{aRectangle.dimension.width(), 0.}),
+                static_cast<grapito::Position2>(static_cast<grapito::Vec2>(aRectangle.origin) + grapito::Vec2{aRectangle.dimension.width(), 0.f}),
                 0.,
                 aRectangle.color,
             });
             mLines.push_back({
                 static_cast<grapito::Position2>(aRectangle.origin),
-                static_cast<grapito::Position2>(static_cast<grapito::Vec2>(aRectangle.origin) + grapito::Vec2{0., aRectangle.dimension.height()}),
+                static_cast<grapito::Position2>(static_cast<grapito::Vec2>(aRectangle.origin) + grapito::Vec2{0.f, aRectangle.dimension.height()}),
                 0.,
                 aRectangle.color,
             });
             mLines.push_back({
-                static_cast<grapito::Position2>(static_cast<grapito::Vec2>(aRectangle.origin) + grapito::Vec2{0., aRectangle.dimension.height()}),
+                static_cast<grapito::Position2>(static_cast<grapito::Vec2>(aRectangle.origin) + grapito::Vec2{0.f, aRectangle.dimension.height()}),
                 static_cast<grapito::Position2>(static_cast<grapito::Vec2>(aRectangle.origin) + grapito::Vec2{aRectangle.dimension.width(), aRectangle.dimension.height()}),
                 0.,
                 aRectangle.color,
             });
             mLines.push_back({
-                static_cast<grapito::Position2>(static_cast<grapito::Vec2>(aRectangle.origin) + grapito::Vec2{aRectangle.dimension.width(), 0.}),
+                static_cast<grapito::Position2>(static_cast<grapito::Vec2>(aRectangle.origin) + grapito::Vec2{aRectangle.dimension.width(), 0.f}),
                 static_cast<grapito::Position2>(static_cast<grapito::Vec2>(aRectangle.origin) + grapito::Vec2{aRectangle.dimension.width(), aRectangle.dimension.height()}),
                 0.,
                 aRectangle.color,

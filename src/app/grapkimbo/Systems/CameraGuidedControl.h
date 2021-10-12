@@ -20,12 +20,12 @@ using Camera = aunteater::Archetype<CameraTag, Position>;
 using CameraPoints = aunteater::Archetype<CameraGuide, Position>;
 
 
-class CameraGuidedControl : public aunteater::System<GameInputState>
+class CameraGuidedControl : public aunteater::System<GrapitoTimer, GameInputState>
 {
 public:
     CameraGuidedControl(aunteater::EntityManager & aEntityManager);
 
-    void update(const aunteater::Timer aTimer, const GameInputState & aInputState) override;
+    void update(const GrapitoTimer aTimer, const GameInputState & aInputState) override;
 
 private:
     const aunteater::FamilyHelp<Camera> mCameras;

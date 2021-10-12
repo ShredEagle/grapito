@@ -16,25 +16,25 @@ namespace grapito
 struct Body : public aunteater::Component<Body>
 {
     explicit Body(
-        math::Rectangle<double> aBox,
+        math::Rectangle<float> aBox,
         BodyType aBodyType,
         ShapeType aShapeType,
         CollisionType aCollisionType,
-        float aMass = 1.,
-        double aTheta = 0.,
-        double aFriction = 0.,
+        float aMass = 1.f,
+        float aTheta = 0.f,
+        float aFriction = 0.f,
         bool noMaxFriction = false,
         std::vector<CollisionType> aAcceptedCollision = {}
     ) :
+        mass{aMass},
+        moi{0.f},
+        friction{aFriction},
+        noMaxFriction{noMaxFriction},
+        theta{math::Radian<float>{aTheta}},
         shape{aBox},
         bodyType{aBodyType},
         shapeType{aShapeType},
         collisionType{aCollisionType},
-        friction{aFriction},
-        noMaxFriction{noMaxFriction},
-        moi{0.},
-        theta{math::Radian<double>{aTheta}},
-        mass{aMass},
         acceptedCollision{aAcceptedCollision}
     {
         updateData();
@@ -42,19 +42,19 @@ struct Body : public aunteater::Component<Body>
 
     void updateData()
     {
-        double area = 0.;
+        float area = 0.f;
 
         Vec2 vecMassCenter = Vec2::Zero();
-        for (int i = 0; i < shape.mFaceCount; ++i)
+        for (size_t i = 0; i < shape.mFaceCount; ++i)
         {
             Shape::Edge edge = shape.getEdge(i);
             Vec2 vertexA = edge.origin.as<math::Vec>();
             Vec2 vertexB = edge.end.as<math::Vec>();
-            double areaStep = twoDVectorCross(vertexA, vertexB) / 2.;
-            Vec2 centerStep = (vertexA + vertexB) / 3.;
-            double moiStep = areaStep * (vertexA.dot(vertexA) + vertexB.dot(vertexB) + vertexA.dot(vertexB)) / 6.;
+            float areaStep = twoDVectorCross(vertexA, vertexB) / 2.f;
+            Vec2 centerStep = (vertexA + vertexB) / 3.f;
+            float moiStep = areaStep * (vertexA.dot(vertexA) + vertexB.dot(vertexB) + vertexA.dot(vertexB)) / 6.f;
 
-            if (area + areaStep != 0.)
+            if (area + areaStep != 0.f)
             {
                 vecMassCenter = (vecMassCenter * area + centerStep * areaStep)/(area + areaStep);
             }
@@ -67,20 +67,20 @@ struct Body : public aunteater::Component<Body>
 
         if (bodyType == BodyType_Static)
         {
-            mass = 0.;
-            invMass = 0.;
-            moi = 0.;
-            invMoi = 0.;
+            mass = 0.f;
+            invMass = 0.f;
+            moi = 0.f;
+            invMoi = 0.f;
         }
         else if (bodyType == BodyType_Kinematic)
         {
             //Kinematic object are affected by gravity but not physic collision
-            invMass = 0.;
-            invMoi = 0.;
+            invMass = 0.f;
+            invMoi = 0.f;
         }
         else
         {
-            double density = mass / area;
+            float density = mass / area;
             moi *= density;
             moi -= mass * vecMassCenter.dot(vecMassCenter);
             invMass = 1 / mass;
@@ -95,7 +95,7 @@ struct Body : public aunteater::Component<Body>
 
     void debugRender(Position2 pos)
     {
-        for (int i = 0; i < shape.mFaceCount; ++i)
+        for (size_t i = 0; i < shape.mFaceCount; ++i)
         {
             auto vertex = shape.getVertice(i);
             debugDrawer->drawPoint({
@@ -115,17 +115,17 @@ struct Body : public aunteater::Component<Body>
         });
     }
 
-    double mass;
-    double invMass;
-    double moi;
-    double invMoi;
-    Position2 massCenter = {0., 0.};
+    float mass;
+    float invMass;
+    float moi;
+    float invMoi;
+    Position2 massCenter = {0.f, 0.f};
 
-    double friction;
-    double restitution;
+    float friction;
+    float restitution;
     bool noMaxFriction;
 
-    math::Radian<double> theta;
+    math::Radian<float> theta;
 
     Shape shape;
 

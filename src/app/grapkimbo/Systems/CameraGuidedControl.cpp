@@ -10,10 +10,10 @@ CameraGuidedControl::CameraGuidedControl(aunteater::EntityManager & aEntityManag
 {}
 
 
-void CameraGuidedControl::update(const aunteater::Timer aTimer, const GameInputState & aInputState)
+void CameraGuidedControl::update(const GrapitoTimer aTimer, const GameInputState & aInputState)
 {
-    math::Vec<2, double> accumulatedPosition = math::Vec<2, double>::Zero();
-    double totalInfluence = 0.;
+    math::Vec<2, float> accumulatedPosition = math::Vec<2, float>::Zero();
+    float totalInfluence = 0.;
     for (auto cameraPoint : mCameraPoints)
     {
         auto & [cameraGuide, geometry] = cameraPoint;

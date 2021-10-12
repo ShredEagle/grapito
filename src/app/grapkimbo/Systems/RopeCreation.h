@@ -17,13 +17,13 @@ namespace grapito
 
 typedef aunteater::Archetype<RopeCreator, Position, Body> RopeCreatorType;
 
-class RopeCreation : public aunteater::System<GameInputState>, public aunteater::FamilyObserver
+class RopeCreation : public aunteater::System<GrapitoTimer, GameInputState>, public aunteater::FamilyObserver
 {
 
 public:
     RopeCreation(aunteater::EntityManager & aEntityManager);
 
-    void update(const aunteater::Timer aTimer, const GameInputState &) override;
+    void update(const GrapitoTimer aTimer, const GameInputState &) override;
 
     void addedEntity(aunteater::LiveEntity & aEntity) override;
 

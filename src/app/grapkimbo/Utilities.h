@@ -22,7 +22,7 @@ struct ClosestResult
 {
     typename aunteater::FamilyHelp<T_archetype>::const_Wrap entity;
     Position2 testedPosition;
-    double distance;
+    float distance;
 };
 
 
@@ -30,7 +30,7 @@ template <class T_archetype>
 bool isCloser(const typename aunteater::FamilyHelp<T_archetype>::const_Wrap &,
               Position2 aCandidate,
               Position2 aBasePosition,
-              double aNormSquared)
+              float aNormSquared)
 {
     return (aCandidate - aBasePosition).getNormSquared() < aNormSquared;
 }
@@ -46,7 +46,7 @@ getClosest(
 {
     std::optional<typename aunteater::FamilyHelp<T_archetype>::const_Wrap> closest;
     Position2 position = Position2::Zero();
-    double normSquared = std::numeric_limits<double>::max();
+    float normSquared = std::numeric_limits<float>::max();
 
     for (const auto entity : aEntities) 
     {

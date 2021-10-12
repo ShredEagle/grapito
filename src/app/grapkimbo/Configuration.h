@@ -1,15 +1,11 @@
 #pragma once
 
-
 #include <math/Constants.h>
 #include <math/Angle.h>
 #include <math/Color.h>
 #include <math/Vector.h>
 
-
 namespace ad {
-
-
 namespace anchor
 {
     constexpr math::sdr::Rgb gColor{200, 200, 200};
@@ -18,17 +14,32 @@ namespace anchor
 
 namespace camera
 {
-    constexpr double gAnchorGuideFadeIn = 2.;
-    constexpr double gAnchorGuideFadeOut = 0.8;
+    constexpr float gAnchorGuideFadeIn = 2.f;
+    constexpr float gAnchorGuideFadeOut = 0.8f;
 }
 
 
 namespace player
 {
-    constexpr double gMass = 80.;
-    constexpr math::Size<2, double> gSize{0.8, 1.9};
-    constexpr double gInitialRopeLength = 3.;
-    constexpr math::Radian<double> gInitialAngle{math::pi<double>/3.};
+    constexpr float gMass = 80.f;
+    constexpr math::Size<2, float> gSize{0.8f, 1.9f};
+    constexpr float gInitialRopeLength = 3.f;
+    constexpr math::Radian<float> gInitialAngle{math::pi<double>/3.f};
+    //TODO(franz) replace with constexpr
+    inline float gWalkingSpeedAccelFactor = 0.25f;
+    inline float gAcceleration = 70.f;
+    inline float gPlayerWalkingSpeed = 12.f;
+    inline float gPlayerGroundFriction = 0.3f;
+    inline float gAirSpeedAccelFactor = 0.25f;
+    inline float gPlayerJumpImpulse = 24.f; // m/s
+    inline float gAirControlAcceleration = 12.f; // m/s
+    inline float gAirFriction = 0.1f; // m/s
+    //static constexpr double gAirControlAcceleration = 12.; // m/s
+    //constexpr double gAcceleration = 10.;
+    //constexpr double gPlayerJumpImpulse = 10.; // m/s
+    //constexpr double gPlayerWalkingSpeed = 7.;
+    //constexpr double gPlayerGroundFriction = 0.25;
+
 } // namespace player
 
 
@@ -41,15 +52,15 @@ namespace render
 
 namespace sight
 {
-    constexpr double gReachDistance = 20.  ;
-    constexpr math::Degree<double> gAngleTolerance{40.};
+    constexpr float gReachDistance = 20.f;
+    constexpr math::Degree<float> gAngleTolerance{40.f};
 
-    constexpr double gBaseOutlineOffset = 0.25;
+    constexpr float gBaseOutlineOffset = 0.25f;
 } // namespace sight
 
 namespace physic
 {
-    constexpr double linearSlop = 0.0001;
+    constexpr float linearSlop = 0.0001f;
 }
 
 namespace rope

@@ -10,27 +10,24 @@ namespace ad {
 namespace grapito {
 
 
-inline Position2 transformPosition(Position2 position, math::AffineMatrix<3, double> transform)
+inline Position2 transformPosition(Position2 position, math::AffineMatrix<3, float> transform)
 {
-    math::Position<3, double> homoPos = math::homogeneous::makePosition(position) * transform;
+    math::Position<3, float> homoPos = math::homogeneous::makePosition(position) * transform;
     return {homoPos.x(), homoPos.y()};
 }
 
-
-inline Position2 transformPosition(Position2 position, math::Radian<double> angle, Position2 center)
+inline Position2 transformPosition(Position2 position, math::Radian<float> angle, Position2 center)
 {
     return transformPosition(position, math::trans2d::rotateAbout(angle, center));
 }
 
-
-inline Vec2 transformVector(Vec2 aVector, math::AffineMatrix<3, double> transform)
+inline Vec2 transformVector(Vec2 aVector, math::AffineMatrix<3, float> transform)
 {
-    math::Vec<3, double> homoPos = math::homogeneous::makeVec(aVector) * transform;
+    math::Vec<3, float> homoPos = math::homogeneous::makeVec(aVector) * transform;
     return {homoPos.x(), homoPos.y()};
 }
 
-
-inline Vec2 transformVector(Vec2 aVector, math::Radian<double> angle)
+inline Vec2 transformVector(Vec2 aVector, math::Radian<float> angle)
 {
     return transformVector(aVector, math::trans2d::rotate(angle));
 }

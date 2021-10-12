@@ -1,19 +1,18 @@
 #pragma once
 
 
-#include "Components/Body.h"
-#include "Components/Mass.h"
-#include "Components/Position.h"
 #include "Configuration.h"
 #include "Input.h"
-
-#include "Components/AccelAndSpeed.h"
-#include "Components/GrappleControl.h"
-#include "Components/Pendular.h"
-#include "Components/PlayerData.h"
-#include "aunteater/Entity.h"
 #include "commons.h"
 
+#include <Components/Body.h>
+#include <Components/Mass.h>
+#include <Components/Position.h>
+#include <Components/AccelAndSpeed.h>
+#include <Components/GrappleControl.h>
+#include <Components/PlayerData.h>
+
+#include <aunteater/Entity.h>
 #include <aunteater/EntityManager.h>
 #include <iostream>
 
@@ -28,40 +27,11 @@ aunteater::Entity makePlayer(int aIndex,
                              math::sdr::Rgb aColor,
                              GrappleMode aGrappleMode = GrappleMode::Closest);
 
-aunteater::Entity makeCamera(Position2 pos = {0., 0.});
+aunteater::Entity makeCamera(Position2 pos = {0.f, 0.f});
 
 
-aunteater::Entity makeAnchor(math::Position<2, double> aPosition, math::Size<2, double> aSize);
+aunteater::Entity makeAnchor(Position2 aPosition, math::Size<2, float> aSize);
 
-
-Pendular makePendular(aunteater::weak_entity aConnected,
-                      double aRopeLength = player::gInitialRopeLength,
-                      math::Radian<double> aInitialAngle = player::gInitialAngle);
-
-
-Pendular makePendular(Position2 aGrappleOrigin,
-                      Position2 aAnchorPoint,
-                      aunteater::weak_entity aConnected,
-                      math::Vec<2, double> aCartesianSpeed,
-                      double aGrappleLength);
-
-
-inline Pendular makePendular(Position2 aGrappleOrigin,
-                             Position2 aAnchorPoint,
-                             aunteater::weak_entity aConnected,
-                             math::Vec<2, double> aCartesianSpeed)
-{
-    return makePendular(aGrappleOrigin,
-                        aAnchorPoint,
-                        aConnected,
-                        aCartesianSpeed,
-                        (aAnchorPoint - aGrappleOrigin).getNorm());
-}
-
-void connectGrapple(aunteater::weak_entity aEntity, Pendular aPendular);
-
-
-void retractGrapple(aunteater::weak_entity aEntity);
 
 aunteater::Entity createRopeSegment(Position2 origin, Position2 endRR);
 

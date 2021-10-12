@@ -12,20 +12,20 @@ namespace grapito
 struct Position : public aunteater::Component<Position>
 {
     explicit Position(Position2 aPosition  = Position2::Zero(),
-                      math::Size<2, double> aDimension = math::Size<2, double>{1., 1.}) :
+                      math::Size<2, float> aDimension = math::Size<2, float>{1.f, 1.f}) :
         position{std::move(aPosition)},
-        oldPosition(position),
-        dimension{std::move(aDimension)}
+        dimension{std::move(aDimension)},
+        oldPosition(position)
     {}
 
     Position2 center() const
-    { return position + dimension.as<math::Vec>() / 2.; }
+    { return position + dimension.as<math::Vec>() / 2.f; }
 
-    math::Rectangle<double> rectangle() const
+    math::Rectangle<float> rectangle() const
     { return {position, dimension}; } 
 
     Position2 position;
-    math::Size<2, double> dimension;
+    math::Size<2, float> dimension;
     Position2 oldPosition;
 };
 

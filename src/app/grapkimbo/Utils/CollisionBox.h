@@ -28,7 +28,7 @@ namespace grapito
             Shape shape;
 
             CollisionBox(Shape aShape);
-            CollisionBox(math::Rectangle<double> aRectangle);
+            CollisionBox(math::Rectangle<float> aRectangle);
             CollisionBox(std::vector<Position2> aVertices);
 
             const Position2 getSupport(const Vec2 direction) const;
