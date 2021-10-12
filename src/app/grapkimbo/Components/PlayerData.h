@@ -36,13 +36,13 @@ constexpr Vec2 PlayerWalkingSpeed = {10., 0.};
 
 struct PlayerData : public aunteater::Component<PlayerData>
 {
-    PlayerData(int aId, Color aColor) :
+    PlayerData(int aId, math::sdr::Rgb aColor) :
         id{aId},
         color{aColor}
     {}
 
     int id;
-    Color color;
+    math::sdr::Rgb color;
     PlayerCollisionState state = PlayerCollisionState_Jumping;
     ControlStateFlags controlState = 0;
     aunteater::weak_entity grapple;

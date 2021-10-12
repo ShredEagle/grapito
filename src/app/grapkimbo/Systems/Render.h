@@ -38,7 +38,7 @@ class Render : public aunteater::System<GameInputState>
 {
 
 public:
-    Render(aunteater::EntityManager & aEntityManager, ApplicationGlfw & aApplication);
+    Render(aunteater::EntityManager & aEntityManager, graphics::ApplicationGlfw & aApplication);
 
     void update(const aunteater::Timer aTimer, const GameInputState &) override;
 
@@ -51,10 +51,10 @@ private:
     const aunteater::FamilyHelp<RopeCreatorType> mRopes;
     const aunteater::FamilyHelp<Camera> mCameras;
 
-    std::shared_ptr<AppInterface> mAppInterface;
-    TrivialShaping mTrivialShaping;
-    TrivialLineStrip mTrivialLineStrip;
-    Curving mCurving;
+    std::shared_ptr<graphics::AppInterface> mAppInterface;
+    graphics::TrivialShaping mTrivialShaping;
+    graphics::TrivialLineStrip mTrivialLineStrip;
+    graphics::Curving mCurving;
 #ifdef KIMBO_DEBUG
     const aunteater::FamilyHelp<Collider> mColliders;
 #endif

@@ -17,7 +17,7 @@ namespace grapito {
 using namespace ImGui;
 
 
-static void setupImGui(ApplicationGlfw & aApplication)
+static void setupImGui(graphics::ApplicationGlfw & aApplication)
 {
     IMGUI_CHECKVERSION();
     CreateContext();
@@ -37,7 +37,7 @@ struct ImguiState
     bool showRopeStructure{false};
 };
 
-static void drawImGui(ApplicationGlfw & aApplication, DebugUI & aUI, ImguiState & aState)
+static void drawImGui(graphics::ApplicationGlfw & aApplication, DebugUI & aUI, ImguiState & aState)
 {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();

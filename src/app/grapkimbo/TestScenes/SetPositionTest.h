@@ -18,7 +18,7 @@ namespace grapito {
 class SetPositionTest : public Game
 {
 public:
-    SetPositionTest(ApplicationGlfw & aApplication, DebugUI & aUI);
+    SetPositionTest(graphics::ApplicationGlfw & aApplication, DebugUI & aUI);
     ~SetPositionTest() = default;
 
     bool update(const aunteater::Timer & aTimer, const GameInputState & aInputState);

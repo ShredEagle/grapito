@@ -14,7 +14,7 @@ namespace ad {
 namespace grapito
 {
 
-Render::Render(aunteater::EntityManager & aEntityManager, ApplicationGlfw & aApplication) :
+Render::Render(aunteater::EntityManager & aEntityManager, graphics::ApplicationGlfw & aApplication) :
     mEntityManager{aEntityManager},
     mRectangles{mEntityManager},
     mBodyRectangles{mEntityManager},
@@ -95,7 +95,7 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
         setOrthographicView(mCurving,
                             // TODO FPASS
                             {static_cast<math::Position<2, GLfloat>>(geometry.position), 0.f},
-                            getViewVolume(mAppInterface->getWindowSize(), render::gViewedHeight, 1.f, 2.f));
+                            graphics::getViewVolume(mAppInterface->getWindowSize(), render::gViewedHeight, 1.f, 2.f));
         setViewedRectangle(debugDrawer->mTrivialShaping, viewed);
         setViewedRectangle(debugDrawer->mTrivialLineStrip, viewed);
     }

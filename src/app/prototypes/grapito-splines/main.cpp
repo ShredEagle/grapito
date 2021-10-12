@@ -8,8 +8,8 @@ int main(int argc, const char * argv[])
 {
     try
     {
-        ad::ApplicationGlfw application("Grapito splines", 1600, 900,
-                                    ad::ApplicationGlfw::Window_Keep_Ratio);
+        ad::graphics::ApplicationGlfw application("Grapito splines", 1600, 900,
+                                                   ad::graphics::ApplicationGlfw::Window_Keep_Ratio);
 
         ad::Scene scene{application.getAppInterface()->getFramebufferSize()};
 

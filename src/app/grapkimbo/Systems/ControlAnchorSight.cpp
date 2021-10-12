@@ -27,7 +27,7 @@ void ControlAnchorSight::positionSight(AnchorSelector & aSelector,
 {
     Position playerGeometry = aSelector.player->get<Position>();
 
-    auto positionProvider = [](const Rectangle<double> aCandidate)
+    auto positionProvider = [](const math::Rectangle<double> aCandidate)
     {
         return aCandidate.center();
     };

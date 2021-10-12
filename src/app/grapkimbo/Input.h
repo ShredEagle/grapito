@@ -10,8 +10,7 @@
 
 
 namespace ad {
-namespace grapito
-{
+namespace grapito {
 
 
 enum Command {
@@ -119,7 +118,7 @@ bool isGamepadPresent(Controller aController);
 
 struct GameInputState
 {
-    void readAll(ApplicationGlfw & aApplication);
+    void readAll(graphics::ApplicationGlfw & aApplication);
     float asAxis(Controller aController, Command aNegativeButton, Command aPositiveButton, Command aGamepadAxis) const;
     math::Vec<2, float> asDirection(Controller aController,
                                     Command aHorizontalAxis,

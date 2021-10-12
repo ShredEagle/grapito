@@ -69,7 +69,7 @@ void createBox(Position2 pos, math::Size<2, double> size, double angularSpeed, a
 
 // This test is basically succesful given our current
 // contact solving. It cannot converge without contact persistence.
-CollisionTest::CollisionTest(ApplicationGlfw & aApplication, DebugUI & aUI) :
+CollisionTest::CollisionTest(graphics::ApplicationGlfw & aApplication, DebugUI & aUI) :
     mUI{aUI}
 {
     mSystemManager.add<Gravity>();

@@ -39,7 +39,7 @@ static void setupSceneChanger()
 
 */
 
-static void ChangeScene(GameList aGameType, ApplicationGlfw & aApplication, DebugUI & aUI)
+static void ChangeScene(GameList aGameType, graphics::ApplicationGlfw & aApplication, DebugUI & aUI)
 {
     switch (aGameType) {
     case GameList::CollisionTest:

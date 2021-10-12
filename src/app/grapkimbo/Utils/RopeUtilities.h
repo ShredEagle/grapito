@@ -14,7 +14,7 @@ namespace ad {
 namespace grapito {
 
 
-using Spline = std::vector<Curving::Instance>;
+using Spline = std::vector<graphics::Curving::Instance>;
 void appendRopeSpline(const RopeCreator & aRope,
                       std::back_insert_iterator<Spline> aOutputIterator);
 

@@ -19,21 +19,21 @@ struct VisualRectangle : public aunteater::Component<VisualRectangle>
         RopeStructure,
     };
 
-    explicit VisualRectangle(Color aColor = math::sdr::gWhite) :
+    explicit VisualRectangle(math::sdr::Rgb aColor = math::sdr::gWhite) :
         color{aColor}
     {}
 
-    explicit VisualRectangle(Color aColor, math::Matrix<3, 3, float> aTransform) :
+    explicit VisualRectangle(math::sdr::Rgb aColor, math::Matrix<3, 3, float> aTransform) :
         color{aColor},
         transform{aTransform}
     {}
 
-    VisualRectangle(Color aColor, Scope aScope) :
+    VisualRectangle(math::sdr::Rgb aColor, Scope aScope) :
         color{aColor},
         scope{aScope}
     {}
 
-    Color color;
+    math::sdr::Rgb color;
     math::Matrix<3, 3, float> transform{math::Matrix<3, 3, float>::Identity()};
     Scope scope{Scope::Gameplay};
 };

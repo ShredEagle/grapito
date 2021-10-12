@@ -18,7 +18,7 @@ namespace grapito {
 class PivotTest : public Game
 {
 public:
-    PivotTest(ApplicationGlfw & aApplication, DebugUI & aUI);
+    PivotTest(graphics::ApplicationGlfw & aApplication, DebugUI & aUI);
     ~PivotTest() = default;
 
     bool update(const aunteater::Timer & aTimer, const GameInputState & aInputState);

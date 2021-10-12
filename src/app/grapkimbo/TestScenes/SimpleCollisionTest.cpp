@@ -74,7 +74,7 @@ void createSimpleCollisionTest(
             ));
 }
 
-SimpleCollisionTest::SimpleCollisionTest(ApplicationGlfw & aApplication, DebugUI & aUI) :
+SimpleCollisionTest::SimpleCollisionTest(graphics::ApplicationGlfw & aApplication, DebugUI & aUI) :
     mUI{aUI}
 {
     mSystemManager.add<Gravity>();

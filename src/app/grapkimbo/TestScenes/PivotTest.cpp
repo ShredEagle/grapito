@@ -74,7 +74,7 @@ void createPivotTest(double height, aunteater::EntityManager & mEntityManager)
             ));
 }
 
-PivotTest::PivotTest(ApplicationGlfw & aApplication, DebugUI & aUI) :
+PivotTest::PivotTest(graphics::ApplicationGlfw & aApplication, DebugUI & aUI) :
     mUI{aUI}
 {
     mSystemManager.add<Gravity>();

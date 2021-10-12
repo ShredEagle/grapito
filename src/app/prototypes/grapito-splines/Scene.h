@@ -21,7 +21,7 @@ constexpr int gBezierSubdivisions = 100;
 constexpr GLfloat gBezierWidth = 5.0f;
 
 
-using Point = TrivialLineStrip::LinePoint;
+using Point = graphics::TrivialLineStrip::LinePoint;
 
 // Just a fantasy to use math::Vec here
 using CardinalCubic = math::Vec<4, math::Position<2, GLfloat>>;
@@ -57,21 +57,21 @@ inline Bezier toBezier(const CardinalCubic & aCardinal, GLfloat aTension)
 }
 
 
-auto get2dProjection(Size2<int> aRenderResolution)
+auto get2dProjection(math::Size<2, int> aRenderResolution)
 {
-    return math::trans2d::orthographicProjection(getViewRectangle(aRenderResolution, gWindowHeight));
+    return math::trans2d::orthographicProjection(graphics::getViewRectangle(aRenderResolution, gWindowHeight));
 }
 
-auto get3dProjection(Size2<int> aRenderResolution, GLfloat aNear = gNear, GLfloat aDepth = gDepth)
+auto get3dProjection(math::Size<2, int> aRenderResolution, GLfloat aNear = gNear, GLfloat aDepth = gDepth)
 {
-    return math::trans3d::orthographicProjection(getViewVolume(aRenderResolution, gWindowHeight, aNear, aDepth));
+    return math::trans3d::orthographicProjection(graphics::getViewVolume(aRenderResolution, gWindowHeight, aNear, aDepth));
 }
 
 
 
 struct Scene
 {
-    Scene(Size2<int> aRenderResolution) :
+    Scene(math::Size<2, int> aRenderResolution) :
         mTrivialLineStrip{aRenderResolution},
         mCurving{gBezierSubdivisions, get3dProjection(aRenderResolution)}
     {
@@ -131,9 +131,9 @@ struct Scene
 
     std::vector<Point> mPoints;
     std::vector<Point> mCardinalApproximation;
-    std::vector<Curving::Instance> mBeziers;
-    TrivialLineStrip mTrivialLineStrip;
-    Curving mCurving;
+    std::vector<graphics::Curving::Instance> mBeziers;
+    graphics::TrivialLineStrip mTrivialLineStrip;
+    graphics::Curving mCurving;
 };
 
 } // namespace ad

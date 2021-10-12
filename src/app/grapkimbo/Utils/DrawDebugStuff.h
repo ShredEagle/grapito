@@ -22,7 +22,7 @@ namespace ad
                 const grapito::Position2 & aOrigin,
                 const math::Size<2, double> & aDimension,
                 const math::Matrix<3, 3> aTransform,
-                const Color & aColor
+                const math::sdr::Rgb & aColor
             ) :
                 origin{static_cast<math::Position<2, float>>(aOrigin)},
                 dimension{static_cast<math::Size<2, float>>(aDimension)},
@@ -33,7 +33,7 @@ namespace ad
             math::Position<2, GLfloat> origin;
             math::Size<2, GLfloat> dimension;
             math::Matrix<3, 3, float> transform;
-            Color color;
+            const math::sdr::Rgb color;
         };
 
         struct Line
@@ -42,7 +42,7 @@ namespace ad
                 const grapito::Position2 & aOrigin,
                 const grapito::Position2 & aEnd,
                 float aWidth,
-                const Color & aColor
+                const math::sdr::Rgb & aColor
             ) :
                 origin{static_cast<math::Position<2, float>>(aOrigin)},
                 end{static_cast<math::Position<2, float>>(aEnd)},
@@ -52,7 +52,7 @@ namespace ad
             math::Position<2, GLfloat> origin;
             math::Position<2, GLfloat> end;
             float width;
-            Color color;
+            math::sdr::Rgb color;
         };
 
         struct Arrow
@@ -62,7 +62,7 @@ namespace ad
                 const grapito::Position2 & aEnd,
                 const math::Size<2, double> & aHeadDimension,
                 float aWidth,
-                const Color & aColor
+                const math::sdr::Rgb & aColor
             ) :
                 origin{static_cast<math::Position<2, int>>(aOrigin)},
                 end{static_cast<math::Position<2, int>>(aEnd)},
@@ -74,7 +74,7 @@ namespace ad
             math::Position<2, int> end;
             math::Size<2, int> headDimension;
             float width;
-            Color color;
+            math::sdr::Rgb color;
         };
 
         struct Point
@@ -82,7 +82,7 @@ namespace ad
             Point(
                 const grapito::Position2 & aOrigin,
                 float aRadius,
-                const Color & aColor
+                const math::sdr::Rgb & aColor
             ) :
                 origin{aOrigin},
                 radius{aRadius},
@@ -90,13 +90,13 @@ namespace ad
             {}
             math::Position<2, GLfloat> origin;
             float radius;
-            Color color;
+            math::sdr::Rgb color;
         };
 
         class DrawDebugStuff
         {
             public:
-                DrawDebugStuff(const ApplicationGlfw & aApplication) :
+                DrawDebugStuff(const graphics::ApplicationGlfw & aApplication) :
                     mTrivialShaping{aApplication.getAppInterface()->getWindowSize()},
                     mTrivialLineStrip{aApplication.getAppInterface()->getWindowSize()}
                 {}
@@ -108,8 +108,8 @@ namespace ad
                 //void drawPoint(Point aPoint);
                 void render();
                 void clear();
-                TrivialShaping mTrivialShaping;
-                TrivialLineStrip mTrivialLineStrip;
+                graphics::TrivialShaping mTrivialShaping;
+                graphics::TrivialLineStrip mTrivialLineStrip;
 
                 bool mShown{false};
 

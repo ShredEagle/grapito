@@ -19,7 +19,7 @@ namespace grapito {
 class Game_pendulum : public Game
 {
 public:
-    Game_pendulum(ApplicationGlfw & aApplication, DebugUI & aUI);
+    Game_pendulum(graphics::ApplicationGlfw & aApplication, DebugUI & aUI);
     ~Game_pendulum() = default;
 
     bool update(const aunteater::Timer & aTimer, const GameInputState & aInputState);

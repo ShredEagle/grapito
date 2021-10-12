@@ -21,8 +21,9 @@ int main(int argc, const char * argv[])
         GameInputState inputState;
         DebugUI debugUI;
 
-        ad::ApplicationGlfw application("grapkimbo", 1600, 900,
-                                ad::ApplicationGlfw::Window_Keep_Ratio);
+        ad::graphics::ApplicationGlfw application(
+            "grapkimbo", 1600, 900,
+            ad::graphics::ApplicationGlfw::Window_Keep_Ratio);
         aunteater::Timer timer{glfwGetTime()};
 
         setupImGui(application);
