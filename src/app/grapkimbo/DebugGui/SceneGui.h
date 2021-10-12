@@ -3,7 +3,7 @@
 #include "../TestScenes/SceneChanger.h"
 #include "../Utils/DrawDebugStuff.h"
 
-#include <engine/Application.h>
+#include <graphics/ApplicationGlfw.h>
 
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
@@ -17,7 +17,7 @@ namespace grapito {
 using namespace ImGui;
 
 
-static void setupImGui(Application & aApplication)
+static void setupImGui(graphics::ApplicationGlfw & aApplication)
 {
     IMGUI_CHECKVERSION();
     CreateContext();
@@ -37,7 +37,7 @@ struct ImguiState
     bool showRopeStructure{false};
 };
 
-static void drawImGui(Application & aApplication, DebugUI & aUI, ImguiState & aState)
+static void drawImGui(graphics::ApplicationGlfw & aApplication, DebugUI & aUI, ImguiState & aState)
 {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();

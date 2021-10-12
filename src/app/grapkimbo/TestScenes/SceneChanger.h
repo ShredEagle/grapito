@@ -8,7 +8,9 @@
 #include "TestScenes/SimpleCollisionTest.h"
 #include "TestScenes/SetPositionTest.h"
 #include "aunteater/EntityManager.h"
-#include "engine/Application.h"
+
+#include <graphics/ApplicationGlfw.h>
+
 namespace ad {
 namespace grapito {
 
@@ -27,7 +29,7 @@ enum GameList
 
 /*
  * I'm not good at cpp
-static std::vector<std::function<Game(Application & aApplication)>> games;
+static std::vector<std::function<Game(ApplicationGlfw & aApplication)>> games;
 
 static void setupSceneChanger()
 {
@@ -37,7 +39,7 @@ static void setupSceneChanger()
 
 */
 
-static void ChangeScene(GameList aGameType, Application & aApplication, DebugUI & aUI)
+static void ChangeScene(GameList aGameType, graphics::ApplicationGlfw & aApplication, DebugUI & aUI)
 {
     switch (aGameType) {
     case GameList::CollisionTest:

@@ -15,11 +15,11 @@
 #include <aunteater/FamilyHelp.h>
 #include <aunteater/System.h>
 
-#include <engine/Application.h>
-#include <engine/Curving.h>
-#include <engine/DrawLine.h>
-#include <engine/TrivialLineStrip.h>
-#include <engine/TrivialShaping.h>
+#include <graphics/ApplicationGlfw.h>
+#include <graphics/Curving.h>
+#include <graphics/DrawLine.h>
+#include <graphics/TrivialLineStrip.h>
+#include <graphics/TrivialShaping.h>
 
 
 namespace ad {
@@ -38,7 +38,7 @@ class Render : public aunteater::System<GameInputState>
 {
 
 public:
-    Render(aunteater::EntityManager & aEntityManager, Application & aApplication);
+    Render(aunteater::EntityManager & aEntityManager, graphics::ApplicationGlfw & aApplication);
 
     void update(const aunteater::Timer aTimer, const GameInputState &) override;
 
@@ -51,10 +51,10 @@ private:
     const aunteater::FamilyHelp<RopeCreatorType> mRopes;
     const aunteater::FamilyHelp<Camera> mCameras;
 
-    std::shared_ptr<Engine> mEngine;
-    TrivialShaping mTrivialShaping;
-    TrivialLineStrip mTrivialLineStrip;
-    Curving mCurving;
+    std::shared_ptr<graphics::AppInterface> mAppInterface;
+    graphics::TrivialShaping mTrivialShaping;
+    graphics::TrivialLineStrip mTrivialLineStrip;
+    graphics::Curving mCurving;
 #ifdef KIMBO_DEBUG
     const aunteater::FamilyHelp<Collider> mColliders;
 #endif

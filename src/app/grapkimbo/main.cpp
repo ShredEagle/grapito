@@ -7,7 +7,7 @@
 
 #include <aunteater/Timer.h>
 
-#include <engine/Application.h>
+#include <graphics/ApplicationGlfw.h>
 
 #include <iostream>
 
@@ -21,8 +21,9 @@ int main(int argc, const char * argv[])
         GameInputState inputState;
         DebugUI debugUI;
 
-        ad::Application application("grapkimbo", 1600, 900,
-                                ad::Application::Window_Keep_Ratio);
+        ad::graphics::ApplicationGlfw application(
+            "grapkimbo", 1600, 900,
+            ad::graphics::ApplicationGlfw::Window_Keep_Ratio);
         aunteater::Timer timer{glfwGetTime()};
 
         setupImGui(application);

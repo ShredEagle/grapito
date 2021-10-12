@@ -9,7 +9,7 @@
 #include <aunteater/Timer.h>
 #include <aunteater/SystemManager.h>
 
-#include <engine/Application.h>
+#include <graphics/ApplicationGlfw.h>
 
 #include <iostream>
 
@@ -19,7 +19,7 @@ namespace grapito {
 class SimpleCollisionTest : public Game
 {
 public:
-    SimpleCollisionTest(Application & aApplication, DebugUI & aUI);
+    SimpleCollisionTest(graphics::ApplicationGlfw & aApplication, DebugUI & aUI);
     ~SimpleCollisionTest() = default;
 
     bool update(const aunteater::Timer & aTimer, const GameInputState & aInputState);

@@ -10,12 +10,12 @@ namespace grapito
 
 struct VisualOutline : public aunteater::Component<VisualOutline>
 {
-    VisualOutline(Color aColor, double aOvershoot) :
+    VisualOutline(math::sdr::Rgb aColor, double aOvershoot) :
         color{aColor},
         overshoot{aOvershoot, aOvershoot}
     {}
 
-    Color color;
+    math::sdr::Rgb color;
     Vec2 overshoot;
 };
 

@@ -4,7 +4,7 @@
 #include "../Utils/DrawDebugStuff.h"
 #include "../Utils/RopeUtilities.h"
 
-#include <engine/CameraUtilities.h>
+#include <graphics/CameraUtilities.h>
 
 #include <math/Transformations.h>
 #include <math/VectorUtilities.h>
@@ -14,7 +14,7 @@ namespace ad {
 namespace grapito
 {
 
-Render::Render(aunteater::EntityManager & aEntityManager, Application & aApplication) :
+Render::Render(aunteater::EntityManager & aEntityManager, graphics::ApplicationGlfw & aApplication) :
     mEntityManager{aEntityManager},
     mRectangles{mEntityManager},
     mBodyRectangles{mEntityManager},
@@ -22,12 +22,12 @@ Render::Render(aunteater::EntityManager & aEntityManager, Application & aApplica
     mPendulums{mEntityManager},
     mRopes{mEntityManager},
     mCameras{mEntityManager},
-    mEngine(aApplication.getEngine()),
+    mAppInterface(aApplication.getAppInterface()),
 #ifdef KIMBO_DEBUG
     mColliders{mEntityManager},
 #endif
-    mTrivialShaping{aApplication.getEngine()->getWindowSize()},
-    mTrivialLineStrip{aApplication.getEngine()->getWindowSize()},
+    mTrivialShaping{aApplication.getAppInterface()->getWindowSize()},
+    mTrivialLineStrip{aApplication.getAppInterface()->getWindowSize()},
     mCurving{render::gBezierSubdivisions}
 {}
 
@@ -36,7 +36,7 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
     mTrivialShaping.clearShapes();
     mTrivialLineStrip.clearLines();
     debugDrawer->clear();
-    mEngine->clear();
+    mAppInterface->clear();
 
     for (auto & [geometry, body, visualRectangle] : mBodyRectangles)
     {
@@ -88,14 +88,14 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
     {
         auto viewed = math::Rectangle<GLfloat>{
             static_cast<math::Position<2, GLfloat>>(geometry.position),
-            math::makeSizeFromHeight(render::gViewedHeight, math::getRatio<GLfloat>(mEngine->getWindowSize()))
+            math::makeSizeFromHeight(render::gViewedHeight, math::getRatio<GLfloat>(mAppInterface->getWindowSize()))
         }.centered();
         setViewedRectangle(mTrivialShaping, viewed);
         setViewedRectangle(mTrivialLineStrip, viewed);
         setOrthographicView(mCurving,
                             // TODO FPASS
                             {static_cast<math::Position<2, GLfloat>>(geometry.position), 0.f},
-                            getViewVolume(mEngine->getWindowSize(), render::gViewedHeight, 1.f, 2.f));
+                            graphics::getViewVolume(mAppInterface->getWindowSize(), render::gViewedHeight, 1.f, 2.f));
         setViewedRectangle(debugDrawer->mTrivialShaping, viewed);
         setViewedRectangle(debugDrawer->mTrivialLineStrip, viewed);
     }

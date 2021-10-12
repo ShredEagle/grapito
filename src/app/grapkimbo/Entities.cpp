@@ -28,7 +28,7 @@ namespace grapito
 
 aunteater::Entity makePlayer(int aIndex,
                              Controller aController,
-                             Color aColor,
+                             math::sdr::Rgb aColor,
                              GrappleMode aGrappleMode)
 {
     aunteater::Entity player = aunteater::Entity()

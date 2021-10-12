@@ -10,7 +10,7 @@
 #include <aunteater/Timer.h>
 #include <aunteater/SystemManager.h>
 
-#include <engine/Application.h>
+#include <graphics/ApplicationGlfw.h>
 
 namespace ad {
 namespace grapito {
@@ -18,7 +18,7 @@ namespace grapito {
 class SetPositionTest : public Game
 {
 public:
-    SetPositionTest(Application & aApplication, DebugUI & aUI);
+    SetPositionTest(graphics::ApplicationGlfw & aApplication, DebugUI & aUI);
     ~SetPositionTest() = default;
 
     bool update(const aunteater::Timer & aTimer, const GameInputState & aInputState);

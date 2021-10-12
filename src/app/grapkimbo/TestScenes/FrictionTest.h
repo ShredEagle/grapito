@@ -9,7 +9,7 @@
 #include <aunteater/Timer.h>
 #include <aunteater/SystemManager.h>
 
-#include <engine/Application.h>
+#include <graphics/ApplicationGlfw.h>
 
 #include <iostream>
 
@@ -19,7 +19,7 @@ namespace grapito {
 class FrictionTest : public Game
 {
 public:
-    FrictionTest(Application & aApplication, DebugUI & aUI);
+    FrictionTest(graphics::ApplicationGlfw & aApplication, DebugUI & aUI);
     ~FrictionTest() = default;
 
     bool update(const aunteater::Timer & aTimer, const GameInputState & aInputState);

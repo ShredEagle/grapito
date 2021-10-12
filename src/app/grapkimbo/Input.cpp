@@ -59,7 +59,7 @@ void handleButtonEdges(InputState & aInputState, int aGlfwState)
 }
 
 
-void readKeyboard(const KeyboardInputConfig & aConfig, ControllerInputState & aState, Application & aApplication)
+void readKeyboard(const KeyboardInputConfig & aConfig, ControllerInputState & aState, graphics::ApplicationGlfw & aApplication)
 {
     for (size_t i = 0; i < aConfig.size(); ++i)
     {
@@ -115,7 +115,7 @@ bool isGamepadPresent(Controller aController)
 }
 
 
-void GameInputState::readAll(Application & aApplication)
+void GameInputState::readAll(graphics::ApplicationGlfw & aApplication)
 {
     readKeyboard(gKeyboardConfig,
                  controllerState[static_cast<std::size_t>(Controller::Keyboard)],

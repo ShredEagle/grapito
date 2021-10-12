@@ -69,7 +69,7 @@ static inline ContactManifold QueryFacePenetration(
         const Position2 support = bodyB.box->getSupport(-edgeA.normal);
         const double distance = distanceToLine(support, edgeA.origin, edgeA.end, edgeA.normal);
 
-        Color color = distance > 0 ? Color{0, 200, 0} : Color{200, 0, 0};
+        math::sdr::Rgb color = distance > 0 ? math::sdr::Rgb{0, 200, 0} : math::sdr::Rgb{200, 0, 0};
 
 
         if (distance > resultManifold.separation)

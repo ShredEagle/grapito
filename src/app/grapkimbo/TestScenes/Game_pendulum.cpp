@@ -34,7 +34,7 @@ namespace ad {
 
 namespace grapito {
 
-Game_pendulum::Game_pendulum(Application & aApplication, DebugUI & aUI) :
+Game_pendulum::Game_pendulum(graphics::ApplicationGlfw & aApplication, DebugUI & aUI) :
     mUI{aUI}
 {
 

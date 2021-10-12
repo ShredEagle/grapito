@@ -1,12 +1,14 @@
 #pragma once
 
 #include "commons.h"
-#include "engine/Application.h"
-#include "engine/TrivialLineStrip.h"
-#include "engine/commons.h"
-#include "math/Angle.h"
-#include "math/Matrix.h"
-#include <engine/TrivialShaping.h>
+
+#include <graphics/ApplicationGlfw.h>
+#include <graphics/commons.h>
+#include <graphics/TrivialLineStrip.h>
+#include <graphics/TrivialShaping.h>
+
+#include <math/Angle.h>
+#include <math/Matrix.h>
 
 #include <vector>
 
@@ -20,7 +22,7 @@ namespace ad
                 const grapito::Position2 & aOrigin,
                 const math::Size<2, double> & aDimension,
                 const math::Matrix<3, 3> aTransform,
-                const Color & aColor
+                const math::sdr::Rgb & aColor
             ) :
                 origin{static_cast<math::Position<2, float>>(aOrigin)},
                 dimension{static_cast<math::Size<2, float>>(aDimension)},
@@ -31,7 +33,7 @@ namespace ad
             math::Position<2, GLfloat> origin;
             math::Size<2, GLfloat> dimension;
             math::Matrix<3, 3, float> transform;
-            Color color;
+            const math::sdr::Rgb color;
         };
 
         struct Line
@@ -40,7 +42,7 @@ namespace ad
                 const grapito::Position2 & aOrigin,
                 const grapito::Position2 & aEnd,
                 float aWidth,
-                const Color & aColor
+                const math::sdr::Rgb & aColor
             ) :
                 origin{static_cast<math::Position<2, float>>(aOrigin)},
                 end{static_cast<math::Position<2, float>>(aEnd)},
@@ -50,7 +52,7 @@ namespace ad
             math::Position<2, GLfloat> origin;
             math::Position<2, GLfloat> end;
             float width;
-            Color color;
+            math::sdr::Rgb color;
         };
 
         struct Arrow
@@ -60,7 +62,7 @@ namespace ad
                 const grapito::Position2 & aEnd,
                 const math::Size<2, double> & aHeadDimension,
                 float aWidth,
-                const Color & aColor
+                const math::sdr::Rgb & aColor
             ) :
                 origin{static_cast<math::Position<2, int>>(aOrigin)},
                 end{static_cast<math::Position<2, int>>(aEnd)},
@@ -72,7 +74,7 @@ namespace ad
             math::Position<2, int> end;
             math::Size<2, int> headDimension;
             float width;
-            Color color;
+            math::sdr::Rgb color;
         };
 
         struct Point
@@ -80,7 +82,7 @@ namespace ad
             Point(
                 const grapito::Position2 & aOrigin,
                 float aRadius,
-                const Color & aColor
+                const math::sdr::Rgb & aColor
             ) :
                 origin{aOrigin},
                 radius{aRadius},
@@ -88,15 +90,15 @@ namespace ad
             {}
             math::Position<2, GLfloat> origin;
             float radius;
-            Color color;
+            math::sdr::Rgb color;
         };
 
         class DrawDebugStuff
         {
             public:
-                DrawDebugStuff(const Application & aApplication) :
-                    mTrivialShaping{aApplication.getEngine()->getWindowSize()},
-                    mTrivialLineStrip{aApplication.getEngine()->getWindowSize()}
+                DrawDebugStuff(const graphics::ApplicationGlfw & aApplication) :
+                    mTrivialShaping{aApplication.getAppInterface()->getWindowSize()},
+                    mTrivialLineStrip{aApplication.getAppInterface()->getWindowSize()}
                 {}
                 void drawRectangle(Rectangle aRectangle);
                 void drawOutline(Rectangle aRectangle);
@@ -106,8 +108,8 @@ namespace ad
                 //void drawPoint(Point aPoint);
                 void render();
                 void clear();
-                TrivialShaping mTrivialShaping;
-                TrivialLineStrip mTrivialLineStrip;
+                graphics::TrivialShaping mTrivialShaping;
+                graphics::TrivialLineStrip mTrivialLineStrip;
 
                 bool mShown{false};
 
