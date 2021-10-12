@@ -2,7 +2,7 @@
 
 #include "commons.h"
 
-#include <graphics/Application.h>
+#include <graphics/ApplicationGlfw.h>
 #include <graphics/commons.h>
 #include <graphics/TrivialLineStrip.h>
 #include <graphics/TrivialShaping.h>
@@ -96,7 +96,7 @@ namespace ad
         class DrawDebugStuff
         {
             public:
-                DrawDebugStuff(const Application & aApplication) :
+                DrawDebugStuff(const ApplicationGlfw & aApplication) :
                     mTrivialShaping{aApplication.getAppInterface()->getWindowSize()},
                     mTrivialLineStrip{aApplication.getAppInterface()->getWindowSize()}
                 {}

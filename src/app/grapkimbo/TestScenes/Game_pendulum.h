@@ -10,7 +10,7 @@
 #include <aunteater/SystemManager.h>
 #include <aunteater/Timer.h>
 
-#include <graphics/Application.h>
+#include <graphics/ApplicationGlfw.h>
 
 
 namespace ad {
@@ -19,7 +19,7 @@ namespace grapito {
 class Game_pendulum : public Game
 {
 public:
-    Game_pendulum(Application & aApplication, DebugUI & aUI);
+    Game_pendulum(ApplicationGlfw & aApplication, DebugUI & aUI);
     ~Game_pendulum() = default;
 
     bool update(const aunteater::Timer & aTimer, const GameInputState & aInputState);

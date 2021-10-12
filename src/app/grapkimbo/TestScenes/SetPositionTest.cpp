@@ -50,7 +50,7 @@ void createSetPositionTest(Position2 pos, double angle, Position2 localPoint, Po
     setLocalPointToWorldPos(bodyB, localPoint, worldPoint);
 }
 
-SetPositionTest::SetPositionTest(Application & aApplication, DebugUI & aUI) :
+SetPositionTest::SetPositionTest(ApplicationGlfw & aApplication, DebugUI & aUI) :
     mUI{aUI}
 {
     mSystemManager.add<Render>(aApplication); 

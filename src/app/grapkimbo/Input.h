@@ -1,6 +1,6 @@
 #pragma once
 
-#include <graphics/Application.h>
+#include <graphics/ApplicationGlfw.h>
 
 #include <array>
 #include <variant>
@@ -119,7 +119,7 @@ bool isGamepadPresent(Controller aController);
 
 struct GameInputState
 {
-    void readAll(Application & aApplication);
+    void readAll(ApplicationGlfw & aApplication);
     float asAxis(Controller aController, Command aNegativeButton, Command aPositiveButton, Command aGamepadAxis) const;
     math::Vec<2, float> asDirection(Controller aController,
                                     Command aHorizontalAxis,

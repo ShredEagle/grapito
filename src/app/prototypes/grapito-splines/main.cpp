@@ -1,6 +1,6 @@
 #include "Scene.h"
 
-#include <graphics/Application.h>
+#include <graphics/ApplicationGlfw.h>
 
 #include <math/Color.h>
 
@@ -8,8 +8,8 @@ int main(int argc, const char * argv[])
 {
     try
     {
-        ad::Application application("Grapito splines", 1600, 900,
-                                    ad::Application::Window_Keep_Ratio);
+        ad::ApplicationGlfw application("Grapito splines", 1600, 900,
+                                    ad::ApplicationGlfw::Window_Keep_Ratio);
 
         ad::Scene scene{application.getAppInterface()->getFramebufferSize()};
 

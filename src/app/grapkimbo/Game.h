@@ -8,7 +8,7 @@
 #include <aunteater/Timer.h>
 #include <aunteater/SystemManager.h>
 
-#include <graphics/Application.h>
+#include <graphics/ApplicationGlfw.h>
 
 #include <iostream>
 #include <string>

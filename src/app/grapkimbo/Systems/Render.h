@@ -15,7 +15,7 @@
 #include <aunteater/FamilyHelp.h>
 #include <aunteater/System.h>
 
-#include <graphics/Application.h>
+#include <graphics/ApplicationGlfw.h>
 #include <graphics/Curving.h>
 #include <graphics/DrawLine.h>
 #include <graphics/TrivialLineStrip.h>
@@ -38,7 +38,7 @@ class Render : public aunteater::System<GameInputState>
 {
 
 public:
-    Render(aunteater::EntityManager & aEntityManager, Application & aApplication);
+    Render(aunteater::EntityManager & aEntityManager, ApplicationGlfw & aApplication);
 
     void update(const aunteater::Timer aTimer, const GameInputState &) override;
 

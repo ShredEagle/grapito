@@ -14,7 +14,7 @@ namespace ad {
 namespace grapito
 {
 
-Render::Render(aunteater::EntityManager & aEntityManager, Application & aApplication) :
+Render::Render(aunteater::EntityManager & aEntityManager, ApplicationGlfw & aApplication) :
     mEntityManager{aEntityManager},
     mRectangles{mEntityManager},
     mBodyRectangles{mEntityManager},

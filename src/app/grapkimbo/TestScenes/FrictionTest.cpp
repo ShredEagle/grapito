@@ -63,7 +63,7 @@ void createFrictionTest(double height, double friction, aunteater::EntityManager
             ));
 }
 
-FrictionTest::FrictionTest(Application & aApplication, DebugUI & aUI) :
+FrictionTest::FrictionTest(ApplicationGlfw & aApplication, DebugUI & aUI) :
     mUI{aUI}
 {
     mSystemManager.add<Gravity>();
