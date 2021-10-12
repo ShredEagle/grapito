@@ -51,7 +51,7 @@ private:
     const aunteater::FamilyHelp<RopeCreatorType> mRopes;
     const aunteater::FamilyHelp<Camera> mCameras;
 
-    std::shared_ptr<Engine> mEngine;
+    std::shared_ptr<AppInterface> mAppInterface;
     TrivialShaping mTrivialShaping;
     TrivialLineStrip mTrivialLineStrip;
     Curving mCurving;

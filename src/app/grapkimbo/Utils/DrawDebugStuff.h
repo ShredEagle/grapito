@@ -97,8 +97,8 @@ namespace ad
         {
             public:
                 DrawDebugStuff(const Application & aApplication) :
-                    mTrivialShaping{aApplication.getEngine()->getWindowSize()},
-                    mTrivialLineStrip{aApplication.getEngine()->getWindowSize()}
+                    mTrivialShaping{aApplication.getAppInterface()->getWindowSize()},
+                    mTrivialLineStrip{aApplication.getAppInterface()->getWindowSize()}
                 {}
                 void drawRectangle(Rectangle aRectangle);
                 void drawOutline(Rectangle aRectangle);
