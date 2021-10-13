@@ -42,6 +42,11 @@ set(${TARGET_NAME}_HEADERS
     TestScenes/Game_pendulum.h
     TestScenes/SceneChanger.h
 
+    Scenery/GameScene.h
+    Scenery/MenuScene.h
+    Scenery/RopeGame.h
+    Scenery/StateMachine.h
+
     Utils/CollisionBox.h
     Utils/DrawDebugStuff.h
     Utils/HomogeneousTransformation.h
@@ -76,6 +81,9 @@ set(${TARGET_NAME}_SOURCES
     TestScenes/SetPositionTest.cpp
     TestScenes/PivotTest.cpp
     TestScenes/Game_pendulum.cpp
+
+    Scenery/GameScene.cpp
+    Scenery/RopeGame.cpp
 
     Utils/CollisionBox.cpp
     Utils/DrawDebugStuff.cpp

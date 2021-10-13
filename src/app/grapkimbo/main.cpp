@@ -5,7 +5,9 @@
 
 #include <DebugGui/SceneGui.h>
 
-#include "TestScenes/SceneChanger.h"
+#include "Scenery/StateMachine.h"
+#include "Scenery/RopeGame.h"
+
 #include "Utils/DrawDebugStuff.h"
 
 #include <aunteater/Timer.h>
@@ -35,17 +37,14 @@ int main(int argc, const char * argv[])
 
         ad::debugDrawer = std::make_unique<ad::debug::DrawDebugStuff>(application);
         ad::grapito::ImguiState imguiState;
-        //
-        // "Game" selection
-        // 
-        //Game game{application};
-        ChangeScene(GameList::GamePendulum, application, debugUI);
+
+        StateMachine topLevelFlow{std::make_shared<RopeGame>(application.getAppInterface())};
 
         while(application.handleEvents())
         {
             inputState.readAll(application);
             timer.mark((float)glfwGetTime());
-            if (currentGame->update(timer, inputState))
+            if (topLevelFlow.update(timer, inputState))
             {
                 drawImGui(application, debugUI, imguiState);
                 renderImGui();
