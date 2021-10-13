@@ -6,8 +6,6 @@
 #include "Configuration.h"
 #include "Input.h"
 
-#include "TestScenes/SceneChanger.h"
-
 #include <Systems/Render.h>
 #include <Systems/Control.h>
 #include <Systems/Gravity.h>
@@ -29,15 +27,15 @@ namespace ad {
 
 namespace grapito {
 
-void createPivotTest(double height, aunteater::EntityManager & mEntityManager)
+void createPivotTest(float height, aunteater::EntityManager & mEntityManager)
 {
 
     aunteater::weak_entity bodyB = mEntityManager.addEntity(
             aunteater::Entity()
-            .add<Position>(Position2{5., height}, math::Size<2, double>{3., 1.})
+            .add<Position>(Position2{5.f, height}, math::Size<2, float>{3.f, 1.f})
             .add<PlayerData>(0, math::sdr::gMagenta)
             .add<Body>(
-                math::Rectangle<double>{{0., 0.}, {3., 1.}},
+                math::Rectangle<float>{{0.f, 0.f}, {3.f, 1.f}},
                 BodyType_Dynamic,
                 ShapeType_Hull,
                 CollisionType_Floor,
@@ -52,11 +50,11 @@ void createPivotTest(double height, aunteater::EntityManager & mEntityManager)
     aunteater::weak_entity bodyA = mEntityManager.addEntity(
             aunteater::Entity()
             .add<AccelAndSpeed>()
-            .add<Position>(Position2{-0., height}, math::Size<2, double>{5., 1.})
+            .add<Position>(Position2{-0.f, height}, math::Size<2, float>{5.f, 1.f})
             .add<PlayerData>(0, math::sdr::gRed)
             .add<VisualRectangle>(math::sdr::gRed)
             .add<Body>(
-                math::Rectangle<double>{{0., 0.}, {5., 1.}},
+                math::Rectangle<float>{{0.f, 0.f}, {5.f, 1.f}},
                 BodyType_Static,
                 ShapeType_Hull,
                 CollisionType_Floor,
@@ -67,8 +65,8 @@ void createPivotTest(double height, aunteater::EntityManager & mEntityManager)
     mEntityManager.addEntity(
             aunteater::Entity()
             .add<PivotJoint>(
-                Position2{5., .5},
-                Position2{0., .5},
+                Position2{5.f, 0.5f},
+                Position2{0.f, 0.5f},
                 bodyA,
                 bodyB
             ));
@@ -83,14 +81,14 @@ PivotTest::PivotTest(graphics::ApplicationGlfw & aApplication, DebugUI & aUI) :
     mSystemManager.add<Physics>();
     mSystemManager.add<Render>(aApplication); 
 
-    aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera({10., 2.}));
+    mEntityManager.addEntity(makeCamera({10.f, 2.f}));
 
     createPivotTest(5., mEntityManager);
 }
 
-bool PivotTest::update(const aunteater::Timer & aTimer, const GameInputState & aInputState)
+bool PivotTest::update(const GrapitoTimer & aTimer, const GameInputState & aInputState)
 {
-    aunteater::UpdateTiming<GameInputState> timings;
+    aunteater::UpdateTiming<GrapitoTimer, GameInputState> timings;
     InputState pauseInput = aInputState.get(Controller::Keyboard)[Command::Pause];
     InputState step = aInputState.get(Controller::Keyboard)[Command::Step];
 

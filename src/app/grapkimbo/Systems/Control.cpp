@@ -20,15 +20,10 @@ Control::Control(aunteater::EntityManager & aEntityManager) :
     mEntityManager{aEntityManager},
     mCartesianControllables{mEntityManager},
     mPolarControllables{mEntityManager},
-    mGrapplers{mEntityManager},
-    mModeSelectables{mEntityManager},
-    mAnchorables{mEntityManager}
+    mGrapplers{mEntityManager}
 {}
 
-using AnchorWrap = aunteater::FamilyHelp<AnchorElement>::const_Wrap;
-
-
-void Control::update(const aunteater::Timer aTimer, const GameInputState & aInputState)
+void Control::update(const GrapitoTimer aTimer, const GameInputState & aInputState)
 {
     //
     // Air
@@ -37,21 +32,27 @@ void Control::update(const aunteater::Timer aTimer, const GameInputState & aInpu
     {
         const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
         float horizontalAxis = aInputState.asAxis(controllable.controller, Left, Right, LeftHorizontalAxis);
+        float horizontalAxisSign = horizontalAxis / std::abs(horizontalAxis);
 
         if (playerData.state == PlayerCollisionState_Grounded)
         {
-            aas.speed += PlayerWalkingSpeed * horizontalAxis;
+            if (aas.speed.getNorm() < player::gPlayerWalkingSpeed && std::abs(horizontalAxis) > 0.)
+            {
+                aas.speed += horizontalAxisSign * (1.f / (1.f - player::gPlayerGroundFriction)) * player::gPlayerWalkingSpeed * player::gWalkingSpeedAccelFactor * Vec2{1.f, 0.f};
+            }
 
             if (inputs[Jump])
             {
-                aas.speed += Vec2{0., + gJumpImpulse};
+                aas.speed += Vec2{0.f, + player::gPlayerJumpImpulse};
             }
         }
         else
         {
-
-            aas.accel += Vec2{horizontalAxis * gAirControlAcceleration, 0.};
-
+            if (std::abs(aas.speed.x()) < player::gPlayerWalkingSpeed && std::abs(horizontalAxis) > 0.)
+            {
+                aas.speed += horizontalAxisSign * (1.f / (1.f - player::gAirFriction)) * player::gAirControlAcceleration * player::gAirSpeedAccelFactor * Vec2{1.f, 0.f};
+            }
+            aas.speed.x() *= (1.f - player::gAirFriction);
         }
 
         playerData.state = PlayerCollisionState_Jumping;
@@ -93,20 +94,6 @@ void Control::update(const aunteater::Timer aTimer, const GameInputState & aInpu
             playerData.controlState |= ControlState_Attached;
         }
 
-    }
-
-    //
-    // Change grapple mode
-    //
-    for(const auto & entity : mModeSelectables)
-    {
-        auto & [controllable, grappleControl, playerData] = entity;
-        const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
-
-        if (inputs[ChangeMode].positiveEdge())
-        {
-            setGrappleMode(entity, playerData, toggle(grappleControl.mode), mEntityManager);
-        }
     }
 }
 

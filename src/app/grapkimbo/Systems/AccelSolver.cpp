@@ -14,7 +14,7 @@ AccelSolver::AccelSolver(aunteater::EntityManager & aEntityManager) :
     mRotationed(aEntityManager)
 {}
 
-void AccelSolver::update(const aunteater::Timer aTimer, const GameInputState & aInputState)
+void AccelSolver::update(const GrapitoTimer aTimer, const GameInputState & aInputState)
 {
     // For the accel solver we will use a derive methode
     // from velocity verlet. It assumes a constant acceleration
@@ -36,7 +36,7 @@ void AccelSolver::update(const aunteater::Timer aTimer, const GameInputState & a
 
     for(auto & [aas, body] : mRotationed)
     {
-        body.theta += math::Radian<double>{aas.w * aTimer.delta()};
+        body.theta += math::Radian<float>{aas.w * aTimer.delta()};
     }
 }
 

@@ -25,7 +25,7 @@ public:
     Game_pendulum(graphics::ApplicationGlfw & aApplication, DebugUI & aUI);
     ~Game_pendulum() = default;
 
-    bool update(const aunteater::Timer & aTimer, const GameInputState & aInputState);
+    bool update(const GrapitoTimer & aTimer, const GameInputState & aInputState);
 private:
     DebugUI & mUI;
     TimeSystemsUpdater<GameInputState> mUpdater;

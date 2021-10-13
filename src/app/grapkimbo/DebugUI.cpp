@@ -21,7 +21,7 @@ DebugUI::DebugUI() :
     mNetworkContext.run();
 }
 
-void DebugUI::broadcast(const aunteater::UpdateTiming<GameInputState> & aTimings)
+void DebugUI::broadcast(const aunteater::UpdateTiming<GrapitoTimer, GameInputState> & aTimings)
 {
     std::ostringstream oss;
     aTimings.outputTimings(oss);

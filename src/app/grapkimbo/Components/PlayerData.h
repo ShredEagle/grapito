@@ -25,13 +25,10 @@ typedef int ControlStateFlag;
 constexpr ControlStateFlag ControlState_Throwing = 0b1;
 constexpr ControlStateFlag ControlState_Attached = 0b10;
 
-constexpr Vec2 PlayerGroundedNormal = {0., 1.};
-constexpr Vec2 PlayerWalledNormal = {1., 0.};
-constexpr double PlayerGroundedSlopeDotValue = 0.6;
-constexpr double PlayerWallSlopeDotValue = 0.8;
-constexpr double PlayerGroundFriction = 0.25;
-
-constexpr Vec2 PlayerWalkingSpeed = {10., 0.};
+constexpr Vec2 PlayerGroundedNormal = {0.f, 1.f};
+constexpr Vec2 PlayerWalledNormal = {1.f, 0.f};
+constexpr float PlayerGroundedSlopeDotValue = 0.6f;
+constexpr float PlayerWallSlopeDotValue = 0.8f;
 
 
 struct PlayerData : public aunteater::Component<PlayerData>

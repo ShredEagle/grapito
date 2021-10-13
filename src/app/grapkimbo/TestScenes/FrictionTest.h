@@ -22,7 +22,7 @@ public:
     FrictionTest(graphics::ApplicationGlfw & aApplication, DebugUI & aUI);
     ~FrictionTest() = default;
 
-    bool update(const aunteater::Timer & aTimer, const GameInputState & aInputState);
+    bool update(const GrapitoTimer & aTimer, const GameInputState & aInputState);
 private:
     DebugUI & mUI;
 };

@@ -6,7 +6,6 @@
 #include <Components/Body.h>
 #include <Components/AccelAndSpeed.h>
 #include <Components/GrappleControl.h>
-#include <Components/Pendular.h>
 #include <Components/PlayerData.h>
 #include <Components/Position.h>
 #include <Components/Mass.h>
@@ -16,8 +15,6 @@
 #include <aunteater/EntityManager.h>
 #include <aunteater/System.h>
 
-#include <utility>
-
 namespace ad {
 namespace grapito
 {
@@ -25,17 +22,14 @@ namespace grapito
 typedef aunteater::Archetype<Controllable, Position, AccelAndSpeed, Mass, PlayerData> CartesianControlled;
 typedef aunteater::Archetype<Controllable, PlayerData> PolarControlled;
 typedef aunteater::Archetype<Controllable, AccelAndSpeed, GrappleControl, Position, PlayerData> Grappler;
-typedef aunteater::Archetype<Controllable, GrappleControl, PlayerData> ModeSelectable; // est une bande de mecs sympas
-// Currently using EnvironmentCollisionBox as a tag, because it is not correctly positioned...
-typedef aunteater::Archetype<Position, Body> AnchorElement;
 
-class Control : public aunteater::System<GameInputState>
+class Control : public aunteater::System<GrapitoTimer, GameInputState>
 {
 
 public:
     Control(aunteater::EntityManager & aEntityManager);
 
-    void update(const aunteater::Timer aTimer, const GameInputState & aInputState) override;
+    void update(const GrapitoTimer aTimer, const GameInputState & aInputState) override;
 
     static constexpr double gPendularControlAccelerationFactor = 1./6.;
     static constexpr double gAirControlAcceleration = 12.; // m/s
@@ -48,8 +42,6 @@ private:
     const aunteater::FamilyHelp<CartesianControlled> mCartesianControllables;
     const aunteater::FamilyHelp<PolarControlled> mPolarControllables;
     const aunteater::FamilyHelp<Grappler> mGrapplers;
-    const aunteater::FamilyHelp<ModeSelectable> mModeSelectables;
-    const aunteater::FamilyHelp<AnchorElement> mAnchorables;
 
 };
 

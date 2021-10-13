@@ -1,23 +1,24 @@
 #include "Gravity.h"
 
+#include "../Configuration.h"
+
 #include <math/Vector.h>
 
 namespace ad {
 namespace grapito
 {
 
-const Vec2 gravityVector = {0., - Gravity::gAcceleration};
-
 Gravity::Gravity(aunteater::EntityManager & aEntityManager) :
     mMassives(aEntityManager)
 {}
 
-void Gravity::update(const aunteater::Timer aTimer, const GameInputState &)
+void Gravity::update(const GrapitoTimer aTimer, const GameInputState &)
 {
     for(auto massive : mMassives)
     {
         if (massive->get<Body>().bodyType != BodyType_Static)
         {
+            const Vec2 gravityVector = {0.f, - player::gAcceleration};
             massive->get<AccelAndSpeed>().accel += gravityVector;
         }
     }

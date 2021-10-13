@@ -26,7 +26,7 @@ class GrapitoConan(ConanFile):
         ("imgui/1.84.2"),
         ("spdlog/1.9.2"),
 
-        ("aunteater/2814861773@adnn/develop"),
+        ("aunteater/b7424ee873@adnn/develop"),
         ("graphics/21cd7a05fd@adnn/develop"),
         ("math/64e6aa9451@adnn/develop"),
         ("websocket/1e3830b8b8@adnn/develop"),

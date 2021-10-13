@@ -49,7 +49,7 @@ void RopeCreation::addedEntity(aunteater::LiveEntity & aEntity)
     mEntityManager.addEntity(
             aunteater::Entity()
             .add<PivotJoint>(
-                Position2{0., rope::ropeHalfwidth},
+                Position2{0.f, rope::ropeHalfwidth},
                 body.massCenter,
                 link,
                 &aEntity
@@ -73,7 +73,7 @@ void RopeCreation::handleThrow(RopeCreator & aRopeCreator)
                                                     rope::ropeHalfwidth});
             double length = (end - origin).getNorm();
 
-            if (length > .4)
+            if (length > .4f)
             {
                 aunteater::weak_entity link = mEntityManager.addEntity(createRopeSegment(
                     origin,
@@ -83,7 +83,7 @@ void RopeCreation::handleThrow(RopeCreator & aRopeCreator)
                 mEntityManager.addEntity(
                         aunteater::Entity()
                         .add<PivotJoint>(
-                            Position2{0., rope::ropeHalfwidth},
+                            Position2{0.f, rope::ropeHalfwidth},
                             Position2{lastSegment->get<Position>().dimension.width(), rope::ropeHalfwidth},
                             link,
                             lastSegment
@@ -95,7 +95,7 @@ void RopeCreation::handleThrow(RopeCreator & aRopeCreator)
 }
 
 
-void RopeCreation::update(const aunteater::Timer aTimer, const GameInputState &)
+void RopeCreation::update(const GrapitoTimer aTimer, const GameInputState &)
 {
     for (auto & ropeCreatorEntity : mRopeCreator)
     {

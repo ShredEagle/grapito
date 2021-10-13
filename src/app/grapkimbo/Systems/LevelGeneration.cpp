@@ -17,7 +17,7 @@ LevelGeneration::LevelGeneration(aunteater::EntityManager & aEntityManager) :
 }
 
 
-void LevelGeneration::update(const aunteater::Timer aTimer, const GameInputState &)
+void LevelGeneration::update(const GrapitoTimer aTimer, const GameInputState &)
 {
     math::Vec<2, int> cameraPosition = static_cast<math::Vec<2, int>>(getCameraPosition());
     TileIndex newIndex = cameraPosition.cwDiv(gTileDimension.as<math::Vec>());
@@ -108,12 +108,12 @@ void LevelGeneration::generateTiles(TileIndex aIndex)
     {
         for (int x = 0; x != count; ++x)
         {
-            auto offset = static_cast<math::Vec<2, double>>(gTileDimension) / count;
-            math::Position<2, double> position = 
-                static_cast<math::Position<2, double>>(gTileDimension.cwMul(aIndex.as<math::Size>()))
-                + offset.cwMul({(double)x, (double)y});
+            auto offset = static_cast<math::Vec<2, float>>(gTileDimension) / count;
+            Position2 position = 
+                static_cast<Position2>(gTileDimension.cwMul(aIndex.as<math::Size>()))
+                + offset.cwMul({(float)x, (float)y});
                 ;
-            math::Size<2, double> size{2., 2.};
+            math::Size<2, float> size{2.f, 2.f};
             anchors.push_back(mEntityManager.addEntity(makeAnchor(position, size)));
         }
     }
@@ -122,13 +122,13 @@ void LevelGeneration::generateTiles(TileIndex aIndex)
 }
 
 
-math::Position<2, double> LevelGeneration::getCameraPosition() const
+Position2 LevelGeneration::getCameraPosition() const
 {
     for(const auto & [cameraGuide, geometry] : mGuides)
     {
         return geometry.position;
     }
-    return {0., 0.};
+    return {0.f, 0.f};
 }
 
 } //namespace grapito

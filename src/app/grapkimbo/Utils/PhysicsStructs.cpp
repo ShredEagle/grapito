@@ -21,11 +21,11 @@ ConstructedBody::ConstructedBody(Body & aBody, Position & aPos, AccelAndSpeed & 
     bodyType{aBody.bodyType},
     shapeType{aBody.shapeType},
     collisionType{aBody.collisionType},
+    acceptedCollision{aBody.acceptedCollision},
     bodyRef{aBody},
     posRef{aPos},
     aasRef{aAas},
-    entity{aEntity},
-    acceptedCollision{aBody.acceptedCollision}
+    entity{aEntity}
 {
 }
 
@@ -60,14 +60,14 @@ void ConstructedBody::updateEntity()
 bool ConstructedBody::shouldCollide(ConstructedBody & body)
 {
     bool result = true;
-    result = result && std::find(body.acceptedCollision.begin(), body.acceptedCollision.end(), collisionType) != body.acceptedCollision.end() || body.acceptedCollision.size() == 0;
-    result = result && std::find(acceptedCollision.begin(), acceptedCollision.end(), body.collisionType) != acceptedCollision.end() || acceptedCollision.size() == 0;
+    result = (result && std::find(body.acceptedCollision.begin(), body.acceptedCollision.end(), collisionType) != body.acceptedCollision.end()) || body.acceptedCollision.size() == 0;
+    result = (result && std::find(acceptedCollision.begin(), acceptedCollision.end(), body.collisionType) != acceptedCollision.end()) || acceptedCollision.size() == 0;
     return result;
 }
 
 void ConstructedBody::debugRender()
 {
-    for (int i = 0; i < box->shape.mFaceCount; ++i)
+    for (size_t i = 0; i < box->shape.mFaceCount; ++i)
     {
         auto vertex = box->shape.getVertice(i);
         debugDrawer->drawPoint({

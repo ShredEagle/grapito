@@ -7,13 +7,13 @@ namespace ad {
 namespace grapito {
 
 
-Shape::Shape(math::Rectangle<double> aRectangle) :
+Shape::Shape(math::Rectangle<float> aRectangle) :
     mFaceCount{4}
 {
-    Vec2 xVec{aRectangle.width(), 0.};
-    Vec2 yVec{0., aRectangle.height()};
+    Vec2 xVec{aRectangle.width(), 0.f};
+    Vec2 yVec{0.f, aRectangle.height()};
 
-    for (int index = 0; index < mFaceCount; ++index)
+    for (size_t index = 0; index < mFaceCount; ++index)
     {
         auto vertice = aRectangle.origin() + ((index & 0x01) ^ index >> 1) * xVec + (index >> 1) * yVec;
         vertices.emplace_back(vertice);
@@ -37,18 +37,18 @@ const Shape::Edge Shape::getEdge(const int index) const
     return {origin, end, normal.normalize(), edgeVector};
 };
 
-const math::Rectangle<double> Shape::getAABB() const
+const math::Rectangle<float> Shape::getAABB() const
 {
-    double minX = std::numeric_limits<double>::max();
-    double minY = std::numeric_limits<double>::max();
-    double maxX = -std::numeric_limits<double>::max();
-    double maxY = -std::numeric_limits<double>::max();
+    float minX = std::numeric_limits<float>::max();
+    float minY = std::numeric_limits<float>::max();
+    float maxX = -std::numeric_limits<float>::max();
+    float maxY = -std::numeric_limits<float>::max();
 
-    for (int index = 0; index < mFaceCount; ++index)
+    for (size_t index = 0; index < mFaceCount; ++index)
     {
         const auto pos = getVertice(index);
-        const double x = pos.x();
-        const double y = pos.y();
+        const float x = pos.x();
+        const float y = pos.y();
 
         minX = std::min(minX, x);
         maxX = std::max(maxX, x);
@@ -62,7 +62,7 @@ const math::Rectangle<double> Shape::getAABB() const
 
 void Shape::debugRender()
 {
-    for (int i = 0; i < mFaceCount; ++i)
+    for (size_t i = 0; i < mFaceCount; ++i)
     {
         debugDrawer->drawLine({
                 getVertice(i),

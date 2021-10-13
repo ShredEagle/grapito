@@ -30,12 +30,12 @@ namespace ad {
 namespace grapito {
 
 void createSimpleCollisionTest(
-        double widthA,
-        double widthB,
-        double baseHeight,
+        float widthA,
+        float widthB,
+        float baseHeight,
         int qty,
         int index,
-        double w,
+        float w,
         aunteater::EntityManager & mEntityManager
         )
 {
@@ -43,9 +43,9 @@ void createSimpleCollisionTest(
     {
         mEntityManager.addEntity(
                 aunteater::Entity()
-                .add<Position>(Position2{index * 4 - widthA / 2, baseHeight + i * 2.1}, math::Size<2, double>{widthA, 2.})
+                .add<Position>(Position2{index * 4.f - widthA / 2.f, baseHeight + i * 2.1f}, math::Size<2, float>{widthA, 2.f})
                 .add<Body>(
-                    math::Rectangle<double>{{0., 0.}, {widthA, 2.}},
+                    math::Rectangle<float>{{0.f, 0.f}, {widthA, 2.f}},
                     BodyType_Dynamic,
                     ShapeType_Hull,
                     CollisionType_Moving_Env,
@@ -54,17 +54,17 @@ void createSimpleCollisionTest(
                     .2
                 )
                 .add<VisualRectangle>(math::sdr::gCyan)
-                .add<AccelAndSpeed>(Vec2{0., 0.}, w)
+                .add<AccelAndSpeed>(Vec2{0.f, 0.f}, w)
                 );
     }
 
     mEntityManager.addEntity(
             aunteater::Entity()
             .add<AccelAndSpeed>()
-            .add<Position>(Position2{index * 4 - widthB / 2 , 2.}, math::Size<2, double>{widthB, 1.})
+            .add<Position>(Position2{index * 4.f - widthB / 2.f, 2.f}, math::Size<2, float>{widthB, 1.f})
             .add<VisualRectangle>(math::sdr::gCyan)
             .add<Body>(
-                math::Rectangle<double>{{0., 0.}, {widthB, 1.}},
+                math::Rectangle<float>{{0.f, 0.f}, {widthB, 1.f}},
                 BodyType_Static,
                 ShapeType_Hull,
                 CollisionType_Moving_Env,
@@ -83,16 +83,16 @@ SimpleCollisionTest::SimpleCollisionTest(graphics::ApplicationGlfw & aApplicatio
     mSystemManager.add<Physics>();
     mSystemManager.add<Render>(aApplication); 
 
-    aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera({10., 2.}));
+    mEntityManager.addEntity(makeCamera({10.f, 2.f}));
 
-    createSimpleCollisionTest(2., 6., 20., 1, 1, 0., mEntityManager);
-    createSimpleCollisionTest(2., .5, 4., 2, 2, 0., mEntityManager);
-    createSimpleCollisionTest(2., .5, 4., 4, 3, 0., mEntityManager);
+    createSimpleCollisionTest(2.f, 6.f, 20.f, 1, 1, 0.f, mEntityManager);
+    createSimpleCollisionTest(2.f, 0.5f, 4.f, 2, 2, 0.f, mEntityManager);
+    createSimpleCollisionTest(2.f, 0.5f, 4.f, 4, 3, 0.f, mEntityManager);
 }
 
-bool SimpleCollisionTest::update(const aunteater::Timer & aTimer, const GameInputState & aInputState)
+bool SimpleCollisionTest::update(const GrapitoTimer & aTimer, const GameInputState & aInputState)
 {
-    aunteater::UpdateTiming<GameInputState> timings;
+    aunteater::UpdateTiming<GrapitoTimer, GameInputState> timings;
     InputState pauseInput = aInputState.get(Controller::Keyboard)[Command::Pause];
     InputState step = aInputState.get(Controller::Keyboard)[Command::Step];
 

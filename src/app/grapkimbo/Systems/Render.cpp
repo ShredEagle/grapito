@@ -19,19 +19,15 @@ Render::Render(aunteater::EntityManager & aEntityManager, graphics::ApplicationG
     mRectangles{mEntityManager},
     mBodyRectangles{mEntityManager},
     mOutlines{mEntityManager},
-    mPendulums{mEntityManager},
     mRopes{mEntityManager},
     mCameras{mEntityManager},
     mAppInterface(aApplication.getAppInterface()),
-#ifdef KIMBO_DEBUG
-    mColliders{mEntityManager},
-#endif
     mTrivialShaping{aApplication.getAppInterface()->getWindowSize()},
     mTrivialLineStrip{aApplication.getAppInterface()->getWindowSize()},
     mCurving{render::gBezierSubdivisions}
 {}
 
-void Render::update(const aunteater::Timer aTimer, const GameInputState &)
+void Render::update(const GrapitoTimer aTimer, const GameInputState &)
 {
     mTrivialShaping.clearShapes();
     mTrivialLineStrip.clearLines();
@@ -68,14 +64,6 @@ void Render::update(const aunteater::Timer aTimer, const GameInputState &)
             },
             visualOutline.color
         );
-    }
-
-    for(const auto [pendular, geometry, aas] : mPendulums)
-    {
-        mTrivialLineStrip.addLine({
-            {static_cast<math::Position<2, GLfloat>>(pendular.anchor), math::sdr::gRed},
-            {static_cast<math::Position<2, GLfloat>>(geometry.center()), math::sdr::gGreen},
-        });
     }
 
     Spline beziers;
