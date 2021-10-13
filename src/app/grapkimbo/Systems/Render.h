@@ -32,7 +32,8 @@ class Render : public aunteater::System<GrapitoTimer, GameInputState>
 {
 
 public:
-    Render(aunteater::EntityManager & aEntityManager, graphics::ApplicationGlfw & aApplication);
+    Render(aunteater::EntityManager & aEntityManager,
+           std::shared_ptr<graphics::AppInterface> aAppInterface);
 
     void update(const GrapitoTimer aTimer, const GameInputState &) override;
 

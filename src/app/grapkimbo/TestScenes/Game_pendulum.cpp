@@ -44,7 +44,7 @@ Game_pendulum::Game_pendulum(graphics::ApplicationGlfw & aApplication, DebugUI &
     mSystemManager.add<AccelSolver>();
     mSystemManager.add<Physics>();
 
-    mSystemManager.add<Render>(aApplication); 
+    mSystemManager.add<Render>(aApplication.getAppInterface());  
 
     // Camera
     aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera());

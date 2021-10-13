@@ -14,16 +14,17 @@ namespace ad {
 namespace grapito
 {
 
-Render::Render(aunteater::EntityManager & aEntityManager, graphics::ApplicationGlfw & aApplication) :
+Render::Render(aunteater::EntityManager & aEntityManager,
+               std::shared_ptr<graphics::AppInterface> aAppInterface) :
     mEntityManager{aEntityManager},
     mRectangles{mEntityManager},
     mBodyRectangles{mEntityManager},
     mOutlines{mEntityManager},
     mRopes{mEntityManager},
     mCameras{mEntityManager},
-    mAppInterface(aApplication.getAppInterface()),
-    mTrivialShaping{aApplication.getAppInterface()->getWindowSize()},
-    mTrivialLineStrip{aApplication.getAppInterface()->getWindowSize()},
+    mAppInterface{aAppInterface},
+    mTrivialShaping{aAppInterface->getWindowSize()},
+    mTrivialLineStrip{aAppInterface->getWindowSize()},
     mCurving{render::gBezierSubdivisions}
 {}
 
