@@ -5,6 +5,8 @@
 #include <math/Color.h>
 #include <math/Vector.h>
 
+#include <glad/glad.h>
+
 namespace ad {
 namespace anchor
 {

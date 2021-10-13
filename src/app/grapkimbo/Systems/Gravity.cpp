@@ -1,5 +1,7 @@
 #include "Gravity.h"
 
+#include "../Configuration.h"
+
 #include <math/Vector.h>
 
 namespace ad {

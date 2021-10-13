@@ -28,7 +28,7 @@ math::Position<3, GLfloat> getSegmentKnotPosition(aunteater::weak_entity aSegmen
 
 math::Position<3, GLfloat> getSegmentKnotPositionFront(aunteater::weak_entity aSegment)
 {
-    return getSegmentKnotPosition(aSegment, {0., rope::ropeHalfwidth});
+    return getSegmentKnotPosition(aSegment, {0.f, rope::ropeHalfwidth});
 }
 
 

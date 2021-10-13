@@ -909,7 +909,7 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
         if (-constraint.normal.dot(PlayerGroundedNormal) > PlayerGroundedSlopeDotValue)
         {
             //Set player as grounded
-            constraint.cPlayer->velocity->v *= PlayerGroundFriction;
+            constraint.cPlayer->velocity->v *= player::gPlayerGroundFriction;
             constraint.cPlayer->entity->get<PlayerData>().state = PlayerCollisionState_Grounded;
         }
         else if (constraint.normal.dot(PlayerWalledNormal) > PlayerWallSlopeDotValue || constraint.normal.dot(PlayerWalledNormal) < -PlayerWallSlopeDotValue)
