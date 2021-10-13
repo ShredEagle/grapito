@@ -4,9 +4,10 @@ set(${TARGET_NAME}_HEADERS
     commons.h
     Configuration.h
     DebugUI.h
+    Entities.h
     Game.h
     Input.h
-    Entities.h
+    Logging.h
     Utilities.h
 
     Components/AccelAndSpeed.h
@@ -48,10 +49,11 @@ set(${TARGET_NAME}_HEADERS
 
     Utils/CollisionBox.h
     Utils/DrawDebugStuff.h
-    Utils/RopeUtilities.h
     Utils/HomogeneousTransformation.h
-    Utils/Shape.h
     Utils/PhysicsStructs.h
+    Utils/RopeUtilities.h
+    Utils/Shape.h
+    Utils/TimeSystemsUpdater.h
 
     DebugGui/SceneGui.h
 )
@@ -61,6 +63,7 @@ set(${TARGET_NAME}_SOURCES
 
     DebugUI.cpp
     Input.cpp
+    Logging.cpp
     Entities.cpp
 
     Systems/CameraGuidedControl.cpp
@@ -100,6 +103,7 @@ find_package(Websocket CONFIG REQUIRED COMPONENTS websocket)
 
 find_package(glad REQUIRED)
 find_package(imgui REQUIRED)
+find_package(spdlog REQUIRED)
 
 
 add_executable(${TARGET_NAME}
@@ -138,6 +142,7 @@ target_link_libraries(${TARGET_NAME}
 
         glad::glad
         imgui::imgui
+        spdlog::libspdlog
 )
 
 

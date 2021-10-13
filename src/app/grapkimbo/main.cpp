@@ -1,4 +1,5 @@
 #include "Input.h"
+#include "Logging.h"
 
 #include <DebugGui/SceneGui.h>
 
@@ -18,6 +19,8 @@ int main(int argc, const char * argv[])
 {
     try
     {
+        initializeLogging();
+
         GameInputState inputState;
         DebugUI debugUI;
 

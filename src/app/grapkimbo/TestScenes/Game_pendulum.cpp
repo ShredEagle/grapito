@@ -1,6 +1,7 @@
 #include "Game_pendulum.h"
 #include "Configuration.h"
 #include "Entities.h"
+#include "Logging.h"
 
 #include "TestScenes/SceneChanger.h"
 
@@ -80,9 +81,10 @@ Game_pendulum::Game_pendulum(graphics::ApplicationGlfw & aApplication, DebugUI &
     }
 }
 
+
 bool Game_pendulum::update(const aunteater::Timer & aTimer, const GameInputState & aInputState)
 {
-    aunteater::UpdateTiming<GameInputState> timings;
+    //aunteater::UpdateTiming<GameInputState> timings;
     InputState pauseInput = aInputState.get(Controller::Keyboard)[Command::Pause];
     InputState step = aInputState.get(Controller::Keyboard)[Command::Step];
 
@@ -94,8 +96,9 @@ bool Game_pendulum::update(const aunteater::Timer & aTimer, const GameInputState
     if (!pause || step.positiveEdge())
     {
         mSystemManager.pause(false);
-        mSystemManager.update(aTimer, aInputState, timings);
-        mUI.broadcast(timings);
+        mSystemManager.update(aTimer, aInputState, mUpdater);
+        log(mUpdater);
+        //mUI.broadcast(timings);
     }
     else 
     {

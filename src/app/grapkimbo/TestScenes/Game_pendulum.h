@@ -4,6 +4,8 @@
 #include "Game.h"
 #include "Input.h"
 
+#include "Utils/TimeSystemsUpdater.h"
+
 #include "Systems/Control.h"
 
 #include <aunteater/EntityManager.h>
@@ -16,6 +18,7 @@
 namespace ad {
 namespace grapito {
 
+
 class Game_pendulum : public Game
 {
 public:
@@ -25,6 +28,9 @@ public:
     bool update(const aunteater::Timer & aTimer, const GameInputState & aInputState);
 private:
     DebugUI & mUI;
+    TimeSystemsUpdater<GameInputState> mUpdater;
 };
+
+
 } // namespace grapito
 } // namespace ad
