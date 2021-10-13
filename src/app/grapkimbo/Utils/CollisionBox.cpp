@@ -11,7 +11,7 @@ CollisionBox::CollisionBox(Shape aShape) :
     shape{std::move(aShape)}
 {};
 
-CollisionBox::CollisionBox(math::Rectangle<double> aRectangle) : 
+CollisionBox::CollisionBox(math::Rectangle<float> aRectangle) : 
     shape{aRectangle}
 {};
 
@@ -26,14 +26,14 @@ CollisionBox::CollisionBox(std::vector<Position2> vertices) :
 // and makes normal computation easy
 const Position2 CollisionBox::getSupport(const Vec2 direction) const
 {
-    double bestProjection = -std::numeric_limits<double>::max();
+    float bestProjection = -std::numeric_limits<float>::max();
     Position2 bestVertex{0.f, 0.f};
 
     //In 2D face count and vertex count are always the same
     for (int i = 0; i < shape.mFaceCount; ++i)
     {
         Position2 vertex = shape.getVertice(i);
-        double projection = direction.dot(vertex.as<math::Vec>());
+        float projection = direction.dot(vertex.as<math::Vec>());
 
         if (projection > bestProjection)
         {

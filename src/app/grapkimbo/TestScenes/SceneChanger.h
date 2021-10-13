@@ -15,7 +15,6 @@ namespace ad {
 namespace grapito {
 
 static std::unique_ptr<Game> currentGame;
-static bool pause = false;
 
 enum GameList
 {

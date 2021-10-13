@@ -1,24 +1,22 @@
 #include "CollisionTest.h"
 
 #include "Entities.h"
-#include "Systems/Physics.h"
 #include "commons.h"
 #include "Configuration.h"
 #include "Input.h"
 
-#include "TestScenes/SceneChanger.h"
-
 #include <Systems/Render.h>
+#include <Systems/Physics.h>
 #include <Systems/Control.h>
 #include <Systems/Gravity.h>
-#include "Systems/AccelSolver.h"
+#include <Systems/AccelSolver.h>
 #include <Utils/DrawDebugStuff.h>
 
 #include <Components/AccelAndSpeed.h>
-#include "Components/Body.h"
+#include <Components/Body.h>
 #include <Components/Controllable.h>
 #include <Components/Position.h>
-#include "Components/VisualRectangle.h"
+#include <Components/VisualRectangle.h>
 
 #include <aunteater/UpdateTiming.h>
 #include <aunteater/Entity.h>
@@ -30,7 +28,7 @@ namespace ad {
 
 namespace grapito {
 
-void createStaticPlatform(Position2 pos, math::Size<2, double> size, double angle, aunteater::EntityManager & mEntityManager)
+void createStaticPlatform(Position2 pos, math::Size<2, float> size, float angle, aunteater::EntityManager & mEntityManager)
 {
     mEntityManager.addEntity(
             aunteater::Entity()
@@ -38,7 +36,7 @@ void createStaticPlatform(Position2 pos, math::Size<2, double> size, double angl
             .add<Position>(pos, size)
             .add<VisualRectangle>(math::sdr::gCyan)
             .add<Body>(
-                math::Rectangle<double>{{0., 0.}, size},
+                math::Rectangle<float>{{0.f, 0.f}, size},
                 BodyType_Static,
                 ShapeType_Hull,
                 CollisionType_Static_Env,
@@ -48,13 +46,13 @@ void createStaticPlatform(Position2 pos, math::Size<2, double> size, double angl
             ));
 }
 
-void createBox(Position2 pos, math::Size<2, double> size, double angularSpeed, aunteater::EntityManager & mEntityManager)
+void createBox(Position2 pos, math::Size<2, float> size, float angularSpeed, aunteater::EntityManager & mEntityManager)
 {
     mEntityManager.addEntity(
             aunteater::Entity()
             .add<Position>(pos, size)
             .add<Body>(
-                math::Rectangle<double>{{0., 0.}, size},
+                math::Rectangle<float>{{0.f, 0.f}, size},
                 BodyType_Dynamic,
                 ShapeType_Hull,
                 CollisionType_Moving_Env,
@@ -63,7 +61,7 @@ void createBox(Position2 pos, math::Size<2, double> size, double angularSpeed, a
                 .5
             )
             .add<VisualRectangle>(math::sdr::gCyan)
-            .add<AccelAndSpeed>(Vec2{0., 0.}, angularSpeed)
+            .add<AccelAndSpeed>(Vec2{0.f, 0.f}, angularSpeed)
             );
 }
 
@@ -78,23 +76,23 @@ CollisionTest::CollisionTest(graphics::ApplicationGlfw & aApplication, DebugUI &
     mSystemManager.add<Physics>();
     mSystemManager.add<Render>(aApplication); 
 
-    aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera({10., 2.}));
+    mEntityManager.addEntity(makeCamera({10.f, 2.f}));
 
-    createStaticPlatform({-2., 0.}, {15., 2.}, -math::pi<double> / 3, mEntityManager);
-    createStaticPlatform({6., 0.}, {15., 2.}, -2 * math::pi<double> / 3, mEntityManager);
+    createStaticPlatform({-2.f, 0.f}, {15.f, 2.f}, -math::pi<float> / 3.f, mEntityManager);
+    createStaticPlatform({6.f, 0.f}, {15.f, 2.f}, -2.f * math::pi<float> / 3.f, mEntityManager);
 
     for (int i = 0; i < 6; ++i)
     {
         for (int j = 0; j < 50; ++j)
         {
-            createBox({5. + i * 1.5, 5. + j * 1.5}, {.5, .5}, (j + i * 5) % 3, mEntityManager);
+            createBox({5.f + i * 1.5f, 5.f + j * 1.5f}, {0.5f, 0.5f}, (j + i * 5) % 3, mEntityManager);
         }
     }
 }
 
-bool CollisionTest::update(const aunteater::Timer & aTimer, const GameInputState & aInputState)
+bool CollisionTest::update(const GrapitoTimer & aTimer, const GameInputState & aInputState)
 {
-    aunteater::UpdateTiming<GameInputState> timings;
+    aunteater::UpdateTiming<GrapitoTimer, GameInputState> timings;
     InputState pauseInput = aInputState.get(Controller::Keyboard)[Command::Pause];
     InputState step = aInputState.get(Controller::Keyboard)[Command::Step];
 

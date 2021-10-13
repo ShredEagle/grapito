@@ -6,19 +6,17 @@
 #include "Configuration.h"
 #include "Input.h"
 
-#include "TestScenes/SceneChanger.h"
-
 #include <Systems/Render.h>
 #include <Systems/Control.h>
 #include <Systems/Gravity.h>
-#include "Systems/AccelSolver.h"
+#include <Systems/AccelSolver.h>
 #include <Utils/DrawDebugStuff.h>
 
 #include <Components/AccelAndSpeed.h>
-#include "Components/Body.h"
+#include <Components/Body.h>
 #include <Components/Controllable.h>
 #include <Components/Position.h>
-#include "Components/VisualRectangle.h"
+#include <Components/VisualRectangle.h>
 
 #include <aunteater/UpdateTiming.h>
 #include <aunteater/Entity.h>
@@ -29,13 +27,13 @@ namespace ad {
 
 namespace grapito {
 
-void createFrictionTest(double height, double friction, aunteater::EntityManager & mEntityManager)
+void createFrictionTest(float height, float friction, aunteater::EntityManager & mEntityManager)
 {
     mEntityManager.addEntity(
             aunteater::Entity()
-            .add<Position>(Position2{3., height}, math::Size<2, double>{2., 2.})
+            .add<Position>(Position2{3.f, height}, math::Size<2, float>{2.f, 2.f})
             .add<Body>(
-                math::Rectangle<double>{{0., 0.}, {2., 2.}},
+                math::Rectangle<float>{{0.f, 0.f}, {2.f, 2.f}},
                 BodyType_Dynamic,
                 ShapeType_Hull,
                 CollisionType_Static_Env,
@@ -44,16 +42,16 @@ void createFrictionTest(double height, double friction, aunteater::EntityManager
                 friction
             )
             .add<VisualRectangle>(math::sdr::gCyan)
-            .add<AccelAndSpeed>(Vec2{2.0, 0.}, 0.)
+            .add<AccelAndSpeed>(Vec2{2.0f, 0.f}, 0.f)
             );
 
     mEntityManager.addEntity(
             aunteater::Entity()
             .add<AccelAndSpeed>()
-            .add<Position>(Position2{1., height - 1.1}, math::Size<2, double>{12., 1.})
+            .add<Position>(Position2{1.f, height - 1.1f}, math::Size<2, float>{12.f, 1.f})
             .add<VisualRectangle>(math::sdr::gCyan)
             .add<Body>(
-                math::Rectangle<double>{{0., 0.}, {12., 1.}},
+                math::Rectangle<float>{{0.f, 0.f}, {12.f, 1.f}},
                 BodyType_Static,
                 ShapeType_Hull,
                 CollisionType_Moving_Env,
@@ -72,16 +70,16 @@ FrictionTest::FrictionTest(graphics::ApplicationGlfw & aApplication, DebugUI & a
     mSystemManager.add<Physics>();
     mSystemManager.add<Render>(aApplication); 
 
-    aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera({10., 2.}));
+    mEntityManager.addEntity(makeCamera({10.f, 2.f}));
 
-    createFrictionTest(5., .2, mEntityManager);
-    createFrictionTest(0., .75, mEntityManager);
-    createFrictionTest(-5., 1., mEntityManager);
+    createFrictionTest(5.f, 0.2f, mEntityManager);
+    createFrictionTest(0.f, 0.75f, mEntityManager);
+    createFrictionTest(-5.f, 1.f, mEntityManager);
 }
 
-bool FrictionTest::update(const aunteater::Timer & aTimer, const GameInputState & aInputState)
+bool FrictionTest::update(const GrapitoTimer & aTimer, const GameInputState & aInputState)
 {
-    aunteater::UpdateTiming<GameInputState> timings;
+    aunteater::UpdateTiming<GrapitoTimer, GameInputState> timings;
     InputState pauseInput = aInputState.get(Controller::Keyboard)[Command::Pause];
     InputState step = aInputState.get(Controller::Keyboard)[Command::Step];
 

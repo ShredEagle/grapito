@@ -1,5 +1,7 @@
 #include "Input.h"
 
+#include "commons.h"
+
 #include <DebugGui/SceneGui.h>
 
 #include "TestScenes/SceneChanger.h"
@@ -24,7 +26,7 @@ int main(int argc, const char * argv[])
         ad::graphics::ApplicationGlfw application(
             "grapkimbo", 1600, 900,
             ad::graphics::ApplicationGlfw::Window_Keep_Ratio);
-        aunteater::Timer timer{glfwGetTime()};
+        GrapitoTimer timer{static_cast<float>(glfwGetTime())};
 
         setupImGui(application);
 

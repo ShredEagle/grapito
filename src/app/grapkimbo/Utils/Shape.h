@@ -23,21 +23,21 @@ public:
     };
 
     Shape(std::vector<Position2> aVertices) :
-        vertices(std::move(aVertices)),
-        mFaceCount(aVertices.size())
+        mFaceCount{aVertices.size()},
+        vertices{std::move(aVertices)}
     {}
 
-    Shape(math::Rectangle<double> aRectangle);
+    Shape(math::Rectangle<float> aRectangle);
 
     const Position2 getVertice(const int index) const;
     const Edge getEdge(const int index) const;
-    const math::Rectangle<double> getAABB() const;
+    const math::Rectangle<float> getAABB() const;
     void debugRender();
 
     friend std::ostream &operator<<(std::ostream & os, const Shape & shape);
 
 
-    uint8_t mFaceCount;
+    size_t mFaceCount;
     std::vector<Position2> vertices;
 };
 

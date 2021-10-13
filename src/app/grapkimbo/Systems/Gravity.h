@@ -15,13 +15,13 @@ namespace grapito
 
 typedef aunteater::Archetype<AccelAndSpeed, Body> Massive;
 
-class Gravity : public aunteater::System<GameInputState>
+class Gravity : public aunteater::System<GrapitoTimer, GameInputState>
 {
 
 public:
     Gravity(aunteater::EntityManager & aEntityManager);
 
-    void update(const aunteater::Timer aTimer, const GameInputState &) override;
+    void update(const GrapitoTimer aTimer, const GameInputState &) override;
 
     static constexpr double gAcceleration = 10.;
 

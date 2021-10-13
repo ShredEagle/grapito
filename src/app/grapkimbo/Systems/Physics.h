@@ -23,67 +23,6 @@ namespace grapito
 
 typedef aunteater::Archetype<Position, Body, AccelAndSpeed> PhysicalBody;
 typedef aunteater::Archetype<PivotJoint> Pivotable;
-
-static inline void addPair(ConstructedBody & bodyA, ConstructedBody & bodyB, std::list<CollisionPair> & pairs)
-{
-    for (auto contact : bodyA.contactList)
-    {
-        if (
-            (bodyA.entity == contact->bodyA.entity && bodyB.entity == contact->bodyB.entity) ||
-            (bodyA.entity == contact->bodyB.entity && bodyB.entity == contact->bodyA.entity)
-        )
-        {
-            contact->cold = false;
-            //contact already exists so we get out
-            return;
-        }
-    }
-
-    CollisionPair contactPair = {
-        false,
-        bodyA,
-        bodyB,
-    };
-
-    pairs.push_back(std::move(contactPair));
-
-    pairs.back().iteratorA = bodyA.contactList.insert(bodyA.contactList.end(), &(pairs.back()));
-    pairs.back().iteratorB = bodyB.contactList.insert(bodyB.contactList.end(), &(pairs.back()));
-}
-
-static inline const double distanceToLine(Position2 point, Position2 origin, Position2 end, Vec2 normal)
-{
-    return (((end.x() - origin.x()) * (origin.y() - point.y())) - ((origin.x() - point.x()) * (end.y() - origin.y()))) / (origin - end).getNorm();
-}
-
-static inline ContactManifold QueryFacePenetration(
-    const ConstructedBody & bodyA,
-    const ConstructedBody & bodyB
-)
-{
-    ContactManifold resultManifold;
-
-    for (int i = 0; i < bodyA.box->shape.mFaceCount; ++i)
-    {
-        const Shape::Edge edgeA = bodyA.box->shape.getEdge(i);
-        const Position2 support = bodyB.box->getSupport(-edgeA.normal);
-        const double distance = distanceToLine(support, edgeA.origin, edgeA.end, edgeA.normal);
-
-        math::sdr::Rgb color = distance > 0 ? math::sdr::Rgb{0, 200, 0} : math::sdr::Rgb{200, 0, 0};
-
-
-        if (distance > resultManifold.separation)
-        {
-            resultManifold.separation = distance;
-            resultManifold.referenceEdgeIndex = i;
-            resultManifold.normal = -edgeA.normal;
-            resultManifold.localPoint = edgeA.origin - bodyA.bodyPos->c;
-        }
-    }
-
-    return resultManifold;
-};
-
 static constexpr int maxVelocityConstraintIteration = 16;
 static constexpr int maxPositionConstraintIteration = 16;
 static std::array<
@@ -125,13 +64,13 @@ class PivotObserver : public aunteater::FamilyObserver
     Physics * mPhysicsSystem;
 };
 
-class Physics : public aunteater::System<GameInputState>
+class Physics : public aunteater::System<GrapitoTimer, GameInputState>
 {
 
 public:
     Physics(aunteater::EntityManager & aEntityManager);
 
-    void update(const aunteater::Timer aTimer, const GameInputState & aInputState) override;
+    void update(const GrapitoTimer aTimer, const GameInputState & aInputState) override;
 
 
 private:

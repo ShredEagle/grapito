@@ -29,14 +29,14 @@ namespace ad {
 
 namespace grapito {
 
-void createSetPositionTest(Position2 pos, double angle, Position2 localPoint, Position2 worldPoint, aunteater::EntityManager & mEntityManager)
+void createSetPositionTest(Position2 pos, float angle, Position2 localPoint, Position2 worldPoint, aunteater::EntityManager & mEntityManager)
 {
 
     aunteater::weak_entity bodyB = mEntityManager.addEntity(
             aunteater::Entity()
-            .add<Position>(pos, math::Size<2, double>{3., 1.})
+            .add<Position>(pos, math::Size<2, float>{3.f, 1.f})
             .add<Body>(
-                math::Rectangle<double>{{0., 0.}, {3., 1.}},
+                math::Rectangle<float>{{0.f, 0.f}, {3.f, 1.f}},
                 BodyType_Dynamic,
                 ShapeType_Hull,
                 CollisionType_Floor,
@@ -55,18 +55,18 @@ SetPositionTest::SetPositionTest(graphics::ApplicationGlfw & aApplication, Debug
 {
     mSystemManager.add<Render>(aApplication); 
 
-    aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera({10., 2.}));
+    mEntityManager.addEntity(makeCamera({10.f, 2.f}));
 
-    createSetPositionTest({10., 3.}, 0., {0.,0.}, {3., 0.},  mEntityManager);
-    createSetPositionTest({10., 3.}, 2., {0., 0.}, {6., 3.}, mEntityManager);
-    createSetPositionTest({10., 3.}, 2., {3., 0.}, {3., 3.}, mEntityManager);
-    createSetPositionTest({10., 3.}, 8., {1.5, 0.5}, {12., 0.}, mEntityManager);
+    createSetPositionTest({10.f, 3.f}, 0.f, {0.f,0.f}, {3.f, 0.f},  mEntityManager);
+    createSetPositionTest({10.f, 3.f}, 2.f, {0.f, 0.f}, {6.f, 3.f}, mEntityManager);
+    createSetPositionTest({10.f, 3.f}, 2.f, {3.f, 0.f}, {3.f, 3.f}, mEntityManager);
+    createSetPositionTest({10.f, 3.f}, 8.f, {1.5f, 0.5f}, {12.f, 0.f}, mEntityManager);
 
 }
 
-bool SetPositionTest::update(const aunteater::Timer & aTimer, const GameInputState & aInputState)
+bool SetPositionTest::update(const GrapitoTimer & aTimer, const GameInputState & aInputState)
 {
-    aunteater::UpdateTiming<GameInputState> timings;
+    aunteater::UpdateTiming<GrapitoTimer, GameInputState> timings;
     InputState pauseInput = aInputState.get(Controller::Keyboard)[Command::Pause];
     InputState step = aInputState.get(Controller::Keyboard)[Command::Step];
 
@@ -79,26 +79,6 @@ bool SetPositionTest::update(const aunteater::Timer & aTimer, const GameInputSta
     {
         mSystemManager.pause(false);
 
-        debugDrawer->drawPoint({
-            {3., 0.},
-            0.07,
-            {255,255,255}
-        });
-        debugDrawer->drawPoint({
-            {3., 3.},
-            0.07,
-            {255,255,255}
-        });
-        debugDrawer->drawPoint({
-            {6., 3.},
-            0.07,
-            {255,255,255}
-        });
-        debugDrawer->drawPoint({
-            {12., 0.},
-            0.07,
-            {255,255,255}
-        });
         mSystemManager.update(aTimer, aInputState, timings);
         mUI.broadcast(timings);
     }

@@ -5,12 +5,10 @@
 #include "TestScenes/SceneChanger.h"
 
 #include <Components/AccelAndSpeed.h>
-#include <Components/AnchorSelector.h>
 #include <Components/Body.h>
 #include <Components/CameraGuide.h>
 #include <Components/Controllable.h>
 #include <Components/GrappleControl.h>
-#include <Components/Pendular.h>
 #include <Components/Position.h>
 #include <Components/VisualRectangle.h>
 #include <Components/Mass.h>
@@ -18,10 +16,8 @@
 #include <Systems/AccelSolver.h>
 #include <Systems/CameraGuidedControl.h>
 #include <Systems/Control.h>
-#include <Systems/ControlAnchorSight.h>
 #include <Systems/Gravity.h>
 #include <Systems/LevelGeneration.h>
-#include <Systems/PendulumSimulation.h>
 #include <Systems/Render.h>
 #include "Systems/Physics.h"
 #include "Systems/RopeCreation.h"
@@ -42,8 +38,6 @@ Game_pendulum::Game_pendulum(graphics::ApplicationGlfw & aApplication, DebugUI &
     mSystemManager.add<Control>();
     mSystemManager.add<Gravity>();
     mSystemManager.add<RopeCreation>();
-    mSystemManager.add<PendulumSimulation>();
-    mSystemManager.add<ControlAnchorSight>(); // it will position the sight, which might follow something impacted by speed resolution
     mSystemManager.add<CameraGuidedControl>();
 
     mSystemManager.add<AccelSolver>();
@@ -56,13 +50,13 @@ Game_pendulum::Game_pendulum(graphics::ApplicationGlfw & aApplication, DebugUI &
     // Environment anchors
 
     aunteater::weak_entity anchor_2 = mEntityManager.addEntity(
-        makeAnchor(Position2{12., 5.}, math::Size<2, double>{2., 2.} ));
+        makeAnchor(Position2{12.f, 5.f}, math::Size<2, float>{2.f, 2.f} ));
 
     aunteater::weak_entity anchor_3 = mEntityManager.addEntity(
-        makeAnchor(Position2{24., 9.}, math::Size<2, double>{2., 2.} ));
+        makeAnchor(Position2{24.f, 9.f}, math::Size<2, float>{2.f, 2.f} ));
 
     aunteater::weak_entity floor = mEntityManager.addEntity(
-        makeAnchor(Position2{-20., -4.}, math::Size<2, double>{40., 2.} ));
+        makeAnchor(Position2{-20.f, -4.f}, math::Size<2, float>{40.f, 2.f} ));
 
     // Player 1
     Controller controller = isGamepadPresent(Controller::Gamepad_0) ?
@@ -70,7 +64,7 @@ Game_pendulum::Game_pendulum(graphics::ApplicationGlfw & aApplication, DebugUI &
 
     mEntityManager.addEntity(
         makePlayer(0, controller, math::sdr::gCyan)
-            .add<CameraGuide>(1.0));
+            .add<CameraGuide>(1.0f));
 
     // Player 2
     if (isGamepadPresent(Controller::Gamepad_1))
@@ -80,9 +74,9 @@ Game_pendulum::Game_pendulum(graphics::ApplicationGlfw & aApplication, DebugUI &
     }
 }
 
-bool Game_pendulum::update(const aunteater::Timer & aTimer, const GameInputState & aInputState)
+bool Game_pendulum::update(const GrapitoTimer & aTimer, const GameInputState & aInputState)
 {
-    aunteater::UpdateTiming<GameInputState> timings;
+    aunteater::UpdateTiming<GrapitoTimer, GameInputState> timings;
     InputState pauseInput = aInputState.get(Controller::Keyboard)[Command::Pause];
     InputState step = aInputState.get(Controller::Keyboard)[Command::Step];
 

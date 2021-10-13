@@ -75,7 +75,7 @@ struct ContactManifold
     Vec2 localPoint = Vec2::Zero();
 
     Vec2 normal = Vec2::Zero();
-    double separation = -std::numeric_limits<double>::max();
+    float separation = -std::numeric_limits<float>::max();
 
     std::vector<ContactFeature> contacts;
     friend std::ostream &operator<<(std::ostream & os, const ContactManifold & cm);
@@ -93,19 +93,19 @@ struct Line
 //contiguous in memory
 struct Velocity
 {
-    explicit Velocity(Vec2 aV, double aW) :
+    explicit Velocity(Vec2 aV, float aW) :
         v{aV},
         w{aW}
     {}
 
     Vec2 v;
-    double w;
+    float w;
 };
 
 //Same as velocity but for the position of a body
 struct BodyPosition
 {
-    explicit BodyPosition(Position2 aP, Position2 aC, math::Radian<double> aA) :
+    explicit BodyPosition(Position2 aP, Position2 aC, math::Radian<float> aA) :
         p{aP},
         c{aC},
         a{aA}
@@ -113,7 +113,7 @@ struct BodyPosition
 
     Position2 p;
     Position2 c;
-    math::Radian<double> a;
+    math::Radian<float> a;
 };
 
 //A ConstructedBody is a proxy representation of a Body component
@@ -134,12 +134,12 @@ class ConstructedBody
 
     bool shouldCollide(ConstructedBody & body);
 
-    double mass;
-    double invMass;
-    double moi;
-    double invMoi;
+    float mass;
+    float invMass;
+    float moi;
+    float invMoi;
 
-    double friction;
+    float friction;
     bool noMaxFriction;
 
     //non owning pointer to Physics system vector
@@ -188,27 +188,27 @@ struct VelocityConstraint
     Velocity * velocityA;
     BodyPosition * bodyPosA;
     Vec2 rA;
-    double crossA;
-    double crossATangent;
-    double invMassA;
-    double invMoiA;
-    double tangentSpeedA;
-    math::Radian<double> angleBaseA;
+    float crossA;
+    float crossATangent;
+    float invMassA;
+    float invMoiA;
+    float tangentSpeedA;
+    math::Radian<float> angleBaseA;
 
     //non owning pointer to Physics system vector
     Velocity * velocityB;
     BodyPosition * bodyPosB;
     Vec2 rB;
-    double crossB;
-    double crossBTangent;
-    double invMassB;
-    double invMoiB;
-    double tangentSpeedB;
-    math::Radian<double> angleBaseB;
+    float crossB;
+    float crossBTangent;
+    float invMassB;
+    float invMoiB;
+    float tangentSpeedB;
+    math::Radian<float> angleBaseB;
 
-    double friction;
+    float friction;
     bool noMaxFriction;
-    double restitution;
+    float restitution;
     Vec2 normal; 
     Vec2 tangent;
 
@@ -224,7 +224,7 @@ struct VelocityConstraint
 struct PlayerEnvironmentConstraint
 {
     Vec2 normal; 
-    double separation;
+    float separation;
 
     //Non owning pointer to the constructed body of the player
     ConstructedBody * cPlayer;
@@ -233,12 +233,12 @@ struct PlayerEnvironmentConstraint
 struct PivotJointConstraint
 {
     explicit PivotJointConstraint(
-            double aInvMassA,
-            double aInvMoiA,
+            float aInvMassA,
+            float aInvMoiA,
             Position2 aLocalAnchorA,
 
-            double aInvMassB,
-            double aInvMoiB,
+            float aInvMassB,
+            float aInvMoiB,
             Position2 aLocalAnchorB,
 
             ConstructedBody * aCbA,
@@ -259,23 +259,23 @@ struct PivotJointConstraint
 
     Velocity * velocityA;
     BodyPosition * bodyPosA;
-    double invMassA;
-    double invMoiA;
+    float invMassA;
+    float invMoiA;
     Position2 localAnchorA;
     Vec2 rA = Vec2::Zero();
     Vec2 angVecA = Vec2::Zero();
 
     Velocity * velocityB;
     BodyPosition * bodyPosB;
-    double invMassB;
-    double invMoiB;
+    float invMassB;
+    float invMoiB;
     Position2 localAnchorB;
     Vec2 rB = Vec2::Zero();
     Vec2 angVecB = Vec2::Zero();
 
     Vec2 impulse = Vec2::Zero();
-    double axialMass;
-    math::Matrix<2, 2, double> k = math::Matrix<2, 2>::Zero();
+    float axialMass;
+    math::Matrix<2, 2, float> k = math::Matrix<2, 2, float>::Zero();
 
     ConstructedBody * cbA;
     ConstructedBody * cbB;

@@ -12,7 +12,7 @@ namespace grapito
 
 struct AccelAndSpeed : public aunteater::Component<AccelAndSpeed>
 {
-    explicit AccelAndSpeed(Vec2 baseSpeed = Vec2::Zero(), double aW = 0.) :
+    explicit AccelAndSpeed(Vec2 baseSpeed = Vec2::Zero(), float aW = 0.f) :
         accel{Vec2::Zero()},
         speed{std::move(baseSpeed)},
         oldSpeed{std::move(baseSpeed)},
@@ -22,7 +22,7 @@ struct AccelAndSpeed : public aunteater::Component<AccelAndSpeed>
     Vec2 accel;
     Vec2 speed;
     Vec2 oldSpeed;
-    double w;
+    float w;
 };
 
 

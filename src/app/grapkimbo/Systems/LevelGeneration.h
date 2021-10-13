@@ -51,12 +51,12 @@ struct IndexDifferences
 };
 
 
-class LevelGeneration : public aunteater::System<GameInputState>
+class LevelGeneration : public aunteater::System<GrapitoTimer, GameInputState>
 {
 public:
     LevelGeneration(aunteater::EntityManager & aEntityManager);
 
-    void update(const aunteater::Timer aTimer, const GameInputState &) override;
+    void update(const GrapitoTimer aTimer, const GameInputState &) override;
 
 private:
     static std::vector<TileIndex> listConnected(TileIndex aIndex);
@@ -68,7 +68,7 @@ private:
     void generateTiles(TileIndex aIndex);
 
     // Abstracting away the detail of getting the camera
-    math::Position<2, double> getCameraPosition() const;
+    Position2 getCameraPosition() const;
 
     static constexpr math::Size<2, int> gTileDimension{
         (int)(1*render::gViewedHeight),

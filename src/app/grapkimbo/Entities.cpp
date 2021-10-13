@@ -1,11 +1,9 @@
 #include "Entities.h"
 
-#include "Components/AnchorSelector.h"
 #include "Components/CameraGuide.h"
 #include "Components/CameraTag.h"
 #include "Components/Controllable.h"
 #include <Components/GrappleControl.h>
-#include "Components/Pendular.h"
 #include "Components/PivotJoint.h"
 #include "Components/PlayerData.h"
 #include "Components/Position.h"
@@ -14,7 +12,6 @@
 #include "Components/VisualRectangle.h"
 #include "Components/Mass.h"
 
-#include "Systems/ControlAnchorSight.h"
 #include "Utils/PhysicsStructs.h"
 #include "aunteater/EntityManager.h"
 #include "commons.h"
@@ -32,26 +29,19 @@ aunteater::Entity makePlayer(int aIndex,
                              GrappleMode aGrappleMode)
 {
     aunteater::Entity player = aunteater::Entity()
-        // Needed for gravity
-        //.add<Body>(
-        //    math::Rectangle<double>{{0., 0.}, {2., 2.}},
-        //    BodyType::DYNAMIC,
-        //    ShapeType::HULL,
-        //    player::gMass,
-        //    0.)
         .add<Controllable>(aController)
         .add<GrappleControl>(aGrappleMode)
         .add<PlayerData>(aIndex, aColor)
         .add<AccelAndSpeed>()
-        .add<Position>(Position2{3., 3.}, player::gSize) // The position will be set by pendulum simulation
+        .add<Position>(Position2{3.f, 3.f}, player::gSize) // The position will be set by pendulum simulation
         .add<Body>(
-            math::Rectangle<double>{{0., 0.}, player::gSize},
+            math::Rectangle<float>{{0.f, 0.f}, player::gSize},
             BodyType_Dynamic,
             ShapeType_Hull,
             CollisionType_Player,
-            15.,
-            0.,
-            0.,
+            15.f,
+            0.f,
+            0.f,
             false,
             std::vector<CollisionType>{CollisionType_Static_Env}
             )
@@ -74,17 +64,17 @@ aunteater::Entity makeCamera(Position2 pos)
 }
 
 
-aunteater::Entity makeAnchor(math::Position<2, double> aPosition, math::Size<2, double> aSize)
+aunteater::Entity makeAnchor(math::Position<2, float> aPosition, math::Size<2, float> aSize)
 {
     return aunteater::Entity()
         .add<Body>(
-            math::Rectangle<double>{{0., 0.}, aSize},
+            math::Rectangle<float>{{0.f, 0.f}, aSize},
             BodyType_Static,
             ShapeType_Hull,
             CollisionType_Static_Env,
-            0.,
-            0.,
-            1.
+            0.f,
+            0.f,
+            1.f
             )
         .add<Position>(aPosition, aSize)
         .add<AccelAndSpeed>()
@@ -92,149 +82,57 @@ aunteater::Entity makeAnchor(math::Position<2, double> aPosition, math::Size<2, 
     ;
 }
 
-
-void connectGrapple(aunteater::weak_entity aEntity, Pendular aPendular)
-{
-    (*aEntity)
-        .add<Pendular>(std::move(aPendular))
-        ;
-
-    aPendular.connected->add<CameraGuide>(
-        math::makeInterpolation<math::ease::SmoothStep>(0., 1., camera::gAnchorGuideFadeIn));
-}
-
-
-void retractGrapple(aunteater::weak_entity aEntity)
-{
-    CameraGuide & guide = aEntity->get<Pendular>().connected->get<CameraGuide>();
-    guide = CameraGuide{
-        math::makeInterpolation<math::ease::SmoothStep>(guide.influence, 0., camera::gAnchorGuideFadeOut),
-        CameraGuide::OnCompletion::Remove,
-    };
-
-    (*aEntity)
-        .markComponentToRemove<Pendular>()
-        ;
-
-}
-
-
-aunteater::weak_entity setGrappleMode(aunteater::weak_entity aEntity,
-                                      const PlayerData & aPlayerData,
-                                      GrappleMode aMode,
-                                      aunteater::EntityManager & aEntityManager)
-{
-    (*aEntity)
-        .get<GrappleControl>().mode = aMode;
-
-    switch (aMode)
-    {
-    case GrappleMode::AnchorSight:
-        aEntityManager.addEntity(
-            aunteater::Entity()
-                .add<AnchorSelector>(sight::gReachDistance, sight::gAngleTolerance, aEntity, nullptr)
-                .add<Controllable>(aEntity->get<Controllable>())
-                .add<Position>() // Will be handled by ControlAnchorSight system
-                .add<VisualOutline>(aPlayerData.color, (aPlayerData.id + 1) * sight::gBaseOutlineOffset)
-        );
-        break;
-    case GrappleMode::Closest:
-        for(const auto anchorSight : aunteater::FamilyHelp<AnchorSight>{aEntityManager})
-        {
-            if (anchorSight->get<AnchorSelector>().player == aEntity)
-            {
-                anchorSight->markToRemove();
-            }
-        }
-        break;
-    }
-
-    return aEntity;
-}
-
-
-Pendular makePendular(Position2 aGrappleOrigin,
-                      Position2 aAnchorPoint,
-                      aunteater::weak_entity aConnected,
-                      Vec2 aCartesianSpeed,
-                      double aGrappleLength)
-{
-    Vec2 grappleLine = aAnchorPoint - aGrappleOrigin;
-    // grapple line goes from origin to anchor, we need the angle with -Y
-    math::Radian<double> angle{std::atan2(-grappleLine.x(), grappleLine.y())};
-
-    Vec2 tangent{grappleLine.y(), - grappleLine.x()};
-    math::Radian<double> angularSpeed{ cos(math::getOrientedAngle(aCartesianSpeed, tangent)) 
-                                       * aCartesianSpeed.getNorm() / aGrappleLength };
-
-    return Pendular{aAnchorPoint, aConnected, angle, aGrappleLength, angularSpeed};
-}
-
-
-Pendular makePendular(aunteater::weak_entity aConnected,
-                      double aRopeLength,
-                      math::Radian<double> aInitialAngle)
-{
-    auto rectangle = aConnected->get<Position>().rectangle();
-    return Pendular{
-        (rectangle.bottomLeft() + rectangle.bottomRight().as<math::Vec>()) / 2.,
-        aConnected,
-        aInitialAngle,
-        aRopeLength
-    };
-}
-
 aunteater::Entity createRopeSegment(Position2 origin, Position2 end)
 {
     Vec2 ropeVector = end - origin;
-    double length = ropeVector.getNorm();
-    math::Radian<double> angle{atan2(ropeVector.y(), ropeVector.x())};
-    math::Size<2, double> size{length, rope::ropeWidth};
+    float length = ropeVector.getNorm();
+    math::Radian<float> angle{atan2(ropeVector.y(), ropeVector.x())};
+    math::Size<2, float> size{length, rope::ropeWidth};
     aunteater::Entity rope = aunteater::Entity()
             .add<Position>(
                 Position2::Zero(),
                 size
                 )
             .add<Body>(
-                math::Rectangle<double>{{0., 0.}, size},
+                math::Rectangle<float>{{0.f, 0.f}, size},
                 BodyType_Dynamic,
                 ShapeType_Hull,
                 CollisionType_Moving_Env,
-                0.5,
+                0.5f,
                 angle.value(),
-                0.,
+                0.f,
                 false,
                 std::vector<CollisionType>{CollisionType_Static_Env}
                 )
             .add<VisualRectangle>(math::sdr::gGreen, VisualRectangle::Scope::RopeStructure)
             .add<AccelAndSpeed>();
 
-    setLocalPointToWorldPos(rope, {0., rope::ropeHalfwidth}, origin);
+    setLocalPointToWorldPos(rope, {0.f, rope::ropeHalfwidth}, origin);
     return rope;
 }
 
 void throwGrapple(aunteater::weak_entity aEntity, aunteater::EntityManager & aEntityManager)
 {
-    math::Size<2, double> size{.25, .25};
-    Position2 playerPos = static_cast<Position2>(aEntity->get<Position>().position.as<math::Vec>() + aEntity->get<Body>().massCenter.as<math::Vec>() + Vec2{.5, .5});
+    math::Size<2, float> size{.25f, .25f};
+    Position2 grapplePos = static_cast<Position2>(aEntity->get<Position>().position.as<math::Vec>() + aEntity->get<Body>().massCenter.as<math::Vec>() + Vec2{.5f, .5f});
     aEntity->get<PlayerData>().grapple = aEntityManager.addEntity(aunteater::Entity()
             .add<Position>(
-                playerPos,
+                grapplePos,
                 size
                 )
             .add<Body>(
-                math::Rectangle<double>{{0., 0.}, size},
+                math::Rectangle<float>{{0.f, 0.f}, size},
                 BodyType_Dynamic,
                 ShapeType_Hull,
                 CollisionType_Moving_Env,
-                4.,
-                0.,
-                1.,
+                4.f,
+                0.f,
+                1.f,
                 true,
                 std::vector<CollisionType>{CollisionType_Static_Env}
                 )
             .add<VisualRectangle>(math::sdr::gYellow)
-            .add<AccelAndSpeed>(Vec2{40., 40.}, 0.)
+            .add<AccelAndSpeed>(Vec2{40.f, 40.f}, 0.f)
             );
 
     // IMPORTANT: bugfix by adding RopeCreator only after Body has been added.
@@ -249,19 +147,18 @@ void attachPlayerToGrapple(aunteater::weak_entity aPlayer, aunteater::EntityMana
     aunteater::weak_entity & grapple = aPlayer->get<PlayerData>().grapple;
     RopeCreator & ropeCreator = grapple->get<RopeCreator>();
     Body & grappleBody = grapple->get<Body>();
-    grappleBody.mass = 0.5;
+    grappleBody.mass = 0.5f;
     grappleBody.updateData();
     grappleBody.updateConstructedBody();
 
     Body & playerBody = aPlayer->get<Body>();
-    playerBody.mass = 15.;
+    playerBody.mass = 15.f;
     playerBody.updateData();
     playerBody.updateConstructedBody();
 
     aunteater::weak_entity lastSegment = ropeCreator.mRopeSegments.back();
-    Position2 end = static_cast<Position2>(aPlayer->get<Position>().position.as<math::Vec>() + aPlayer->get<Body>().massCenter.as<math::Vec>());
-    Position2 origin = static_cast<Position2>(getLocalPointInWorld(lastSegment->get<Body>(), lastSegment->get<Position>(), {lastSegment->get<Position>().dimension.width(), 0.05}));
-    double length = (end - origin).getNorm();
+    Position2 end = aPlayer->get<Position>().position + aPlayer->get<Body>().massCenter.as<math::Vec>();
+    Position2 origin = getLocalPointInWorld(lastSegment->get<Body>(), lastSegment->get<Position>(), {lastSegment->get<Position>().dimension.width(), 0.05f});
 
     aunteater::weak_entity link = aEntityManager.addEntity(createRopeSegment(
         origin,
@@ -271,15 +168,15 @@ void attachPlayerToGrapple(aunteater::weak_entity aPlayer, aunteater::EntityMana
     aEntityManager.addEntity(
             aunteater::Entity()
             .add<PivotJoint>(
-                Position2{0., 0.05},
-                Position2{lastSegment->get<Position>().dimension.width(), 0.05},
+                Position2{0.f, 0.05f},
+                Position2{lastSegment->get<Position>().dimension.width(), 0.05f},
                 link,
                 lastSegment
             ));
     aPlayer->get<PlayerData>().grappleAttachment = aEntityManager.addEntity(
             aunteater::Entity()
             .add<PivotJoint>(
-                Position2{lastSegment->get<Position>().dimension.width(), 0.05},
+                Position2{lastSegment->get<Position>().dimension.width(), 0.05f},
                 aPlayer->get<Body>().massCenter,
                 link,
                 aPlayer
