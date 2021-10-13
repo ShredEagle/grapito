@@ -29,7 +29,7 @@ public:
 
 private:
     DebugUI & mUI;
-    TimeSystemsUpdater<GameInputState> mUpdater;
+    TimeSystemsUpdater mUpdater;
 };
 
 

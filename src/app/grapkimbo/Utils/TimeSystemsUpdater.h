@@ -13,7 +13,6 @@ namespace ad {
 namespace grapito {
 
 
-template <class ... VT_inputState>
 class TimeSystemsUpdater
 {
     template <class T>
@@ -28,7 +27,7 @@ public:
         pre = initial = std::chrono::steady_clock::now();
     }
 
-    template <class T_timer>
+    template <class T_timer, class ... VT_inputState>
     void operator()(aunteater::System<T_timer, VT_inputState...> & aSystem,
                     const T_timer & aTimer,
                     const VT_inputState & ... aInputState)
@@ -82,8 +81,7 @@ private:
 };
 
 
-template <class ... VT_inputState>
-void TimeSystemsUpdater<VT_inputState...>::outputTimings(std::ostream & os) const
+inline void TimeSystemsUpdater::outputTimings(std::ostream & os) const
 {
     for(auto timing : mTimings)
     {

@@ -16,7 +16,7 @@ void initializeLogging()
 }
 
 
-void log(const TimeSystemsUpdater<GameInputState> & aUpdater)
+void log(const TimeSystemsUpdater & aUpdater)
 {
     std::ostringstream oss;
     aUpdater.outputTimings(oss);

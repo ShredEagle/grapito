@@ -12,9 +12,7 @@ namespace grapito {
 void initializeLogging();
 
 
-struct GameInputState;
-void log(const TimeSystemsUpdater<GameInputState> & aUpdater);
-
+void log(const TimeSystemsUpdater & aUpdater);
 
 
 } // namespace grapito
