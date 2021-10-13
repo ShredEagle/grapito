@@ -26,7 +26,7 @@ namespace player
     constexpr float gMass = 80.f;
     constexpr math::Size<2, float> gSize{0.8f, 1.9f};
     constexpr float gInitialRopeLength = 3.f;
-    constexpr math::Radian<float> gInitialAngle{math::pi<double>/3.f};
+    constexpr math::Radian<float> gInitialAngle{math::pi<float>/3.f};
     //TODO(franz) replace with constexpr
     inline float gWalkingSpeedAccelFactor = 0.25f;
     inline float gAcceleration = 70.f;

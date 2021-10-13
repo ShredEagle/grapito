@@ -28,11 +28,12 @@ public:
         pre = initial = std::chrono::steady_clock::now();
     }
 
-    void operator()(aunteater::System<VT_inputState...> & aSystem,
-                    const aunteater::Timer aTime,
+    template <class T_timer>
+    void operator()(aunteater::System<T_timer, VT_inputState...> & aSystem,
+                    const T_timer & aTimer,
                     const VT_inputState & ... aInputState)
     {
-        aSystem.update(aTime, aInputState...);
+        aSystem.update(aTimer, aInputState...);
         const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
         mTimings[getTypeName(aSystem)].addSample(
              std::chrono::duration_cast<std::chrono::microseconds>(now - pre));

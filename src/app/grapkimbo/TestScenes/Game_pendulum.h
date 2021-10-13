@@ -26,6 +26,7 @@ public:
     ~Game_pendulum() = default;
 
     bool update(const GrapitoTimer & aTimer, const GameInputState & aInputState);
+
 private:
     DebugUI & mUI;
     TimeSystemsUpdater<GameInputState> mUpdater;

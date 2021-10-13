@@ -44,7 +44,7 @@ int main(int argc, const char * argv[])
         while(application.handleEvents())
         {
             inputState.readAll(application);
-            timer.mark(glfwGetTime());
+            timer.mark((float)glfwGetTime());
             if (currentGame->update(timer, inputState))
             {
                 drawImGui(application, debugUI, imguiState);

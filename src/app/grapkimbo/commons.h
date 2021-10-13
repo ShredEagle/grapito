@@ -13,7 +13,7 @@ typedef math::Vec<2, float> Vec2;
 typedef math::Vec<3, float> Vec3;
 typedef math::Position<2, float> Position2;
 typedef math::Position<3, double> Position3;
-typedef aunteater::Timer_base<float> GrapitoTimer;
+using GrapitoTimer = aunteater::Timer_base<float>;
 
 static inline float twoDVectorCross(Vec2 v, Vec2 w)
 {
@@ -27,7 +27,7 @@ static inline Vec2 solveMatrix(math::Matrix<2, 2, float> m, Vec2 v)
 
     if (det != 0.)
     {
-        det = 1. / det;
+        det = 1.f / det;
     }
 
     return {
