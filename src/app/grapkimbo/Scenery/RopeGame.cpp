@@ -33,12 +33,13 @@ RopeGame::RopeGame(std::shared_ptr<graphics::AppInterface> aAppInterface)
     mSystemManager.add<Control>();
     mSystemManager.add<Gravity>();
     mSystemManager.add<RopeCreation>();
-    mSystemManager.add<CameraGuidedControl>();
 
     mSystemManager.add<AccelSolver>();
     mSystemManager.add<Physics>();
 
-    mSystemManager.add<Render>(aAppInterface); 
+    mSystemManager.add<CameraGuidedControl>();
+
+    mSystemManager.add<Render>(mAppInterface); 
 
     // Camera
     aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera());
