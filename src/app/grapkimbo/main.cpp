@@ -23,22 +23,22 @@ int main(int argc, const char * argv[])
 {
     try
     {
-        initializeLogging();
-
-        GameInputState inputState;
-        DebugUI debugUI;
-
         ad::graphics::ApplicationGlfw application(
             "grapkimbo", 1600, 900,
             ad::graphics::ApplicationGlfw::Window_Keep_Ratio);
-        GrapitoTimer timer{static_cast<float>(glfwGetTime())};
+        // Need to wait for the graphics logger initialized by ApplicationGlfw constructor.
+        initializeLogging();
 
         setupImGui(application);
 
         ad::debugDrawer = std::make_unique<ad::debug::DrawDebugStuff>(application);
+
         ad::grapito::ImguiState imguiState;
+        DebugUI debugUI;
 
         StateMachine topLevelFlow{std::make_shared<RopeGame>(application.getAppInterface())};
+        GrapitoTimer timer{static_cast<float>(glfwGetTime())};
+        GameInputState inputState;
 
         while(application.handleEvents())
         {

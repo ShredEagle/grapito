@@ -49,7 +49,6 @@ using State_ptr = std::shared_ptr<State>;
 class StateMachine
 {
 public:
-
     StateMachine(State_ptr aInitialState);
 
     UpdateStatus update(GrapitoTimer & aTimer, const GameInputState & aInputs);
@@ -57,7 +56,7 @@ public:
     State & topState();
 
     StateMachine & pushState(State_ptr aState);
-    [[nodiscard]] State_ptr popState();
+    State_ptr popState();
 
     template <class T_state, class... VT_aArgs>
     StateMachine & emplaceState(VT_aArgs &&... vaArgs);
@@ -77,7 +76,10 @@ inline StateMachine::StateMachine(std::shared_ptr<State> aInitialState) :
 
 inline UpdateStatus StateMachine::update(GrapitoTimer & aTimer, const GameInputState & aInputs)
 {
-    return topState().update(aTimer, aInputs, *this);
+    // Make a copy of the shared_ptr. This is wastefull most of the time,
+    // yet ensures that a state popping itself will not access its freed memory. 
+    State_ptr state{mStates.back()};
+    return state->update(aTimer, aInputs, *this);
 }
 
 

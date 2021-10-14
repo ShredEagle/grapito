@@ -61,9 +61,10 @@ namespace render
 namespace menu
 {
     constexpr float gViewedHeight = 1000.f;
+    constexpr math::Size<2, GLfloat> gButtonSize{320.f, 80.f};
+    constexpr float gButtonSpacing = 100.f;
     constexpr math::sdr::Rgb gButtonColor{ 120, 100, 110 };
-    constexpr math::Size<2, GLfloat> gButtonSize{320.f, 60.f};
-    constexpr float gButtonSpacing = 200.f;
+    constexpr math::sdr::Rgb gSelectedColor{ 190, 190, 80 };
 }
 
 namespace sight

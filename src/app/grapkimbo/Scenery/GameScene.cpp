@@ -20,10 +20,10 @@ UpdateStatus GameScene::update(
     const GameInputState & aInputs,
     StateMachine & aStateMachine)
 {
-    InputState gamePause = aInputs.get(Controller::Keyboard)[Command::GamePause];
+    InputState gamePause = aInputs.get(Controller::Keyboard)[Command::Start];
     if (gamePause.positiveEdge())
     {
-        aStateMachine.emplaceState<MenuScene>(mAppInterface);
+        aStateMachine.emplaceState<MenuScene>(makePauseMenu(), mAppInterface);
         // Causes troubles with detection of next press of pause button
         // it would still be the same edge!
         //return aStateMachine.update(aTimer, aInputs);
