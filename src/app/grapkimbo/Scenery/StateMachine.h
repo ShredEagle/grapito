@@ -44,15 +44,26 @@ public:
 };
 
 
+using State_ptr = std::shared_ptr<State>;
+
 class StateMachine
 {
 public:
-    StateMachine(std::shared_ptr<State> aInitialState);
+
+    StateMachine(State_ptr aInitialState);
 
     UpdateStatus update(GrapitoTimer & aTimer, const GameInputState & aInputs);
 
+    State & topState();
+
+    StateMachine & pushState(State_ptr aState);
+    [[nodiscard]] State_ptr popState();
+
+    template <class T_state, class... VT_aArgs>
+    StateMachine & emplaceState(VT_aArgs &&... vaArgs);
+
 private:
-    std::vector<std::shared_ptr<State>> mStates;
+    std::vector<State_ptr> mStates;
 };
 
 
@@ -66,7 +77,37 @@ inline StateMachine::StateMachine(std::shared_ptr<State> aInitialState) :
 
 inline UpdateStatus StateMachine::update(GrapitoTimer & aTimer, const GameInputState & aInputs)
 {
-    return mStates.back()->update(aTimer, aInputs, *this);
+    return topState().update(aTimer, aInputs, *this);
+}
+
+
+inline State & StateMachine::topState()
+{
+    return *(mStates.back());
+}
+
+
+inline StateMachine & StateMachine::pushState(std::shared_ptr<State> aState)
+{
+    mStates.push_back(std::move(aState));
+    return *this;
+}
+
+
+inline State_ptr StateMachine::popState()
+{
+    State_ptr popped = std::move(mStates.back());
+    mStates.pop_back();
+    return popped;
+}
+
+
+template <class T_state, class... VT_aArgs>
+StateMachine & StateMachine::emplaceState(VT_aArgs &&... vaArgs)
+{
+    mStates.push_back(
+        std::make_shared<T_state>(std::forward<VT_aArgs>(vaArgs)...));
+    return *this;
 }
 
 

@@ -27,7 +27,8 @@ namespace ad {
 namespace grapito {
 
 
-RopeGame::RopeGame(std::shared_ptr<graphics::AppInterface> aAppInterface)
+RopeGame::RopeGame(std::shared_ptr<graphics::AppInterface> aAppInterface) :
+    GameScene{std::move(aAppInterface)}
 {
     mSystemManager.add<LevelGeneration>();
     mSystemManager.add<Control>();

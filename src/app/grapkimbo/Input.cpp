@@ -12,27 +12,31 @@ namespace grapito
 
 
 const KeyboardInputConfig gKeyboardConfig = {
-    KeyboardInputMapping{Up,      GLFW_KEY_UP},
-    KeyboardInputMapping{Down,    GLFW_KEY_DOWN},
-    KeyboardInputMapping{Left,    GLFW_KEY_LEFT},
-    KeyboardInputMapping{Right,   GLFW_KEY_RIGHT},
-    KeyboardInputMapping{Jump,    GLFW_KEY_SPACE},
-    KeyboardInputMapping{Grapple, GLFW_KEY_X},
-    KeyboardInputMapping{Pause,   GLFW_KEY_P},
-    KeyboardInputMapping{Step,    GLFW_KEY_O},
+    KeyboardInputMapping{Up,        GLFW_KEY_UP},
+    KeyboardInputMapping{Down,      GLFW_KEY_DOWN},
+    KeyboardInputMapping{Left,      GLFW_KEY_LEFT},
+    KeyboardInputMapping{Right,     GLFW_KEY_RIGHT},
+    KeyboardInputMapping{Jump,      GLFW_KEY_SPACE},
+    KeyboardInputMapping{Grapple,   GLFW_KEY_X},
+    KeyboardInputMapping{GamePause, GLFW_KEY_ENTER},
+
+    // Debugging
+    KeyboardInputMapping{Pause, GLFW_KEY_P},
+    KeyboardInputMapping{Step,  GLFW_KEY_O},
 };
 
 
 const GamepadInputConfig gGamepadConfig = {
-    GamepadInputMapping{Up, GLFW_GAMEPAD_BUTTON_DPAD_UP, Button},
-    GamepadInputMapping{Down, GLFW_GAMEPAD_BUTTON_DPAD_DOWN, Button},
-    GamepadInputMapping{Left, GLFW_GAMEPAD_BUTTON_DPAD_LEFT, Button},
-    GamepadInputMapping{Right, GLFW_GAMEPAD_BUTTON_DPAD_RIGHT, Button},
-    GamepadInputMapping{Jump, GLFW_GAMEPAD_BUTTON_A, Button},
-    GamepadInputMapping{Grapple, GLFW_GAMEPAD_BUTTON_B, Button},
+    GamepadInputMapping{Up,         GLFW_GAMEPAD_BUTTON_DPAD_UP, Button},
+    GamepadInputMapping{Down,       GLFW_GAMEPAD_BUTTON_DPAD_DOWN, Button},
+    GamepadInputMapping{Left,       GLFW_GAMEPAD_BUTTON_DPAD_LEFT, Button},
+    GamepadInputMapping{Right,      GLFW_GAMEPAD_BUTTON_DPAD_RIGHT, Button},
+    GamepadInputMapping{Jump,       GLFW_GAMEPAD_BUTTON_A, Button},
+    GamepadInputMapping{Grapple,    GLFW_GAMEPAD_BUTTON_B, Button},
     GamepadInputMapping{ChangeMode, GLFW_GAMEPAD_BUTTON_Y, Button},
-    GamepadInputMapping{LeftHorizontalAxis, GLFW_GAMEPAD_AXIS_LEFT_X, Axis},
-    GamepadInputMapping{LeftVerticalAxis,   GLFW_GAMEPAD_AXIS_LEFT_Y, AxisInverted},
+    GamepadInputMapping{GamePause,  GLFW_GAMEPAD_BUTTON_START, Button},
+    GamepadInputMapping{LeftHorizontalAxis,  GLFW_GAMEPAD_AXIS_LEFT_X, Axis},
+    GamepadInputMapping{LeftVerticalAxis,    GLFW_GAMEPAD_AXIS_LEFT_Y, AxisInverted},
     GamepadInputMapping{RightHorizontalAxis, GLFW_GAMEPAD_AXIS_RIGHT_X, Axis},
     GamepadInputMapping{RightVerticalAxis,   GLFW_GAMEPAD_AXIS_RIGHT_Y, AxisInverted},
 };

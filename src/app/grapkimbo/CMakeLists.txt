@@ -83,6 +83,7 @@ set(${TARGET_NAME}_SOURCES
     TestScenes/Game_pendulum.cpp
 
     Scenery/GameScene.cpp
+    Scenery/MenuScene.cpp
     Scenery/RopeGame.cpp
 
     Utils/CollisionBox.cpp

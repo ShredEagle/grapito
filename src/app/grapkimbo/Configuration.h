@@ -21,6 +21,12 @@ namespace camera
 }
 
 
+namespace debug
+{
+    constexpr float gStepTimeIncrement = 0.016f;
+};
+
+
 namespace player
 {
     constexpr float gMass = 80.f;
@@ -51,6 +57,14 @@ namespace render
     constexpr GLsizei gBezierSubdivisions = 30;
 } // namespace render
 
+
+namespace menu
+{
+    constexpr float gViewedHeight = 1000.f;
+    constexpr math::sdr::Rgb gButtonColor{ 120, 100, 110 };
+    constexpr math::Size<2, GLfloat> gButtonSize{320.f, 60.f};
+    constexpr float gButtonSpacing = 200.f;
+}
 
 namespace sight
 {
