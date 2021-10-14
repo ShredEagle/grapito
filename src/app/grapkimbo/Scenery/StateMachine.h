@@ -17,6 +17,13 @@ namespace grapito {
 class StateMachine;
 
 
+enum class UpdateStatus
+{
+    KeepFrame,
+    SwapBuffers,
+};
+
+
 class State
 {
 public:
@@ -30,7 +37,7 @@ public:
 
     /// \return True if  the frame buffer should be swapped.
     /// \note Leaves the door open to timer manipulation (e.g. debug stepping).
-    virtual /*std::optional<shared_ptr<State>>*/ bool update(
+    virtual /*std::optional<shared_ptr<State>>*/ UpdateStatus update(
         GrapitoTimer & aTimer,
         const GameInputState & aInputs,
         StateMachine & aStateMachine) = 0;
@@ -42,7 +49,7 @@ class StateMachine
 public:
     StateMachine(std::shared_ptr<State> aInitialState);
 
-    bool update(GrapitoTimer & aTimer, const GameInputState & aInputs);
+    UpdateStatus update(GrapitoTimer & aTimer, const GameInputState & aInputs);
 
 private:
     std::vector<std::shared_ptr<State>> mStates;
@@ -57,7 +64,7 @@ inline StateMachine::StateMachine(std::shared_ptr<State> aInitialState) :
 {}
 
 
-inline bool StateMachine::update(GrapitoTimer & aTimer, const GameInputState & aInputs)
+inline UpdateStatus StateMachine::update(GrapitoTimer & aTimer, const GameInputState & aInputs)
 {
     return mStates.back()->update(aTimer, aInputs, *this);
 }

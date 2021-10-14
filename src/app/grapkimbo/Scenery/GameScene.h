@@ -13,7 +13,7 @@ namespace grapito {
 class GameScene : public State
 {
 public:
-    bool update(
+    UpdateStatus update(
         GrapitoTimer & aTimer,
         const GameInputState & aInputs,
         StateMachine & aStateMachine) override;

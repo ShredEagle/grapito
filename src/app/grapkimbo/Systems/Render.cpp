@@ -51,8 +51,8 @@ void Render::update(const GrapitoTimer aTimer, const GameInputState &)
                 static_cast<math::Position<2, GLfloat>>(geometry.position),
                 static_cast<math::Size<2, GLfloat>>(geometry.dimension)  
             },
-            visualRectangle.transform,
             visualRectangle.color,
+            visualRectangle.transform,
         });
     }
 

@@ -44,7 +44,7 @@ int main(int argc, const char * argv[])
         {
             inputState.readAll(application);
             timer.mark((float)glfwGetTime());
-            if (topLevelFlow.update(timer, inputState))
+            if (topLevelFlow.update(timer, inputState) == UpdateStatus::SwapBuffers)
             {
                 drawImGui(application, debugUI, imguiState);
                 renderImGui();

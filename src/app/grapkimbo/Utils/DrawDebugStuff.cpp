@@ -63,20 +63,18 @@ namespace ad
                             rectangle.origin,
                             rectangle.dimension,
                         },
-                        rectangle.transform,
                         rectangle.color,
+                        rectangle.transform,
                     }
                 );
             }
 
             for (auto line : mLines)
             {
-                mTrivialLineStrip.addLine(
-                    {
+                mTrivialLineStrip.addLine({
                     {line.origin, line.color},
                     {line.end, line.color},
-                    }
-                );
+                });
             }
 
             for (auto point : mPoints)

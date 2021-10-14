@@ -8,7 +8,7 @@ namespace grapito {
 
 static constexpr float gDebugStepTimeIncrement = 0.016f;
 
-bool GameScene::update(
+UpdateStatus GameScene::update(
     GrapitoTimer & aTimer,
     const GameInputState & aInputs,
     StateMachine & aStateMachine)
@@ -32,10 +32,10 @@ bool GameScene::update(
 
         mSystemManager.step(aTimer, aInputs, mUpdater);
         log(mUpdater);
-        return true;
+        return UpdateStatus::SwapBuffers;
     }
 
-    return false;
+    return UpdateStatus::KeepFrame;
 }
 
 
