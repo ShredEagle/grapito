@@ -6,6 +6,7 @@
 #include "../Entities.h"
 #include "../Utilities.h"
 #include "commons.h"
+#include "math/Constants.h"
 
 #include <Components/VisualRectangle.h>
 
@@ -38,10 +39,11 @@ void Control::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
         float groundSpeedAccelFactor = 1.f / static_cast<float>(player::gGroundNumberOfAccelFrame);
         float groundFriction = 1.f / static_cast<float>(player::gGroundNumberOfSlowFrame);
         float airSpeedAccelFactor = 1.f / static_cast<float>(player::gAirNumberOfAccelFrame);
-        float airFriction = 1.f / static_cast<float>(player::gAirNumberOfSlowFrame); // m/s
-        if (playerData.state == PlayerCollisionState_Grounded)
+        float airFriction = 1.f / static_cast<float>(player::gAirNumberOfSlowFrame);
+
+        if (playerData.state & PlayerCollisionState_Grounded)
         {
-            if (std::abs(horizontalAxis) > 0.)
+            if (std::abs(horizontalAxis) > 0.f)
             {
                 aas.speed += horizontalAxisSign * player::gGroundSpeed * groundSpeedAccelFactor * Vec2{1.f, 0.f};
                 aas.speed.x() = std::max(std::min(player::gGroundSpeed, aas.speed.x()), -player::gGroundSpeed);
@@ -56,7 +58,7 @@ void Control::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
                 aas.speed += Vec2{0.f, + player::gJumpImpulse};
             }
         }
-        else if (playerData.state == PlayerCollisionState_Jumping)
+        else if (playerData.state & PlayerCollisionState_Jumping)
         {
             if (std::abs(horizontalAxis) > 0.)
             {
@@ -67,9 +69,55 @@ void Control::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
             {
                 aas.speed.x() *= 1.f - airFriction;
             }
+
+            if (playerData.state & PlayerCollisionState_Walled)
+            {
+                if (!inputs[Jump])
+                {
+                    aas.accel -= aas.speed * player::gWallFriction;
+                }
+
+                // Player wall succion
+                // This is to avoid unstucking yourself from the wall to easily
+                if (
+                    playerData.wallClingFrameCounter < 10 && 
+                    ((playerData.state & PlayerCollisionState_WalledLeft && aas.speed.x() > 0.f) ||
+                    (playerData.state & PlayerCollisionState_WalledRight && aas.speed.x() < 0.f))
+                )
+                {
+                    playerData.wallClingFrameCounter++;
+                }
+
+                if (playerData.wallClingFrameCounter < 10)
+                {
+                    aas.speed.x() = playerData.state & PlayerCollisionState_WalledLeft ? -1.f : 1.f;
+                }
+                else 
+                {
+                    playerData.wallClingFrameCounter = 0;
+                }
+
+                if (inputs[Jump].positiveEdge() && !(playerData.state & PlayerCollisionState_Grounded))
+                {
+                    float wallJumpHorizontalImpulse = player::gJumpImpulse * 2.f * cos(math::pi<float> / 7.);
+                    float wallJumpVerticalImpulse = player::gJumpImpulse * 2.f * sin(math::pi<float> / 7.);
+
+                    aas.speed = playerData.state & PlayerCollisionState_WalledLeft ?
+                        Vec2{wallJumpHorizontalImpulse, wallJumpVerticalImpulse} :
+                        Vec2{-wallJumpHorizontalImpulse, wallJumpVerticalImpulse};
+
+                    playerData.wallClingFrameCounter = 0;
+                }
+            }
         }
 
-        playerData.state = PlayerCollisionState_Jumping;
+        playerData.state &= ~PlayerCollisionState_Walled;
+        playerData.state &= ~PlayerCollisionState_WalledLeft;
+        playerData.state &= ~PlayerCollisionState_WalledRight;
+
+        //Reset playerData transient state
+        playerData.state |= PlayerCollisionState_Jumping;
+        playerData.state &= ~PlayerCollisionState_Grounded;
     }
 
     //

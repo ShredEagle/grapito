@@ -912,12 +912,25 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
         if (-constraint.normal.dot(PlayerGroundedNormal) > PlayerGroundedSlopeDotValue)
         {
             //Set player as grounded
-            constraint.cPlayer->entity->get<PlayerData>().state = PlayerCollisionState_Grounded;
+            constraint.cPlayer->entity->get<PlayerData>().state |= PlayerCollisionState_Grounded;
+            constraint.cPlayer->entity->get<PlayerData>().state &= ~PlayerCollisionState_Jumping;
         }
-        else if (constraint.normal.dot(PlayerWalledNormal) > PlayerWallSlopeDotValue || constraint.normal.dot(PlayerWalledNormal) < -PlayerWallSlopeDotValue)
+        else if (constraint.normal.dot(PlayerWalledNormal) < -PlayerWallSlopeDotValue ||
+            constraint.normal.dot(PlayerWalledNormal) > PlayerWallSlopeDotValue)
         {
-            //Set player as walled
-            constraint.cPlayer->entity->get<PlayerData>().state = PlayerCollisionState_Walled;
+            constraint.cPlayer->entity->get<PlayerData>().state |= PlayerCollisionState_Walled;
+            if (constraint.normal.x() > 0.)
+            {
+                constraint.cPlayer->entity->get<PlayerData>().state |= PlayerCollisionState_WalledRight;
+            }
+            else
+            {
+                constraint.cPlayer->entity->get<PlayerData>().state |= PlayerCollisionState_WalledLeft;
+            }
+        }
+        else
+        {
+            constraint.cPlayer->entity->get<PlayerData>().wallClingFrameCounter = 0;
         }
     }
 

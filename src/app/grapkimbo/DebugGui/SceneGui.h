@@ -145,6 +145,8 @@ static void drawImGui(graphics::ApplicationGlfw & aApplication, DebugUI & aUI, I
         Text("Jump tuning values");
         SliderFloat("Player impulse strength", &player::gJumpImpulse, 10., 60.);
         SliderFloat("Gravity", &player::gAcceleration, 45., 70.);
+        Text("Wall tuning values");
+        SliderFloat("Wall friction", &player::gWallFriction, 1.f, 20.f);
         End();
 
     }

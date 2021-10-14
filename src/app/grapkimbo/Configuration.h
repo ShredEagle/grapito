@@ -36,6 +36,7 @@ namespace player
     inline int gAirNumberOfAccelFrame = 10;
     inline int gAirNumberOfSlowFrame = 10;
     inline float gJumpImpulse = 24.f; // m/s
+    inline float gWallFriction = 4.f; // m/s
     //static constexpr double gAirControlAcceleration = 12.; // m/s
     //constexpr double gAcceleration = 10.;
     //constexpr double gPlayerJumpImpulse = 10.; // m/s
