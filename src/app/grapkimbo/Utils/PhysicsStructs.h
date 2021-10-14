@@ -188,24 +188,31 @@ struct VelocityConstraint
     Velocity * velocityA;
     BodyPosition * bodyPosA;
     Vec2 rA;
+    Vec2 angVecA;
     float crossA;
+    float crossASquared;
     float crossATangent;
+    float crossATangentSquared;
     float invMassA;
     float invMoiA;
-    float tangentSpeedA;
     math::Radian<float> angleBaseA;
 
     //non owning pointer to Physics system vector
     Velocity * velocityB;
     BodyPosition * bodyPosB;
     Vec2 rB;
+    Vec2 angVecB;
     float crossB;
+    float crossBSquared;
     float crossBTangent;
+    float crossBTangentSquared;
     float invMassB;
     float invMoiB;
-    float tangentSpeedB;
     math::Radian<float> angleBaseB;
 
+    float totalMass;
+    float totalNormalAngularMass;
+    float totalTangentAngularMass;
     float friction;
     bool noMaxFriction;
     float restitution;

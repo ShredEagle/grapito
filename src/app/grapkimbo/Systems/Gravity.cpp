@@ -5,7 +5,6 @@
 #include <math/Vector.h>
 
 namespace ad {
-extern float player::gAcceleration;
 namespace grapito
 {
 

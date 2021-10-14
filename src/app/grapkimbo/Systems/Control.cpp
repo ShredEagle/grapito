@@ -35,25 +35,38 @@ void Control::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
         float horizontalAxis = aInputState.asAxis(controllable.controller, Left, Right, LeftHorizontalAxis);
         float horizontalAxisSign = horizontalAxis / std::abs(horizontalAxis);
 
+        float groundSpeedAccelFactor = 1.f / static_cast<float>(player::gGroundNumberOfAccelFrame);
+        float groundFriction = 1.f / static_cast<float>(player::gGroundNumberOfSlowFrame);
+        float airSpeedAccelFactor = 1.f / static_cast<float>(player::gAirNumberOfAccelFrame);
+        float airFriction = 1.f / static_cast<float>(player::gAirNumberOfSlowFrame); // m/s
         if (playerData.state == PlayerCollisionState_Grounded)
         {
-            if (aas.speed.getNorm() < player::gPlayerWalkingSpeed && std::abs(horizontalAxis) > 0.)
+            if (std::abs(horizontalAxis) > 0.)
             {
-                aas.speed += horizontalAxisSign * (1.f / (1.f - player::gPlayerGroundFriction)) * player::gPlayerWalkingSpeed * player::gWalkingSpeedAccelFactor * Vec2{1.f, 0.f};
+                aas.speed += horizontalAxisSign * player::gGroundSpeed * groundSpeedAccelFactor * Vec2{1.f, 0.f};
+                aas.speed.x() = std::max(std::min(player::gGroundSpeed, aas.speed.x()), -player::gGroundSpeed);
+            }
+            else
+            {
+                aas.speed *= (1.f - groundFriction);
             }
 
             if (inputs[Jump].positiveEdge())
             {
-                aas.speed += Vec2{0.f, + player::gPlayerJumpImpulse};
+                aas.speed += Vec2{0.f, + player::gJumpImpulse};
             }
         }
         else if (playerData.state == PlayerCollisionState_Jumping)
         {
-            if (std::abs(aas.speed.x()) < player::gPlayerWalkingSpeed && std::abs(horizontalAxis) > 0.)
+            if (std::abs(horizontalAxis) > 0.)
             {
-                aas.speed += horizontalAxisSign * (1.f / (1.f - player::gAirFriction)) * player::gAirControlAcceleration * player::gAirSpeedAccelFactor * Vec2{1.f, 0.f};
+                aas.speed += horizontalAxisSign * player::gAirSpeed * airSpeedAccelFactor * Vec2{1.f, 0.f};
+                aas.speed.x() = std::max(std::min(player::gAirSpeed, aas.speed.x()), -player::gAirSpeed);
             }
-            aas.speed.x() *= (1.f - player::gAirFriction);
+            else
+            {
+                aas.speed.x() *= 1.f - airFriction;
+            }
         }
 
         playerData.state = PlayerCollisionState_Jumping;
