@@ -2,17 +2,20 @@
 
 #include "Input.h"
 
-#include <Components/AccelAndSpeed.h>
-#include <Components/PivotJoint.h>
-#include <Components/Position.h>
-#include <Components/Body.h>
-#include "Components/VisualRectangle.h"
+#include "../commons.h"
 
-#include "Utils/CollisionBox.h"
-#include "Utils/PhysicsStructs.h"
-#include "aunteater/EntityManager.h"
-#include "aunteater/Family.h"
-#include "commons.h"
+#include "../Components/AccelAndSpeed.h"
+#include "../Components/Body.h"
+#include "../Components/PivotJoint.h"
+#include "../Components/Position.h"
+#include "../Components/VisualRectangle.h"
+#include "../Components/WeldJoint.h"
+
+#include "../Utils/CollisionBox.h"
+#include "../Utils/PhysicsStructs.h"
+
+#include <aunteater/EntityManager.h>
+#include <aunteater/Family.h>
 #include <aunteater/Archetype.h>
 #include <aunteater/FamilyHelp.h>
 #include <aunteater/System.h>
@@ -23,6 +26,7 @@ namespace grapito
 
 typedef aunteater::Archetype<Position, Body, AccelAndSpeed> PhysicalBody;
 typedef aunteater::Archetype<PivotJoint> Pivotable;
+typedef aunteater::Archetype<WeldJoint> weldable;
 static constexpr int maxVelocityConstraintIteration = 16;
 static constexpr int maxPositionConstraintIteration = 16;
 static std::array<
@@ -51,11 +55,37 @@ class BodyObserver : public aunteater::FamilyObserver
     Physics * mPhysicsSystem;
 };
 
+template<class T_joint, class T_joint_constraint>
+class JointObserver : public aunteater::FamilyObserver
+{
+    public:
+    JointObserver(Physics * aPhysicsSystem);
+
+    void addedEntity(aunteater::LiveEntity & aEntity) override;
+
+    void removedEntity(aunteater::LiveEntity & aEntity) override;
+
+    Physics * mPhysicsSystem;
+};
+
 class PivotObserver : public aunteater::FamilyObserver
 {
     public:
 
     PivotObserver(Physics * aPhysicsSystem);
+
+    void addedEntity(aunteater::LiveEntity & aEntity) override;
+
+    void removedEntity(aunteater::LiveEntity & aEntity) override;
+
+    Physics * mPhysicsSystem;
+};
+
+class WeldObserver : public aunteater::FamilyObserver
+{
+    public:
+
+    WeldObserver(Physics * aPhysicsSystem);
 
     void addedEntity(aunteater::LiveEntity & aEntity) override;
 
@@ -72,15 +102,17 @@ public:
 
     void update(const GrapitoTimer aTimer, const GameInputState & aInputState) override;
 
+    //This is here to simplify the implementation of JointObserver
+    std::list<std::unique_ptr<JointConstraint>> jointConstraints;
+    std::list<ConstructedBody> constructedBodies;
 
 private:
     friend BodyObserver;
-    friend PivotObserver;
 
     BodyObserver bodyObserver;
-    PivotObserver pivotObserver;
+    JointObserver<PivotJoint, PivotJointConstraint> pivotObserver;
+    JointObserver<WeldJoint, WeldJointConstraint> weldObserver;
 
-    std::list<ConstructedBody> constructedBodies;
     std::list<CollisionPair> collidingBodies;
 
     std::vector<Velocity> velocities;
@@ -90,10 +122,6 @@ private:
     std::vector<VelocityConstraint> velocityConstraints;
     std::vector<PlayerEnvironmentConstraint> playerConstraints;
 
-    //This is a list for the moment because it is easier to remove stuff
-    //from it if it is
-    //And there will probably not be that much joint constraint in it
-    std::list<PivotJointConstraint> pivotJointConstraints;
     //Think of putting in place a pool_allocator from foonathan/memory of from boost
 };
 

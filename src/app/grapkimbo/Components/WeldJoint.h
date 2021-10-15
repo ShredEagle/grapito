@@ -8,17 +8,29 @@ namespace ad {
 namespace grapito
 {
 
-struct PivotJoint : public aunteater::Component<PivotJoint>
+struct WeldJoint : public aunteater::Component<WeldJoint>
 {
-    explicit PivotJoint(Position2 aLocalAnchorA, Position2 aLocalAnchorB, aunteater::weak_entity aBodyA, aunteater::weak_entity aBodyB) :
+    explicit WeldJoint(
+            Position2 aLocalAnchorA,
+            Position2 aLocalAnchorB,
+            float aStiffness,
+            float aDamping,
+            aunteater::weak_entity aBodyA,
+            aunteater::weak_entity aBodyB
+            ) :
         localAnchorA{std::move(aLocalAnchorA)},
         localAnchorB{std::move(aLocalAnchorB)},
+        mStiffness{aStiffness},
+        mDamping{aDamping},
         bodyA{aBodyA},
         bodyB{aBodyB}
     {}
 
     Position2 localAnchorA = Position2::Zero();
     Position2 localAnchorB = Position2::Zero();
+
+    float mStiffness;
+    float mDamping;
 
     aunteater::weak_entity bodyA;
     aunteater::weak_entity bodyB;

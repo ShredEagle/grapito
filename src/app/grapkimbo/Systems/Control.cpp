@@ -45,8 +45,15 @@ void Control::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
         {
             if (std::abs(horizontalAxis) > 0.f)
             {
-                aas.speed += horizontalAxisSign * player::gGroundSpeed * groundSpeedAccelFactor * Vec2{1.f, 0.f};
-                aas.speed.x() = std::max(std::min(player::gGroundSpeed, aas.speed.x()), -player::gGroundSpeed);
+                if (std::abs(aas.speed.x()) <= player::gGroundSpeed)
+                {
+                    aas.speed += horizontalAxisSign * player::gGroundSpeed * groundSpeedAccelFactor * Vec2{1.f, 0.f};
+                    aas.speed.x() = std::max(std::min(player::gGroundSpeed, aas.speed.x()), -player::gGroundSpeed);
+                }
+                else
+                {
+                    aas.accel -= aas.speed * 5.f;
+                }
             }
             else
             {
@@ -62,8 +69,15 @@ void Control::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
         {
             if (std::abs(horizontalAxis) > 0.)
             {
-                aas.speed += horizontalAxisSign * player::gAirSpeed * airSpeedAccelFactor * Vec2{1.f, 0.f};
-                aas.speed.x() = std::max(std::min(player::gAirSpeed, aas.speed.x()), -player::gAirSpeed);
+                if (std::abs(aas.speed.x()) <= player::gGroundSpeed)
+                {
+                    aas.speed += horizontalAxisSign * player::gAirSpeed * airSpeedAccelFactor * Vec2{1.f, 0.f};
+                    aas.speed.x() = std::max(std::min(player::gAirSpeed, aas.speed.x()), -player::gAirSpeed);
+                }
+                else
+                {
+                    aas.accel.x() -= aas.speed.x();
+                }
             }
             else
             {
@@ -99,8 +113,8 @@ void Control::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
 
                 if (inputs[Jump].positiveEdge() && !(playerData.state & PlayerCollisionState_Grounded))
                 {
-                    float wallJumpHorizontalImpulse = player::gJumpImpulse * 2.f * cos(math::pi<float> / 7.);
-                    float wallJumpVerticalImpulse = player::gJumpImpulse * 2.f * sin(math::pi<float> / 7.);
+                    float wallJumpHorizontalImpulse = player::gJumpImpulse * player::gDoubleJumpFactor * cos(math::pi<float> / 5.);
+                    float wallJumpVerticalImpulse = player::gJumpImpulse * player::gDoubleJumpFactor * sin(math::pi<float> / 5.);
 
                     aas.speed = playerData.state & PlayerCollisionState_WalledLeft ?
                         Vec2{wallJumpHorizontalImpulse, wallJumpVerticalImpulse} :
