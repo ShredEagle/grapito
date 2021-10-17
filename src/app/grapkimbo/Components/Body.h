@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../Utilities.h"
-#include "Components/AccelAndSpeed.h"
-#include "Utils/CollisionBox.h"
-#include "Utils/Shape.h"
-#include "Utils/PhysicsStructs.h"
+#include "../Components/AccelAndSpeed.h"
+#include "../Utils/CollisionBox.h"
+#include "../Utils/Shape.h"
+#include "../Utils/PhysicsStructs.h"
+#include "../Utils/PhysicsMathUtilities.h"
 
 #include <algorithm>
 #include <aunteater/Component.h>

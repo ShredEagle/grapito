@@ -64,7 +64,10 @@ namespace sight
 
 namespace physic
 {
+    //This is the error that is allowed during physics resolution
+    //This represent the separation that we expect at rest
     constexpr float linearSlop = 0.0001f;
+    constexpr float angularSlop = 2.f / 180 * math::pi<float>;
 }
 
 namespace rope

@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include <ostream>
+#include <spdlog/spdlog.h>
 
 namespace ad {
 namespace grapito
@@ -91,6 +92,7 @@ void JointObserver<T_joint, T_joint_constraint>::addedEntity(aunteater::LiveEnti
     T_joint & joint = aEntity.get<T_joint>();
     ConstructedBody & bodyA = *joint.bodyA->template get<Body>().constructedBodyIt;
     ConstructedBody & bodyB = *joint.bodyB->template get<Body>().constructedBodyIt;
+    spdlog::get("grapito")->info("Observing joint");
 
     auto jointIt = mPhysicsSystem->jointConstraints.insert(
         mPhysicsSystem->jointConstraints.end(),
@@ -480,6 +482,7 @@ Physics::Physics(aunteater::EntityManager & aEntityManager) :
 {
     aEntityManager.getFamily<PhysicalBody>().registerObserver(&bodyObserver);
     aEntityManager.getFamily<Pivotable>().registerObserver(&pivotObserver);
+    aEntityManager.getFamily<Weldable>().registerObserver(&weldObserver);
 
     //Initiliazing the query functions
     queryFunctions[ShapeType_Hull][ShapeType_Hull] = QueryFacePenetration;
@@ -487,9 +490,9 @@ Physics::Physics(aunteater::EntityManager & aEntityManager) :
     //We just reserve an arbitrary (2^n) value of velocities, positions, collisionBoxes
     //This is just to avoid the vector going through the basic vector growth
     //which is 1, 2, 4, 8, 16...
-    velocities.reserve(512);
-    positions.reserve(512);
-    collisionBoxes.reserve(512);
+    velocities.reserve(128);
+    positions.reserve(128);
+    collisionBoxes.reserve(128);
 }
 
 void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputState)
@@ -713,7 +716,7 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
     //Init joint constraint
     for (auto & constraint : jointConstraints)
     {
-        constraint->InitVelocityConstraint();
+        constraint->InitVelocityConstraint(aTimer);
     }
     
 
