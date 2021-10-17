@@ -1,13 +1,18 @@
 #include "PhysicsStructs.h"
-#include "Components/Body.h"
-#include "Components/PivotJoint.h"
-#include "Components/Position.h"
 
-#include "Components/WeldJoint.h"
-#include "Configuration.h"
-#include "Utils/CollisionBox.h"
-#include "Utils/DrawDebugStuff.h"
-#include "math/Vector.h"
+#include "../Configuration.h"
+
+#include "../Components/Body.h"
+#include "../Components/PivotJoint.h"
+#include "../Components/Position.h"
+#include "../Components/WeldJoint.h"
+
+#include "../Utils/CollisionBox.h"
+#include "../Utils/DrawDebugStuff.h"
+#include "../Utils/PhysicsMathUtilities.h"
+#include "Logging.h"
+
+#include <math/Vector.h>
 #include <iostream>
 
 
@@ -143,23 +148,232 @@ WeldJointConstraint::WeldJointConstraint(
     invMassB{aBodyB->invMass},
     invMoiB{aBodyB->invMoi},
     localAnchorB{aWeldJoint.localAnchorB},
-    mRefAngle{aBodyA->bodyPos->a - aBodyB->bodyPos->a},
     mStiffness{aWeldJoint.mStiffness},
     mDamping{aWeldJoint.mDamping}
 {}
 
-void WeldJointConstraint::InitVelocityConstraint()
-{}
+void WeldJointConstraint::InitVelocityConstraint(const GrapitoTimer & timer)
+{
+    bodyPosA = cbA->bodyPos;
+    bodyPosB = cbB->bodyPos;
+    velocityA = cbA->velocity;
+    velocityB = cbB->velocity;
+    mRefAngle = cbA->bodyPos->a - cbB->bodyPos->a;
+    rA = transformVector(localAnchorA - (bodyPosA->c - bodyPosA->p).as<math::Position>(), bodyPosA->a);
+    rB = transformVector(localAnchorB - (bodyPosB->c - bodyPosB->p).as<math::Position>(), bodyPosB->a);
+    angVecA = {-rA.y(), rA.x()};
+    angVecB = {-rB.y(), rB.x()};
+
+    float mA = invMassA;
+    float iA = invMoiA;
+    float mB = invMassB;
+    float iB = invMoiB;
+
+    math::Matrix<3, 3, float> K = 
+    {
+
+        //First row
+        mA + mB + rA.y() * rA.y() * iA + rB.y() * rB.y() * iB, 
+        -rA.y() * rA.x() * iA - rB.y() * rB.x() * iB,
+        -rA.y() * iA - rB.y() * iB,
+
+        //Second row
+        -rA.y() * rA.x() * iA - rB.y() * rB.x() * iB,
+        mA + mB + rA.x() * rA.x() * iA + rB.x() * rB.x() * iB, 
+        rA.x() * iA + rB.x() * iB,
+
+        //Third row
+        -rA.y() * iA - rB.y() * iB,
+        rA.x() * iA + rB.x() * iB,
+        iA + iB
+
+    };
+
+    if (mStiffness > 0.f)
+    {
+        mMassMatrix = getInverse2by2(K);   
+        float invM = iA + iB;
+        float C = (bodyPosB->a - bodyPosA->a - mRefAngle).value();
+        float d = mDamping;
+        float k = mStiffness;
+
+        //Apparently this is magic
+        mGamma = timer.delta() * (d + timer.delta() * k);
+        mGamma = mGamma != 0.f ? 1.f / mGamma : 0.f;
+        mBias = C * k * timer.delta() * mGamma;
+
+        invM += mGamma;
+        mMassMatrix.at(2,2) = invM != 0.f ? 1.f / invM : 0.f;
+    }
+    else if (K.at(2,2) == 0.f)
+    {
+        mMassMatrix = getInverse2by2(K);   
+        mGamma = 0.f;
+        mBias = 0.f;
+    }
+    else
+    {
+        mMassMatrix = K.inverse();
+        mGamma = 0.f;
+        mBias = 0.f;
+    }
+
+    Vec2 impulseSpeed = {mImpulse.x(), mImpulse.y()};
+
+    //warm start constraint
+    velocityA->v -= impulseSpeed * invMassA;
+    velocityA->w -= invMoiA * (twoDVectorCross(rA, impulseSpeed) + mImpulse.z());
+    velocityB->v += impulseSpeed * invMassB;
+    velocityB->w += invMoiB * (twoDVectorCross(rB, impulseSpeed) + mImpulse.z());
+}
 
 void WeldJointConstraint::SolveVelocityConstraint()
-{}
+{
+    float mA = invMassA;
+    float iA = invMoiA;
+    float mB = invMassB;
+    float iB = invMoiB;
+    Vec2 vA = velocityA->v;
+    Vec2 vB = velocityB->v;
+    float wA = velocityA->w;
+    float wB = velocityB->w;
+
+    if (mStiffness > 0.f)
+    {
+        float Cdot2 = wB - wA;
+
+        float impulse2 = -mMassMatrix.at(2, 2) * (Cdot2 + mBias + mGamma * mImpulse.z());
+        mImpulse.z() += impulse2;
+
+        wA -= iA * impulse2;
+        wB += iB * impulse2;
+
+        Vec2 Cdot1 = vB + wB * angVecB - vA - wA * angVecA;
+
+        Vec2 impulseSpeed = -Cdot1 * mMassMatrix.getSubmatrix(2, 2);
+        mImpulse.x() += impulseSpeed.x();
+        mImpulse.y() += impulseSpeed.y();
+
+        vA -= mA * impulseSpeed;
+        wA -= iA * twoDVectorCross(rA, impulseSpeed);
+
+        vB += mB * impulseSpeed;
+        wB += iB * twoDVectorCross(rB, impulseSpeed);
+    }
+    else
+    {
+        Vec2 Cdot1 = vB + wB * angVecB - vA - wA * angVecA;
+        float Cdot2 = wB - wA;
+        Vec3 Cdot{Cdot1.x(), Cdot1.y(), Cdot2};
+
+        Vec3 newImpulse = - Cdot * mMassMatrix;
+        mImpulse += newImpulse;
+
+        Vec2 impulseSpeed{newImpulse.x(), newImpulse.y()};
+
+        vA -= mA * impulseSpeed;
+        wA -= iA * (twoDVectorCross(rA, impulseSpeed) + newImpulse.z());
+
+        vB += mB * impulseSpeed;
+        wB += iB * (twoDVectorCross(rB, impulseSpeed) + newImpulse.z());
+    }
+
+    velocityA->v = vA;
+    velocityA->w = wA;
+    velocityB->v = vB;
+    velocityB->w = wB;
+}
 
 bool WeldJointConstraint::SolvePositionConstraint()
 {
-    return true;
+    Position2 pA = bodyPosA->p;
+    Position2 pB = bodyPosB->p;
+    Position2 cA = bodyPosA->c;
+    Position2 cB = bodyPosB->c;
+    math::Radian<float> aA = bodyPosA->a;
+    math::Radian<float> aB = bodyPosB->a;
+
+    Vec2 rA = transformVector(localAnchorA - (cA - pA).as<math::Position>(), aA);
+    Vec2 rB = transformVector(localAnchorB - (cB - pB).as<math::Position>(), aB);
+
+    float mA = invMassA;
+    float iA = invMoiA;
+    float mB = invMassB;
+    float iB = invMoiB;
+
+    math::Matrix<3, 3, float> K = 
+    {
+
+        //First row
+        mA + mB + rA.y() * rA.y() * iA + rB.y() * rB.y() * iB, 
+        -rA.y() * rA.x() * iA - rB.y() * rB.x() * iB,
+        -rA.y() * iA - rB.y() * iB,
+
+        //Second row
+        -rA.y() * rA.x() * iA - rB.y() * rB.x() * iB,
+        mA + mB + rA.x() * rA.x() * iA + rB.x() * rB.x() * iB, 
+        rA.x() * iA + rB.x() * iB,
+
+        //Third row
+        -rA.y() * iA - rB.y() * iB,
+        rA.x() * iA + rB.x() * iB,
+        iA + iB
+
+    };
+
+    float positionError; 
+    float angularError = 0.f; 
+
+    if (mStiffness > 0.f)
+    {
+        Vec2 C = cB + rB - cA - rA;
+
+        positionError = C.getNorm();
+
+        Vec2 impulse = -solveMatrix(K.getSubmatrix(2, 2), C);
+
+        bodyPosA->c -= impulse * invMassA;
+        bodyPosA->p -= impulse * invMassA;
+
+        bodyPosB->c += impulse * invMassB;
+        bodyPosB->p += impulse * invMassB;
+    }
+    else
+    {
+        Vec2 C1 =  cB + rB - cA - rA;
+        float C2 = (aB - aA - mRefAngle).value();
+
+        positionError = C1.getNorm();
+        angularError = std::abs(C2);
+
+        Vec3 C{C1.x(), C1.y(), C2};
+      
+        Vec3 impulse = Vec3::Zero();
+        if (K.at(2, 2) > 0.0f)
+        {
+          impulse = -solveMatrix(K, C);
+        }
+        else
+        {
+          Vec2 impulse2 = -solveMatrix(K.getSubmatrix(2, 2), C1);
+          impulse = Vec3{impulse2.x(), impulse2.y(), 0.0f};
+        }
+
+        Vec2 impulseSpeed{impulse.x(), impulse.y()};
+
+        bodyPosA->c -= mA * impulseSpeed;
+        bodyPosA->p -= mA * impulseSpeed;
+        bodyPosA->a -= math::Radian<float>(iA * (twoDVectorCross(rA, impulseSpeed) + impulse.z()));
+
+        bodyPosB->c += mB * impulseSpeed;
+        bodyPosB->p += mB * impulseSpeed;
+        bodyPosB->a += math::Radian<float>(iB * (twoDVectorCross(rB, impulseSpeed) + impulse.z()));
+    }
+
+    return positionError <= physic::linearSlop && angularError <= physic::angularSlop;
 }
 
-void PivotJointConstraint::InitVelocityConstraint()
+void PivotJointConstraint::InitVelocityConstraint(const GrapitoTimer & timer)
 {
     bodyPosA = cbA->bodyPos;
     bodyPosB = cbB->bodyPos;
@@ -181,10 +395,10 @@ void PivotJointConstraint::InitVelocityConstraint()
     k.at(1,1) = mA + mB + rA.x() * rA.x() * iA + rB.x() * rB.x() * iB;
 
     //warm start constraint
-    velocityA->v -= impulse * invMassA;
-    velocityA->w -= invMoiA * twoDVectorCross(rA, impulse);
-    velocityB->v += impulse * invMassB;
-    velocityB->w += invMoiB * twoDVectorCross(rB, impulse);
+    velocityA->v -= mImpulse * invMassA;
+    velocityA->w -= invMoiA * twoDVectorCross(rA, mImpulse);
+    velocityB->v += mImpulse * invMassB;
+    velocityB->w += invMoiB * twoDVectorCross(rB, mImpulse);
 }
 
 void PivotJointConstraint::SolveVelocityConstraint()
@@ -193,7 +407,7 @@ void PivotJointConstraint::SolveVelocityConstraint()
         velocityA->v - angVecA * velocityA->w;
     Vec2 impulse = solveMatrix(k, -angularSpeed);
 
-    impulse += impulse;
+    mImpulse += impulse;
 
     velocityA->v -= impulse * invMassA;
     velocityA->w -= invMoiA * twoDVectorCross(rA, impulse);
@@ -203,33 +417,33 @@ void PivotJointConstraint::SolveVelocityConstraint()
 
 bool PivotJointConstraint::SolvePositionConstraint()
 {
-        Vec2 rA = transformVector(localAnchorA - (bodyPosA->c - bodyPosA->p).as<math::Position>(), bodyPosA->a);
-        Vec2 rB = transformVector(localAnchorB - (bodyPosB->c - bodyPosB->p).as<math::Position>(), bodyPosB->a);
+    Vec2 rA = transformVector(localAnchorA - (bodyPosA->c - bodyPosA->p).as<math::Position>(), bodyPosA->a);
+    Vec2 rB = transformVector(localAnchorB - (bodyPosB->c - bodyPosB->p).as<math::Position>(), bodyPosB->a);
 
-        Vec2 C = bodyPosB->c + rB - bodyPosA->c - rA;
-        float positionError = C.getNorm();
+    Vec2 C = bodyPosB->c + rB - bodyPosA->c - rA;
+    float positionError = C.getNorm();
 
-        float mA = invMassA;
-        float iA = invMoiA;
-        float mB = invMassB;
-        float iB = invMoiB;
+    float mA = invMassA;
+    float iA = invMoiA;
+    float mB = invMassB;
+    float iB = invMoiB;
 
-        k.at(0,0) = mA + mB + rA.y() * rA.y() * iA + rB.y() * rB.y() * iB;
-        k.at(0,1) = -rA.y() * rA.x() * iA - rB.y() * rB.x() * iB;
-        k.at(1,0) = k.at(0,1);
-        k.at(1,1) = mA + mB + rA.x() * rA.x() * iA + rB.x() * rB.x() * iB;
+    k.at(0,0) = mA + mB + rA.y() * rA.y() * iA + rB.y() * rB.y() * iB;
+    k.at(0,1) = -rA.y() * rA.x() * iA - rB.y() * rB.x() * iB;
+    k.at(1,0) = k.at(0,1);
+    k.at(1,1) = mA + mB + rA.x() * rA.x() * iA + rB.x() * rB.x() * iB;
 
-        Vec2 impulse = solveMatrix(-k, C);
+    Vec2 impulse = solveMatrix(-k, C);
 
-        bodyPosA->c -= mA * impulse;
-        bodyPosA->p -= mA * impulse;
-        bodyPosA->a -= math::Radian<float>{iA * twoDVectorCross(rA, impulse)};
+    bodyPosA->c -= mA * impulse;
+    bodyPosA->p -= mA * impulse;
+    bodyPosA->a -= math::Radian<float>{iA * twoDVectorCross(rA, impulse)};
 
-        bodyPosB->c += mB * impulse;
-        bodyPosB->p += mB * impulse;
-        bodyPosB->a += math::Radian<float>{iB * twoDVectorCross(rB, impulse)};
+    bodyPosB->c += mB * impulse;
+    bodyPosB->p += mB * impulse;
+    bodyPosB->a += math::Radian<float>{iB * twoDVectorCross(rB, impulse)};
 
-        return positionError <= physic::linearSlop;
+    return positionError <= physic::linearSlop;
 }
 
 PivotJointConstraint::PivotJointConstraint(

@@ -26,7 +26,8 @@ namespace grapito
 
 typedef aunteater::Archetype<Position, Body, AccelAndSpeed> PhysicalBody;
 typedef aunteater::Archetype<PivotJoint> Pivotable;
-typedef aunteater::Archetype<WeldJoint> weldable;
+typedef aunteater::Archetype<WeldJoint> Weldable;
+
 static constexpr int maxVelocityConstraintIteration = 16;
 static constexpr int maxPositionConstraintIteration = 16;
 static std::array<
@@ -60,32 +61,6 @@ class JointObserver : public aunteater::FamilyObserver
 {
     public:
     JointObserver(Physics * aPhysicsSystem);
-
-    void addedEntity(aunteater::LiveEntity & aEntity) override;
-
-    void removedEntity(aunteater::LiveEntity & aEntity) override;
-
-    Physics * mPhysicsSystem;
-};
-
-class PivotObserver : public aunteater::FamilyObserver
-{
-    public:
-
-    PivotObserver(Physics * aPhysicsSystem);
-
-    void addedEntity(aunteater::LiveEntity & aEntity) override;
-
-    void removedEntity(aunteater::LiveEntity & aEntity) override;
-
-    Physics * mPhysicsSystem;
-};
-
-class WeldObserver : public aunteater::FamilyObserver
-{
-    public:
-
-    WeldObserver(Physics * aPhysicsSystem);
 
     void addedEntity(aunteater::LiveEntity & aEntity) override;
 

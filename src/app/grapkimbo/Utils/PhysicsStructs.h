@@ -263,7 +263,7 @@ class JointConstraint
     {}
     virtual ~JointConstraint() = default;
 
-    virtual void InitVelocityConstraint() = 0;
+    virtual void InitVelocityConstraint(const GrapitoTimer & timer) = 0;
     virtual void SolveVelocityConstraint() = 0;
     virtual bool SolvePositionConstraint() = 0;
 
@@ -283,10 +283,11 @@ class WeldJointConstraint : public JointConstraint
             aunteater::weak_entity aEntity
             );
 
-    void InitVelocityConstraint() override;
+    void InitVelocityConstraint(const GrapitoTimer & timer) override;
     void SolveVelocityConstraint() override;
     bool SolvePositionConstraint() override;
 
+    protected:
     Velocity * velocityA;
     BodyPosition * bodyPosA;
     float invMassA;
@@ -303,9 +304,10 @@ class WeldJointConstraint : public JointConstraint
     Vec2 rB = Vec2::Zero();
     Vec2 angVecB = Vec2::Zero();
 
-    Vec2 impulse = Vec2::Zero();
+    Vec3 mImpulse = Vec3::Zero();
     math::Matrix<3, 3, float> mMassMatrix = math::Matrix<3, 3, float>::Zero();
     float mGamma;
+    float mBias;
     math::Radian<float> mRefAngle;
     float mStiffness;
     float mDamping;
@@ -321,10 +323,11 @@ class PivotJointConstraint : public JointConstraint
             aunteater::weak_entity aEntity
             );
 
-    void InitVelocityConstraint() override;
+    void InitVelocityConstraint(const GrapitoTimer & timer) override;
     void SolveVelocityConstraint() override;
     bool SolvePositionConstraint() override;
 
+    protected:
     Velocity * velocityA;
     BodyPosition * bodyPosA;
     float invMassA;
@@ -341,7 +344,7 @@ class PivotJointConstraint : public JointConstraint
     Vec2 rB = Vec2::Zero();
     Vec2 angVecB = Vec2::Zero();
 
-    Vec2 impulse = Vec2::Zero();
+    Vec2 mImpulse = Vec2::Zero();
     float axialMass;
     math::Matrix<2, 2, float> k = math::Matrix<2, 2, float>::Zero();
 };

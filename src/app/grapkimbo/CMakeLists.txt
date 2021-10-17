@@ -42,11 +42,13 @@ set(${TARGET_NAME}_HEADERS
     TestScenes/SetPositionTest.h
     TestScenes/Game_pendulum.h
     TestScenes/SceneChanger.h
+    TestScenes/WeldTest.h
 
     Utils/CollisionBox.h
     Utils/DrawDebugStuff.h
     Utils/HomogeneousTransformation.h
     Utils/PhysicsStructs.h
+    Utils/PhysicsMathUtilities.h
     Utils/RopeUtilities.h
     Utils/Shape.h
     Utils/TimeSystemsUpdater.h
@@ -77,6 +79,7 @@ set(${TARGET_NAME}_SOURCES
     TestScenes/SetPositionTest.cpp
     TestScenes/PivotTest.cpp
     TestScenes/Game_pendulum.cpp
+    TestScenes/WeldTest.cpp
 
     Utils/CollisionBox.cpp
     Utils/DrawDebugStuff.cpp
