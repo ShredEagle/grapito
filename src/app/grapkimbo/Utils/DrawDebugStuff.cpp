@@ -63,8 +63,8 @@ namespace ad
                             rectangle.origin,
                             rectangle.dimension,
                         },
-                        rectangle.transform,
                         rectangle.color,
+                        rectangle.transform,
                     }
                 );
             }
