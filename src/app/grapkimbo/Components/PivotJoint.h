@@ -23,9 +23,9 @@ struct PivotJoint : public aunteater::Component<PivotJoint>
     aunteater::weak_entity bodyA;
     aunteater::weak_entity bodyB;
 
-    std::list<PivotJointConstraint>::iterator constraintIt;
-    std::list<std::list<PivotJointConstraint>::iterator>::iterator constructedBodyConstraintItA;
-    std::list<std::list<PivotJointConstraint>::iterator>::iterator constructedBodyConstraintItB;
+    std::list<std::unique_ptr<JointConstraint>>::iterator constraintIt;
+    std::list<std::list<std::unique_ptr<JointConstraint>>::iterator>::iterator constructedBodyConstraintItA;
+    std::list<std::list<std::unique_ptr<JointConstraint>>::iterator>::iterator constructedBodyConstraintItB;
 };
 
 

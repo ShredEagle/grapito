@@ -1,18 +1,19 @@
 #include "Physics.h"
 
-#include "Configuration.h"
+#include "../Configuration.h"
 
-#include "Components/Body.h"
-#include "Components/PivotJoint.h"
-#include "Components/PlayerData.h"
+#include "../Components/Body.h"
+#include "../Components/PivotJoint.h"
+#include "../Components/PlayerData.h"
+#include "../Components/WeldJoint.h"
 
-#include "Utils/HomogeneousTransformation.h"
-#include "Utils/PhysicsStructs.h"
-#include "math/Angle.h"
-#include "math/Interpolation.h"
+#include "../Utils/HomogeneousTransformation.h"
+#include "../Utils/PhysicsStructs.h"
 
 #include <aunteater/Timer.h>
 
+#include <math/Angle.h>
+#include <math/Interpolation.h>
 #include <math/Matrix.h>
 
 #include <iostream>
@@ -68,75 +69,73 @@ void BodyObserver::removedEntity(aunteater::LiveEntity & aEntity)
         collisionPair->toRemove = true;
     }
 
-    for (auto pjcIt : body.pivotJointItList)
+    for (auto jcIt : body.jointItList)
     {
-        PivotJointConstraint & pjc = *pjcIt;
-        pjc.pivotJointEntity->markToRemove();
+        auto & jc = *jcIt;
+        jc->jointEntity->markToRemove();
     }
 
     mPhysicsSystem->constructedBodies.erase(aEntity.get<Body>().constructedBodyIt);
 }
 
-PivotObserver::PivotObserver(Physics * aPhysicsSystem) :
+template<class T_joint, class T_joint_constraint>
+JointObserver<T_joint, T_joint_constraint>::JointObserver(Physics * aPhysicsSystem) :
     mPhysicsSystem{aPhysicsSystem}
 {}
 
-void PivotObserver::addedEntity(aunteater::LiveEntity & aEntity)
+template<class T_joint, class T_joint_constraint>
+void JointObserver<T_joint, T_joint_constraint>::addedEntity(aunteater::LiveEntity & aEntity)
 {
     //assert(!aEntity.get<PivotJoint>().bodyA->has<Body>() && "Pivot jointed entity A must have a body component");
     //assert(!aEntity.get<PivotJoint>().bodyB->has<Body>() && "Pivot jointed entity B must have a body component");
-    PivotJoint & pivotJoint = aEntity.get<PivotJoint>();
-    ConstructedBody & bodyA = *pivotJoint.bodyA->get<Body>().constructedBodyIt;
-    ConstructedBody & bodyB = *pivotJoint.bodyB->get<Body>().constructedBodyIt;
+    T_joint & joint = aEntity.get<T_joint>();
+    ConstructedBody & bodyA = *joint.bodyA->template get<Body>().constructedBodyIt;
+    ConstructedBody & bodyB = *joint.bodyB->template get<Body>().constructedBodyIt;
 
-    auto pivotJointIt = mPhysicsSystem->pivotJointConstraints.insert(
-        mPhysicsSystem->pivotJointConstraints.end(),
-        PivotJointConstraint{
-             bodyA.invMass,
-             bodyA.invMoi,
-             pivotJoint.localAnchorA,
+    auto jointIt = mPhysicsSystem->jointConstraints.insert(
+        mPhysicsSystem->jointConstraints.end(),
+        std::make_unique<T_joint_constraint>(
+            joint,
 
-             bodyB.invMass,
-             bodyB.invMoi,
-             pivotJoint.localAnchorB,
+            &bodyA,
+            &bodyB,
 
-             &bodyA,
-             &bodyB,
-
-             &aEntity,
-        }
+            &aEntity
+        )
     );
 
-    auto itA = bodyA.pivotJointItList.insert(
-            bodyA.pivotJointItList.end(),
-            pivotJointIt
+    auto itA = bodyA.jointItList.insert(
+            bodyA.jointItList.end(),
+            jointIt
     );
-    auto itB = bodyB.pivotJointItList.insert(
-            bodyB.pivotJointItList.end(),
-            pivotJointIt
+    auto itB = bodyB.jointItList.insert(
+            bodyB.jointItList.end(),
+            jointIt
     );
 
-    aEntity.get<PivotJoint>().constraintIt = pivotJointIt;
-    aEntity.get<PivotJoint>().constructedBodyConstraintItB = itB;
-    aEntity.get<PivotJoint>().constructedBodyConstraintItA = itA;
+    aEntity.get<T_joint>().constraintIt = jointIt;
+    aEntity.get<T_joint>().constructedBodyConstraintItB = itB;
+    aEntity.get<T_joint>().constructedBodyConstraintItA = itA;
 }
 
-void PivotObserver::removedEntity(aunteater::LiveEntity & aEntity)
+template<class T_joint, class T_joint_constraint>
+void JointObserver<T_joint, T_joint_constraint>::removedEntity(aunteater::LiveEntity & aEntity)
 {
-    PivotJoint & pivot = aEntity.get<PivotJoint>();
+    T_joint & joint = aEntity.get<T_joint>();
 
     if (aEntity.get<PivotJoint>().bodyA->has<Body>())
     {
         ConstructedBody & bodyA = *aEntity.get<PivotJoint>().bodyA->get<Body>().constructedBodyIt;
-        bodyA.pivotJointItList.erase(pivot.constructedBodyConstraintItA);
+        bodyA.jointItList.erase(joint.constructedBodyConstraintItA);
     }
     if (aEntity.get<PivotJoint>().bodyB->has<Body>())
     {
         ConstructedBody & bodyB = *aEntity.get<PivotJoint>().bodyB->get<Body>().constructedBodyIt;
-        bodyB.pivotJointItList.erase(pivot.constructedBodyConstraintItB);
+        bodyB.jointItList.erase(joint.constructedBodyConstraintItB);
     }
-    mPhysicsSystem->pivotJointConstraints.erase(pivot.constraintIt);
+    mPhysicsSystem->jointConstraints.erase(joint.constraintIt);
 }
+
 
 static inline void addPair(ConstructedBody & bodyA, ConstructedBody & bodyB, std::list<CollisionPair> & pairs)
 {
@@ -283,7 +282,7 @@ static inline std::vector<ContactFeature> CheckContactValidity(const Shape::Edge
 
         //This is sad that we get fucked by smaller than difference 0.01mm
         if (
-                candidateSeparation < separation + physic::linearSlop
+                candidateSeparation < separation + physic::gLinearSlop
            )
         {
             result.emplace_back(contact);
@@ -474,87 +473,14 @@ static inline void solveContactVelocityConstraint(VelocityConstraint & constrain
     constraint.velocityB->w -= angularImpulseB;
 }
 
-static inline void solvePivotJointVelocityConstraint(PivotJointConstraint & constraint)
-{
-    Vec2 angularSpeed = constraint.velocityB->v + constraint.angVecB * constraint.velocityB->w -
-        constraint.velocityA->v - constraint.angVecA * constraint.velocityA->w;
-    Vec2 impulse = solveMatrix(constraint.k, -angularSpeed);
-
-    constraint.impulse += impulse;
-
-    constraint.velocityA->v -= impulse * constraint.invMassA;
-    constraint.velocityA->w -= constraint.invMoiA * twoDVectorCross(constraint.rA, impulse);
-    constraint.velocityB->v += impulse * constraint.invMassB;
-    constraint.velocityB->w += constraint.invMoiB * twoDVectorCross(constraint.rB, impulse);
-}
-
-static inline bool solvePivotJointPositionConstraint(PivotJointConstraint & constraint)
-{
-        Vec2 rA = transformVector(constraint.localAnchorA - (constraint.bodyPosA->c - constraint.bodyPosA->p).as<math::Position>(), constraint.bodyPosA->a);
-        Vec2 rB = transformVector(constraint.localAnchorB - (constraint.bodyPosB->c - constraint.bodyPosB->p).as<math::Position>(), constraint.bodyPosB->a);
-
-        Vec2 C = constraint.bodyPosB->c + rB - constraint.bodyPosA->c - rA;
-        float positionError = C.getNorm();
-
-        float mA = constraint.invMassA;
-        float iA = constraint.invMoiA;
-        float mB = constraint.invMassB;
-        float iB = constraint.invMoiB;
-
-        constraint.k.at(0,0) = mA + mB + rA.y() * rA.y() * iA + rB.y() * rB.y() * iB;
-        constraint.k.at(0,1) = -rA.y() * rA.x() * iA - rB.y() * rB.x() * iB;
-        constraint.k.at(1,0) = constraint.k.at(0,1);
-        constraint.k.at(1,1) = mA + mB + rA.x() * rA.x() * iA + rB.x() * rB.x() * iB;
-
-        Vec2 impulse = solveMatrix(-constraint.k, C);
-
-        constraint.bodyPosA->c -= mA * impulse;
-        constraint.bodyPosA->p -= mA * impulse;
-        constraint.bodyPosA->a -= math::Radian<float>{iA * twoDVectorCross(rA, impulse)};
-
-        constraint.bodyPosB->c += mB * impulse;
-        constraint.bodyPosB->p += mB * impulse;
-        constraint.bodyPosB->a += math::Radian<float>{iB * twoDVectorCross(rB, impulse)};
-
-        return positionError <= physic::linearSlop;
-}
-
-static inline void initializePivotJointConstraint(PivotJointConstraint & constraint)
-{
-        constraint.bodyPosA = constraint.cbA->bodyPos;
-        constraint.bodyPosB = constraint.cbB->bodyPos;
-        constraint.velocityA = constraint.cbA->velocity;
-        constraint.velocityB = constraint.cbB->velocity;
-        constraint.rA = transformVector(constraint.localAnchorA - (constraint.bodyPosA->c - constraint.bodyPosA->p).as<math::Position>(), constraint.bodyPosA->a);
-        constraint.rB = transformVector(constraint.localAnchorB - (constraint.bodyPosB->c - constraint.bodyPosB->p).as<math::Position>(), constraint.bodyPosB->a);
-        constraint.angVecA = {-constraint.rA.y(), constraint.rA.x()};
-        constraint.angVecB = {-constraint.rB.y(), constraint.rB.x()};
-
-        Vec2 rA = constraint.rA;
-        Vec2 rB = constraint.rB;
-        float mA = constraint.invMassA;
-        float iA = constraint.invMoiA;
-        float mB = constraint.invMassB;
-        float iB = constraint.invMoiB;
-
-        constraint.k.at(0,0) = mA + mB + rA.y() * rA.y() * iA + rB.y() * rB.y() * iB;
-        constraint.k.at(0,1) = -rA.y() * rA.x() * iA - rB.y() * rB.x() * iB;
-        constraint.k.at(1,0) = constraint.k.at(0,1);
-        constraint.k.at(1,1) = mA + mB + rA.x() * rA.x() * iA + rB.x() * rB.x() * iB;
-
-        //warm start constraint
-        constraint.velocityA->v -= constraint.impulse * constraint.invMassA;
-        constraint.velocityA->w -= constraint.invMoiA * twoDVectorCross(constraint.rA, constraint.impulse);
-        constraint.velocityB->v += constraint.impulse * constraint.invMassB;
-        constraint.velocityB->w += constraint.invMoiB * twoDVectorCross(constraint.rB, constraint.impulse);
-}
-
 Physics::Physics(aunteater::EntityManager & aEntityManager) :
     bodyObserver{this},
-    pivotObserver{this}
+    pivotObserver{this},
+    weldObserver{this}
 {
     aEntityManager.getFamily<PhysicalBody>().registerObserver(&bodyObserver);
     aEntityManager.getFamily<Pivotable>().registerObserver(&pivotObserver);
+    aEntityManager.getFamily<Weldable>().registerObserver(&weldObserver);
 
     //Initiliazing the query functions
     queryFunctions[ShapeType_Hull][ShapeType_Hull] = QueryFacePenetration;
@@ -786,9 +712,9 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
     }
 
     //Init joint constraint
-    for (auto & pjConstraint : pivotJointConstraints)
+    for (auto & constraint : jointConstraints)
     {
-        initializePivotJointConstraint(pjConstraint);
+        constraint->InitVelocityConstraint(aTimer);
     }
     
 
@@ -806,11 +732,11 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
         constraint.velocityB->w -= twoDVectorCross(constraint.rB, impulseVec) * constraint.invMassB;
     }
 
-    for (int i = 0; i < maxVelocityConstraintIteration; i++)
+    for (int i = 0; i < physic::gMaxVelocityConstraintIteration; i++)
     {
-        for (PivotJointConstraint & pjConstraint : pivotJointConstraints)
+        for (auto & constraint : jointConstraints)
         {
-            solvePivotJointVelocityConstraint(pjConstraint);
+            constraint->SolveVelocityConstraint();
         }
 
         for (VelocityConstraint & constraint : velocityConstraints)
@@ -859,12 +785,12 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
         constraint.angleBaseB = constraint.bodyPosB->a;
     }
 
-    for (int i = 0; i < maxPositionConstraintIteration; i++)
+    for (int i = 0; i < physic::gMaxPositionConstraintIteration; i++)
     {
         bool jointOkay = true;
-        for (PivotJointConstraint & constraint : pivotJointConstraints)
+        for (auto & constraint : jointConstraints)
         {
-            jointOkay = solvePivotJointPositionConstraint(constraint) && jointOkay;
+            jointOkay = constraint->SolvePositionConstraint() && jointOkay;
         }
 
         for (VelocityConstraint & constraint : velocityConstraints)
@@ -876,9 +802,9 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
             Position2 onEdgePoint = constraint.bodyPosA->c + clipPoint;
 
             Position2 point = constraint.bodyPosB->c + rB;
-            float separation = (point.as<math::Vec>() - onEdgePoint.as<math::Vec>()).dot(normal) - physic::linearSlop * 4.;
+            float separation = (point.as<math::Vec>() - onEdgePoint.as<math::Vec>()).dot(normal) - physic::gLinearSlop * 4.;
 
-            float C = std::min(0., std::max(-.2, .2 * (separation + physic::linearSlop)));
+            float C = std::min(0., std::max(-.2, .2 * (separation + physic::gLinearSlop)));
 
             float rnA = twoDVectorCross(rA, normal);
             float rnB = twoDVectorCross(rB, normal);
@@ -894,7 +820,7 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
             constraint.bodyPosB->p += constraint.invMassB * impulse;
             constraint.bodyPosB->a += math::Radian<float>{constraint.invMoiB * twoDVectorCross(rB, impulse)};
 
-            jointOkay = jointOkay && separation >= -4. * physic::linearSlop;
+            jointOkay = jointOkay && separation >= -4. * physic::gLinearSlop;
         }
 
         if (jointOkay)

@@ -5,9 +5,11 @@
 #include "TestScenes/CollisionTest.h"
 #include "TestScenes/FrictionTest.h"
 #include "TestScenes/PivotTest.h"
+#include "TestScenes/WeldTest.h"
 #include "TestScenes/SimpleCollisionTest.h"
 #include "TestScenes/SetPositionTest.h"
-#include "aunteater/EntityManager.h"
+
+#include <aunteater/EntityManager.h>
 
 #include <graphics/ApplicationGlfw.h>
 
@@ -23,6 +25,7 @@ enum GameList
     FrictionTest,
     SimpleCollisionTest,
     PivotTest,
+    WeldTest,
     SetPositionTest,
 };
 
@@ -55,6 +58,9 @@ static void ChangeScene(GameList aGameType, graphics::ApplicationGlfw & aApplica
         break;
     case GameList::PivotTest:
         currentGame = std::make_unique<class PivotTest>(aApplication, aUI);
+        break;
+    case GameList::WeldTest:
+        currentGame = std::make_unique<class WeldTest>(aApplication, aUI);
         break;
     case GameList::SetPositionTest:
         currentGame = std::make_unique<class SetPositionTest>(aApplication, aUI);
