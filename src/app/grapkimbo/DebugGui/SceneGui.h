@@ -2,6 +2,7 @@
 
 #include "../TestScenes/SceneChanger.h"
 #include "../Utils/DrawDebugStuff.h"
+#include "../Configuration.h"
 
 #include <graphics/ApplicationGlfw.h>
 
@@ -31,6 +32,7 @@ static void setupImGui(graphics::ApplicationGlfw & aApplication)
 }
 
 static bool showDebugWindow = false;
+static bool showTuningWindow = true;
 
 struct ImguiState
 {
@@ -46,11 +48,41 @@ static void drawImGui(graphics::ApplicationGlfw & aApplication, DebugUI & aUI, I
     const ImGuiViewport * main_viewport = ImGui::GetMainViewport();
 
     ImGui::SetNextWindowPos(ImVec2(main_viewport->WorkPos.x + 20, main_viewport->WorkPos.y + 10), ImGuiCond_Once);
-    Begin("Hello");
-    if(ImGui::Button("Debug scenes"))
+    Begin("Hello", nullptr, ImGuiWindowFlags_MenuBar);
+    if (ImGui::BeginMenuBar())
     {
-        showDebugWindow = !showDebugWindow;
+        if (ImGui::BeginMenu("Debug Scenes"))
+        {
+            if(ImGui::MenuItem("Collision test"))
+            {
+                ChangeScene(GameList::CollisionTest, aApplication, aUI);
+            }
+            if(ImGui::MenuItem("FrictionTest"))
+            {
+                ChangeScene(GameList::FrictionTest, aApplication, aUI);
+            }
+            if(ImGui::MenuItem("SimpleCollisionTest"))
+            {
+                ChangeScene(GameList::SimpleCollisionTest, aApplication, aUI);
+            }
+            if(ImGui::MenuItem("PivotTest"))
+            {
+                ChangeScene(GameList::PivotTest, aApplication, aUI);
+            }
+            if(ImGui::MenuItem("SetPositionTest"))
+            {
+                ChangeScene(GameList::SetPositionTest, aApplication, aUI);
+            }
+            ImGui::EndMenu();
+        }
+        if(ImGui::BeginMenu("Open gameplay tuning"))
+        {
+            showTuningWindow = true;
+            ImGui::EndMenu();
+        }
+        ImGui::EndMenuBar();
     }
+
     if(ImGui::Button("Game_pendulum"))
     {
         ChangeScene(GameList::GamePendulum, aApplication, aUI);
@@ -100,32 +132,26 @@ static void drawImGui(graphics::ApplicationGlfw & aApplication, DebugUI & aUI, I
     }
     End();
 
-    if (showDebugWindow)
+    if (showTuningWindow)
     {
-        ImGui::SetNextWindowPos(ImVec2(main_viewport->WorkPos.x + 20, main_viewport->WorkPos.y + 120), ImGuiCond_Once);
-        ImGui::SetNextWindowSize(ImVec2(200.f, 300.f), ImGuiCond_Once);
-        Begin("Debug scenes");
-        if(ImGui::Button("Collision test"))
-        {
-            ChangeScene(GameList::CollisionTest, aApplication, aUI);
-        }
-        if(ImGui::Button("FrictionTest"))
-        {
-            ChangeScene(GameList::FrictionTest, aApplication, aUI);
-        }
-        if(ImGui::Button("SimpleCollisionTest"))
-        {
-            ChangeScene(GameList::SimpleCollisionTest, aApplication, aUI);
-        }
-        if(ImGui::Button("PivotTest"))
-        {
-            ChangeScene(GameList::PivotTest, aApplication, aUI);
-        }
-        if(ImGui::Button("SetPositionTest"))
-        {
-            ChangeScene(GameList::SetPositionTest, aApplication, aUI);
-        }
+        ImGui::SetNextWindowPos(ImVec2(main_viewport->WorkPos.x + 20 , main_viewport->WorkPos.y + main_viewport->WorkSize.y - 20), ImGuiCond_Once, ImVec2(0.f, 1.f));
+        Begin("Player physic tuning", &showTuningWindow, ImGuiWindowFlags_AlwaysAutoResize);
+        Text("Ground tuning Values");
+        SliderFloat("Player ground max speed", &player::gGroundSpeed, 10., 70.);
+        SliderInt("Player ground accel frames", &player::gGroundNumberOfAccelFrame, 2, 15);
+        SliderInt("Player ground slow down frames", &player::gGroundNumberOfSlowFrame, 2, 15);
+        Text("Air tuning Values");
+        SliderFloat("Player air speed", &player::gAirSpeed, 30., 60.);
+        SliderInt("Player air accel frames", &player::gAirNumberOfAccelFrame, 2, 15);
+        SliderInt("Player air slow down frames", &player::gAirNumberOfSlowFrame, 2, 15);
+        Text("Jump tuning values");
+        SliderFloat("Player impulse strength", &player::gJumpImpulse, 10., 60.);
+        SliderFloat("Gravity", &player::gAcceleration, 45., 70.);
+        SliderFloat("Double jump factor", &player::gDoubleJumpFactor, 0.5f, 2.);
+        Text("Wall tuning values");
+        SliderFloat("Wall friction", &player::gWallFriction, 1.f, 20.f);
         End();
+
     }
 }
 

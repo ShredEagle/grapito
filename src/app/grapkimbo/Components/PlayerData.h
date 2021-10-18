@@ -10,14 +10,16 @@ namespace ad {
 namespace grapito
 {
 
-enum PlayerCollisionState
-{
-    PlayerCollisionState_Grounded,
-    PlayerCollisionState_Walled,
-    PlayerCollisionState_Jumping,
-    PlayerCollisionState_Grappling,
-    PlayerCollisionState_OffGrapple,
-};
+typedef int PlayerCollisionStateFlags;
+typedef int PlayerCollisionStateFlag;
+
+constexpr PlayerCollisionStateFlag PlayerCollisionState_Grounded = 0b1;
+constexpr PlayerCollisionStateFlag PlayerCollisionState_Walled = 0b10;
+constexpr PlayerCollisionStateFlag PlayerCollisionState_WalledRight = 0b100;
+constexpr PlayerCollisionStateFlag PlayerCollisionState_WalledLeft = 0b1000;
+constexpr PlayerCollisionStateFlag PlayerCollisionState_Jumping = 0b10000;
+constexpr PlayerCollisionStateFlag PlayerCollisionState_Grappling = 0b100000;
+constexpr PlayerCollisionStateFlag PlayerCollisionState_OffGrapple = 0b1000000;
 
 typedef int ControlStateFlags;
 typedef int ControlStateFlag;
@@ -40,10 +42,11 @@ struct PlayerData : public aunteater::Component<PlayerData>
 
     int id;
     math::sdr::Rgb color;
-    PlayerCollisionState state = PlayerCollisionState_Jumping;
+    PlayerCollisionStateFlags state = PlayerCollisionState_Jumping;
     ControlStateFlags controlState = 0;
     aunteater::weak_entity grapple;
     aunteater::weak_entity grappleAttachment;
+    int wallClingFrameCounter = 0;
 };
 
 

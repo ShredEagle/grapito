@@ -1,10 +1,12 @@
 #include "Control.h"
 
+#include "Configuration.h"
 #include "Gravity.h"
 
 #include "../Entities.h"
 #include "../Utilities.h"
 #include "commons.h"
+#include "math/Constants.h"
 
 #include <Components/VisualRectangle.h>
 
@@ -34,28 +36,102 @@ void Control::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
         float horizontalAxis = aInputState.asAxis(controllable.controller, Left, Right, LeftHorizontalAxis);
         float horizontalAxisSign = horizontalAxis / std::abs(horizontalAxis);
 
-        if (playerData.state == PlayerCollisionState_Grounded)
+        float groundSpeedAccelFactor = 1.f / player::gGroundNumberOfAccelFrame;
+        float groundFriction = 1.f / player::gGroundNumberOfSlowFrame;
+        float airSpeedAccelFactor = 1.f / player::gAirNumberOfAccelFrame;
+        float airFriction = 1.f / player::gAirNumberOfSlowFrame;
+
+        if (playerData.state & PlayerCollisionState_Grounded)
         {
-            if (aas.speed.getNorm() < player::gPlayerWalkingSpeed && std::abs(horizontalAxis) > 0.)
+            if (std::abs(horizontalAxis) > 0.f)
             {
-                aas.speed += horizontalAxisSign * (1.f / (1.f - player::gPlayerGroundFriction)) * player::gPlayerWalkingSpeed * player::gWalkingSpeedAccelFactor * Vec2{1.f, 0.f};
+                if (std::abs(aas.speed.x()) <= player::gGroundSpeed)
+                {
+                    aas.speed += horizontalAxisSign * player::gGroundSpeed * groundSpeedAccelFactor * Vec2{1.f, 0.f};
+                    aas.speed.x() = std::max(std::min(player::gGroundSpeed, aas.speed.x()), -player::gGroundSpeed);
+                }
+                else
+                {
+                    aas.accel -= aas.speed * 5.f;
+                }
+            }
+            else
+            {
+                aas.speed *= (1.f - groundFriction);
             }
 
-            if (inputs[Jump])
+            if (inputs[Jump].positiveEdge())
             {
-                aas.speed += Vec2{0.f, + player::gPlayerJumpImpulse};
+                aas.speed += Vec2{0.f, + player::gJumpImpulse};
             }
         }
-        else
+        else if (playerData.state & PlayerCollisionState_Jumping)
         {
-            if (std::abs(aas.speed.x()) < player::gPlayerWalkingSpeed && std::abs(horizontalAxis) > 0.)
+            if (std::abs(horizontalAxis) > 0.)
             {
-                aas.speed += horizontalAxisSign * (1.f / (1.f - player::gAirFriction)) * player::gAirControlAcceleration * player::gAirSpeedAccelFactor * Vec2{1.f, 0.f};
+                if (std::abs(aas.speed.x()) <= player::gGroundSpeed)
+                {
+                    aas.speed += horizontalAxisSign * player::gAirSpeed * airSpeedAccelFactor * Vec2{1.f, 0.f};
+                    aas.speed.x() = std::max(std::min(player::gAirSpeed, aas.speed.x()), -player::gAirSpeed);
+                }
+                else
+                {
+                    aas.accel.x() -= aas.speed.x();
+                }
             }
-            aas.speed.x() *= (1.f - player::gAirFriction);
+            else
+            {
+                aas.speed.x() *= 1.f - airFriction;
+            }
+
+            if (playerData.state & PlayerCollisionState_Walled)
+            {
+                if (!inputs[Jump])
+                {
+                    aas.accel -= aas.speed * player::gWallFriction;
+                }
+
+                // Player wall succion
+                // This is to avoid unstucking yourself from the wall to easily
+                if (
+                    playerData.wallClingFrameCounter < 10 && 
+                    ((playerData.state & PlayerCollisionState_WalledLeft && aas.speed.x() > 0.f) ||
+                    (playerData.state & PlayerCollisionState_WalledRight && aas.speed.x() < 0.f))
+                )
+                {
+                    playerData.wallClingFrameCounter++;
+                }
+
+                if (playerData.wallClingFrameCounter < 10)
+                {
+                    aas.speed.x() = playerData.state & PlayerCollisionState_WalledLeft ? -1.f : 1.f;
+                }
+                else 
+                {
+                    playerData.wallClingFrameCounter = 0;
+                }
+
+                if (inputs[Jump].positiveEdge() && !(playerData.state & PlayerCollisionState_Grounded))
+                {
+                    float wallJumpHorizontalImpulse = player::gJumpImpulse * player::gDoubleJumpFactor * cos(math::pi<float> / 4.);
+                    float wallJumpVerticalImpulse = player::gJumpImpulse * player::gDoubleJumpFactor * sin(math::pi<float> / 4.);
+
+                    aas.speed = playerData.state & PlayerCollisionState_WalledLeft ?
+                        Vec2{wallJumpHorizontalImpulse, wallJumpVerticalImpulse} :
+                        Vec2{-wallJumpHorizontalImpulse, wallJumpVerticalImpulse};
+
+                    playerData.wallClingFrameCounter = 0;
+                }
+            }
         }
 
-        playerData.state = PlayerCollisionState_Jumping;
+        playerData.state &= ~PlayerCollisionState_Walled;
+        playerData.state &= ~PlayerCollisionState_WalledLeft;
+        playerData.state &= ~PlayerCollisionState_WalledRight;
+
+        //Reset playerData transient state
+        playerData.state |= PlayerCollisionState_Jumping;
+        playerData.state &= ~PlayerCollisionState_Grounded;
     }
 
     //

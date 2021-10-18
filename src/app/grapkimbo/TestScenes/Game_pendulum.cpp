@@ -39,25 +39,25 @@ Game_pendulum::Game_pendulum(graphics::ApplicationGlfw & aApplication, DebugUI &
     mSystemManager.add<Control>();
     mSystemManager.add<Gravity>();
     mSystemManager.add<RopeCreation>();
-    mSystemManager.add<CameraGuidedControl>();
 
     mSystemManager.add<AccelSolver>();
     mSystemManager.add<Physics>();
 
+    mSystemManager.add<CameraGuidedControl>();
     mSystemManager.add<Render>(aApplication); 
 
     // Camera
     aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera());
     // Environment anchors
 
-    aunteater::weak_entity anchor_2 = mEntityManager.addEntity(
-        makeAnchor(Position2{12.f, 5.f}, math::Size<2, float>{2.f, 2.f} ));
-
-    aunteater::weak_entity anchor_3 = mEntityManager.addEntity(
-        makeAnchor(Position2{24.f, 9.f}, math::Size<2, float>{2.f, 2.f} ));
-
     aunteater::weak_entity floor = mEntityManager.addEntity(
         makeAnchor(Position2{-20.f, -4.f}, math::Size<2, float>{40.f, 2.f} ));
+
+    aunteater::weak_entity floor2 = mEntityManager.addEntity(
+        makeAnchor(Position2{20.f, -2.f}, math::Size<2, float>{40.f, 2.f} ));
+
+    aunteater::weak_entity wall = mEntityManager.addEntity(
+        makeAnchor(Position2{-20.f, -2.f}, math::Size<2, float>{2.f, 20.f} ));
 
     // Player 1
     Controller controller = isGamepadPresent(Controller::Gamepad_0) ?

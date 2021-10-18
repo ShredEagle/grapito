@@ -103,13 +103,13 @@ void VelocityConstraint::debugRender()
     /*
     debugDrawer->drawLine({
             cf.contactPoint,
-            static_cast<Position2>(cf.contactPoint.as<math::Vec>() + normal * 3),
+            cf.contactPoint + normal * 3,
             .05,
             {255,0,0},
     });
     debugDrawer->drawLine({
             cf.contactPoint,
-            static_cast<Position2>(cf.contactPoint.as<math::Vec>() + cf.normalImpulse * normal * 3),
+            cf.contactPoint + cf.normalImpulse * normal * 3,
             .05,
             {150,150,200},
     });
@@ -120,7 +120,7 @@ void VelocityConstraint::debugRender()
 
     debugDrawer->drawLine({
             cf.contactPoint,
-            static_cast<Position2>(cf.contactPoint.as<math::Vec>() + speed.dot(normal) * normal),
+            cf.contactPoint + speed.dot(normal) * normal,
             .05,
             {0,200,0},
     });

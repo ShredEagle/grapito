@@ -100,16 +100,16 @@ struct Body : public aunteater::Component<Body>
             auto vertex = shape.getVertice(i);
             debugDrawer->drawPoint({
                     transformPosition(
-                            (Position2)pos.as<math::Vec>() + vertex.as<math::Vec>(),
+                            (Position2)pos + vertex.as<math::Vec>(),
                             theta,
-                            (Position2)pos.as<math::Vec>() + massCenter.as<math::Vec>()
+                            (Position2)pos + massCenter.as<math::Vec>()
                     ),
                     .05f,
                     {255,255,0},
             });
         }
         debugDrawer->drawPoint({
-                (Position2)pos.as<math::Vec>() + massCenter.as<math::Vec>(),
+                (Position2)pos + massCenter.as<math::Vec>(),
                 .05f,
                 {255,100,0},
         });

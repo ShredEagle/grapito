@@ -16,6 +16,7 @@
 #include <math/Matrix.h>
 
 #include <iostream>
+#include <ostream>
 
 namespace ad {
 namespace grapito
@@ -40,6 +41,7 @@ void BodyObserver::removedEntity(aunteater::LiveEntity & aEntity)
     ConstructedBody & body = *aEntity.get<Body>().constructedBodyIt;
 
     auto collisionPairIt = body.contactList.begin();
+
     //Removing collision pairs involving this body
     while (collisionPairIt != body.contactList.end())
     {
@@ -408,9 +410,9 @@ static std::vector<Position2> createTransformedCollisionBox(Body & aBody, Positi
     for (auto vertex : aBody.shape.vertices)
     {
         auto transformedPos = transformPosition(
-                static_cast<Position2>(vertex.as<math::Vec>() + aPos.position.as<math::Vec>()),
+                vertex + aPos.position.as<math::Vec>(),
                 aBody.theta,
-                static_cast<Position2>(aBody.massCenter.as<math::Vec>() + aPos.position.as<math::Vec>())
+                aBody.massCenter + aPos.position.as<math::Vec>()
                 );
         transformedVertices.emplace_back(transformedPos);
     }
@@ -422,16 +424,12 @@ static inline void solveContactVelocityConstraint(VelocityConstraint & constrain
 {
 
     ContactFeature & cf = constraint.cf;
-    Vec2 AngVecA = {-constraint.rA.y(), constraint.rA.x()};
-    Vec2 AngVecB = {-constraint.rB.y(), constraint.rB.x()};
+    Vec2 AngVecA = constraint.angVecA;
+    Vec2 AngVecB = constraint.angVecB;
 
+    float totalMass = constraint.totalMass;
 
-    float totalMass = constraint.invMassA + constraint.invMassB;
-
-
-    float crossASquared = constraint.crossA * constraint.crossA;
-    float crossBSquared = constraint.crossB * constraint.crossB;
-    float totalAngularMass = constraint.invMoiA * crossASquared + constraint.invMoiB * crossBSquared;
+    float totalAngularMass = constraint.totalNormalAngularMass;
 
     if (constraint.friction > 0.)
     {
@@ -439,17 +437,13 @@ static inline void solveContactVelocityConstraint(VelocityConstraint & constrain
 
         float tangentSpeed = speed.dot(constraint.tangent);
 
-        float crossATangentSquared = constraint.crossATangent * constraint.crossATangent;
-        float crossBTangentSquared = constraint.crossBTangent * constraint.crossBTangent;
-
-        float totalAngularTangentMass = constraint.invMoiA * crossATangentSquared + constraint.invMoiB * crossBTangentSquared;
+        float totalAngularTangentMass = constraint.totalTangentAngularMass;
 
         float lambda = -(1 / (totalMass + totalAngularTangentMass)) * (tangentSpeed);
         float maxFriction = constraint.noMaxFriction ? std::numeric_limits<float>::max() : constraint.friction * cf.normalImpulse;
         float newImpulseTangent = std::max(std::min(cf.tangentImpulse + lambda, maxFriction), -maxFriction);
         lambda = newImpulseTangent - cf.tangentImpulse;
         cf.tangentImpulse = newImpulseTangent;
-
 
         Vec2 impulse = lambda * constraint.tangent;
         float angularImpulseA = lambda * constraint.crossATangent * constraint.invMoiA;
@@ -564,6 +558,13 @@ Physics::Physics(aunteater::EntityManager & aEntityManager) :
 
     //Initiliazing the query functions
     queryFunctions[ShapeType_Hull][ShapeType_Hull] = QueryFacePenetration;
+
+    //We just reserve an arbitrary (2^n) value of velocities, positions, collisionBoxes
+    //This is just to avoid the vector going through the basic vector growth
+    //which is 1, 2, 4, 8, 16...
+    velocities.reserve(128);
+    positions.reserve(128);
+    collisionBoxes.reserve(128);
 }
 
 void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputState)
@@ -571,6 +572,7 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
     velocities.clear();
     positions.clear();
     collisionBoxes.clear();
+
     //Updating all the positions of the proxy bodies
     for (auto & body : constructedBodies)
     {
@@ -583,8 +585,8 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
     for (auto & body :constructedBodies)
     {
         body.synchronize(velocities, positions, collisionBoxes, i++);
-        //body.debugRender();
     }
+
     // Broad phase
     // This should be done with a tree of hierarchical aabb for fastest aabb queries
     for (auto bodyAIt = constructedBodies.begin(); bodyAIt != --constructedBodies.end(); ++bodyAIt)
@@ -606,21 +608,6 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
             auto aabbA = bodyA.box->shape.getAABB();
             auto aabbB = bodyB.box->shape.getAABB();
 
-            /*
-            debugDrawer->drawOutline({
-                    aabbA.mPosition,
-                    aabbA.mDimension,
-                    math::Matrix<3, 3>::Identity(),
-                    {210,100,255}
-            });
-
-            debugDrawer->drawOutline({
-                    aabbB.mPosition,
-                    aabbB.mDimension,
-                    math::Matrix<3, 3>::Identity(),
-                    {210,100,255}
-            });
-            */
             //Basic SAT for AABB
             if (aabbA.x() <= aabbB.x() + aabbB.width() &&
                aabbA.x() + aabbA.width() >= aabbB.x() &&
@@ -692,6 +679,8 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
                             newContact.typeReference == oldContact.typeReference
                        )
                     {
+                        //We know the contact are the same so we copy the previous
+                        //frame impulse
                         newContact.normalImpulse = oldContact.normalImpulse;
                         newContact.tangentImpulse = oldContact.tangentImpulse;
                     }
@@ -703,7 +692,6 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
 
             //Now we create the different contact constraints
             //We need to put everything back in the right order for this to work
-
             if (
                     (bodyRef->collisionType == CollisionType_Player &&
                     bodyInc->collisionType == CollisionType_Static_Env) || 
@@ -727,29 +715,45 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
             {
                 for (auto & contact : manifold.contacts)
                 {
-                    Vec2 rA = contact.contactPoint.as<math::Vec>() - (bodyRef->bodyPos->c.as<math::Vec>());
-                    Vec2 rB = contact.contactPoint.as<math::Vec>() - (bodyInc->bodyPos->c.as<math::Vec>());
                     Vec2 tangent = {manifold.normal.y(), -manifold.normal.x()};
+
+                    Vec2 rA = contact.contactPoint.as<math::Vec>() - (bodyRef->bodyPos->c.as<math::Vec>());
+                    float crossA = twoDVectorCross(rA, manifold.normal);
+                    float crossATangent = twoDVectorCross(rA, tangent);
+
+                    Vec2 rB = contact.contactPoint.as<math::Vec>() - (bodyInc->bodyPos->c.as<math::Vec>());
+                    float crossB = twoDVectorCross(rB, manifold.normal);
+                    float crossBTangent = twoDVectorCross(rB, tangent);
+
+
                     velocityConstraints.emplace_back(VelocityConstraint{
                         bodyRef->velocity,
                         bodyRef->bodyPos,
                         rA,
-                        twoDVectorCross(rA, manifold.normal),
-                        twoDVectorCross(rA, tangent),
+                        {-rA.y(), rA.x()},
+                        crossA,
+                        crossA * crossA,
+                        crossATangent,
+                        crossATangent * crossATangent,
                         bodyRef->invMass,
                         bodyRef->invMoi,
-                        0.,
-                        math::Radian<float>(0.),
+                        math::Radian<float>{0.f},
+
                         bodyInc->velocity,
                         bodyInc->bodyPos,
                         rB,
-                        twoDVectorCross(rB, manifold.normal),
-                        twoDVectorCross(rB, tangent),
+                        {-rB.y(), rB.x()},
+                        crossB,
+                        crossB * crossB,
+                        crossBTangent,
+                        crossBTangent * crossBTangent,
                         bodyInc->invMass,
                         bodyInc->invMoi,
-                        0.,
-                        math::Radian<float>(0.),
+                        math::Radian<float>{0.f},
 
+                        bodyRef->invMass + bodyInc->invMass,
+                        bodyRef->invMoi * crossA * crossA + bodyInc->invMoi * crossB * crossB,
+                        bodyRef->invMoi * crossATangent * crossATangent + bodyInc->invMoi * crossBTangent * crossBTangent,
                         sqrt(bodyRef->friction * bodyInc->friction),
                         bodyRef->noMaxFriction || bodyInc->noMaxFriction,
                         std::max(bodyRef->friction, bodyInc->friction),
@@ -811,7 +815,6 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
 
         for (VelocityConstraint & constraint : velocityConstraints)
         {
-            constraint.debugRender();
             solveContactVelocityConstraint(constraint);
         }
     }
@@ -909,13 +912,25 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
         if (-constraint.normal.dot(PlayerGroundedNormal) > PlayerGroundedSlopeDotValue)
         {
             //Set player as grounded
-            constraint.cPlayer->velocity->v *= player::gPlayerGroundFriction;
-            constraint.cPlayer->entity->get<PlayerData>().state = PlayerCollisionState_Grounded;
+            constraint.cPlayer->entity->get<PlayerData>().state |= PlayerCollisionState_Grounded;
+            constraint.cPlayer->entity->get<PlayerData>().state &= ~PlayerCollisionState_Jumping;
         }
-        else if (constraint.normal.dot(PlayerWalledNormal) > PlayerWallSlopeDotValue || constraint.normal.dot(PlayerWalledNormal) < -PlayerWallSlopeDotValue)
+        else if (constraint.normal.dot(PlayerWalledNormal) < -PlayerWallSlopeDotValue ||
+            constraint.normal.dot(PlayerWalledNormal) > PlayerWallSlopeDotValue)
         {
-            //Set player as walled
-            constraint.cPlayer->entity->get<PlayerData>().state = PlayerCollisionState_Walled;
+            constraint.cPlayer->entity->get<PlayerData>().state |= PlayerCollisionState_Walled;
+            if (constraint.normal.x() > 0.)
+            {
+                constraint.cPlayer->entity->get<PlayerData>().state |= PlayerCollisionState_WalledRight;
+            }
+            else
+            {
+                constraint.cPlayer->entity->get<PlayerData>().state |= PlayerCollisionState_WalledLeft;
+            }
+        }
+        else
+        {
+            constraint.cPlayer->entity->get<PlayerData>().wallClingFrameCounter = 0;
         }
     }
 
@@ -923,7 +938,6 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
     for (auto & body : constructedBodies)
     {
         body.updateEntity();
-        body.box->shape.debugRender();
     }
 
     //Cleaning up

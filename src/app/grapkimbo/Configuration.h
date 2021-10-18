@@ -28,14 +28,16 @@ namespace player
     constexpr float gInitialRopeLength = 3.f;
     constexpr math::Radian<float> gInitialAngle{math::pi<float>/3.f};
     //TODO(franz) replace with constexpr
-    inline float gWalkingSpeedAccelFactor = 0.25f;
     inline float gAcceleration = 70.f;
-    inline float gPlayerWalkingSpeed = 12.f;
-    inline float gPlayerGroundFriction = 0.3f;
-    inline float gAirSpeedAccelFactor = 0.25f;
-    inline float gPlayerJumpImpulse = 24.f; // m/s
-    inline float gAirControlAcceleration = 12.f; // m/s
-    inline float gAirFriction = 0.1f; // m/s
+    inline float gGroundSpeed = 12.f;
+    inline int gGroundNumberOfAccelFrame = 4;
+    inline int gGroundNumberOfSlowFrame = 4;
+    inline float gAirSpeed = 12.f; // m/s
+    inline int gAirNumberOfAccelFrame = 10;
+    inline int gAirNumberOfSlowFrame = 10;
+    inline float gJumpImpulse = 24.f; // m/s
+    inline float gWallFriction = 4.f; // m/s
+    inline float gDoubleJumpFactor = 1.3f; // m/s
     //static constexpr double gAirControlAcceleration = 12.; // m/s
     //constexpr double gAcceleration = 10.;
     //constexpr double gPlayerJumpImpulse = 10.; // m/s

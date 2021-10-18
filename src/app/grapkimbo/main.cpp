@@ -16,7 +16,6 @@
 
 using namespace ad::grapito;
 
-
 int main(int argc, const char * argv[])
 {
     try
@@ -45,6 +44,7 @@ int main(int argc, const char * argv[])
         {
             inputState.readAll(application);
             timer.mark((float)glfwGetTime());
+
             if (currentGame->update(timer, inputState))
             {
                 drawImGui(application, debugUI, imguiState);
