@@ -66,8 +66,10 @@ namespace physic
 {
     //This is the error that is allowed during physics resolution
     //This represent the separation that we expect at rest
-    constexpr float linearSlop = 0.0001f;
-    constexpr float angularSlop = 2.f / 180 * math::pi<float>;
+    constexpr float gLinearSlop = 0.0001f;
+    constexpr float gAngularSlop = 2.f / 180 * math::pi<float>;
+    constexpr int gMaxVelocityConstraintIteration = 8;
+    constexpr int gMaxPositionConstraintIteration = 3;
 }
 
 namespace rope

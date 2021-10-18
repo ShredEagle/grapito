@@ -370,7 +370,7 @@ bool WeldJointConstraint::SolvePositionConstraint()
         bodyPosB->a += math::Radian<float>(iB * (twoDVectorCross(rB, impulseSpeed) + impulse.z()));
     }
 
-    return positionError <= physic::linearSlop && angularError <= physic::angularSlop;
+    return positionError <= physic::gLinearSlop && angularError <= physic::gAngularSlop;
 }
 
 void PivotJointConstraint::InitVelocityConstraint(const GrapitoTimer & timer)
@@ -443,7 +443,7 @@ bool PivotJointConstraint::SolvePositionConstraint()
     bodyPosB->p += mB * impulse;
     bodyPosB->a += math::Radian<float>{iB * twoDVectorCross(rB, impulse)};
 
-    return positionError <= physic::linearSlop;
+    return positionError <= physic::gLinearSlop;
 }
 
 PivotJointConstraint::PivotJointConstraint(

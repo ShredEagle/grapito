@@ -28,8 +28,6 @@ typedef aunteater::Archetype<Position, Body, AccelAndSpeed> PhysicalBody;
 typedef aunteater::Archetype<PivotJoint> Pivotable;
 typedef aunteater::Archetype<WeldJoint> Weldable;
 
-static constexpr int maxVelocityConstraintIteration = 16;
-static constexpr int maxPositionConstraintIteration = 16;
 static std::array<
     std::array<
         std::function<ContactManifold(

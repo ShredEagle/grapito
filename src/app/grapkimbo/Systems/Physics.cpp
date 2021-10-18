@@ -18,7 +18,6 @@
 
 #include <iostream>
 #include <ostream>
-#include <spdlog/spdlog.h>
 
 namespace ad {
 namespace grapito
@@ -70,10 +69,10 @@ void BodyObserver::removedEntity(aunteater::LiveEntity & aEntity)
         collisionPair->toRemove = true;
     }
 
-    for (auto pjcIt : body.jointItList)
+    for (auto jcIt : body.jointItList)
     {
-        auto & pjc = *pjcIt;
-        pjc->jointEntity->markToRemove();
+        auto & jc = *jcIt;
+        jc->jointEntity->markToRemove();
     }
 
     mPhysicsSystem->constructedBodies.erase(aEntity.get<Body>().constructedBodyIt);
@@ -92,7 +91,6 @@ void JointObserver<T_joint, T_joint_constraint>::addedEntity(aunteater::LiveEnti
     T_joint & joint = aEntity.get<T_joint>();
     ConstructedBody & bodyA = *joint.bodyA->template get<Body>().constructedBodyIt;
     ConstructedBody & bodyB = *joint.bodyB->template get<Body>().constructedBodyIt;
-    spdlog::get("grapito")->info("Observing joint");
 
     auto jointIt = mPhysicsSystem->jointConstraints.insert(
         mPhysicsSystem->jointConstraints.end(),
@@ -284,7 +282,7 @@ static inline std::vector<ContactFeature> CheckContactValidity(const Shape::Edge
 
         //This is sad that we get fucked by smaller than difference 0.01mm
         if (
-                candidateSeparation < separation + physic::linearSlop
+                candidateSeparation < separation + physic::gLinearSlop
            )
         {
             result.emplace_back(contact);
@@ -734,7 +732,7 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
         constraint.velocityB->w -= twoDVectorCross(constraint.rB, impulseVec) * constraint.invMassB;
     }
 
-    for (int i = 0; i < maxVelocityConstraintIteration; i++)
+    for (int i = 0; i < physic::gMaxVelocityConstraintIteration; i++)
     {
         for (auto & constraint : jointConstraints)
         {
@@ -787,7 +785,7 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
         constraint.angleBaseB = constraint.bodyPosB->a;
     }
 
-    for (int i = 0; i < maxPositionConstraintIteration; i++)
+    for (int i = 0; i < physic::gMaxPositionConstraintIteration; i++)
     {
         bool jointOkay = true;
         for (auto & constraint : jointConstraints)
@@ -804,9 +802,9 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
             Position2 onEdgePoint = constraint.bodyPosA->c + clipPoint;
 
             Position2 point = constraint.bodyPosB->c + rB;
-            float separation = (point.as<math::Vec>() - onEdgePoint.as<math::Vec>()).dot(normal) - physic::linearSlop * 4.;
+            float separation = (point.as<math::Vec>() - onEdgePoint.as<math::Vec>()).dot(normal) - physic::gLinearSlop * 4.;
 
-            float C = std::min(0., std::max(-.2, .2 * (separation + physic::linearSlop)));
+            float C = std::min(0., std::max(-.2, .2 * (separation + physic::gLinearSlop)));
 
             float rnA = twoDVectorCross(rA, normal);
             float rnB = twoDVectorCross(rB, normal);
@@ -822,7 +820,7 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
             constraint.bodyPosB->p += constraint.invMassB * impulse;
             constraint.bodyPosB->a += math::Radian<float>{constraint.invMoiB * twoDVectorCross(rB, impulse)};
 
-            jointOkay = jointOkay && separation >= -4. * physic::linearSlop;
+            jointOkay = jointOkay && separation >= -4. * physic::gLinearSlop;
         }
 
         if (jointOkay)
