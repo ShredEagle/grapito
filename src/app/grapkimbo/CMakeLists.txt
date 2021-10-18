@@ -14,6 +14,7 @@ set(${TARGET_NAME}_HEADERS
     Components/CameraGuide.h
     Components/CameraTag.h
     Components/Controllable.h
+    Components/DistanceJoint.h
     Components/GrappleControl.h
     Components/Mass.h
     Components/PivotJoint.h
@@ -115,12 +116,12 @@ add_executable(${TARGET_NAME}
 )
 
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    target_compile_options(${TARGET_NAME}
-        PRIVATE "-O3")
     #target_compile_options(${TARGET_NAME}
-    #    PRIVATE "-Wall" "-Wextra" "-fsanitize=address" "-fsanitize=undefined")
-    #target_link_options(${TARGET_NAME}
-    #    PRIVATE "-fsanitize=address" "-fsanitize=undefined")
+    #    PRIVATE "-O3")
+    target_compile_options(${TARGET_NAME}
+        PRIVATE "-Wall" "-Wextra" "-fsanitize=address" "-fsanitize=undefined")
+    target_link_options(${TARGET_NAME}
+        PRIVATE "-fsanitize=address" "-fsanitize=undefined")
 endif()
 
 target_compile_definitions(${TARGET_NAME} PRIVATE KIMBO_DEBUG)

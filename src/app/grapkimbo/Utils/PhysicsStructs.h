@@ -15,6 +15,7 @@ namespace grapito {
 
 struct WeldJoint;
 struct PivotJoint;
+struct DistanceJoint;
 struct Body;
 struct CollisionPair;
 struct JointConstraint;
@@ -347,6 +348,53 @@ class PivotJointConstraint : public JointConstraint
     Vec2 mImpulse = Vec2::Zero();
     float axialMass;
     math::Matrix<2, 2, float> k = math::Matrix<2, 2, float>::Zero();
+};
+
+class DistanceJointConstraint : public JointConstraint
+{
+    DistanceJointConstraint(
+            const DistanceJoint & aDistanceJoint,
+            ConstructedBody * aBodyA,
+            ConstructedBody * aBodyB,
+            aunteater::weak_entity aEntity
+            );
+
+    void InitVelocityConstraint(const GrapitoTimer & timer) override;
+    void SolveVelocityConstraint() override;
+    bool SolvePositionConstraint() override;
+
+    protected:
+    Velocity * velocityA;
+    BodyPosition * bodyPosA;
+    float invMassA;
+    float invMoiA;
+    Position2 localAnchorA;
+    Vec2 rA = Vec2::Zero();
+    Vec2 angVecA = Vec2::Zero();
+
+    Velocity * velocityB;
+    BodyPosition * bodyPosB;
+    float invMassB;
+    float invMoiB;
+    Position2 localAnchorB;
+    Vec2 rB = Vec2::Zero();
+    Vec2 angVecB = Vec2::Zero();
+
+    float mStiffness = 0.f;
+    float mDamping = 0.f;
+    float mMass = 0.f;
+    float mSoftMass = 0.f;
+    float mGamma = 0.f;
+    float mBias = 0.f;
+    float mImpulse = 0.f;
+    float mLowerImpulse = 0.f;
+    float mUpperImpulse = 0.f;
+    Vec2 mBaseDiffVector = Vec2::Zero();
+    Vec2 mCurrentDirection = Vec2::Zero();
+    float mBaseLength = 0.f;
+    float mMinBaseLength = 0.f;
+    float mMaxBaseLength = 0.f;
+    float mCurrentLength = 0.f;
 };
 }
 }

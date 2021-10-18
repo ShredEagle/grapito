@@ -4,6 +4,7 @@
 
 #include "../Components/Body.h"
 #include "../Components/PivotJoint.h"
+#include "../Components/DistanceJoint.h"
 #include "../Components/Position.h"
 #include "../Components/WeldJoint.h"
 
@@ -373,6 +374,21 @@ bool WeldJointConstraint::SolvePositionConstraint()
     return positionError <= physic::gLinearSlop && angularError <= physic::gAngularSlop;
 }
 
+PivotJointConstraint::PivotJointConstraint(
+        const PivotJoint & aPivotJoint,
+        ConstructedBody * aBodyA,
+        ConstructedBody * aBodyB,
+        aunteater::weak_entity aEntity
+        ) :
+    JointConstraint{aBodyA, aBodyB, aEntity},
+    invMassA{aBodyA->invMass},
+    invMoiA{aBodyA->invMoi},
+    localAnchorA{aPivotJoint.localAnchorA},
+    invMassB{aBodyB->invMass},
+    invMoiB{aBodyB->invMoi},
+    localAnchorB{aPivotJoint.localAnchorB}
+{}
+
 void PivotJointConstraint::InitVelocityConstraint(const GrapitoTimer &)
 {
     bodyPosA = cbA->bodyPos;
@@ -446,21 +462,6 @@ bool PivotJointConstraint::SolvePositionConstraint()
     return positionError <= physic::gLinearSlop;
 }
 
-PivotJointConstraint::PivotJointConstraint(
-        const PivotJoint & aPivotJoint,
-        ConstructedBody * aBodyA,
-        ConstructedBody * aBodyB,
-        aunteater::weak_entity aEntity
-        ) :
-    JointConstraint{aBodyA, aBodyB, aEntity},
-    invMassA{aBodyA->invMass},
-    invMoiA{aBodyA->invMoi},
-    localAnchorA{aPivotJoint.localAnchorA},
-    invMassB{aBodyB->invMass},
-    invMoiB{aBodyB->invMoi},
-    localAnchorB{aPivotJoint.localAnchorB}
-{}
-
 std::ostream &operator<<(std::ostream & os, const VelocityConstraint & vc)
 {
     os << "{ VelocityConstraint\n";
@@ -492,6 +493,138 @@ std::ostream &operator<<(std::ostream & os, const VelocityConstraint & vc)
     os << "    invMoiB : " << vc.invMoiB << "\n";
     os << "}\n";
     return os;
+}
+
+DistanceJointConstraint::DistanceJointConstraint(
+        const DistanceJoint & aDistanceJoint,
+        ConstructedBody * aBodyA,
+        ConstructedBody * aBodyB,
+        aunteater::weak_entity aEntity
+        ) :
+    JointConstraint{aBodyA, aBodyB, aEntity},
+    invMassA{aBodyA->invMass},
+    invMoiA{aBodyA->invMoi},
+    localAnchorA{aDistanceJoint.localAnchorA},
+    invMassB{aBodyB->invMass},
+    invMoiB{aBodyB->invMoi},
+    localAnchorB{aDistanceJoint.localAnchorB},
+    mStiffness{aDistanceJoint.mStiffness},
+    mDamping{aDistanceJoint.mDamping}
+{
+    rA = transformVector(localAnchorA - (bodyPosA->c - bodyPosA->p).as<math::Position>(), bodyPosA->a);
+    rB = transformVector(localAnchorB - (bodyPosB->c - bodyPosB->p).as<math::Position>(), bodyPosB->a);
+
+    mBaseDiffVector = (aBodyB->bodyPos->c + rB) - (aBodyA->bodyPos->c + rA);
+    mBaseLength = std::max(mBaseDiffVector.getNorm(), physic::gLinearSlop);
+    mMinBaseLength = mBaseLength * (1 - aDistanceJoint.mSlackFactor); 
+    mMaxBaseLength = mBaseLength * (1 + aDistanceJoint.mSlackFactor); 
+}
+
+void DistanceJointConstraint::InitVelocityConstraint(const GrapitoTimer & aTimer)
+{
+    bodyPosA = cbA->bodyPos;
+    bodyPosB = cbB->bodyPos;
+    velocityA = cbA->velocity;
+    velocityB = cbB->velocity;
+
+    rA = transformVector(localAnchorA - (bodyPosA->c - bodyPosA->p).as<math::Position>(), bodyPosA->a);
+    rB = transformVector(localAnchorB - (bodyPosB->c - bodyPosB->p).as<math::Position>(), bodyPosB->a);
+    angVecA = {-rA.y(), rA.x()};
+    angVecB = {-rB.y(), rB.x()};
+
+    mCurrentDirection = (bodyPosB->c + rB) - (bodyPosA->c + rA);
+    mCurrentLength = mCurrentDirection.getNorm();
+
+    if (mCurrentLength > physic::gLinearSlop)
+    {
+        mCurrentDirection *= 1.f / mCurrentLength;
+    }
+    else
+    {
+        mCurrentDirection = Vec2::Zero();
+        mMass = 0.f;
+        mImpulse = 0.f;
+        mLowerImpulse = 0.f;
+        mUpperImpulse = 0.f;
+    }
+
+    float crossRaDirection = twoDVectorCross(rA, mCurrentDirection);
+    float crossRbDirection = twoDVectorCross(rB, mCurrentDirection);
+    float invMass = invMassA + invMoiA * crossRaDirection* crossRaDirection + invMassB + invMoiB * crossRbDirection * crossRbDirection;
+
+    mMass = invMass != 0.f ? 1.f / invMass : 0.f;
+
+    if (mStiffness > 0.f)
+    {
+        float C = mCurrentLength - mBaseLength;
+        
+        float d = mDamping;
+        float k = mStiffness;
+
+        mGamma = aTimer.delta() * (d + aTimer.delta() * k);
+        mGamma = mGamma != 0.f ? 1.f / mGamma : 0.f;
+        mBias = C * aTimer.delta() * k * mGamma;
+
+        invMass += mGamma;
+        mSoftMass = invMass != 0.f ? 1.f / invMass : 0.f;
+    }
+    else
+    {
+        mGamma = 0.f;
+        mBias = 0.f;
+        mSoftMass = mMass;
+    }
+
+    Vec2 impulse = (mImpulse + mLowerImpulse + mUpperImpulse) * mCurrentDirection;
+
+    //warm start constraint
+    velocityA->v -= impulse * invMassA;
+    velocityA->w -= invMoiA * twoDVectorCross(rA, impulse);
+    velocityB->v += impulse * invMassB;
+    velocityB->w += invMoiB * twoDVectorCross(rB, impulse);
+}
+
+void DistanceJointConstraint::SolveVelocityConstraint()
+{
+    float mA = invMassA;
+    float iA = invMoiA;
+    float mB = invMassB;
+    float iB = invMoiB;
+    Vec2 vA = velocityA->v;
+    Vec2 vB = velocityB->v;
+    float wA = velocityA->w;
+    float wB = velocityB->w;
+
+    if (mMaxBaseLength > mMinBaseLength)
+    {
+        if (mStiffness > 0.f)
+        {
+            Vec2 pointSpeedA = vA + wA * angVecA;
+            Vec2 pointSpeedB = vB + wB * angVecB;
+            float Cdot = mCurrentDirection.dot(pointSpeedB - pointSpeedA);
+
+            float impulse = -mSoftMass * (Cdot + mBias + mGamma * mImpulse);
+            mImpulse += impulse;
+
+            Vec2 impulseVec = impulse * mCurrentDirection;
+            vA -= mA * impulseVec;
+            wA -= iA * twoDVectorCross(rA, impulseVec);
+            vB -= mB * impulseVec;
+            wB -= iB * twoDVectorCross(rB, impulseVec);
+        }
+
+        //Lower than min length
+        {
+            //Scope is just because the computation are really similar
+        }
+        //Greater than default length
+        {
+            //Scope is just because the computation are really similar
+        }
+    }
+    else
+    {
+    }
 }
 
 std::ostream &operator<<(std::ostream & os, const ConstructedBody & cb)
