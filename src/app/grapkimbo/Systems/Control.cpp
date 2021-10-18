@@ -36,10 +36,10 @@ void Control::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
         float horizontalAxis = aInputState.asAxis(controllable.controller, Left, Right, LeftHorizontalAxis);
         float horizontalAxisSign = horizontalAxis / std::abs(horizontalAxis);
 
-        float groundSpeedAccelFactor = 1.f / static_cast<float>(player::gGroundNumberOfAccelFrame);
-        float groundFriction = 1.f / static_cast<float>(player::gGroundNumberOfSlowFrame);
-        float airSpeedAccelFactor = 1.f / static_cast<float>(player::gAirNumberOfAccelFrame);
-        float airFriction = 1.f / static_cast<float>(player::gAirNumberOfSlowFrame);
+        float groundSpeedAccelFactor = 1.f / player::gGroundNumberOfAccelFrame;
+        float groundFriction = 1.f / player::gGroundNumberOfSlowFrame;
+        float airSpeedAccelFactor = 1.f / player::gAirNumberOfAccelFrame;
+        float airFriction = 1.f / player::gAirNumberOfSlowFrame;
 
         if (playerData.state & PlayerCollisionState_Grounded)
         {
@@ -113,8 +113,8 @@ void Control::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
 
                 if (inputs[Jump].positiveEdge() && !(playerData.state & PlayerCollisionState_Grounded))
                 {
-                    float wallJumpHorizontalImpulse = player::gJumpImpulse * player::gDoubleJumpFactor * cos(math::pi<float> / 5.);
-                    float wallJumpVerticalImpulse = player::gJumpImpulse * player::gDoubleJumpFactor * sin(math::pi<float> / 5.);
+                    float wallJumpHorizontalImpulse = player::gJumpImpulse * player::gDoubleJumpFactor * cos(math::pi<float> / 4.);
+                    float wallJumpVerticalImpulse = player::gJumpImpulse * player::gDoubleJumpFactor * sin(math::pi<float> / 4.);
 
                     aas.speed = playerData.state & PlayerCollisionState_WalledLeft ?
                         Vec2{wallJumpHorizontalImpulse, wallJumpVerticalImpulse} :

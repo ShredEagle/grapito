@@ -562,9 +562,9 @@ Physics::Physics(aunteater::EntityManager & aEntityManager) :
     //We just reserve an arbitrary (2^n) value of velocities, positions, collisionBoxes
     //This is just to avoid the vector going through the basic vector growth
     //which is 1, 2, 4, 8, 16...
-    velocities.reserve(512);
-    positions.reserve(512);
-    collisionBoxes.reserve(512);
+    velocities.reserve(128);
+    positions.reserve(128);
+    collisionBoxes.reserve(128);
 }
 
 void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputState)
