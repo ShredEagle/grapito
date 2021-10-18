@@ -1,7 +1,10 @@
 #include "PhysicsStructs.h"
 #include "Components/Body.h"
+#include "Components/PivotJoint.h"
 #include "Components/Position.h"
 
+#include "Components/WeldJoint.h"
+#include "Configuration.h"
 #include "Utils/CollisionBox.h"
 #include "Utils/DrawDebugStuff.h"
 #include "math/Vector.h"
@@ -126,6 +129,123 @@ void VelocityConstraint::debugRender()
     });
     */
 }
+
+WeldJointConstraint::WeldJointConstraint(
+        const WeldJoint & aWeldJoint,
+        ConstructedBody * aBodyA,
+        ConstructedBody * aBodyB,
+        aunteater::weak_entity aEntity
+        ) :
+    JointConstraint{aBodyA, aBodyB, aEntity},
+    invMassA{aBodyA->invMass},
+    invMoiA{aBodyA->invMoi},
+    localAnchorA{aWeldJoint.localAnchorA},
+    invMassB{aBodyB->invMass},
+    invMoiB{aBodyB->invMoi},
+    localAnchorB{aWeldJoint.localAnchorB},
+    mRefAngle{aBodyA->bodyPos->a - aBodyB->bodyPos->a},
+    mStiffness{aWeldJoint.mStiffness},
+    mDamping{aWeldJoint.mDamping}
+{}
+
+void WeldJointConstraint::InitVelocityConstraint()
+{}
+
+void WeldJointConstraint::SolveVelocityConstraint()
+{}
+
+bool WeldJointConstraint::SolvePositionConstraint()
+{
+    return true;
+}
+
+void PivotJointConstraint::InitVelocityConstraint()
+{
+    bodyPosA = cbA->bodyPos;
+    bodyPosB = cbB->bodyPos;
+    velocityA = cbA->velocity;
+    velocityB = cbB->velocity;
+    rA = transformVector(localAnchorA - (bodyPosA->c - bodyPosA->p).as<math::Position>(), bodyPosA->a);
+    rB = transformVector(localAnchorB - (bodyPosB->c - bodyPosB->p).as<math::Position>(), bodyPosB->a);
+    angVecA = {-rA.y(), rA.x()};
+    angVecB = {-rB.y(), rB.x()};
+
+    float mA = invMassA;
+    float iA = invMoiA;
+    float mB = invMassB;
+    float iB = invMoiB;
+
+    k.at(0,0) = mA + mB + rA.y() * rA.y() * iA + rB.y() * rB.y() * iB;
+    k.at(0,1) = -rA.y() * rA.x() * iA - rB.y() * rB.x() * iB;
+    k.at(1,0) = k.at(0,1);
+    k.at(1,1) = mA + mB + rA.x() * rA.x() * iA + rB.x() * rB.x() * iB;
+
+    //warm start constraint
+    velocityA->v -= impulse * invMassA;
+    velocityA->w -= invMoiA * twoDVectorCross(rA, impulse);
+    velocityB->v += impulse * invMassB;
+    velocityB->w += invMoiB * twoDVectorCross(rB, impulse);
+}
+
+void PivotJointConstraint::SolveVelocityConstraint()
+{
+    Vec2 angularSpeed = velocityB->v + angVecB * velocityB->w -
+        velocityA->v - angVecA * velocityA->w;
+    Vec2 impulse = solveMatrix(k, -angularSpeed);
+
+    impulse += impulse;
+
+    velocityA->v -= impulse * invMassA;
+    velocityA->w -= invMoiA * twoDVectorCross(rA, impulse);
+    velocityB->v += impulse * invMassB;
+    velocityB->w += invMoiB * twoDVectorCross(rB, impulse);
+}
+
+bool PivotJointConstraint::SolvePositionConstraint()
+{
+        Vec2 rA = transformVector(localAnchorA - (bodyPosA->c - bodyPosA->p).as<math::Position>(), bodyPosA->a);
+        Vec2 rB = transformVector(localAnchorB - (bodyPosB->c - bodyPosB->p).as<math::Position>(), bodyPosB->a);
+
+        Vec2 C = bodyPosB->c + rB - bodyPosA->c - rA;
+        float positionError = C.getNorm();
+
+        float mA = invMassA;
+        float iA = invMoiA;
+        float mB = invMassB;
+        float iB = invMoiB;
+
+        k.at(0,0) = mA + mB + rA.y() * rA.y() * iA + rB.y() * rB.y() * iB;
+        k.at(0,1) = -rA.y() * rA.x() * iA - rB.y() * rB.x() * iB;
+        k.at(1,0) = k.at(0,1);
+        k.at(1,1) = mA + mB + rA.x() * rA.x() * iA + rB.x() * rB.x() * iB;
+
+        Vec2 impulse = solveMatrix(-k, C);
+
+        bodyPosA->c -= mA * impulse;
+        bodyPosA->p -= mA * impulse;
+        bodyPosA->a -= math::Radian<float>{iA * twoDVectorCross(rA, impulse)};
+
+        bodyPosB->c += mB * impulse;
+        bodyPosB->p += mB * impulse;
+        bodyPosB->a += math::Radian<float>{iB * twoDVectorCross(rB, impulse)};
+
+        return positionError <= physic::linearSlop;
+}
+
+PivotJointConstraint::PivotJointConstraint(
+        const PivotJoint & aPivotJoint,
+        ConstructedBody * aBodyA,
+        ConstructedBody * aBodyB,
+        aunteater::weak_entity aEntity
+        ) :
+    JointConstraint{aBodyA, aBodyB, aEntity},
+    invMassA{aBodyA->invMass},
+    invMoiA{aBodyA->invMoi},
+    localAnchorA{aPivotJoint.localAnchorA},
+    invMassB{aBodyB->invMass},
+    invMoiB{aBodyB->invMoi},
+    localAnchorB{aPivotJoint.localAnchorB}
+{}
 
 std::ostream &operator<<(std::ostream & os, const VelocityConstraint & vc)
 {
