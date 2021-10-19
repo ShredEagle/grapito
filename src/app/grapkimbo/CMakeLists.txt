@@ -45,6 +45,7 @@ set(${TARGET_NAME}_HEADERS
     Scenery/GameScene.h
     Scenery/MenuScene.h
     Scenery/RopeGame.h
+    Scenery/SplashScene.h
     Scenery/StateMachine.h
 
     Utils/CollisionBox.h
@@ -85,6 +86,7 @@ set(${TARGET_NAME}_SOURCES
     Scenery/GameScene.cpp
     Scenery/MenuScene.cpp
     Scenery/RopeGame.cpp
+    Scenery/SplashScene.cpp
 
     Utils/CollisionBox.cpp
     Utils/DrawDebugStuff.cpp
@@ -99,7 +101,7 @@ source_group(TREE ${CMAKE_CURRENT_LIST_DIR}
 
 
 find_package(Aunteater CONFIG REQUIRED COMPONENTS aunteater)
-find_package(Graphics CONFIG REQUIRED COMPONENTS graphics)
+find_package(Graphics CONFIG REQUIRED COMPONENTS arte graphics)
 find_package(Math CONFIG REQUIRED COMPONENTS math)
 find_package(Websocket CONFIG REQUIRED COMPONENTS websocket)
 
@@ -137,6 +139,7 @@ target_include_directories(${TARGET_NAME}
 
 target_link_libraries(${TARGET_NAME}
     PRIVATE
+        ad::arte
         ad::aunteater
         ad::graphics
         ad::math
