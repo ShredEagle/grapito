@@ -21,6 +21,12 @@ namespace camera
 }
 
 
+namespace controller
+{
+    constexpr float gDeadzone = 0.4f;
+}
+
+
 namespace player
 {
     constexpr float gMass = 80.f;

@@ -33,7 +33,8 @@ void Control::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
     for(auto & [controllable, geometry, aas, mass, playerData] :  mCartesianControllables)
     {
         const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
-        float horizontalAxis = aInputState.asAxis(controllable.controller, Left, Right, LeftHorizontalAxis);
+        Vec2 direction = aInputState.asDirection(controllable.controller, LeftHorizontalAxis, LeftVerticalAxis, controller::gDeadzone);
+        float horizontalAxis = direction.x();
         float horizontalAxisSign = horizontalAxis / std::abs(horizontalAxis);
 
         float groundSpeedAccelFactor = 1.f / player::gGroundNumberOfAccelFrame;
