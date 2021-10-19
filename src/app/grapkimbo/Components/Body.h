@@ -49,10 +49,17 @@ struct Body : public aunteater::Component<Body>
         {
             Shape::Edge edge = shape.getEdge(i);
             Vec2 vertexA = edge.origin.as<math::Vec>();
+            std::cout << "VertexA " << vertexA << std::endl;
             Vec2 vertexB = edge.end.as<math::Vec>();
+            std::cout << "VertexB " << vertexB << std::endl;
             float areaStep = twoDVectorCross(vertexA, vertexB) / 2.f;
+            std::cout << "area step " << areaStep << std::endl;
             Vec2 centerStep = (vertexA + vertexB) / 3.f;
+            std::cout << "a.dot(a) " << vertexA.dot(vertexA) << std::endl;
+            std::cout << "b.dot(b) " << vertexB.dot(vertexB) << std::endl;
+            std::cout << "a.dot(b) " << vertexA.dot(vertexB) << std::endl;
             float moiStep = areaStep * (vertexA.dot(vertexA) + vertexB.dot(vertexB) + vertexA.dot(vertexB)) / 6.f;
+            std::cout << "moi step " << moiStep << std::endl;
 
             if (area + areaStep != 0.f)
             {
@@ -83,8 +90,10 @@ struct Body : public aunteater::Component<Body>
             float density = mass / area;
             moi *= density;
             moi -= mass * vecMassCenter.dot(vecMassCenter);
+            std::cout << "Moi " << moi << std::endl;
             invMass = 1 / mass;
             invMoi = 1 / moi;
+            std::cout << "invmoi " << invMoi << std::endl;
         }
     }
 
@@ -115,10 +124,10 @@ struct Body : public aunteater::Component<Body>
         });
     }
 
-    float mass;
-    float invMass;
-    float moi;
-    float invMoi;
+    float mass = 0.f;
+    float invMass = 0.f;
+    float moi = 0.f;
+    float invMoi = 0.f;
     Position2 massCenter = {0.f, 0.f};
 
     float friction;
