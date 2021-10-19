@@ -373,7 +373,7 @@ bool WeldJointConstraint::SolvePositionConstraint()
     return positionError <= physic::gLinearSlop && angularError <= physic::gAngularSlop;
 }
 
-void PivotJointConstraint::InitVelocityConstraint(const GrapitoTimer & timer)
+void PivotJointConstraint::InitVelocityConstraint(const GrapitoTimer &)
 {
     bodyPosA = cbA->bodyPos;
     bodyPosB = cbB->bodyPos;
