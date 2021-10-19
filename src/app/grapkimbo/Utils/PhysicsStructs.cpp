@@ -228,7 +228,7 @@ void WeldJointConstraint::InitVelocityConstraint(const GrapitoTimer & timer)
     velocityB->w += invMoiB * (twoDVectorCross(rB, impulseSpeed) + mImpulse.z());
 }
 
-void WeldJointConstraint::SolveVelocityConstraint()
+void WeldJointConstraint::SolveVelocityConstraint(const GrapitoTimer & aTimer)
 {
     float mA = invMassA;
     float iA = invMoiA;
@@ -417,7 +417,7 @@ void PivotJointConstraint::InitVelocityConstraint(const GrapitoTimer &)
     velocityB->w += invMoiB * twoDVectorCross(rB, mImpulse);
 }
 
-void PivotJointConstraint::SolveVelocityConstraint()
+void PivotJointConstraint::SolveVelocityConstraint(const GrapitoTimer & aTimer)
 {
     Vec2 angularSpeed = velocityB->v + angVecB * velocityB->w -
         velocityA->v - angVecA * velocityA->w;
@@ -460,39 +460,6 @@ bool PivotJointConstraint::SolvePositionConstraint()
     bodyPosB->a += math::Radian<float>{iB * twoDVectorCross(rB, impulse)};
 
     return positionError <= physic::gLinearSlop;
-}
-
-std::ostream &operator<<(std::ostream & os, const VelocityConstraint & vc)
-{
-    os << "{ VelocityConstraint\n";
-    os << "    contact : {\n";
-    os << "        x : " << vc.cf.contactPoint.x() << "\n";
-    os << "        y : " << vc.cf.contactPoint.y() << "\n";
-    os << "        nI : " << vc.cf.normalImpulse << "\n";
-    os << "        tI : " << vc.cf.tangentImpulse << "\n";
-    os << "    }\n";
-    os << "    normal : {\n";
-    os << "        x : " << vc.normal.x() << "\n";
-    os << "        y : " << vc.normal.y() << "\n";
-    os << "    }\n";
-    os << "    position A : {\n";
-    os << "        x : " << vc.bodyPosA->p.x() << "\n";
-    os << "        y : " << vc.bodyPosA->p.y() << "\n";
-    os << "    }\n";
-    os << "    position B : {\n";
-    os << "        x : " << vc.bodyPosB->p.x() << "\n";
-    os << "        y : " << vc.bodyPosB->p.y() << "\n";
-    os << "    }\n";
-    os << "    vA : " << vc.velocityA->v << "\n";
-    os << "    vB : " << vc.velocityB->v << "\n";
-    os << "    wA : " << vc.velocityA->w << "\n";
-    os << "    wB : " << vc.velocityB->w << "\n";
-    os << "    invMassA : " << vc.invMassA << "\n";
-    os << "    invMassB : " << vc.invMassB << "\n";
-    os << "    invMoiA : " << vc.invMoiA << "\n";
-    os << "    invMoiB : " << vc.invMoiB << "\n";
-    os << "}\n";
-    return os;
 }
 
 DistanceJointConstraint::DistanceJointConstraint(
@@ -584,7 +551,7 @@ void DistanceJointConstraint::InitVelocityConstraint(const GrapitoTimer & aTimer
     velocityB->w += invMoiB * twoDVectorCross(rB, impulse);
 }
 
-void DistanceJointConstraint::SolveVelocityConstraint()
+void DistanceJointConstraint::SolveVelocityConstraint(const GrapitoTimer & aTimer)
 {
     float mA = invMassA;
     float iA = invMoiA;
@@ -616,15 +583,148 @@ void DistanceJointConstraint::SolveVelocityConstraint()
         //Lower than min length
         {
             //Scope is just because the computation are really similar
+            float C = mCurrentLength - mMinBaseLength;
+            float bias = std::max(0.f, C) / aTimer.delta();
+
+            Vec2 pointSpeedA = vA + wA * angVecA;
+            Vec2 pointSpeedB = vB + wB * angVecB;
+            float Cdot = mCurrentDirection.dot(pointSpeedB - pointSpeedA);
+
+            float impulse = -mMass * (Cdot + bias);
+            float oldImpulse = mLowerImpulse;
+            mLowerImpulse = std::max(0.f, mLowerImpulse + impulse);
+            impulse = mLowerImpulse - oldImpulse;
+
+            Vec2 impulseVec = impulse * mCurrentDirection;
+            vA -= mA * impulseVec;
+            wA -= iA * twoDVectorCross(rA, impulseVec);
+            vB -= mB * impulseVec;
+            wB -= iB * twoDVectorCross(rB, impulseVec);
         }
         //Greater than default length
         {
             //Scope is just because the computation are really similar
+            float C = mMaxBaseLength - mCurrentLength;
+            float bias = std::max(0.f, C) / aTimer.delta();
+
+            Vec2 pointSpeedA = vA + wA * angVecA;
+            Vec2 pointSpeedB = vB + wB * angVecB;
+            float Cdot = mCurrentDirection.dot(pointSpeedA - pointSpeedB);
+
+            float impulse = -mMass * (Cdot + bias);
+            float oldImpulse = mUpperImpulse;
+            mUpperImpulse = std::max(0.f, mUpperImpulse + impulse);
+            impulse = mUpperImpulse - oldImpulse;
+
+            Vec2 impulseVec = impulse * mCurrentDirection;
+            vA -= mA * impulseVec;
+            wA -= iA * twoDVectorCross(rA, impulseVec);
+            vB -= mB * impulseVec;
+            wB -= iB * twoDVectorCross(rB, impulseVec);
         }
     }
     else
     {
+        Vec2 pointSpeedA = vA + wA * angVecA;
+        Vec2 pointSpeedB = vB + wB * angVecB;
+        float Cdot = mCurrentDirection.dot(pointSpeedB - pointSpeedA);
+
+        float impulse = -mMass * Cdot;
+        mImpulse += impulse;
+
+        Vec2 impulseVec = impulse * mCurrentDirection;
+        vA -= mA * impulseVec;
+        wA -= iA * twoDVectorCross(rA, impulseVec);
+        vB -= mB * impulseVec;
+        wB -= iB * twoDVectorCross(rB, impulseVec);
     }
+
+    velocityA->v = vA;
+    velocityA->w = wA;
+    velocityB->v = vB;
+    velocityB->w = wB;
+}
+
+bool DistanceJointConstraint::SolvePositionConstraint()
+{
+    float mA = invMassA;
+    float iA = invMoiA;
+    float mB = invMassB;
+    float iB = invMoiB;
+    Position2 cA = bodyPosA->c;
+    Position2 cB = bodyPosB->c;
+    math::Radian<float> aA = bodyPosA->a;
+    math::Radian<float> aB = bodyPosB->a;
+
+    rA = transformVector(localAnchorA - (cA - bodyPosA->p).as<math::Position>(), aA);
+    rB = transformVector(localAnchorB - (cB - bodyPosB->p).as<math::Position>(), aB);
+
+    mCurrentDirection = (cB + rB) - (cA + rA);
+    float length = mCurrentDirection.getNorm();
+    mCurrentDirection /= length;
+    float C;
+
+    if (mMaxBaseLength == mMinBaseLength)
+    {
+        C = length - mMinBaseLength;
+    }
+    else if (length < mMinBaseLength)
+    {
+        C = length - mMinBaseLength;
+    }
+    else if (length > mMaxBaseLength)
+    {
+        C = length - mMaxBaseLength;
+    }
+    else
+    {
+        //Distance is correct, no need to adjust
+        return true;
+    }
+
+    float impulse = -mMass * C;
+    Vec2 impulseVec = impulse * mCurrentDirection;
+    bodyPosA->c -= impulseVec * invMassA;
+    bodyPosA->p -= impulseVec * invMassA;
+    bodyPosA->a -= static_cast<math::Radian<float>>(iA * twoDVectorCross(rA, impulseVec));
+    bodyPosB->c -= impulseVec * invMassB;
+    bodyPosB->p -= impulseVec * invMassB;
+    bodyPosB->a -= static_cast<math::Radian<float>>(iB * twoDVectorCross(rB, impulseVec));
+
+    return std::abs(C) < physic::gLinearSlop;
+}
+
+std::ostream &operator<<(std::ostream & os, const VelocityConstraint & vc)
+{
+    os << "{ VelocityConstraint\n";
+    os << "    contact : {\n";
+    os << "        x : " << vc.cf.contactPoint.x() << "\n";
+    os << "        y : " << vc.cf.contactPoint.y() << "\n";
+    os << "        nI : " << vc.cf.normalImpulse << "\n";
+    os << "        tI : " << vc.cf.tangentImpulse << "\n";
+    os << "    }\n";
+    os << "    normal : {\n";
+    os << "        x : " << vc.normal.x() << "\n";
+    os << "        y : " << vc.normal.y() << "\n";
+    os << "    }\n";
+    os << "    position A : {\n";
+    os << "        x : " << vc.bodyPosA->p.x() << "\n";
+    os << "        y : " << vc.bodyPosA->p.y() << "\n";
+    os << "    }\n";
+    os << "    position B : {\n";
+    os << "        x : " << vc.bodyPosB->p.x() << "\n";
+    os << "        y : " << vc.bodyPosB->p.y() << "\n";
+    os << "    }\n";
+    os << "    vA : " << vc.velocityA->v << "\n";
+    os << "    vB : " << vc.velocityB->v << "\n";
+    os << "    wA : " << vc.velocityA->w << "\n";
+    os << "    wB : " << vc.velocityB->w << "\n";
+    os << "    invMassA : " << vc.invMassA << "\n";
+    os << "    invMassB : " << vc.invMassB << "\n";
+    os << "    invMoiA : " << vc.invMoiA << "\n";
+    os << "    invMoiB : " << vc.invMoiB << "\n";
+    os << "}\n";
+    return os;
 }
 
 std::ostream &operator<<(std::ostream & os, const ConstructedBody & cb)

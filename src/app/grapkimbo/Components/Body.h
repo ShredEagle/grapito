@@ -50,7 +50,7 @@ struct Body : public aunteater::Component<Body>
             Shape::Edge edge = shape.getEdge(i);
             Vec2 vertexA = edge.origin.as<math::Vec>();
             Vec2 vertexB = edge.end.as<math::Vec>();
-            float areaStep = twoDVectorCross(vertexA, vertexB) / 2.f;
+            float areaStep = std::abs(twoDVectorCross(vertexA, vertexB)) / 2.f;
             Vec2 centerStep = (vertexA + vertexB) / 3.f;
             float moiStep = areaStep * (vertexA.dot(vertexA) + vertexB.dot(vertexB) + vertexA.dot(vertexB)) / 6.f;
 

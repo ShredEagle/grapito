@@ -264,8 +264,8 @@ class JointConstraint
     {}
     virtual ~JointConstraint() = default;
 
-    virtual void InitVelocityConstraint(const GrapitoTimer & timer) = 0;
-    virtual void SolveVelocityConstraint() = 0;
+    virtual void InitVelocityConstraint(const GrapitoTimer & aTimer) = 0;
+    virtual void SolveVelocityConstraint(const GrapitoTimer & aTimer) = 0;
     virtual bool SolvePositionConstraint() = 0;
 
     ConstructedBody * cbA;
@@ -284,8 +284,8 @@ class WeldJointConstraint : public JointConstraint
             aunteater::weak_entity aEntity
             );
 
-    void InitVelocityConstraint(const GrapitoTimer & timer) override;
-    void SolveVelocityConstraint() override;
+    void InitVelocityConstraint(const GrapitoTimer & aTimer) override;
+    void SolveVelocityConstraint(const GrapitoTimer & aTimer) override;
     bool SolvePositionConstraint() override;
 
     protected:
@@ -324,8 +324,8 @@ class PivotJointConstraint : public JointConstraint
             aunteater::weak_entity aEntity
             );
 
-    void InitVelocityConstraint(const GrapitoTimer & timer) override;
-    void SolveVelocityConstraint() override;
+    void InitVelocityConstraint(const GrapitoTimer & aTimer) override;
+    void SolveVelocityConstraint(const GrapitoTimer & aTimer) override;
     bool SolvePositionConstraint() override;
 
     protected:
@@ -359,8 +359,8 @@ class DistanceJointConstraint : public JointConstraint
             aunteater::weak_entity aEntity
             );
 
-    void InitVelocityConstraint(const GrapitoTimer & timer) override;
-    void SolveVelocityConstraint() override;
+    void InitVelocityConstraint(const GrapitoTimer & aTimer) override;
+    void SolveVelocityConstraint(const GrapitoTimer & aTimer) override;
     bool SolvePositionConstraint() override;
 
     protected:
