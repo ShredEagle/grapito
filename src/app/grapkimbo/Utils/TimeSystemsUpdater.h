@@ -6,6 +6,7 @@
 #include <boost/core/demangle.hpp>
 
 #include <chrono>
+#include <numeric>
 #include <ostream>
 
 
@@ -59,11 +60,12 @@ private:
             latest = aDuration;
             min = std::min(min, latest);
             max = std::max(max, latest);
-            average = (average * (double)sampleCount / (sampleCount + 1))
-                      + (double)latest.count() / (sampleCount + 1);
+            samples[sampleCount % sMaxSample] = latest.count();
+            average = std::accumulate(samples.begin(), samples.end(), 0.0) / (double)sMaxSample;
             ++sampleCount;
         }
 
+        const static int sMaxSample{240};
         int sampleCount{0};
         std::chrono::microseconds latest{0};
         // Need to use the representation type,
@@ -72,6 +74,7 @@ private:
             std::numeric_limits<std::chrono::microseconds::rep>::max()};
         std::chrono::microseconds max{0};
         double average{0.};
+        std::array<double, sMaxSample> samples;
     };
 
     std::chrono::steady_clock::time_point initial;

@@ -523,7 +523,7 @@ void DistanceJointConstraint::InitVelocityConstraint(const GrapitoTimer & aTimer
 
     if (mStiffness > 0.f && mMaxBaseLength > mMinBaseLength)
     {
-        float C = mCurrentLength - mBaseLength;
+        float C = std::max(0.f, mCurrentLength - mBaseLength);
         
         float d = mDamping;
         float k = mStiffness;
@@ -565,7 +565,7 @@ void DistanceJointConstraint::SolveVelocityConstraint(const GrapitoTimer & aTime
 
     if (mMaxBaseLength > mMinBaseLength)
     {
-        if (mStiffness > 0.f)
+        if (mStiffness > 0.f && mCurrentLength > mBaseLength)
         {
             Vec2 pointSpeedA = vA + wA * angVecA;
             Vec2 pointSpeedB = vB + wB * angVecB;
@@ -624,7 +624,7 @@ void DistanceJointConstraint::SolveVelocityConstraint(const GrapitoTimer & aTime
             wB += iB * twoDVectorCross(rB, impulseVec);
         }
     }
-    else
+    else if (mCurrentLength > mBaseLength)
     {
         Vec2 pointSpeedA = vA + wA * angVecA;
         Vec2 pointSpeedB = vB + wB * angVecB;

@@ -99,13 +99,13 @@ DistanceTest::DistanceTest(graphics::ApplicationGlfw & aApplication, DebugUI & a
 
     mEntityManager.addEntity(makeCamera({10.f, 2.f}));
 
-    createDistanceTest(5.f, -5.f, mEntityManager, 15.f, 0.5f);
-    createDistanceTest(10.f, -5.f, mEntityManager, 15.f, 0.5f, 0.f, 1.f);
+    //createDistanceTest(5.f, -5.f, mEntityManager, 15.f, 0.5f);
+    //createDistanceTest(10.f, -5.f, mEntityManager, 15.f, 0.5f, 0.f, 1.f);
 
-    createDistanceTest(5.f, 5.f, mEntityManager, 0.f, 0.f);
-    createDistanceTest(10.f, 5.f, mEntityManager, 15.f, 0.5f, 1.f, 0.f);
+    //createDistanceTest(5.f, 5.f, mEntityManager, 0.f, 0.f);
+    //createDistanceTest(10.f, 5.f, mEntityManager, 15.f, 0.5f, 1.f, 0.f);
 
-    createDistanceTest(10.f, 15.f, mEntityManager, 0.f, 0.f, 1.f, 0.f);
+    createDistanceTest(10.f, 15.f, mEntityManager, 15.f, 0.5f, 1.f, 0.5f, 5.f);
 }
 
 bool DistanceTest::update(const GrapitoTimer & aTimer, const GameInputState & aInputState)
