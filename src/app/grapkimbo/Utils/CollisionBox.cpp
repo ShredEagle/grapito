@@ -30,7 +30,7 @@ const Position2 CollisionBox::getSupport(const Vec2 direction) const
     Position2 bestVertex{0.f, 0.f};
 
     //In 2D face count and vertex count are always the same
-    for (int i = 0; i < shape.mFaceCount; ++i)
+    for (size_t i = 0; i < shape.mFaceCount; ++i)
     {
         Position2 vertex = shape.getVertice(i);
         float projection = direction.dot(vertex.as<math::Vec>());
@@ -49,7 +49,7 @@ std::ostream &operator<<(std::ostream & os, const CollisionBox & box)
 {
     os << "{ CollisionBox\n";
     os << "    Box :\n";
-    for (int i = 0; i < box.shape.mFaceCount; i++)
+    for (size_t i = 0; i < box.shape.mFaceCount; i++)
     {
         os << "    " << box.shape.getVertice(i) << "\n";
     }

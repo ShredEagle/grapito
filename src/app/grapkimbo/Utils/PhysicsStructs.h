@@ -18,7 +18,7 @@ struct PivotJoint;
 struct DistanceJoint;
 struct Body;
 struct CollisionPair;
-struct JointConstraint;
+class JointConstraint;
 
 enum ShapeType
 {
@@ -60,8 +60,8 @@ struct ContactFeature
     uint8_t indexIncident; 
 
     Position2 contactPoint = Position2::Zero();
-    float normalImpulse;
-    float tangentImpulse;
+    float normalImpulse = 0.f;
+    float tangentImpulse = 0.f;
     friend std::ostream &operator<<(std::ostream & os, const ContactFeature & cm);
 };
 
@@ -348,10 +348,13 @@ class PivotJointConstraint : public JointConstraint
     Vec2 mImpulse = Vec2::Zero();
     float axialMass;
     math::Matrix<2, 2, float> k = math::Matrix<2, 2, float>::Zero();
+
+    friend std::ostream &operator<<(std::ostream & os, const VelocityConstraint & vc);
 };
 
 class DistanceJointConstraint : public JointConstraint
 {
+    public:
     DistanceJointConstraint(
             const DistanceJoint & aDistanceJoint,
             ConstructedBody * aBodyA,

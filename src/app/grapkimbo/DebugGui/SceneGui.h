@@ -57,6 +57,10 @@ static void drawImGui(graphics::ApplicationGlfw & aApplication, DebugUI & aUI, I
             {
                 ChangeScene(GameList::CollisionTest, aApplication, aUI);
             }
+            if(ImGui::MenuItem("Distance test"))
+            {
+                ChangeScene(GameList::DistanceTest, aApplication, aUI);
+            }
             if(ImGui::MenuItem("FrictionTest"))
             {
                 ChangeScene(GameList::FrictionTest, aApplication, aUI);

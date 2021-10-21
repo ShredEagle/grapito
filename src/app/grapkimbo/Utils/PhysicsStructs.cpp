@@ -228,7 +228,7 @@ void WeldJointConstraint::InitVelocityConstraint(const GrapitoTimer & timer)
     velocityB->w += invMoiB * (twoDVectorCross(rB, impulseSpeed) + mImpulse.z());
 }
 
-void WeldJointConstraint::SolveVelocityConstraint(const GrapitoTimer & aTimer)
+void WeldJointConstraint::SolveVelocityConstraint(const GrapitoTimer &)
 {
     float mA = invMassA;
     float iA = invMoiA;
@@ -417,7 +417,7 @@ void PivotJointConstraint::InitVelocityConstraint(const GrapitoTimer &)
     velocityB->w += invMoiB * twoDVectorCross(rB, mImpulse);
 }
 
-void PivotJointConstraint::SolveVelocityConstraint(const GrapitoTimer & aTimer)
+void PivotJointConstraint::SolveVelocityConstraint(const GrapitoTimer &)
 {
     Vec2 angularSpeed = velocityB->v + angVecB * velocityB->w -
         velocityA->v - angVecA * velocityA->w;
@@ -478,25 +478,25 @@ DistanceJointConstraint::DistanceJointConstraint(
     mStiffness{aDistanceJoint.mStiffness},
     mDamping{aDistanceJoint.mDamping}
 {
-    rA = transformVector(localAnchorA - (bodyPosA->c - bodyPosA->p).as<math::Position>(), bodyPosA->a);
-    rB = transformVector(localAnchorB - (bodyPosB->c - bodyPosB->p).as<math::Position>(), bodyPosB->a);
+    rA = transformVector(localAnchorA - aBodyA->bodyRef.massCenter, aBodyA->bodyRef.theta);
+    rB = transformVector(localAnchorB - aBodyB->bodyRef.massCenter, aBodyB->bodyRef.theta);
 
-    mBaseDiffVector = (aBodyB->bodyPos->c + rB) - (aBodyA->bodyPos->c + rA);
-    mBaseLength = std::max(mBaseDiffVector.getNorm(), physic::gLinearSlop);
-    mMinBaseLength = mBaseLength * (1 - aDistanceJoint.mSlackFactor); 
-    mMaxBaseLength = mBaseLength * (1 + aDistanceJoint.mSlackFactor); 
+    mBaseDiffVector = (aBodyB->bodyRef.massCenter + aBodyB->posRef.position.as<math::Vec>() + rB) - (aBodyA->bodyRef.massCenter + aBodyA->posRef.position.as<math::Vec>() + rA);
+    mBaseLength = aDistanceJoint.mLength > 0.f ? aDistanceJoint.mLength : std::max(mBaseDiffVector.getNorm(), physic::gLinearSlop);
+    mMinBaseLength = mBaseLength * (1 - aDistanceJoint.mMinSlackFactor); 
+    mMaxBaseLength = mBaseLength * (1 + aDistanceJoint.mMaxSlackFactor); 
 }
 
 void DistanceJointConstraint::InitVelocityConstraint(const GrapitoTimer & aTimer)
 {
     bodyPosA = cbA->bodyPos;
-    bodyPosB = cbB->bodyPos;
     velocityA = cbA->velocity;
-    velocityB = cbB->velocity;
-
     rA = transformVector(localAnchorA - (bodyPosA->c - bodyPosA->p).as<math::Position>(), bodyPosA->a);
-    rB = transformVector(localAnchorB - (bodyPosB->c - bodyPosB->p).as<math::Position>(), bodyPosB->a);
     angVecA = {-rA.y(), rA.x()};
+
+    bodyPosB = cbB->bodyPos;
+    velocityB = cbB->velocity;
+    rB = transformVector(localAnchorB - (bodyPosB->c - bodyPosB->p).as<math::Position>(), bodyPosB->a);
     angVecB = {-rB.y(), rB.x()};
 
     mCurrentDirection = (bodyPosB->c + rB) - (bodyPosA->c + rA);
@@ -521,7 +521,7 @@ void DistanceJointConstraint::InitVelocityConstraint(const GrapitoTimer & aTimer
 
     mMass = invMass != 0.f ? 1.f / invMass : 0.f;
 
-    if (mStiffness > 0.f)
+    if (mStiffness > 0.f && mMaxBaseLength > mMinBaseLength)
     {
         float C = mCurrentLength - mBaseLength;
         
@@ -542,7 +542,7 @@ void DistanceJointConstraint::InitVelocityConstraint(const GrapitoTimer & aTimer
         mSoftMass = mMass;
     }
 
-    Vec2 impulse = (mImpulse + mLowerImpulse + mUpperImpulse) * mCurrentDirection;
+    Vec2 impulse = (mImpulse + mLowerImpulse - mUpperImpulse) * mCurrentDirection;
 
     //warm start constraint
     velocityA->v -= impulse * invMassA;
@@ -555,11 +555,12 @@ void DistanceJointConstraint::SolveVelocityConstraint(const GrapitoTimer & aTime
 {
     float mA = invMassA;
     float iA = invMoiA;
+    Vec2 vA = velocityA->v;
+    float wA = velocityA->w;
+
     float mB = invMassB;
     float iB = invMoiB;
-    Vec2 vA = velocityA->v;
     Vec2 vB = velocityB->v;
-    float wA = velocityA->w;
     float wB = velocityB->w;
 
     if (mMaxBaseLength > mMinBaseLength)
@@ -576,8 +577,8 @@ void DistanceJointConstraint::SolveVelocityConstraint(const GrapitoTimer & aTime
             Vec2 impulseVec = impulse * mCurrentDirection;
             vA -= mA * impulseVec;
             wA -= iA * twoDVectorCross(rA, impulseVec);
-            vB -= mB * impulseVec;
-            wB -= iB * twoDVectorCross(rB, impulseVec);
+            vB += mB * impulseVec;
+            wB += iB * twoDVectorCross(rB, impulseVec);
         }
 
         //Lower than min length
@@ -598,8 +599,8 @@ void DistanceJointConstraint::SolveVelocityConstraint(const GrapitoTimer & aTime
             Vec2 impulseVec = impulse * mCurrentDirection;
             vA -= mA * impulseVec;
             wA -= iA * twoDVectorCross(rA, impulseVec);
-            vB -= mB * impulseVec;
-            wB -= iB * twoDVectorCross(rB, impulseVec);
+            vB += mB * impulseVec;
+            wB += iB * twoDVectorCross(rB, impulseVec);
         }
         //Greater than default length
         {
@@ -619,8 +620,8 @@ void DistanceJointConstraint::SolveVelocityConstraint(const GrapitoTimer & aTime
             Vec2 impulseVec = impulse * mCurrentDirection;
             vA -= mA * impulseVec;
             wA -= iA * twoDVectorCross(rA, impulseVec);
-            vB -= mB * impulseVec;
-            wB -= iB * twoDVectorCross(rB, impulseVec);
+            vB += mB * impulseVec;
+            wB += iB * twoDVectorCross(rB, impulseVec);
         }
     }
     else
@@ -635,8 +636,8 @@ void DistanceJointConstraint::SolveVelocityConstraint(const GrapitoTimer & aTime
         Vec2 impulseVec = impulse * mCurrentDirection;
         vA -= mA * impulseVec;
         wA -= iA * twoDVectorCross(rA, impulseVec);
-        vB -= mB * impulseVec;
-        wB -= iB * twoDVectorCross(rB, impulseVec);
+        vB += mB * impulseVec;
+        wB += iB * twoDVectorCross(rB, impulseVec);
     }
 
     velocityA->v = vA;
@@ -647,13 +648,12 @@ void DistanceJointConstraint::SolveVelocityConstraint(const GrapitoTimer & aTime
 
 bool DistanceJointConstraint::SolvePositionConstraint()
 {
-    float mA = invMassA;
     float iA = invMoiA;
-    float mB = invMassB;
-    float iB = invMoiB;
     Position2 cA = bodyPosA->c;
-    Position2 cB = bodyPosB->c;
     math::Radian<float> aA = bodyPosA->a;
+
+    float iB = invMoiB;
+    Position2 cB = bodyPosB->c;
     math::Radian<float> aB = bodyPosB->a;
 
     rA = transformVector(localAnchorA - (cA - bodyPosA->p).as<math::Position>(), aA);
@@ -687,9 +687,9 @@ bool DistanceJointConstraint::SolvePositionConstraint()
     bodyPosA->c -= impulseVec * invMassA;
     bodyPosA->p -= impulseVec * invMassA;
     bodyPosA->a -= static_cast<math::Radian<float>>(iA * twoDVectorCross(rA, impulseVec));
-    bodyPosB->c -= impulseVec * invMassB;
-    bodyPosB->p -= impulseVec * invMassB;
-    bodyPosB->a -= static_cast<math::Radian<float>>(iB * twoDVectorCross(rB, impulseVec));
+    bodyPosB->c += impulseVec * invMassB;
+    bodyPosB->p += impulseVec * invMassB;
+    bodyPosB->a += static_cast<math::Radian<float>>(iB * twoDVectorCross(rB, impulseVec));
 
     return std::abs(C) < physic::gLinearSlop;
 }

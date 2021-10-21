@@ -164,7 +164,7 @@ static inline void addPair(ConstructedBody & bodyA, ConstructedBody & bodyB, std
     pairs.back().iteratorB = bodyB.contactList.insert(bodyB.contactList.end(), &(pairs.back()));
 }
 
-static inline const double distanceToLine(Position2 point, Position2 origin, Position2 end)
+static inline double distanceToLine(Position2 point, Position2 origin, Position2 end)
 {
     return (((end.x() - origin.x()) * (origin.y() - point.y())) - ((origin.x() - point.x()) * (end.y() - origin.y()))) / (origin - end).getNorm();
 }
@@ -176,7 +176,7 @@ static inline ContactManifold QueryFacePenetration(
 {
     ContactManifold resultManifold;
 
-    for (int i = 0; i < bodyA.box->shape.mFaceCount; ++i)
+    for (size_t i = 0; i < bodyA.box->shape.mFaceCount; ++i)
     {
         const Shape::Edge edgeA = bodyA.box->shape.getEdge(i);
         const Position2 support = bodyB.box->getSupport(-edgeA.normal);
@@ -246,7 +246,7 @@ static inline int findIncidentEdge(
     // (this is to get a correctly oriented reference frame)
     // so we compute the dot of all incident edges with the edgeDirection 
     // and we store the maximum
-    for (int i = 0; i < incidentShape.mFaceCount; ++i)
+    for (size_t i = 0; i < incidentShape.mFaceCount; ++i)
     {
         Shape::Edge edge = incidentShape.getEdge(i);
         
@@ -476,11 +476,13 @@ static inline void solveContactVelocityConstraint(VelocityConstraint & constrain
 Physics::Physics(aunteater::EntityManager & aEntityManager) :
     bodyObserver{this},
     pivotObserver{this},
-    weldObserver{this}
+    weldObserver{this},
+    distanceObserver{this}
 {
     aEntityManager.getFamily<PhysicalBody>().registerObserver(&bodyObserver);
     aEntityManager.getFamily<Pivotable>().registerObserver(&pivotObserver);
     aEntityManager.getFamily<Weldable>().registerObserver(&weldObserver);
+    aEntityManager.getFamily<Distanceable>().registerObserver(&distanceObserver);
 
     //Initiliazing the query functions
     queryFunctions[ShapeType_Hull][ShapeType_Hull] = QueryFacePenetration;
@@ -493,7 +495,7 @@ Physics::Physics(aunteater::EntityManager & aEntityManager) :
     collisionBoxes.reserve(128);
 }
 
-void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputState)
+void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
 {
     velocities.clear();
     positions.clear();
@@ -736,7 +738,7 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
     {
         for (auto & constraint : jointConstraints)
         {
-            constraint->SolveVelocityConstraint();
+            constraint->SolveVelocityConstraint(aTimer);
         }
 
         for (VelocityConstraint & constraint : velocityConstraints)

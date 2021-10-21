@@ -25,26 +25,14 @@ struct WeldJoint : public aunteater::Component<WeldJoint>
         bodyA{aBodyA},
         bodyB{aBodyB}
     {
-        float massA = aBodyA->get<Body>().mass;
-        float massB = aBodyB->get<Body>().mass;
-        float mass;
-
-        if (massA > 0.f && massB > 0.f)
-        {
-            mass = massA * massB / (massA + massB);
-        }
-        else if (massA > 0.f)
-        {
-            mass = massA;
-        }
-        else
-        {
-            mass = massB;
-        }
-
-        float omega = 2.f * math::pi<float> * aFrequency;
-        mStiffness = mass * omega * omega;
-        mDamping = 2.f * mass * aDampingRatio * omega;
+        computeStiffnessDamping(
+                mStiffness,
+                mDamping,
+                aFrequency,
+                aDampingRatio,
+                aBodyA->get<Body>().mass,
+                aBodyB->get<Body>().mass
+                );
     }
 
     Position2 localAnchorA = Position2::Zero();

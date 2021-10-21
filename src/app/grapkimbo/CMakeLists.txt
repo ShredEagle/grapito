@@ -37,6 +37,7 @@ set(${TARGET_NAME}_HEADERS
     Systems/RopeCreation.h
 
     TestScenes/CollisionTest.h
+    TestScenes/DistanceTest.h
     TestScenes/FrictionTest.h
     TestScenes/PivotTest.h
     TestScenes/SimpleCollisionTest.h
@@ -75,6 +76,7 @@ set(${TARGET_NAME}_SOURCES
     Systems/RopeCreation.cpp
 
     TestScenes/CollisionTest.cpp
+    TestScenes/DistanceTest.cpp
     TestScenes/FrictionTest.cpp
     TestScenes/SimpleCollisionTest.cpp
     TestScenes/SetPositionTest.cpp

@@ -20,31 +20,51 @@ struct DistanceJoint : public aunteater::Component<DistanceJoint>
             aunteater::weak_entity aBodyA,
             aunteater::weak_entity aBodyB
             ) :
+        DistanceJoint(aLocalAnchorA, aLocalAnchorB, aFrequency, aDampingRatio, 0.f, 0.f, aBodyA, aBodyB)
+    {
+    }
+    
+    explicit DistanceJoint(
+            Position2 aLocalAnchorA,
+            Position2 aLocalAnchorB,
+            float aFrequency,
+            float aDampingRatio,
+            float aMinSlackFactor,
+            float aMaxSlackFactor,
+            float aLength,
+            aunteater::weak_entity aBodyA,
+            aunteater::weak_entity aBodyB
+            ) :
         localAnchorA{std::move(aLocalAnchorA)},
         localAnchorB{std::move(aLocalAnchorB)},
+        mMinSlackFactor{aMinSlackFactor},
+        mMaxSlackFactor{aMaxSlackFactor},
+        mLength{aLength},
         bodyA{aBodyA},
         bodyB{aBodyB}
     {
-        float massA = aBodyA->get<Body>().mass;
-        float massB = aBodyB->get<Body>().mass;
-        float mass;
+        computeStiffnessDamping(
+                mStiffness,
+                mDamping,
+                aFrequency,
+                aDampingRatio,
+                aBodyA->get<Body>().mass,
+                aBodyB->get<Body>().mass
+                );
+    }
 
-        if (massA > 0.f && massB > 0.f)
-        {
-            mass = massA * massB / (massA + massB);
-        }
-        else if (massA > 0.f)
-        {
-            mass = massA;
-        }
-        else
-        {
-            mass = massB;
-        }
-
-        float omega = 2.f * math::pi<float> * aFrequency;
-        mStiffness = mass * omega * omega;
-        mDamping = 2.f * mass * aDampingRatio * omega;
+    explicit DistanceJoint(
+            Position2 aLocalAnchorA,
+            Position2 aLocalAnchorB,
+            float aFrequency,
+            float aDampingRatio,
+            float aMinSlackFactor,
+            float aMaxSlackFactor,
+            aunteater::weak_entity aBodyA,
+            aunteater::weak_entity aBodyB
+            ) :
+        DistanceJoint(aLocalAnchorA, aLocalAnchorB, aFrequency, aDampingRatio, 0.f, 0.f, -1.f, aBodyA, aBodyB)
+    {
     }
 
     Position2 localAnchorA = Position2::Zero();
@@ -52,7 +72,9 @@ struct DistanceJoint : public aunteater::Component<DistanceJoint>
 
     float mStiffness;
     float mDamping;
-    float mSlackFactor;
+    float mMinSlackFactor = 0.f;
+    float mMaxSlackFactor = 0.f;
+    float mLength = 0.f;
 
     aunteater::weak_entity bodyA;
     aunteater::weak_entity bodyB;
