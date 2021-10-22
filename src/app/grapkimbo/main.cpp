@@ -2,11 +2,13 @@
 #include "Logging.h"
 
 #include "commons.h"
+#include "Configuration.h"
 
 #include <DebugGui/SceneGui.h>
 
-#include "Scenery/StateMachine.h"
 #include "Scenery/RopeGame.h"
+#include "Scenery/SplashScene.h"
+#include "Scenery/StateMachine.h"
 
 #include "Utils/DrawDebugStuff.h"
 
@@ -14,9 +16,40 @@
 
 #include <graphics/ApplicationGlfw.h>
 
+#include <renderer/Image.h>
+
+#include <math/Interpolation.h>
+
 #include <iostream>
 
+
+using namespace ad;
 using namespace ad::grapito;
+
+
+
+std::shared_ptr<SplashScene> setupSplashScreen(math::Size<2, int> aResolution)
+{
+    std::shared_ptr<SplashScene> scene = std::make_unique<SplashScene>(aResolution);
+    scene->splashes.push_back(
+        {
+            graphics::Image{"c:/splash_oc.bmp"},
+            splash::gDuration,
+        });
+    scene->splashes.push_back(
+        {
+            graphics::Image{"c:/cpp.png"},
+            splash::gDuration,
+            [interpolation = math::makeInterpolation<math::ease::SmoothStep>(math::hdr::gBlack,
+                                                                             game::gClearColor,
+                                                                             splash::gDuration)]
+                (auto aDelta) mutable
+                {
+                    return interpolation.advance(aDelta);
+                },
+        });
+    return scene;
+}
 
 
 int main(int argc, const char * argv[])
@@ -37,6 +70,9 @@ int main(int argc, const char * argv[])
         DebugUI debugUI;
 
         StateMachine topLevelFlow{std::make_shared<RopeGame>(application.getAppInterface())};
+        // used for window proportions
+        topLevelFlow.pushState(setupSplashScreen(application.getAppInterface()->getWindowSize())); 
+
         GrapitoTimer timer{static_cast<float>(glfwGetTime())};
         GameInputState inputState;
 
@@ -62,4 +98,3 @@ int main(int argc, const char * argv[])
 
     std::exit(EXIT_SUCCESS);
 }
-

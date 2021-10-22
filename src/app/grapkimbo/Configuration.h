@@ -58,6 +58,18 @@ namespace render
 } // namespace render
 
 
+namespace game
+{
+    constexpr math::hdr::Rgb gClearColor{0.1, 0.2, 0.3};
+} // namespace game
+
+
+namespace splash
+{
+    constexpr int gVerticalResolution = 800;
+    constexpr float gDuration = 3.5f;
+} // namespace splash
+
 namespace menu
 {
     constexpr float gViewedHeight = 1000.f;
