@@ -16,7 +16,7 @@ namespace grapito {
 
 struct UiButton
 {
-    //GLfloat mYPosition;
+    const std::string mText;
     std::function<void(StateMachine &, std::shared_ptr<graphics::AppInterface> &)> mCallback =
         [](StateMachine &, std::shared_ptr<graphics::AppInterface> &){};
 };
@@ -27,7 +27,7 @@ struct Menu
     UiButton & selected()
     { return mButtons[mSelected]; }
 
-    auto size () const
+    auto size() const
     { return mButtons.size(); }
 
     std::vector<UiButton> mButtons;

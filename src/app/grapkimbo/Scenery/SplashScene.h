@@ -21,6 +21,7 @@ struct Splash
     graphics::Image mImage;
     typename GrapitoTimer::Value_t mDuration; 
     Evaluator<math::hdr::Rgb> mBufferClearColor = [](auto){return math::hdr::gBlack;};
+    Evaluator<GLfloat> mSpriteOpacity = [](auto){return 1.f;};
 };
 
 

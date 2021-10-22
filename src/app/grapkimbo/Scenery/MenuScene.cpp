@@ -17,16 +17,25 @@ Menu makePauseMenu()
 {
     return Menu {
         std::vector<UiButton>{
-            { [](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> &)
+            { "Resume",
+              [](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> &)
                 {
-                    aMachine.popState();
+                    aMachine.popState(); // this
                 }
             },
-            { [](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface)
+            { "Restart level",
+              [](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface)
                 {
-                    aMachine.popState();
-                    aMachine.popState();
-                    aMachine.emplaceState<RopeGame>(aAppInterface);
+                    aMachine.popState(); // this
+                    aMachine.popState(); // running game
+                    aMachine.emplaceState<RopeGame>(aAppInterface); // new game
+                }
+            },
+            { "Exit to Main Menu",
+              [](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface)
+                {
+                    aMachine.popState(); // this
+                    aMachine.popState(); // running game
                 }
             },
         },

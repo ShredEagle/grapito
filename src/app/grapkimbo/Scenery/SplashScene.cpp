@@ -39,6 +39,8 @@ UpdateStatus SplashScene::update(
         {
             // All splashes have completed
             reset(); // in case this scene is later re-entered.
+            // when done, pop this state to execute next state in the stack
+            // (e.g. a main menu)
             aStateMachine.popState();
             return UpdateStatus::KeepFrame;
         }
@@ -53,7 +55,7 @@ UpdateStatus SplashScene::update(
     graphics::AppInterface::setClearColor(current().mBufferClearColor(aTimer.delta()));
     graphics::AppInterface::clear();
     mSpriting.render(std::array<graphics::Spriting::Instance, 1>{ 
-        graphics::Spriting::Instance{mSpritePlacement_w, *mLoadedSprite} });
+        graphics::Spriting::Instance{mSpritePlacement_w, *mLoadedSprite, current().mSpriteOpacity(aTimer.delta())} });
     return UpdateStatus::SwapBuffers;
 }
 

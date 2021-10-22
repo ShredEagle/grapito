@@ -8,6 +8,7 @@ set(${TARGET_NAME}_HEADERS
     Game.h
     Input.h
     Logging.h
+    TopLevelStates.h
     Utilities.h
 
     Components/AccelAndSpeed.h
@@ -66,6 +67,7 @@ set(${TARGET_NAME}_SOURCES
     Input.cpp
     Logging.cpp
     Entities.cpp
+    TopLevelStates.cpp
 
     Systems/CameraGuidedControl.cpp
     Systems/Control.cpp
