@@ -4,6 +4,7 @@
 #include "Components/CameraTag.h"
 #include "Components/Controllable.h"
 #include <Components/GrappleControl.h>
+#include "Components/DelayDeletion.h"
 #include "Components/PivotJoint.h"
 #include "Components/PlayerData.h"
 #include "Components/Position.h"
@@ -42,7 +43,7 @@ aunteater::Entity makePlayer(int aIndex,
             15.f,
             0.f,
             0.f,
-            false,
+            1.f,
             std::vector<CollisionType>{CollisionType_Static_Env}
             )
         .add<VisualRectangle>(aColor)
@@ -101,7 +102,7 @@ aunteater::Entity createRopeSegment(Position2 origin, Position2 end)
                 0.5f,
                 angle.value(),
                 0.f,
-                false,
+                0.1f,
                 std::vector<CollisionType>{CollisionType_Static_Env}
                 )
             .add<VisualRectangle>(math::sdr::gGreen, VisualRectangle::Scope::RopeStructure)
@@ -115,6 +116,7 @@ void throwGrapple(aunteater::weak_entity aEntity, aunteater::EntityManager & aEn
 {
     math::Size<2, float> size{.25f, .25f};
     Position2 grapplePos = static_cast<Position2>(aEntity->get<Position>().position.as<math::Vec>() + aEntity->get<Body>().massCenter.as<math::Vec>() + Vec2{.5f, .5f});
+    Vec2 grappleImpulse = aEntity->get<PlayerData>().mAimVector * player::gGrappleBaseImpulse;
     aEntity->get<PlayerData>().grapple = aEntityManager.addEntity(aunteater::Entity()
             .add<Position>(
                 grapplePos,
@@ -128,11 +130,11 @@ void throwGrapple(aunteater::weak_entity aEntity, aunteater::EntityManager & aEn
                 4.f,
                 0.f,
                 1.f,
-                true,
+                0.3f,
                 std::vector<CollisionType>{CollisionType_Static_Env}
                 )
             .add<VisualRectangle>(math::sdr::gYellow)
-            .add<AccelAndSpeed>(Vec2{40.f, 40.f}, 0.f)
+            .add<AccelAndSpeed>(grappleImpulse, 0.f)
             );
 
     // IMPORTANT: bugfix by adding RopeCreator only after Body has been added.
@@ -187,8 +189,14 @@ void attachPlayerToGrapple(aunteater::weak_entity aPlayer, aunteater::EntityMana
 
 void detachPlayerFromGrapple(aunteater::weak_entity aPlayer)
 {
+    aPlayer->get<PlayerData>().grapple->add<DelayDeletion>(60);
     aPlayer->get<PlayerData>().grapple->get<RopeCreator>().mTargetEntity = nullptr;
     aPlayer->get<PlayerData>().grappleAttachment->markToRemove();
+    if (aPlayer->get<PlayerData>().mGrappleWeldJoint != nullptr)
+    {
+        aPlayer->get<PlayerData>().mGrappleWeldJoint->markToRemove();
+        aPlayer->get<PlayerData>().mGrappleWeldJoint = nullptr;
+    }
 }
 
 } // namespace grapito

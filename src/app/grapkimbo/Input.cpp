@@ -94,6 +94,15 @@ void readJoystick(int aGlfwJoystickId, const GamepadInputConfig & aConfig, Contr
     }
 }
 
+void readMouse(ControllerInputState & aState, graphics::ApplicationGlfw & aApplication)
+{
+    float xPos, yPos;
+    aApplication.getMousePos(xPos, yPos);
+
+    aState[MouseXPos].state = xPos;
+    aState[MouseYPos].state = yPos;
+}
+
 
 int toGlfwJoystickId(Controller aController)
 {
@@ -104,7 +113,7 @@ int toGlfwJoystickId(Controller aController)
 
 constexpr bool isGamepad(Controller aController)
 {
-    return aController != Controller::Keyboard;
+    return aController != Controller::KeyboardMouse;
 }
 
 
@@ -118,8 +127,9 @@ bool isGamepadPresent(Controller aController)
 void GameInputState::readAll(graphics::ApplicationGlfw & aApplication)
 {
     readKeyboard(gKeyboardConfig,
-                 controllerState[static_cast<std::size_t>(Controller::Keyboard)],
+                 controllerState[static_cast<std::size_t>(Controller::KeyboardMouse)],
                  aApplication);
+    readMouse(controllerState[static_cast<size_t>(Controller::KeyboardMouse)], aApplication);
 
     for (Controller controller = Controller::Gamepad_0;
          controller != Controller::End;

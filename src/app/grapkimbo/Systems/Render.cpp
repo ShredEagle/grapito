@@ -20,6 +20,7 @@ Render::Render(aunteater::EntityManager & aEntityManager, graphics::ApplicationG
     mBodyRectangles{mEntityManager},
     mOutlines{mEntityManager},
     mRopes{mEntityManager},
+    mCrosshairs{mEntityManager},
     mCameras{mEntityManager},
     mAppInterface(aApplication.getAppInterface()),
     mTrivialShaping{aApplication.getAppInterface()->getWindowSize()},
@@ -70,6 +71,27 @@ void Render::update(const GrapitoTimer aTimer, const GameInputState &)
     for (const auto [ropeCreator, _position, _body] : mRopes)
     {
         appendRopeSpline(ropeCreator, std::back_inserter(beziers));
+    }
+
+    for (const auto & [geometry, body, data] : mCrosshairs)
+    {
+        mTrivialShaping.addRectangle({
+                {
+                    static_cast<math::Position<2, GLfloat>>(geometry.position + body.massCenter.as<math::Vec>() + data.mAimVector * 5.f),
+                    {0.5f, 0.5f}
+                },
+                math::sdr::gGreen,
+        });
+        mTrivialLineStrip.addLine({
+                {
+                    static_cast<math::Position<2, GLfloat>>(geometry.position + body.massCenter.as<math::Vec>()),
+                    math::sdr::gGreen
+                },
+                {
+                    static_cast<math::Position<2, GLfloat>>(geometry.position + body.massCenter.as<math::Vec>() + data.mAimVector * 5.f),
+                    math::sdr::gGreen
+                }
+            });
     }
 
     for(const auto & [cameraTag, geometry] : mCameras)

@@ -3,6 +3,8 @@
 #include "Entities.h"
 #include "Logging.h"
 
+#include "Systems/DelayDeleter.h"
+#include "Systems/GrappleCleanup.h"
 #include "TestScenes/SceneChanger.h"
 
 #include <Components/AccelAndSpeed.h>
@@ -17,6 +19,8 @@
 #include <Systems/AccelSolver.h>
 #include <Systems/CameraGuidedControl.h>
 #include <Systems/Control.h>
+#include <Systems/DelayDeleter.h>
+#include "Systems/GrappleJointCreator.h"
 #include <Systems/Gravity.h>
 #include <Systems/LevelGeneration.h>
 #include <Systems/Render.h>
@@ -39,12 +43,15 @@ Game_pendulum::Game_pendulum(graphics::ApplicationGlfw & aApplication, DebugUI &
     mSystemManager.add<Control>();
     mSystemManager.add<Gravity>();
     mSystemManager.add<RopeCreation>();
+    mSystemManager.add<GrappleJointCreator>();
 
     mSystemManager.add<AccelSolver>();
     mSystemManager.add<Physics>();
 
     mSystemManager.add<CameraGuidedControl>();
     mSystemManager.add<Render>(aApplication); 
+    mSystemManager.add<GrappleCleanup>();
+    mSystemManager.add<DelayDeleter>();
 
     // Camera
     aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera());
@@ -61,7 +68,7 @@ Game_pendulum::Game_pendulum(graphics::ApplicationGlfw & aApplication, DebugUI &
 
     // Player 1
     Controller controller = isGamepadPresent(Controller::Gamepad_0) ?
-                            Controller::Gamepad_0 : Controller::Keyboard;
+                            Controller::Gamepad_0 : Controller::KeyboardMouse;
 
     mEntityManager.addEntity(
         makePlayer(0, controller, math::sdr::gCyan)
@@ -79,8 +86,8 @@ Game_pendulum::Game_pendulum(graphics::ApplicationGlfw & aApplication, DebugUI &
 bool Game_pendulum::update(const GrapitoTimer & aTimer, const GameInputState & aInputState)
 {
     //aunteater::UpdateTiming<GrapitoTimer, GameInputState> timings;
-    InputState pauseInput = aInputState.get(Controller::Keyboard)[Command::Pause];
-    InputState step = aInputState.get(Controller::Keyboard)[Command::Step];
+    InputState pauseInput = aInputState.get(Controller::KeyboardMouse)[Command::Pause];
+    InputState step = aInputState.get(Controller::KeyboardMouse)[Command::Step];
 
     if (pauseInput.positiveEdge())
     {

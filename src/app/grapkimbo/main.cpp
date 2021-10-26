@@ -38,7 +38,7 @@ int main(int /*argc*/, const char ** /*argv*/)
         // "Game" selection
         // 
         //Game game{application};
-        ChangeScene(GameList::WeldTest, application, debugUI);
+        ChangeScene(GameList::GamePendulum, application, debugUI);
 
         while(application.handleEvents())
         {

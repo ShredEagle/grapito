@@ -23,13 +23,13 @@ struct Body : public aunteater::Component<Body>
         float aMass = 1.f,
         float aTheta = 0.f,
         float aFriction = 0.f,
-        bool noMaxFriction = false,
+        float gravityScale = 1.f,
         std::vector<CollisionType> aAcceptedCollision = {}
     ) :
         mass{aMass},
         moi{0.f},
+        gravityScale{gravityScale},
         friction{aFriction},
-        noMaxFriction{noMaxFriction},
         theta{math::Radian<float>{aTheta}},
         shape{aBox},
         bodyType{aBodyType},
@@ -119,11 +119,11 @@ struct Body : public aunteater::Component<Body>
     float invMass;
     float moi;
     float invMoi;
+    float gravityScale;
     Position2 massCenter = {0.f, 0.f};
 
     float friction;
     float restitution;
-    bool noMaxFriction;
 
     math::Radian<float> theta;
 

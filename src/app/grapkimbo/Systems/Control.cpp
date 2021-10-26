@@ -33,8 +33,18 @@ void Control::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
     for(auto & [controllable, geometry, aas, mass, playerData] :  mCartesianControllables)
     {
         const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
-        Vec2 direction = aInputState.asDirection(controllable.controller, LeftHorizontalAxis, LeftVerticalAxis, controller::gDeadzone);
-        float horizontalAxis = direction.x();
+        float horizontalAxis;
+
+        if (controllable.controller == Controller::KeyboardMouse)
+        {
+            horizontalAxis = aInputState.asAxis(controllable.controller, Left, Right, LeftHorizontalAxis);
+        }
+        else
+        {
+            Vec2 direction = aInputState.asDirection(controllable.controller, LeftHorizontalAxis, LeftVerticalAxis, controller::gDeadzone);
+            float horizontalAxis = direction.x();
+        }
+
         float horizontalAxisSign = horizontalAxis / std::abs(horizontalAxis);
 
         float groundSpeedAccelFactor = 1.f / player::gGroundNumberOfAccelFrame;
@@ -158,6 +168,14 @@ void Control::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
         auto & [controllable, aas, grappleControl, geometry, playerData] = entity;
         const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
 
+        if (controllable.controller == Controller::KeyboardMouse)
+        {
+            playerData.mAimVector = {1.0f, 1.0f};
+        }
+        else
+        {
+            playerData.mAimVector = aInputState.asDirection(controllable.controller, RightHorizontalAxis, RightVerticalAxis, 0.25f);
+        }
 
         if (inputs[Grapple].positiveEdge() && !(playerData.controlState & ControlState_Attached))
         {

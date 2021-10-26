@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CameraGuidedControl.h" // for Camera archetype
+#include "Components/PlayerData.h"
 #include "RopeCreation.h" // for RopeCreator archetype
 
 #include <Components/CameraTag.h>
@@ -27,6 +28,7 @@ namespace grapito
 typedef aunteater::Archetype<Position, VisualRectangle> RenderedRectangle;
 typedef aunteater::Archetype<Position, Body, VisualRectangle> RenderedBodyRectangle;
 typedef aunteater::Archetype<Position, VisualOutline> RenderedOutline;
+typedef aunteater::Archetype<Position, Body, PlayerData> AimVector;
 
 class Render : public aunteater::System<GrapitoTimer, GameInputState>
 {
@@ -42,6 +44,7 @@ private:
     const aunteater::FamilyHelp<RenderedBodyRectangle> mBodyRectangles;
     const aunteater::FamilyHelp<RenderedOutline> mOutlines;
     const aunteater::FamilyHelp<RopeCreatorType> mRopes;
+    const aunteater::FamilyHelp<AimVector> mCrosshairs;
     const aunteater::FamilyHelp<Camera> mCameras;
 
     std::shared_ptr<graphics::AppInterface> mAppInterface;

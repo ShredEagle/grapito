@@ -27,6 +27,8 @@ enum Command {
     LeftVerticalAxis,
     RightHorizontalAxis,
     RightVerticalAxis,
+    MouseXPos,
+    MouseYPos,
 
     // Always leave that as last element, until we have reflection for enums
     EndCommand,
@@ -100,7 +102,7 @@ using ControllerInputState = std::array<InputState, EndCommand>;
 
 enum class Controller
 {
-    Keyboard,
+    KeyboardMouse,
     Gamepad_0,
     Gamepad_1,
     Gamepad_2,

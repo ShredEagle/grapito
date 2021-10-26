@@ -111,8 +111,8 @@ DistanceTest::DistanceTest(graphics::ApplicationGlfw & aApplication, DebugUI & a
 bool DistanceTest::update(const GrapitoTimer & aTimer, const GameInputState & aInputState)
 {
     aunteater::UpdateTiming<GrapitoTimer, GameInputState> timings;
-    InputState pauseInput = aInputState.get(Controller::Keyboard)[Command::Pause];
-    InputState step = aInputState.get(Controller::Keyboard)[Command::Step];
+    InputState pauseInput = aInputState.get(Controller::KeyboardMouse)[Command::Pause];
+    InputState step = aInputState.get(Controller::KeyboardMouse)[Command::Step];
 
     if (pauseInput.positiveEdge())
     {

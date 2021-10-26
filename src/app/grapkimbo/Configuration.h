@@ -41,9 +41,12 @@ namespace player
     inline float gAirSpeed = 12.f; // m/s
     inline int gAirNumberOfAccelFrame = 10;
     inline int gAirNumberOfSlowFrame = 10;
+    inline float gAirMaxFallSpeed = -50.f; // m/s
     inline float gJumpImpulse = 24.f; // m/s
     inline float gWallFriction = 4.f; // m/s
     inline float gDoubleJumpFactor = 1.3f; // m/s
+    inline float gGrappleBaseImpulse = 40.f;
+    inline float gRopeDistanceJointFactor = 1.1f;
     //static constexpr double gAirControlAcceleration = 12.; // m/s
     //constexpr double gAcceleration = 10.;
     //constexpr double gPlayerJumpImpulse = 10.; // m/s
@@ -74,8 +77,8 @@ namespace physic
     //This represent the separation that we expect at rest
     constexpr float gLinearSlop = 0.0001f;
     constexpr float gAngularSlop = 2.f / 180 * math::pi<float>;
-    constexpr int gMaxVelocityConstraintIteration = 8;
-    constexpr int gMaxPositionConstraintIteration = 3;
+    constexpr int gMaxVelocityConstraintIteration = 20;
+    constexpr int gMaxPositionConstraintIteration = 20;
 }
 
 namespace rope

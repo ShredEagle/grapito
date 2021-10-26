@@ -14,6 +14,7 @@ set(${TARGET_NAME}_HEADERS
     Components/CameraGuide.h
     Components/CameraTag.h
     Components/Controllable.h
+    Components/DelayDeletion.h
     Components/DistanceJoint.h
     Components/GrappleControl.h
     Components/Mass.h
@@ -29,6 +30,9 @@ set(${TARGET_NAME}_HEADERS
 
     Systems/CameraGuidedControl.h
     Systems/Control.h
+    Systems/DelayDeleter.h
+    Systems/GrappleCleanup.h
+    Systems/GrappleJointCreator.h
     Systems/Gravity.h
     Systems/LevelGeneration.h
     Systems/Render.h
@@ -68,7 +72,10 @@ set(${TARGET_NAME}_SOURCES
 
     Systems/CameraGuidedControl.cpp
     Systems/Control.cpp
+    Systems/DelayDeleter.cpp
     Systems/Gravity.cpp
+    Systems/GrappleCleanup.cpp
+    Systems/GrappleJointCreator.cpp
     Systems/LevelGeneration.cpp
     Systems/Render.cpp
     Systems/AccelSolver.cpp

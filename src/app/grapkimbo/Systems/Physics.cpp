@@ -76,6 +76,7 @@ void BodyObserver::removedEntity(aunteater::LiveEntity & aEntity)
     }
 
     mPhysicsSystem->constructedBodies.erase(aEntity.get<Body>().constructedBodyIt);
+    aEntity.get<Body>().constructedBodyIt = mPhysicsSystem->constructedBodies.end();
 }
 
 template<class T_joint, class T_joint_constraint>
@@ -123,14 +124,18 @@ void JointObserver<T_joint, T_joint_constraint>::removedEntity(aunteater::LiveEn
 {
     T_joint & joint = aEntity.get<T_joint>();
 
-    if (aEntity.get<PivotJoint>().bodyA->has<Body>())
+    if (aEntity.get<T_joint>().bodyA->template has<Body>() &&
+        aEntity.get<T_joint>().bodyA->template get<Body>().constructedBodyIt != mPhysicsSystem->constructedBodies.end()
+       )
     {
-        ConstructedBody & bodyA = *aEntity.get<PivotJoint>().bodyA->get<Body>().constructedBodyIt;
+        ConstructedBody & bodyA = *aEntity.get<T_joint>().bodyA->template get<Body>().constructedBodyIt;
         bodyA.jointItList.erase(joint.constructedBodyConstraintItA);
     }
-    if (aEntity.get<PivotJoint>().bodyB->has<Body>())
+    if (aEntity.get<T_joint>().bodyB->template has<Body>() &&
+        aEntity.get<T_joint>().bodyB->template get<Body>().constructedBodyIt != mPhysicsSystem->constructedBodies.end()
+       )
     {
-        ConstructedBody & bodyB = *aEntity.get<PivotJoint>().bodyB->get<Body>().constructedBodyIt;
+        ConstructedBody & bodyB = *aEntity.get<T_joint>().bodyB->template get<Body>().constructedBodyIt;
         bodyB.jointItList.erase(joint.constructedBodyConstraintItB);
     }
     mPhysicsSystem->jointConstraints.erase(joint.constraintIt);
@@ -439,7 +444,7 @@ static inline void solveContactVelocityConstraint(VelocityConstraint & constrain
         float totalAngularTangentMass = constraint.totalTangentAngularMass;
 
         float lambda = -(1 / (totalMass + totalAngularTangentMass)) * (tangentSpeed);
-        float maxFriction = constraint.noMaxFriction ? std::numeric_limits<float>::max() : constraint.friction * cf.normalImpulse;
+        float maxFriction = constraint.friction * cf.normalImpulse;
         float newImpulseTangent = std::max(std::min(cf.tangentImpulse + lambda, maxFriction), -maxFriction);
         lambda = newImpulseTangent - cf.tangentImpulse;
         cf.tangentImpulse = newImpulseTangent;
@@ -683,7 +688,6 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
                         bodyRef->invMoi * crossA * crossA + bodyInc->invMoi * crossB * crossB,
                         bodyRef->invMoi * crossATangent * crossATangent + bodyInc->invMoi * crossBTangent * crossBTangent,
                         sqrt(bodyRef->friction * bodyInc->friction),
-                        bodyRef->noMaxFriction || bodyInc->noMaxFriction,
                         std::max(bodyRef->friction, bodyInc->friction),
                         manifold.normal,
                         tangent,

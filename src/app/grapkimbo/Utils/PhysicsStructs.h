@@ -148,7 +148,6 @@ class ConstructedBody
     float invMoi;
 
     float friction;
-    bool noMaxFriction;
 
     //non owning pointer to Physics system vector
     Velocity * velocity;
@@ -227,7 +226,6 @@ struct VelocityConstraint
     float totalNormalAngularMass;
     float totalTangentAngularMass;
     float friction;
-    bool noMaxFriction;
     float restitution;
     Vec2 normal; 
     Vec2 tangent;
