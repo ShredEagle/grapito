@@ -6,6 +6,8 @@
 #include "../Configuration.h"
 #include "../Logging.h"
 
+#include <math/VectorUtilities.h>
+
 #include <graphics/CameraUtilities.h>
 
 
@@ -13,45 +15,23 @@ namespace ad {
 namespace grapito {
 
 
-Menu makePauseMenu()
+auto makeInterpolation(std::shared_ptr<graphics::AppInterface> aAppInterface, GLfloat aStartFactor, GLfloat aEndFactor)
 {
-    return Menu {
-        std::vector<UiButton>{
-            { "Resume",
-              [](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> &)
-                {
-                    aMachine.popState(); // this
-                }
-            },
-            { "Restart level",
-              [](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface)
-                {
-                    aMachine.popState(); // this
-                    aMachine.popState(); // running game
-                    aMachine.emplaceState<RopeGame>(aAppInterface); // new game
-                }
-            },
-            { "Exit to Main Menu",
-              [](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface)
-                {
-                    aMachine.popState(); // this
-                    aMachine.popState(); // running game
-                }
-            },
-        },
-    };
+    GLfloat viewedWidth_w = math::getRatio<float>(aAppInterface->getFramebufferSize()) * menu::gViewedHeight;
+    return math::makeInterpolation<math::ease::SmoothStep>(
+        aStartFactor * viewedWidth_w,
+        aEndFactor   * viewedWidth_w,
+        menu::gTransitionDuration);
 }
 
 
 MenuScene::MenuScene(Menu aMenu, std::shared_ptr<graphics::AppInterface> aAppInterface) :
     mMenu{std::move(aMenu)},
     mAppInterface{std::move(aAppInterface)},
-    mShaping{mAppInterface->getFramebufferSize()}
-{
-    setViewedRectangle(
-        mShaping,
-        graphics::getViewRectangle(mAppInterface->getFramebufferSize(), menu::gViewedHeight));
-}
+    mShaping{mAppInterface->getFramebufferSize()},
+    // Useless, it is setup before transitions. But there is no default ctor.
+    mMenuXPosition{makeInterpolation(mAppInterface, 0.f, 0.f)} 
+{}
 
 
 UpdateStatus MenuScene::update(
@@ -59,8 +39,6 @@ UpdateStatus MenuScene::update(
         const GameInputState & aInputs,
         StateMachine & aStateMachine)
 {
-    graphics::AppInterface::clear();
-
     if (aInputs.get(Controller::Keyboard)[Command::Up].positiveEdge())
     {
         mMenu.mSelected = std::min(mMenu.mSelected - 1, mMenu.size() - 1);
@@ -79,9 +57,43 @@ UpdateStatus MenuScene::update(
         return UpdateStatus::KeepFrame;
     }
 
-    GLfloat height = mMenu.size() * menu::gButtonSize.height()
+    renderMenu();
+    return UpdateStatus::SwapBuffers;
+}
+
+void MenuScene::beforeEnter()
+{
+    mMenuXPosition = makeInterpolation(mAppInterface, 0.5f, -0.5f);
+}
+
+
+void MenuScene::beforeExit()
+{
+    mMenuXPosition = makeInterpolation(mAppInterface, -0.5f, -1.5f);
+}
+
+
+std::pair<TransitionProgress, UpdateStatus> MenuScene::scrollMenu(GrapitoTimer & aTimer)
+{
+    Rectangle viewed = graphics::getViewRectangle(mAppInterface->getFramebufferSize(), menu::gViewedHeight);
+    viewed.origin().x() = mMenuXPosition.advance(aTimer.delta());
+    setViewedRectangle(mShaping, viewed);
+    renderMenu();
+
+    return {
+        mMenuXPosition.isCompleted() ? TransitionProgress::Complete : TransitionProgress::Ongoing,
+        UpdateStatus::SwapBuffers
+    };
+}
+
+
+void MenuScene::renderMenu()
+{
+    graphics::AppInterface::clear();
+
+    GLfloat menuHeight = mMenu.size() * menu::gButtonSize.height()
         + (mMenu.size() - 1) * menu::gButtonSpacing;
-    GLfloat buttonY = height / 2.f - menu::gButtonSize.height() / 2.f;
+    GLfloat buttonY = menuHeight / 2.f - menu::gButtonSize.height() / 2.f;
     GLfloat incrementY = menu::gButtonSize.height() + menu::gButtonSpacing;
 
     for (std::size_t buttonId = 0; buttonId != mMenu.size(); ++buttonId)
@@ -92,8 +104,6 @@ UpdateStatus MenuScene::update(
         buttonY -= incrementY;
     }
     mShaping.render();
-
-    return UpdateStatus::SwapBuffers;
 }
 
 

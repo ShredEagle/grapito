@@ -4,6 +4,7 @@
 
 #include "../Configuration.h"
 #include "../Logging.h"
+#include "../TopLevelStates.h"
     
 
 namespace ad {
@@ -23,7 +24,7 @@ UpdateStatus GameScene::update(
     InputState gamePause = aInputs.get(Controller::Keyboard)[Command::Start];
     if (gamePause.positiveEdge())
     {
-        aStateMachine.emplaceState<MenuScene>(makePauseMenu(), mAppInterface);
+        aStateMachine.pushState(setupPauseMenu(mAppInterface));
         // Causes troubles with detection of next press of pause button
         // it would still be the same edge!
         //return aStateMachine.update(aTimer, aInputs);

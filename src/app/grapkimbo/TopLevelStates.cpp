@@ -65,9 +65,41 @@ std::shared_ptr<MenuScene> setupMainMenu(std::shared_ptr<graphics::AppInterface>
                     }
                 },
             },
-    },
-    aAppInterface);
+        },
+        aAppInterface);
 }
+
+std::shared_ptr<MenuScene> setupPauseMenu(std::shared_ptr<graphics::AppInterface> & aAppInterface)
+{
+    return std::make_shared<MenuScene>(
+        Menu {
+            std::vector<UiButton>{
+                { "Resume",
+                  [](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> &)
+                    {
+                        aMachine.popState(); // this
+                    }
+                },
+                { "Restart level",
+                  [](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface)
+                    {
+                        aMachine.popState(); // this
+                        aMachine.popState(); // running game
+                        aMachine.emplaceState<RopeGame>(aAppInterface); // new game
+                    }
+                },
+                { "Exit to Main Menu",
+                  [](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface)
+                    {
+                        aMachine.popState(); // this
+                        aMachine.popState(); // running game
+                    }
+                },
+            },
+        },
+        aAppInterface);
+}
+
 
 
 } // namespace grapito

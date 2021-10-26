@@ -42,12 +42,12 @@ int main(int argc, const char * argv[])
         ad::grapito::ImguiState imguiState;
         DebugUI debugUI;
 
-        // The first state in the stack is the main menu
-        StateMachine topLevelFlow{setupMainMenu(application.getAppInterface())};
+        // The splashscreens are the initial state
+        // note: coordinates are used for window proportions
+        StateMachine topLevelFlow{setupSplashScreen(application.getAppInterface()->getWindowSize())};
 
-        // Add the splashscreens on top
-        // used for window proportions
-        topLevelFlow.pushState(setupSplashScreen(application.getAppInterface()->getWindowSize())); 
+        // The next state in the stack is the main menu
+        topLevelFlow.putNext(setupMainMenu(application.getAppInterface())); 
 
         GrapitoTimer timer{static_cast<float>(glfwGetTime())};
         GameInputState inputState;

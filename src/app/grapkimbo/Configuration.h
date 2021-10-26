@@ -67,7 +67,7 @@ namespace game
 namespace splash
 {
     constexpr int gVerticalResolution = 800;
-    constexpr float gDuration = 3.5f;
+    constexpr float gDuration = 1.5f;
 } // namespace splash
 
 namespace menu
@@ -77,6 +77,7 @@ namespace menu
     constexpr float gButtonSpacing = 100.f;
     constexpr math::sdr::Rgb gButtonColor{ 120, 100, 110 };
     constexpr math::sdr::Rgb gSelectedColor{ 190, 190, 80 };
+    constexpr float gTransitionDuration = 0.275f;
 }
 
 namespace sight
