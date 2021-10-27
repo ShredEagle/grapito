@@ -1,14 +1,15 @@
 #pragma once
 
 #include "CameraGuidedControl.h" // for Camera archetype
-#include "Components/PlayerData.h"
 #include "RopeCreation.h" // for RopeCreator archetype
 
-#include <Components/CameraTag.h>
-#include <Components/Position.h>
-#include <Components/VisualOutline.h>
-#include <Components/VisualRectangle.h>
-#include <Components/Body.h>
+#include "../Components/CameraTag.h"
+#include "../Components/PlayerData.h"
+#include "../Components/Position.h"
+#include "../Components/VisualOutline.h"
+#include "../Components/VisualRectangle.h"
+#include "../Components/VisualPolygon.h"
+#include "../Components/Body.h"
 
 #include <aunteater/Archetype.h>
 #include <aunteater/FamilyHelp.h>
@@ -18,6 +19,7 @@
 #include <graphics/Curving.h>
 #include <graphics/DrawLine.h>
 #include <graphics/TrivialLineStrip.h>
+#include <graphics/TrivialPolygon.h>
 #include <graphics/TrivialShaping.h>
 
 
@@ -26,7 +28,9 @@ namespace grapito
 {
 
 typedef aunteater::Archetype<Position, VisualRectangle> RenderedRectangle;
+typedef aunteater::Archetype<Position, VisualPolygon> RenderedPolygon;
 typedef aunteater::Archetype<Position, Body, VisualRectangle> RenderedBodyRectangle;
+typedef aunteater::Archetype<Position, Body, VisualPolygon> RenderedBodyPolygon;
 typedef aunteater::Archetype<Position, VisualOutline> RenderedOutline;
 typedef aunteater::Archetype<Position, Body, PlayerData> AimVector;
 
@@ -36,12 +40,14 @@ class Render : public aunteater::System<GrapitoTimer, GameInputState>
 public:
     Render(aunteater::EntityManager & aEntityManager, graphics::ApplicationGlfw & aApplication);
 
-    void update(const GrapitoTimer aTimer, const GameInputState &) override;
+    void update(const GrapitoTimer, const GameInputState &) override;
 
 private:
     aunteater::EntityManager & mEntityManager;
     const aunteater::FamilyHelp<RenderedRectangle> mRectangles;
+    const aunteater::FamilyHelp<RenderedPolygon> mPolygons;
     const aunteater::FamilyHelp<RenderedBodyRectangle> mBodyRectangles;
+    const aunteater::FamilyHelp<RenderedBodyPolygon> mBodyPolygons;
     const aunteater::FamilyHelp<RenderedOutline> mOutlines;
     const aunteater::FamilyHelp<RopeCreatorType> mRopes;
     const aunteater::FamilyHelp<AimVector> mCrosshairs;
@@ -50,6 +56,7 @@ private:
     std::shared_ptr<graphics::AppInterface> mAppInterface;
     graphics::TrivialShaping mTrivialShaping;
     graphics::TrivialLineStrip mTrivialLineStrip;
+    graphics::TrivialPolygon mTrivialPolygon;
     graphics::Curving mCurving;
 
 };

@@ -10,6 +10,7 @@
 #include "Components/Position.h"
 #include "Components/RopeCreator.h"
 #include "Components/VisualOutline.h"
+#include "Components/VisualPolygon.h"
 #include "Components/VisualRectangle.h"
 #include "Components/Mass.h"
 
@@ -64,6 +65,23 @@ aunteater::Entity makeCamera(Position2 pos)
         ;
 }
 
+aunteater::Entity makeAnchor(Position2 aPosition, std::vector<Position2> aVertices)
+{
+    return aunteater::Entity()
+        .add<Body>(
+            aVertices,
+            BodyType_Static,
+            ShapeType_Hull,
+            CollisionType_Static_Env,
+            0.f,
+            0.f,
+            1.f
+            )
+        .add<Position>(aPosition, math::Size<2, float>{0.f, 0.f})
+        .add<AccelAndSpeed>()
+        .add<VisualPolygon>(aVertices, anchor::gColor)
+    ;
+}
 
 aunteater::Entity makeAnchor(math::Position<2, float> aPosition, math::Size<2, float> aSize)
 {

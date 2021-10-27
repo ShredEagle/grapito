@@ -22,6 +22,7 @@ set(${TARGET_NAME}_HEADERS
     Components/PlayerData.h
     Components/Position.h
     Components/VisualOutline.h
+    Components/VisualPolygon.h
     Components/VisualRectangle.h
     Components/Body.h
     Components/AccelAndSpeed.h

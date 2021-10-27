@@ -3,6 +3,7 @@
 #include "../Configuration.h"
 #include "../Utils/DrawDebugStuff.h"
 #include "../Utils/RopeUtilities.h"
+#include "graphics/TrivialPolygon.h"
 
 #include <graphics/CameraUtilities.h>
 
@@ -17,7 +18,9 @@ namespace grapito
 Render::Render(aunteater::EntityManager & aEntityManager, graphics::ApplicationGlfw & aApplication) :
     mEntityManager{aEntityManager},
     mRectangles{mEntityManager},
+    mPolygons{mEntityManager},
     mBodyRectangles{mEntityManager},
+    mBodyPolygons{mEntityManager},
     mOutlines{mEntityManager},
     mRopes{mEntityManager},
     mCrosshairs{mEntityManager},
@@ -25,19 +28,28 @@ Render::Render(aunteater::EntityManager & aEntityManager, graphics::ApplicationG
     mAppInterface(aApplication.getAppInterface()),
     mTrivialShaping{aApplication.getAppInterface()->getWindowSize()},
     mTrivialLineStrip{aApplication.getAppInterface()->getWindowSize()},
+    mTrivialPolygon{aApplication.getAppInterface()->getWindowSize()},
     mCurving{render::gBezierSubdivisions}
 {}
 
-void Render::update(const GrapitoTimer aTimer, const GameInputState &)
+void Render::update(const GrapitoTimer, const GameInputState &)
 {
     mTrivialShaping.clearShapes();
     mTrivialLineStrip.clearLines();
+    mTrivialPolygon.clearPolygons();
     debugDrawer->clear();
     mAppInterface->clear();
 
     for (auto & [geometry, body, visualRectangle] : mBodyRectangles)
     {
         visualRectangle.transform = static_cast<math::Matrix<3, 3, float>>(
+            math::trans2d::rotateAbout(body.theta, geometry.position + body.massCenter.as<math::Vec>())
+        );
+    }
+
+    for (auto & [geometry, body, visualPolygon] : mBodyPolygons)
+    {
+        visualPolygon.transform = static_cast<math::Matrix<3, 3, float>>(
             math::trans2d::rotateAbout(body.theta, geometry.position + body.massCenter.as<math::Vec>())
         );
     }
@@ -54,6 +66,22 @@ void Render::update(const GrapitoTimer aTimer, const GameInputState &)
             visualRectangle.color,
             visualRectangle.transform,
         });
+    }
+
+    for(const auto [geometry, visualPolygon] : mPolygons)
+    {
+        std::vector<graphics::TrivialPolygon::PolygonPoint> vertices;
+
+        for (auto vertex : visualPolygon.mVertices)
+        {
+            vertices.emplace_back(graphics::TrivialPolygon::PolygonPoint{
+                        vertex + geometry.position.as<math::Vec>(),
+                        visualPolygon.color,
+                        visualPolygon.transform
+                    });
+        }
+
+        mTrivialPolygon.addVertices(vertices);
     }
 
     for(const auto [geometry, visualOutline] : mOutlines)
@@ -77,7 +105,7 @@ void Render::update(const GrapitoTimer aTimer, const GameInputState &)
     {
         mTrivialShaping.addRectangle({
                 {
-                    static_cast<math::Position<2, GLfloat>>(geometry.position + body.massCenter.as<math::Vec>() + data.mAimVector * 5.f),
+                    static_cast<math::Position<2, GLfloat>>(geometry.position + body.massCenter.as<math::Vec>() + data.mAimVector * 5.f - Vec2{0.25f, 0.25f}),
                     {0.5f, 0.5f}
                 },
                 math::sdr::gGreen,
@@ -102,6 +130,7 @@ void Render::update(const GrapitoTimer aTimer, const GameInputState &)
         }.centered();
         setViewedRectangle(mTrivialShaping, viewed);
         setViewedRectangle(mTrivialLineStrip, viewed);
+        setViewedRectangle(mTrivialPolygon, viewed);
         setOrthographicView(mCurving,
                             // TODO FPASS
                             {static_cast<math::Position<2, GLfloat>>(geometry.position), 0.f},
@@ -111,6 +140,7 @@ void Render::update(const GrapitoTimer aTimer, const GameInputState &)
     }
 
     mTrivialLineStrip.render();
+    mTrivialPolygon.render();
     mTrivialShaping.render();
     mCurving.render(beziers);
     debugDrawer->render();

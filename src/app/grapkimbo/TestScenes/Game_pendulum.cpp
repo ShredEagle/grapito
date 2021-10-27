@@ -60,6 +60,12 @@ Game_pendulum::Game_pendulum(graphics::ApplicationGlfw & aApplication, DebugUI &
     aunteater::weak_entity floor = mEntityManager.addEntity(
         makeAnchor(Position2{-20.f, -4.f}, math::Size<2, float>{40.f, 2.f} ));
 
+    mEntityManager.addEntity(
+        makeAnchor(Position2{15.f, 10.f}, math::Size<2, float>{40.f, 2.f} ));
+
+    aunteater::weak_entity polygon = mEntityManager.addEntity(
+        makeAnchor(Position2{5.f, 5.f}, std::vector<Position2>{Position2{0.f, 0.f}, Position2{1.f, 0.f}, Position2{0.5f, 0.5f}}));
+
     aunteater::weak_entity floor2 = mEntityManager.addEntity(
         makeAnchor(Position2{20.f, -2.f}, math::Size<2, float>{40.f, 2.f} ));
 

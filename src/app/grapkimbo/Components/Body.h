@@ -16,6 +16,31 @@ namespace grapito
 struct Body : public aunteater::Component<Body>
 {
     explicit Body(
+        std::vector<Position2> aVertices,
+        BodyType aBodyType,
+        ShapeType aShapeType,
+        CollisionType aCollisionType,
+        float aMass = 1.f,
+        float aTheta = 0.f,
+        float aFriction = 0.f,
+        float gravityScale = 1.f,
+        std::vector<CollisionType> aAcceptedCollision = {}
+    ) :
+        mass{aMass},
+        moi{0.f},
+        gravityScale{gravityScale},
+        friction{aFriction},
+        theta{math::Radian<float>{aTheta}},
+        shape{aVertices},
+        bodyType{aBodyType},
+        shapeType{aShapeType},
+        collisionType{aCollisionType},
+        acceptedCollision{aAcceptedCollision}
+    {
+        updateData();
+    }
+
+    explicit Body(
         math::Rectangle<float> aBox,
         BodyType aBodyType,
         ShapeType aShapeType,

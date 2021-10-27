@@ -31,6 +31,7 @@ aunteater::Entity makeCamera(Position2 pos = {0.f, 0.f});
 
 
 aunteater::Entity makeAnchor(Position2 aPosition, math::Size<2, float> aSize);
+aunteater::Entity makeAnchor(Position2 aPosition, std::vector<Position2> aVertices);
 
 
 aunteater::Entity createRopeSegment(Position2 origin, Position2 endRR);
