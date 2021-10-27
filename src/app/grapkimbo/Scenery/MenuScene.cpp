@@ -30,6 +30,7 @@ MenuScene::MenuScene(Menu aMenu,
     mMenu{std::move(aMenu)},
     mAppInterface{std::move(aAppInterface)},
     mOptionalGameScene{aGameScene},
+    mRenderEffect{mAppInterface},
     mShaping{mAppInterface->getFramebufferSize()},
     // Useless, it is setup before transitions. But there is no default ctor.
     mMenuXPosition{makeInterpolation(mAppInterface, 0.f, 0.f)} 
@@ -95,7 +96,7 @@ void MenuScene::renderMenu()
 
     if (mOptionalGameScene)
     {
-        mOptionalGameScene->render();
+        mRenderEffect.blurTo(*mOptionalGameScene, graphics::FrameBuffer::Default(), menu::gBlurringPasses);
     }
 
     GLfloat menuHeight = mMenu.size() * menu::gButtonSize.height()

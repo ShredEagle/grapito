@@ -72,6 +72,7 @@ namespace splash
 
 namespace menu
 {
+    constexpr int gBlurringPasses = 6;
     constexpr float gViewedHeight = 1000.f;
     constexpr math::Size<2, GLfloat> gButtonSize{320.f, 80.f};
     constexpr float gButtonSpacing = 100.f;

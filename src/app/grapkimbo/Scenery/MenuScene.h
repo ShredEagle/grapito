@@ -3,6 +3,8 @@
 
 #include "StateMachine.h"
 
+#include "../Utils/RenderEffect.h"
+
 #include <graphics/AppInterface.h>
 #include <graphics/TrivialShaping.h>
 
@@ -81,6 +83,7 @@ private:
     // * it ensures the game is kept alive at least until the menu is completely done (transitions included)
     // There is however a risk of circular keep-alive if the game later keeps a shared_ptr to the menu.
     std::shared_ptr<GameScene> mOptionalGameScene; 
+    RenderEffect mRenderEffect;
     graphics::TrivialShaping mShaping;
     math::Interpolation<GLfloat, GrapitoTimer::Value_t, math::ease::SmoothStep<GrapitoTimer::Value_t>> mMenuXPosition;
 }; 
