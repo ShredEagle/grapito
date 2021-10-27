@@ -810,7 +810,7 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
             Position2 point = constraint.bodyPosB->c + rB;
             float separation = (point.as<math::Vec>() - onEdgePoint.as<math::Vec>()).dot(normal) - physic::gLinearSlop * 4.;
 
-            float C = std::min(0., std::max(-.2, .2 * (separation + physic::gLinearSlop)));
+            float C = std::min(0.f, std::max(-physic::gMaxLinearCorrection, physic::gBaumgarteFactor * (separation + physic::gLinearSlop)));
 
             float rnA = twoDVectorCross(rA, normal);
             float rnB = twoDVectorCross(rB, normal);

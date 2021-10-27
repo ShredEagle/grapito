@@ -77,6 +77,8 @@ namespace physic
     //This represent the separation that we expect at rest
     constexpr float gLinearSlop = 0.0001f;
     constexpr float gAngularSlop = 2.f / 180 * math::pi<float>;
+    constexpr float gBaumgarteFactor = 0.6f;
+    constexpr float gMaxLinearCorrection = 0.2f;
     constexpr int gMaxVelocityConstraintIteration = 20;
     constexpr int gMaxPositionConstraintIteration = 20;
 }
