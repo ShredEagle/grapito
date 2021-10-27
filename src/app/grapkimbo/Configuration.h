@@ -35,10 +35,10 @@ namespace player
     constexpr math::Radian<float> gInitialAngle{math::pi<float>/3.f};
     //TODO(franz) replace with constexpr
     inline float gAcceleration = 70.f;
-    inline float gGroundSpeed = 12.f;
+    inline float gGroundSpeed = 20.f;
     inline int gGroundNumberOfAccelFrame = 4;
     inline int gGroundNumberOfSlowFrame = 4;
-    inline float gAirSpeed = 12.f; // m/s
+    inline float gAirSpeed = 20.f; // m/s
     inline int gAirNumberOfAccelFrame = 10;
     inline int gAirNumberOfSlowFrame = 10;
     inline float gAirMaxFallSpeed = -50.f; // m/s
