@@ -22,7 +22,7 @@ GrappleCleanup::GrappleCleanup(aunteater::EntityManager & aEntityManager) :
     mCleanable{aEntityManager}
 {}
 
-void GrappleCleanup::update(const GrapitoTimer aTimer, const GameInputState &)
+void GrappleCleanup::update(const GrapitoTimer, const GameInputState &)
 {
     for (auto & [playerData] : mCleanable)
     {

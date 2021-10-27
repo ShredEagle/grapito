@@ -13,7 +13,7 @@ Gravity::Gravity(aunteater::EntityManager & aEntityManager) :
     mPlayers(aEntityManager)
 {}
 
-void Gravity::update(const GrapitoTimer aTimer, const GameInputState &)
+void Gravity::update(const GrapitoTimer, const GameInputState &)
 {
     for(auto massive : mMassives)
     {

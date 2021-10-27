@@ -21,7 +21,7 @@ class GrappleCleanup : public aunteater::System<GrapitoTimer, GameInputState>
 public:
     GrappleCleanup(aunteater::EntityManager & aEntityManager);
 
-    void update(const GrapitoTimer aTimer, const GameInputState &) override;
+    void update(const GrapitoTimer, const GameInputState &) override;
 
 private:
     const aunteater::FamilyHelp<Cleanupable> mCleanable;

@@ -25,7 +25,7 @@ Control::Control(aunteater::EntityManager & aEntityManager) :
     mGrapplers{mEntityManager}
 {}
 
-void Control::update(const GrapitoTimer aTimer, const GameInputState & aInputState)
+void Control::update(const GrapitoTimer, const GameInputState & aInputState)
 {
     //
     // Air

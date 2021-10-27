@@ -23,7 +23,7 @@ class Gravity : public aunteater::System<GrapitoTimer, GameInputState>
 public:
     Gravity(aunteater::EntityManager & aEntityManager);
 
-    void update(const GrapitoTimer aTimer, const GameInputState &) override;
+    void update(const GrapitoTimer, const GameInputState &) override;
 
     static constexpr double gAcceleration = 10.;
 

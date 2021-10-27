@@ -29,7 +29,7 @@ class Control : public aunteater::System<GrapitoTimer, GameInputState>
 public:
     Control(aunteater::EntityManager & aEntityManager);
 
-    void update(const GrapitoTimer aTimer, const GameInputState & aInputState) override;
+    void update(const GrapitoTimer, const GameInputState & aInputState) override;
 
 private:
     std::pair<Position2, double> anchor(const Position2 aPosition);
