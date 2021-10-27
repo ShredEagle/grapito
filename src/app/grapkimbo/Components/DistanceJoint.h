@@ -63,7 +63,7 @@ struct DistanceJoint : public aunteater::Component<DistanceJoint>
             aunteater::weak_entity aBodyA,
             aunteater::weak_entity aBodyB
             ) :
-        DistanceJoint(aLocalAnchorA, aLocalAnchorB, aFrequency, aDampingRatio, 0.f, 0.f, -1.f, aBodyA, aBodyB)
+        DistanceJoint(aLocalAnchorA, aLocalAnchorB, aFrequency, aDampingRatio, aMinSlackFactor, aMaxSlackFactor, -1.f, aBodyA, aBodyB)
     {
     }
 
