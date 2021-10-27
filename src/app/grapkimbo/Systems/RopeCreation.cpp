@@ -31,7 +31,7 @@ void RopeCreation::addedEntity(aunteater::LiveEntity & aEntity)
     aunteater::weak_entity player = ropeCreator.mTargetEntity;
 
     Position2 end = player->get<Position>().position + player->get<Body>().massCenter.as<math::Vec>();
-    Position2 origin = pos.position + body.massCenter.as<math::Vec>();
+    Position2 origin = pos.position;
 
     aunteater::weak_entity link = mEntityManager.addEntity(createRopeSegment(
         origin,
@@ -42,7 +42,7 @@ void RopeCreation::addedEntity(aunteater::LiveEntity & aEntity)
             aunteater::Entity()
             .add<PivotJoint>(
                 Position2{0.f, rope::ropeHalfwidth},
-                body.massCenter,
+                Position2{0.f, 0.f},
                 link,
                 &aEntity
             ));

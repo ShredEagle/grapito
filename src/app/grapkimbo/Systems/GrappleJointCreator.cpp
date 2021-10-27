@@ -39,7 +39,6 @@ void GrappleJointCreator::update(const GrapitoTimer aTimer, const GameInputState
         {
             PlayerData & playerData = player->get<PlayerData>();
 
-            Position & playerPos = player->get<Position>();
             Body & playerBody = player->get<Body>();
             float length = 0.f;
 
@@ -140,8 +139,8 @@ void GrappleJointCreator::update(const GrapitoTimer aTimer, const GameInputState
                                     .add<WeldJoint>(
                                         localPointGrapple,
                                         localPointOther,
-                                        0.f,
-                                        0.f,
+                                        15.f,
+                                        0.5f,
                                         ropeCreatorEntity,
                                         otherEntity
                                     ));

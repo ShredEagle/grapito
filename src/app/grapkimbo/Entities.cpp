@@ -132,16 +132,15 @@ aunteater::Entity createRopeSegment(Position2 origin, Position2 end)
 
 void throwGrapple(aunteater::weak_entity aEntity, aunteater::EntityManager & aEntityManager)
 {
-    math::Size<2, float> size{.25f, .25f};
     Position2 grapplePos = static_cast<Position2>(aEntity->get<Position>().position.as<math::Vec>() + aEntity->get<Body>().massCenter.as<math::Vec>() + Vec2{.5f, .5f});
     Vec2 grappleImpulse = aEntity->get<PlayerData>().mAimVector * player::gGrappleBaseImpulse;
     aEntity->get<PlayerData>().grapple = aEntityManager.addEntity(aunteater::Entity()
             .add<Position>(
                 grapplePos,
-                size
+                math::Size<2, float>{0.f, 0.f}
                 )
             .add<Body>(
-                math::Rectangle<float>{{0.f, 0.f}, size},
+                rope::grappleVertices,
                 BodyType_Dynamic,
                 ShapeType_Hull,
                 CollisionType_Moving_Env,
@@ -151,7 +150,7 @@ void throwGrapple(aunteater::weak_entity aEntity, aunteater::EntityManager & aEn
                 0.3f,
                 std::vector<CollisionType>{CollisionType_Static_Env}
                 )
-            .add<VisualRectangle>(math::sdr::gYellow)
+            .add<VisualPolygon>(rope::grappleVertices, math::sdr::gYellow)
             .add<AccelAndSpeed>(grappleImpulse, 0.f)
             );
 

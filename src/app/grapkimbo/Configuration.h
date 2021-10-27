@@ -1,5 +1,6 @@
 #pragma once
 
+#include "commons.h"
 #include <math/Constants.h>
 #include <math/Angle.h>
 #include <math/Color.h>
@@ -85,6 +86,10 @@ namespace physic
 
 namespace rope
 {
+    inline std::vector<grapito::Position2> grappleVertices{
+        grapito::Position2{0.f, 0.f}, grapito::Position2{0.5f, 0.f},
+        grapito::Position2{0.7f, 0.2f}, grapito::Position2{0.55f, 0.55f},
+        grapito::Position2{0.2f, 0.7f}, grapito::Position2{0.f, 0.5f}};
     constexpr GLfloat ropeWidth = .2f;
     constexpr GLfloat ropeHalfwidth = ropeWidth / 2 ;
     constexpr GLfloat curveTension = 0.f; // I.e. Catmull Rom
