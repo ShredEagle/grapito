@@ -42,7 +42,7 @@ void Control::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
         else
         {
             Vec2 direction = aInputState.asDirection(controllable.controller, LeftHorizontalAxis, LeftVerticalAxis, controller::gDeadzone);
-            float horizontalAxis = direction.x();
+            horizontalAxis = direction.x();
         }
 
         float horizontalAxisSign = horizontalAxis / std::abs(horizontalAxis);

@@ -85,8 +85,8 @@ void GrappleJointCreator::update(const GrapitoTimer aTimer, const GameInputState
                                     .add<DistanceJoint>(
                                         localPointPlayer,
                                         localPointOther,
-                                        30.f,
-                                        0.f,
+                                        15.f,
+                                        0.8f,
                                         1.f,
                                         0.5f,
                                         length * player::gRopeDistanceJointFactor,
@@ -164,8 +164,8 @@ void GrappleJointCreator::update(const GrapitoTimer aTimer, const GameInputState
                         .add<DistanceJoint>(
                             localPointPlayer,
                             weldJoint.localAnchorB,
-                            2.f,
-                            1.0f,
+                            15.f,
+                            0.8f,
                             1.f,
                             0.5f,
                             length * player::gRopeDistanceJointFactor,
