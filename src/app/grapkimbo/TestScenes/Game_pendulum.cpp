@@ -39,7 +39,6 @@ Game_pendulum::Game_pendulum(graphics::ApplicationGlfw & aApplication, DebugUI &
     mUI{aUI}
 {
 
-    mSystemManager.add<LevelGeneration>();
     mSystemManager.add<Control>();
     mSystemManager.add<Gravity>();
     mSystemManager.add<RopeCreation>();

@@ -174,7 +174,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
         }
         else
         {
-            playerData.mAimVector = aInputState.asDirection(controllable.controller, RightHorizontalAxis, RightVerticalAxis, 0.25f);
+            playerData.mAimVector = aInputState.asDirection(controllable.controller, LeftHorizontalAxis, LeftVerticalAxis, 0.25f).normalize();
         }
 
         if (inputs[Grapple].positiveEdge() && !(playerData.controlState & ControlState_Attached))
