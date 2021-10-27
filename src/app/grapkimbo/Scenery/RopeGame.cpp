@@ -40,7 +40,8 @@ RopeGame::RopeGame(std::shared_ptr<graphics::AppInterface> aAppInterface) :
 
     mSystemManager.add<CameraGuidedControl>();
 
-    mSystemManager.add<Render>(mAppInterface); 
+    mRenderSystem = mSystemManager.add<Render>(mAppInterface); 
+    
 
     // Camera
     aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera());
@@ -69,6 +70,12 @@ RopeGame::RopeGame(std::shared_ptr<graphics::AppInterface> aAppInterface) :
         mEntityManager.addEntity(
             makePlayer(1, Controller::Gamepad_1, math::sdr::gMagenta));
     }
+}
+
+
+void RopeGame::render() const
+{
+    mRenderSystem->render();
 }
 
 

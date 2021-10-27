@@ -2,7 +2,6 @@
 
 #include "../Configuration.h"
 #include "../Utils/DrawDebugStuff.h"
-#include "../Utils/RopeUtilities.h"
 
 #include <graphics/CameraUtilities.h>
 
@@ -28,7 +27,7 @@ Render::Render(aunteater::EntityManager & aEntityManager,
     mCurving{render::gBezierSubdivisions}
 {}
 
-void Render::update(const GrapitoTimer aTimer, const GameInputState &)
+void Render::update(const GrapitoTimer, const GameInputState &)
 {
     mTrivialShaping.clearShapes();
     mTrivialLineStrip.clearLines();
@@ -67,10 +66,10 @@ void Render::update(const GrapitoTimer aTimer, const GameInputState &)
         );
     }
 
-    Spline beziers;
+    mBeziers.clear();
     for (const auto [ropeCreator, _position, _body] : mRopes)
     {
-        appendRopeSpline(ropeCreator, std::back_inserter(beziers));
+        appendRopeSpline(ropeCreator, std::back_inserter(mBeziers));
     }
 
     for(const auto & [cameraTag, geometry] : mCameras)
@@ -88,9 +87,15 @@ void Render::update(const GrapitoTimer aTimer, const GameInputState &)
         setViewedRectangle(debugDrawer->mTrivialLineStrip, viewed);
     }
 
+    render();
+}
+
+
+void Render::render() const
+{
     mTrivialLineStrip.render();
     mTrivialShaping.render();
-    mCurving.render(beziers);
+    mCurving.render(mBeziers);
     debugDrawer->render();
 }
 

@@ -3,6 +3,8 @@
 #include "CameraGuidedControl.h" // for Camera archetype
 #include "RopeCreation.h" // for RopeCreator archetype
 
+#include "../Utils/RopeUtilities.h"
+
 #include <Components/CameraTag.h>
 #include <Components/Position.h>
 #include <Components/VisualOutline.h>
@@ -35,7 +37,9 @@ public:
     Render(aunteater::EntityManager & aEntityManager,
            std::shared_ptr<graphics::AppInterface> aAppInterface);
 
-    void update(const GrapitoTimer aTimer, const GameInputState &) override;
+    void render() const;
+
+    void update(const GrapitoTimer, const GameInputState &) override;
 
 private:
     aunteater::EntityManager & mEntityManager;
@@ -50,6 +54,7 @@ private:
     graphics::TrivialLineStrip mTrivialLineStrip;
     graphics::Curving mCurving;
 
+    Spline mBeziers;
 };
 
 } // namespace grapito

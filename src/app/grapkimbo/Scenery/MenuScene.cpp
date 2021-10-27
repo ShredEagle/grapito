@@ -24,10 +24,12 @@ auto makeInterpolation(std::shared_ptr<graphics::AppInterface> aAppInterface, GL
         menu::gTransitionDuration);
 }
 
-
-MenuScene::MenuScene(Menu aMenu, std::shared_ptr<graphics::AppInterface> aAppInterface) :
+MenuScene::MenuScene(Menu aMenu,
+                     std::shared_ptr<graphics::AppInterface> aAppInterface,
+                     std::shared_ptr<GameScene> aGameScene) :
     mMenu{std::move(aMenu)},
     mAppInterface{std::move(aAppInterface)},
+    mOptionalGameScene{aGameScene},
     mShaping{mAppInterface->getFramebufferSize()},
     // Useless, it is setup before transitions. But there is no default ctor.
     mMenuXPosition{makeInterpolation(mAppInterface, 0.f, 0.f)} 
@@ -90,6 +92,11 @@ std::pair<TransitionProgress, UpdateStatus> MenuScene::scrollMenu(GrapitoTimer &
 void MenuScene::renderMenu()
 {
     graphics::AppInterface::clear();
+
+    if (mOptionalGameScene)
+    {
+        mOptionalGameScene->render();
+    }
 
     GLfloat menuHeight = mMenu.size() * menu::gButtonSize.height()
         + (mMenu.size() - 1) * menu::gButtonSpacing;

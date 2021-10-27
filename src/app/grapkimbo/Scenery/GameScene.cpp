@@ -24,7 +24,7 @@ UpdateStatus GameScene::update(
     InputState gamePause = aInputs.get(Controller::Keyboard)[Command::Start];
     if (gamePause.positiveEdge())
     {
-        aStateMachine.pushState(setupPauseMenu(mAppInterface));
+        aStateMachine.pushState(setupPauseMenu(mAppInterface, shared_from_this()));
         // Causes troubles with detection of next press of pause button
         // it would still be the same edge!
         //return aStateMachine.update(aTimer, aInputs);

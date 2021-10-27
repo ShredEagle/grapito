@@ -16,6 +16,9 @@ namespace ad {
 namespace grapito {
 
 
+class GameScene;
+
+
 struct UiButton
 {
     const std::string mText;
@@ -43,7 +46,9 @@ Menu makePauseMenu();
 class MenuScene : public State
 {
 public:
-    MenuScene(Menu aMenu, std::shared_ptr<graphics::AppInterface> aAppInterface);
+    MenuScene(Menu aMenu,
+              std::shared_ptr<graphics::AppInterface> aAppInterface,
+              std::shared_ptr<GameScene> aGameScene = nullptr);
 
     UpdateStatus update(
         GrapitoTimer & aTimer,
@@ -71,6 +76,11 @@ private:
 
     Menu mMenu;
     std::shared_ptr<graphics::AppInterface> mAppInterface;
+    // Keeping a shared_ptr to the game scene that is rendered below the menu has several advantages:
+    // * it avoids having to dig in the StateMachine for the state of interest
+    // * it ensures the game is kept alive at least until the menu is completely done (transitions included)
+    // There is however a risk of circular keep-alive if the game later keeps a shared_ptr to the menu.
+    std::shared_ptr<GameScene> mOptionalGameScene; 
     graphics::TrivialShaping mShaping;
     math::Interpolation<GLfloat, GrapitoTimer::Value_t, math::ease::SmoothStep<GrapitoTimer::Value_t>> mMenuXPosition;
 }; 

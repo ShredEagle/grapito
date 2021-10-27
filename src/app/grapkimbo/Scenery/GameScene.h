@@ -7,12 +7,14 @@
 
 #include <graphics/AppInterface.h>
 
+#include <memory>
+
 
 namespace ad {
 namespace grapito {
 
 
-class GameScene : public State
+class GameScene : public State, public std::enable_shared_from_this<GameScene>
 {
 public:
     GameScene(std::shared_ptr<graphics::AppInterface> aAppInterface);
@@ -21,6 +23,11 @@ public:
         GrapitoTimer & aTimer,
         const GameInputState & aInputs,
         StateMachine & aStateMachine) override;
+
+    /// \brief Should render the game in the current state.
+    ///
+    /// It is intended to implement effect such as blurring during pause.
+    virtual void render() const = 0;
 
 protected:
     aunteater::EntityManager mEntityManager;

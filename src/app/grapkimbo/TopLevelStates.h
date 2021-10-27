@@ -19,7 +19,9 @@ std::shared_ptr<SplashScene> setupSplashScreen(math::Size<2, int> aResolution);
 std::shared_ptr<MenuScene> setupMainMenu(std::shared_ptr<graphics::AppInterface> & aAppInterface);
 
 
-std::shared_ptr<MenuScene> setupPauseMenu(std::shared_ptr<graphics::AppInterface> & aAppInterface);
+std::shared_ptr<MenuScene> setupPauseMenu(
+    std::shared_ptr<graphics::AppInterface> & aAppInterface,
+    std::shared_ptr<GameScene> aGameScene);
 
 
 } // namespace grapito

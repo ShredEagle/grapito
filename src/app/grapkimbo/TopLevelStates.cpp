@@ -69,7 +69,9 @@ std::shared_ptr<MenuScene> setupMainMenu(std::shared_ptr<graphics::AppInterface>
         aAppInterface);
 }
 
-std::shared_ptr<MenuScene> setupPauseMenu(std::shared_ptr<graphics::AppInterface> & aAppInterface)
+std::shared_ptr<MenuScene> setupPauseMenu(
+    std::shared_ptr<graphics::AppInterface> & aAppInterface,
+    std::shared_ptr<GameScene> aGameScene)
 {
     return std::make_shared<MenuScene>(
         Menu {
@@ -97,7 +99,9 @@ std::shared_ptr<MenuScene> setupPauseMenu(std::shared_ptr<graphics::AppInterface
                 },
             },
         },
-        aAppInterface);
+        aAppInterface,
+        std::move(aGameScene)
+    );
 }
 
 
