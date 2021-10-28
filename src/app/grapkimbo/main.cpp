@@ -1,3 +1,4 @@
+#include "build_info.h"
 #include "commons.h"
 #include "Configuration.h"
 #include "Input.h"
@@ -16,6 +17,8 @@
 #include <graphics/ApplicationGlfw.h>
 
 #include <renderer/Image.h>
+
+#include <resource/ResourceManager.h>
 
 #include <iostream>
 
@@ -42,9 +45,12 @@ int main(int argc, const char * argv[])
         ad::grapito::ImguiState imguiState;
         DebugUI debugUI;
 
+        resource::ResourceManager resources{gRepositoryRoot / filesystem::path{"../grapito_media/assets/"}};
+
         // The splashscreens are the initial state
         // note: coordinates are used for window proportions
-        StateMachine topLevelFlow{setupSplashScreen(application.getAppInterface()->getWindowSize())};
+        StateMachine topLevelFlow{setupSplashScreen(application.getAppInterface()->getWindowSize(),
+                                                    resources)};
 
         // The next state in the stack is the main menu
         topLevelFlow.putNext(setupMainMenu(application.getAppInterface())); 
