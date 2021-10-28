@@ -31,10 +31,6 @@ public:
 
     void update(const GrapitoTimer aTimer, const GameInputState & aInputState) override;
 
-    static constexpr double gPendularControlAccelerationFactor = 1./6.;
-    static constexpr double gAirControlAcceleration = 12.; // m/s
-    static constexpr double gJumpImpulse = 10.; // m/s
-
 private:
     std::pair<Position2, double> anchor(const Position2 aPosition);
 

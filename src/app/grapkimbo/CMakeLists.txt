@@ -31,6 +31,7 @@ set(${TARGET_NAME}_HEADERS
     Components/Body.h
     Components/AccelAndSpeed.h
     Components/RopeCreator.h
+    Components/WeldJoint.h
 
     Systems/CameraGuidedControl.h
     Systems/Control.h
@@ -48,6 +49,7 @@ set(${TARGET_NAME}_HEADERS
     TestScenes/SetPositionTest.h
     TestScenes/Game_pendulum.h
     TestScenes/SceneChanger.h
+    TestScenes/WeldTest.h
 
     Scenery/GameScene.h
     Scenery/MenuScene.h
@@ -59,6 +61,7 @@ set(${TARGET_NAME}_HEADERS
     Utils/CompositeTransition.h
     Utils/DrawDebugStuff.h
     Utils/HomogeneousTransformation.h
+    Utils/PhysicsMathUtilities.h
     Utils/PhysicsStructs.h
     Utils/RenderEffect.h
     Utils/RopeUtilities.h
@@ -92,6 +95,7 @@ set(${TARGET_NAME}_SOURCES
     TestScenes/SetPositionTest.cpp
     TestScenes/PivotTest.cpp
     TestScenes/Game_pendulum.cpp
+    TestScenes/WeldTest.cpp
 
     Scenery/GameScene.cpp
     Scenery/MenuScene.cpp
@@ -135,15 +139,15 @@ add_executable(${TARGET_NAME}
 )
 
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    #target_compile_options(${TARGET_NAME}
-    #    PRIVATE "-O3")
     target_compile_options(${TARGET_NAME}
-        PRIVATE "-Wall" "-Wextra" "-fsanitize=address" "-fsanitize=undefined")
-    target_link_options(${TARGET_NAME}
-        PRIVATE "-fsanitize=address" "-fsanitize=undefined")
+        PRIVATE "-O3")
+    #target_compile_options(${TARGET_NAME}
+    #    PRIVATE "-Wall" "-Wextra" "-fsanitize=address" "-fsanitize=undefined")
+    #target_link_options(${TARGET_NAME}
+    #    PRIVATE "-fsanitize=address" "-fsanitize=undefined")
 endif()
 
-#target_compile_definitions(${TARGET_NAME} PRIVATE KIMBO_DEBUG)
+target_compile_definitions(${TARGET_NAME} PRIVATE KIMBO_DEBUG)
 
 target_include_directories(${TARGET_NAME}
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}

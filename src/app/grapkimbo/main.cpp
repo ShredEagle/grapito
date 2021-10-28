@@ -27,8 +27,7 @@ using namespace ad;
 using namespace ad::grapito;
 
 
-
-int main(int argc, const char * argv[])
+int main(int /*argc*/, const char ** /*argv*/)
 {
     try
     {
@@ -53,7 +52,7 @@ int main(int argc, const char * argv[])
                                                     resources)};
 
         // The next state in the stack is the main menu
-        topLevelFlow.putNext(setupMainMenu(application.getAppInterface())); 
+        topLevelFlow.putNext(setupMainMenu(application.getAppInterface()));
 
         GrapitoTimer timer{static_cast<float>(glfwGetTime())};
         GameInputState inputState;

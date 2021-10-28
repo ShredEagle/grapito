@@ -1,16 +1,23 @@
 #pragma once
-#include "Components/AccelAndSpeed.h"
-#include "Components/Position.h"
-#include "Utils/CollisionBox.h"
-#include "commons.h"
-#include "math/Angle.h"
-#include "math/Matrix.h"
+
+#include "../commons.h"
+
+#include "../Components/AccelAndSpeed.h"
+#include "../Components/Position.h"
+
+#include "../Utils/CollisionBox.h"
+
+#include <math/Angle.h>
+#include <math/Matrix.h>
+
 namespace ad {
 namespace grapito {
 
+struct WeldJoint;
+struct PivotJoint;
 struct Body;
 struct CollisionPair;
-struct PivotJointConstraint;
+struct JointConstraint;
 
 enum ShapeType
 {
@@ -147,11 +154,16 @@ class ConstructedBody
     BodyPosition * bodyPos;
     CollisionBox * box;
 
-
-    //non owning pointer to Physics system vector
-    std::list<CollisionPair>::iterator collisionPairIt;
+    //The list of contacts the body is involved in
+    //This is used for impulse persistence
     std::list<CollisionPair *> contactList;
-    std::list<std::list<PivotJointConstraint>::iterator> pivotJointItList;
+
+    //Those iterator are used for cleanup
+    std::list<CollisionPair>::iterator collisionPairIt;
+    // this should probably use some sort of polymorphism
+    // for this we would need the list of joint to be pointer based
+    // this has some issue vis-a-vis the memory coherence of the physics system
+    std::list<std::list<std::unique_ptr<JointConstraint>>::iterator> jointItList;
 
     BodyType bodyType;
     ShapeType shapeType;
@@ -188,24 +200,31 @@ struct VelocityConstraint
     Velocity * velocityA;
     BodyPosition * bodyPosA;
     Vec2 rA;
+    Vec2 angVecA;
     float crossA;
+    float crossASquared;
     float crossATangent;
+    float crossATangentSquared;
     float invMassA;
     float invMoiA;
-    float tangentSpeedA;
     math::Radian<float> angleBaseA;
 
     //non owning pointer to Physics system vector
     Velocity * velocityB;
     BodyPosition * bodyPosB;
     Vec2 rB;
+    Vec2 angVecB;
     float crossB;
+    float crossBSquared;
     float crossBTangent;
+    float crossBTangentSquared;
     float invMassB;
     float invMoiB;
-    float tangentSpeedB;
     math::Radian<float> angleBaseB;
 
+    float totalMass;
+    float totalNormalAngularMass;
+    float totalTangentAngularMass;
     float friction;
     bool noMaxFriction;
     float restitution;
@@ -230,33 +249,45 @@ struct PlayerEnvironmentConstraint
     ConstructedBody * cPlayer;
 };
 
-struct PivotJointConstraint
+class JointConstraint
 {
-    explicit PivotJointConstraint(
-            float aInvMassA,
-            float aInvMoiA,
-            Position2 aLocalAnchorA,
-
-            float aInvMassB,
-            float aInvMoiB,
-            Position2 aLocalAnchorB,
-
-            ConstructedBody * aCbA,
-            ConstructedBody * aCbB,
-
+    public:
+    JointConstraint(
+            ConstructedBody * aBodyA,
+            ConstructedBody * aBodyB,
             aunteater::weak_entity aEntity
             ) :
-        invMassA{aInvMassA},
-        invMoiA{aInvMoiA},
-        localAnchorA{aLocalAnchorA},
-        invMassB{aInvMassB},
-        invMoiB{aInvMoiB},
-        localAnchorB{aLocalAnchorB},
-        cbA{aCbA},
-        cbB{aCbB},
-        pivotJointEntity{aEntity}
+        cbA{aBodyA},
+        cbB{aBodyB},
+        jointEntity{aEntity}
     {}
+    virtual ~JointConstraint() = default;
 
+    virtual void InitVelocityConstraint(const GrapitoTimer & timer) = 0;
+    virtual void SolveVelocityConstraint() = 0;
+    virtual bool SolvePositionConstraint() = 0;
+
+    ConstructedBody * cbA;
+    ConstructedBody * cbB;
+
+    aunteater::weak_entity jointEntity;
+};
+
+class WeldJointConstraint : public JointConstraint
+{
+    public:
+    WeldJointConstraint(
+            const WeldJoint & aWeldJoint,
+            ConstructedBody * aBodyA,
+            ConstructedBody * aBodyB,
+            aunteater::weak_entity aEntity
+            );
+
+    void InitVelocityConstraint(const GrapitoTimer & timer) override;
+    void SolveVelocityConstraint() override;
+    bool SolvePositionConstraint() override;
+
+    protected:
     Velocity * velocityA;
     BodyPosition * bodyPosA;
     float invMassA;
@@ -273,14 +304,49 @@ struct PivotJointConstraint
     Vec2 rB = Vec2::Zero();
     Vec2 angVecB = Vec2::Zero();
 
-    Vec2 impulse = Vec2::Zero();
+    Vec3 mImpulse = Vec3::Zero();
+    math::Matrix<3, 3, float> mMassMatrix = math::Matrix<3, 3, float>::Zero();
+    float mGamma;
+    float mBias;
+    math::Radian<float> mRefAngle;
+    float mStiffness;
+    float mDamping;
+};
+
+class PivotJointConstraint : public JointConstraint
+{
+    public:
+    PivotJointConstraint(
+            const PivotJoint & aPivotJoint,
+            ConstructedBody * aBodyA,
+            ConstructedBody * aBodyB,
+            aunteater::weak_entity aEntity
+            );
+
+    void InitVelocityConstraint(const GrapitoTimer & timer) override;
+    void SolveVelocityConstraint() override;
+    bool SolvePositionConstraint() override;
+
+    protected:
+    Velocity * velocityA;
+    BodyPosition * bodyPosA;
+    float invMassA;
+    float invMoiA;
+    Position2 localAnchorA;
+    Vec2 rA = Vec2::Zero();
+    Vec2 angVecA = Vec2::Zero();
+
+    Velocity * velocityB;
+    BodyPosition * bodyPosB;
+    float invMassB;
+    float invMoiB;
+    Position2 localAnchorB;
+    Vec2 rB = Vec2::Zero();
+    Vec2 angVecB = Vec2::Zero();
+
+    Vec2 mImpulse = Vec2::Zero();
     float axialMass;
     math::Matrix<2, 2, float> k = math::Matrix<2, 2, float>::Zero();
-
-    ConstructedBody * cbA;
-    ConstructedBody * cbB;
-
-    aunteater::weak_entity pivotJointEntity;
 };
 }
 }
