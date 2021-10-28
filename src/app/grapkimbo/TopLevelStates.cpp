@@ -59,7 +59,7 @@ std::shared_ptr<SplashScene> setupSplashScreen(math::Size<2, int> aResolution,
 }
 
 
-std::shared_ptr<MenuScene> setupMainMenu(std::shared_ptr<graphics::AppInterface> & aAppInterface)
+std::shared_ptr<MenuScene> setupMainMenu(std::shared_ptr<graphics::AppInterface> aAppInterface)
 {
     return std::make_shared<MenuScene>(
         Menu {
@@ -78,7 +78,7 @@ std::shared_ptr<MenuScene> setupMainMenu(std::shared_ptr<graphics::AppInterface>
                 },
             },
         },
-        aAppInterface);
+        std::move(aAppInterface));
 }
 
 std::shared_ptr<MenuScene> setupPauseMenu(

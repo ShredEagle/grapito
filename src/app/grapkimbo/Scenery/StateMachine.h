@@ -191,6 +191,8 @@ inline UpdateStatus StateMachine::update(GrapitoTimer & aTimer, const GameInputS
         // Fallthrough if the transition was not present
         case Phase::Updating:
             return mActiveState.first->update(aTimer, aInputs, *this);
+        default:
+            throw std::logic_error{"Inconstitent machine state."};
     }
 }
 

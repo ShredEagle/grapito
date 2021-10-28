@@ -19,7 +19,7 @@ std::shared_ptr<SplashScene> setupSplashScreen(math::Size<2, int> aResolution,
                                                const resource::ResourceManager & aResources);
 
 
-std::shared_ptr<MenuScene> setupMainMenu(std::shared_ptr<graphics::AppInterface> & aAppInterface);
+std::shared_ptr<MenuScene> setupMainMenu(std::shared_ptr<graphics::AppInterface> aAppInterface);
 
 
 std::shared_ptr<MenuScene> setupPauseMenu(
