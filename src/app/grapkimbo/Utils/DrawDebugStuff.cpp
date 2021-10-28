@@ -71,12 +71,10 @@ namespace ad
 
             for (auto line : mLines)
             {
-                mTrivialLineStrip.addLine(
-                    {
+                mTrivialLineStrip.addLine({
                     {line.origin, line.color},
                     {line.end, line.color},
-                    }
-                );
+                });
             }
 
             for (auto point : mPoints)

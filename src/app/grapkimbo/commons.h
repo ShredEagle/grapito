@@ -1,18 +1,24 @@
 #pragma once
 
+
 #include <aunteater/Timer.h>
+
+#include <math/Rectangle.h>
 #include <math/Vector.h>
 
-namespace ad
-{
-namespace grapito
-{
 
-typedef math::Vec<2, float> Vec2;
-typedef math::Vec<3, float> Vec3;
-typedef math::Position<2, float> Position2;
-typedef math::Position<3, double> Position3;
+namespace ad {
+namespace grapito {
+
+
+using Vec2 = math::Vec<2, float>;
+using Vec3 = math::Vec<3, float>;
+using Position2 = math::Position<2, float>;
+using Position3 = math::Position<3, float>;
+using Rectangle = math::Rectangle<float>;
+
 using GrapitoTimer = aunteater::Timer_base<float>;
+
 
 }
 }

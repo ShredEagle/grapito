@@ -53,7 +53,7 @@ void createSetPositionTest(Position2 pos, float angle, Position2 localPoint, Pos
 SetPositionTest::SetPositionTest(graphics::ApplicationGlfw & aApplication, DebugUI & aUI) :
     mUI{aUI}
 {
-    mSystemManager.add<Render>(aApplication); 
+    mSystemManager.add<Render>(aApplication.getAppInterface());  
 
     mEntityManager.addEntity(makeCamera({10.f, 2.f}));
 

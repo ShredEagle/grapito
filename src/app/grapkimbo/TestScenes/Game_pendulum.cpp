@@ -44,7 +44,7 @@ Game_pendulum::Game_pendulum(graphics::ApplicationGlfw & aApplication, DebugUI &
     mSystemManager.add<Physics>();
 
     mSystemManager.add<CameraGuidedControl>();
-    mSystemManager.add<Render>(aApplication); 
+    mSystemManager.add<Render>(aApplication.getAppInterface());
 
     // Camera
     aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera());
@@ -94,7 +94,7 @@ bool Game_pendulum::update(const GrapitoTimer & aTimer, const GameInputState & a
         log(mUpdater);
         //mUI.broadcast(timings);
     }
-    else 
+    else
     {
         mSystemManager.pause(true);
     }

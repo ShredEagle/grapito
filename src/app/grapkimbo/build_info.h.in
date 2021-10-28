@@ -1,0 +1,14 @@
+#pragma once
+
+@AUTOGEN_DISCLAIMER@
+
+namespace ad {
+namespace grapito {
+
+
+// Usefull for development builds
+constexpr const char * gRepositoryRoot = "@REPO_FOLDER@";
+
+
+} // namespace grapito
+} // namespace ad

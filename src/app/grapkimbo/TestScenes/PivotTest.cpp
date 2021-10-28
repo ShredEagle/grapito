@@ -79,7 +79,7 @@ PivotTest::PivotTest(graphics::ApplicationGlfw & aApplication, DebugUI & aUI) :
     mSystemManager.add<Control>();
     mSystemManager.add<AccelSolver>();
     mSystemManager.add<Physics>();
-    mSystemManager.add<Render>(aApplication); 
+    mSystemManager.add<Render>(aApplication.getAppInterface());  
 
     mEntityManager.addEntity(makeCamera({10.f, 2.f}));
 
