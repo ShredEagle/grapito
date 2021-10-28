@@ -4,6 +4,8 @@
 
 #include "Scenery/RopeGame.h"
 
+#include "Utils/CompositeTransition.h"
+
 #include <math/Interpolation.h>
 
 
@@ -20,8 +22,17 @@ std::shared_ptr<SplashScene> setupSplashScreen(math::Size<2, int> aResolution,
             graphics::Image{aResources.pathFor("images/splashes/splash.bmp").string()},
             splash::gDuration,
         });
+
+    CompositeTransition<GLfloat, GrapitoTimer::Value_t> spriteOpacity(0.f);
+    spriteOpacity.pushConstant(splash::gHiddenDuration)
+                 .pushInterpolation<math::ease::Linear>(1.f, splash::gLinearDuration)
+                 .pushConstant(splash::gConstantDuration)
+                 .pushInterpolation<math::ease::Linear>(0.f, splash::gLinearDuration)
+    // Useless: the behaviour is programmed to be "constant at last value anyway
+    //             .pushConstant(splash::gHiddenDuration); // T
+                 ;
     scene->splashes.back().mSpriteOpacity = 
-        [interpolation = math::makeInterpolation<math::ease::Linear>(0.f, 1.f, splash::gDuration)]
+        [interpolation = spriteOpacity]
             (auto aDelta) mutable
             {
                 return interpolation.advance(aDelta);
@@ -38,7 +49,7 @@ std::shared_ptr<SplashScene> setupSplashScreen(math::Size<2, int> aResolution,
                 {
                     return interpolation.advance(aDelta);
                 },
-            [interpolation = math::makeInterpolation<math::ease::Linear>(1.f, 0.f, splash::gDuration)]
+            [interpolation = spriteOpacity]
                 (auto aDelta) mutable
                 {
                     return interpolation.advance(aDelta);

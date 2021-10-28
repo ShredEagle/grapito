@@ -8,6 +8,8 @@
 #include <glad/glad.h>
 
 namespace ad {
+
+
 namespace anchor
 {
     constexpr math::sdr::Rgb gColor{200, 200, 200};
@@ -25,6 +27,30 @@ namespace debug
 {
     constexpr float gStepTimeIncrement = 0.016f;
 };
+
+
+namespace game
+{
+    constexpr math::hdr::Rgb gClearColor{0.1, 0.2, 0.3};
+} // namespace game
+
+
+namespace menu
+{
+    constexpr int gBlurringPasses = 6;
+    constexpr float gViewedHeight = 1000.f;
+    constexpr math::Size<2, GLfloat> gButtonSize{320.f, 80.f};
+    constexpr float gButtonSpacing = 100.f;
+    constexpr math::sdr::Rgb gButtonColor{ 120, 100, 110 };
+    constexpr math::sdr::Rgb gSelectedColor{ 190, 190, 80 };
+    constexpr float gTransitionDuration = 0.275f;
+}
+
+
+namespace physic
+{
+    constexpr float linearSlop = 0.0001f;
+}
 
 
 namespace player
@@ -58,28 +84,13 @@ namespace render
 } // namespace render
 
 
-namespace game
+namespace rope
 {
-    constexpr math::hdr::Rgb gClearColor{0.1, 0.2, 0.3};
-} // namespace game
-
-
-namespace splash
-{
-    constexpr int gVerticalResolution = 800;
-    constexpr float gDuration = 1.5f;
-} // namespace splash
-
-namespace menu
-{
-    constexpr int gBlurringPasses = 6;
-    constexpr float gViewedHeight = 1000.f;
-    constexpr math::Size<2, GLfloat> gButtonSize{320.f, 80.f};
-    constexpr float gButtonSpacing = 100.f;
-    constexpr math::sdr::Rgb gButtonColor{ 120, 100, 110 };
-    constexpr math::sdr::Rgb gSelectedColor{ 190, 190, 80 };
-    constexpr float gTransitionDuration = 0.275f;
+    constexpr GLfloat ropeWidth = .2f;
+    constexpr GLfloat ropeHalfwidth = ropeWidth / 2 ;
+    constexpr GLfloat curveTension = 0.f; // I.e. Catmull Rom
 }
+
 
 namespace sight
 {
@@ -89,17 +100,15 @@ namespace sight
     constexpr float gBaseOutlineOffset = 0.25f;
 } // namespace sight
 
-namespace physic
-{
-    constexpr float linearSlop = 0.0001f;
-}
 
-namespace rope
+namespace splash
 {
-    constexpr GLfloat ropeWidth = .2f;
-    constexpr GLfloat ropeHalfwidth = ropeWidth / 2 ;
-    constexpr GLfloat curveTension = 0.f; // I.e. Catmull Rom
-}
+    constexpr int gVerticalResolution = 800;
+    constexpr float gHiddenDuration = 0.2f;
+    constexpr float gLinearDuration = 0.6f;
+    constexpr float gConstantDuration = 0.8f;
+    constexpr float gDuration = 2 * (gHiddenDuration + gLinearDuration) + gConstantDuration;
+} // namespace splash
 
 
 } // namespace ad

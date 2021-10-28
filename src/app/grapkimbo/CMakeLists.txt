@@ -56,6 +56,7 @@ set(${TARGET_NAME}_HEADERS
     Scenery/StateMachine.h
 
     Utils/CollisionBox.h
+    Utils/CompositeTransition.h
     Utils/DrawDebugStuff.h
     Utils/HomogeneousTransformation.h
     Utils/PhysicsStructs.h
