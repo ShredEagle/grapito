@@ -69,15 +69,15 @@ public:
     // Note: StateMachine argument is made a const reference, to intentionally prevent
     // transition from altering the sequence of states.
     virtual std::pair<TransitionProgress, UpdateStatus> enter(
-        GrapitoTimer & aTimer,
-        const GameInputState & aInputs,
-        const StateMachine & aStateMachine)
+        GrapitoTimer &,
+        const GameInputState &,
+        const StateMachine &)
     { return {TransitionProgress::None, UpdateStatus::KeepFrame}; }
 
     virtual std::pair<TransitionProgress, UpdateStatus> exit(
-        GrapitoTimer & aTimer,
-        const GameInputState & aInputs,
-        const StateMachine & aStateMachine)
+        GrapitoTimer &,
+        const GameInputState &,
+        const StateMachine &)
     { return {TransitionProgress::None, UpdateStatus::KeepFrame}; }
 
     // Provided to allow setup of the transition phases

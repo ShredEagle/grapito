@@ -59,21 +59,21 @@ public:
 
     std::pair<TransitionProgress, UpdateStatus> enter(
         GrapitoTimer & aTimer,
-        const GameInputState & aInputs,
-        const StateMachine & aStateMachine) override
+        const GameInputState &,
+        const StateMachine &) override
     { return scrollMenu(aTimer); }
 
     std::pair<TransitionProgress, UpdateStatus> exit(
         GrapitoTimer & aTimer,
-        const GameInputState & aInputs,
-        const StateMachine & aStateMachine) override
+        const GameInputState &,
+        const StateMachine &) override
     { return scrollMenu(aTimer); }
 
     void beforeEnter() override;
     void beforeExit() override;
 
 private:
-    std::pair<TransitionProgress, UpdateStatus> MenuScene::scrollMenu(GrapitoTimer & aTimer);
+    std::pair<TransitionProgress, UpdateStatus> scrollMenu(GrapitoTimer & aTimer);
     void renderMenu();
 
     Menu mMenu;
@@ -85,7 +85,10 @@ private:
     std::shared_ptr<GameScene> mOptionalGameScene; 
     RenderEffect mRenderEffect;
     graphics::TrivialShaping mShaping;
-    math::Interpolation<GLfloat, GrapitoTimer::Value_t, math::ease::SmoothStep<GrapitoTimer::Value_t>> mMenuXPosition;
+    math::Interpolation<
+        GLfloat,
+        GrapitoTimer::Value_t,
+        math::ease::SmoothStep<GrapitoTimer::Value_t>> mMenuXPosition;
 }; 
 
 
