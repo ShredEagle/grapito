@@ -42,15 +42,15 @@ UpdateStatus MenuScene::update(
         const GameInputState & aInputs,
         StateMachine & aStateMachine)
 {
-    if (aInputs.get(Controller::Keyboard)[Command::Up].positiveEdge())
+    if (aInputs.get(Controller::KeyboardMouse)[Command::Up].positiveEdge())
     {
         mMenu.mSelected = std::min(mMenu.mSelected - 1, mMenu.size() - 1);
     }
-    else if (aInputs.get(Controller::Keyboard)[Command::Down].positiveEdge())
+    else if (aInputs.get(Controller::KeyboardMouse)[Command::Down].positiveEdge())
     {
         mMenu.mSelected = (mMenu.mSelected + 1) % mMenu.size();
     }
-    else if (aInputs.get(Controller::Keyboard)[Command::Start].positiveEdge())
+    else if (aInputs.get(Controller::KeyboardMouse)[Command::Start].positiveEdge())
     {
         mMenu.selected().mCallback(aStateMachine, mAppInterface);
         // When the menu is poping itself, the OpenGL is issuing an error when return SwapBuffers:

@@ -17,7 +17,8 @@ struct RopeCreator : public aunteater::Component<RopeCreator>
     {}
 
     std::vector<aunteater::weak_entity> mRopeSegments;
-    aunteater::weak_entity mTargetEntity;
+    std::vector<aunteater::weak_entity> mPivotJoints;
+    aunteater::weak_entity mTargetEntity = nullptr;
 };
 
 

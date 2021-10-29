@@ -21,7 +21,7 @@ UpdateStatus GameScene::update(
     const GameInputState & aInputs,
     StateMachine & aStateMachine)
 {
-    InputState gamePause = aInputs.get(Controller::Keyboard)[Command::Start];
+    InputState gamePause = aInputs.get(Controller::KeyboardMouse)[Command::Start];
     if (gamePause.positiveEdge())
     {
         aStateMachine.pushState(setupPauseMenu(mAppInterface, shared_from_this()));
@@ -31,8 +31,8 @@ UpdateStatus GameScene::update(
         return UpdateStatus::KeepFrame;
     }
 
-    InputState debugPause = aInputs.get(Controller::Keyboard)[Command::Pause];
-    InputState debugStep  = aInputs.get(Controller::Keyboard)[Command::Step];
+    InputState debugPause = aInputs.get(Controller::KeyboardMouse)[Command::Pause];
+    InputState debugStep  = aInputs.get(Controller::KeyboardMouse)[Command::Step];
 
     if (debugPause.positiveEdge())
     {

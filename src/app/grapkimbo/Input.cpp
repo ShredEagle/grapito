@@ -98,6 +98,15 @@ void readJoystick(int aGlfwJoystickId, const GamepadInputConfig & aConfig, Contr
     }
 }
 
+void readMouse(ControllerInputState & aState, graphics::ApplicationGlfw & aApplication)
+{
+    float xPos, yPos;
+    aApplication.getMousePos(xPos, yPos);
+
+    aState[MouseXPos].state = xPos;
+    aState[MouseYPos].state = yPos;
+}
+
 
 int toGlfwJoystickId(Controller aController)
 {
@@ -108,7 +117,7 @@ int toGlfwJoystickId(Controller aController)
 
 constexpr bool isGamepad(Controller aController)
 {
-    return aController != Controller::Keyboard;
+    return aController != Controller::KeyboardMouse;
 }
 
 
@@ -122,8 +131,9 @@ bool isGamepadPresent(Controller aController)
 void GameInputState::readAll(graphics::ApplicationGlfw & aApplication)
 {
     readKeyboard(gKeyboardConfig,
-                 controllerState[static_cast<std::size_t>(Controller::Keyboard)],
+                 controllerState[static_cast<std::size_t>(Controller::KeyboardMouse)],
                  aApplication);
+    readMouse(controllerState[static_cast<size_t>(Controller::KeyboardMouse)], aApplication);
 
     for (Controller controller = Controller::Gamepad_0;
          controller != Controller::End;
@@ -182,6 +192,24 @@ math::Vec<2, float> GameInputState::asDirection(Controller aController,
     ControllerInputState input = get(aController);
     math::Vec<2, float> candidate{input[aHorizontalAxis], input[aVerticalAxis]};
     return candidate.getNorm() > aDeadZone ? candidate : math::Vec<2, float>::Zero();
+}
+
+math::Vec<2, float> GameInputState::asDirection(Controller aController,
+    Command aHorizontalAxis,
+    Command aVerticalAxis,
+    float aHorizontalDeadZone,
+    float aVerticalDeadZone) const
+{
+    if (!isGamepad(aController))
+    {
+        return math::Vec<2, float>::Zero();
+    }
+
+    ControllerInputState input = get(aController);
+    math::Vec<2, float> candidate{ input[aHorizontalAxis], input[aVerticalAxis] };
+    candidate.x() = std::abs(candidate.x()) > aHorizontalDeadZone ? candidate.x() : 0.f;
+    candidate.y() = std::abs(candidate.y()) > aVerticalDeadZone ? candidate.y() : 0.f;
+    return candidate;
 }
 
 } // namespace grapito

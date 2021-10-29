@@ -1,13 +1,14 @@
 #pragma once
 
 #include "Game.h"
-#include "TestScenes/Game_pendulum.h"
-#include "TestScenes/CollisionTest.h"
-#include "TestScenes/FrictionTest.h"
-#include "TestScenes/PivotTest.h"
-#include "TestScenes/WeldTest.h"
-#include "TestScenes/SimpleCollisionTest.h"
-#include "TestScenes/SetPositionTest.h"
+#include "Game_pendulum.h"
+#include "CollisionTest.h"
+#include "DistanceTest.h"
+#include "FrictionTest.h"
+#include "PivotTest.h"
+#include "WeldTest.h"
+#include "SimpleCollisionTest.h"
+#include "SetPositionTest.h"
 
 #include <aunteater/EntityManager.h>
 
@@ -21,6 +22,7 @@ static std::unique_ptr<Game> currentGame;
 enum GameList
 {
     CollisionTest,
+    DistanceTest,
     GamePendulum,
     FrictionTest,
     SimpleCollisionTest,
@@ -46,6 +48,9 @@ static void ChangeScene(GameList aGameType, graphics::ApplicationGlfw & aApplica
     switch (aGameType) {
     case GameList::CollisionTest:
         currentGame = std::make_unique<class CollisionTest>(aApplication, aUI);
+        break;
+    case GameList::DistanceTest:
+        currentGame = std::make_unique<class DistanceTest>(aApplication, aUI);
         break;
     case GameList::GamePendulum:
         currentGame = std::make_unique<Game_pendulum>(aApplication, aUI);

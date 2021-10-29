@@ -14,7 +14,7 @@ AccelSolver::AccelSolver(aunteater::EntityManager & aEntityManager) :
     mRotationed(aEntityManager)
 {}
 
-void AccelSolver::update(const GrapitoTimer aTimer, const GameInputState & aInputState)
+void AccelSolver::update(const GrapitoTimer aTimer, const GameInputState &)
 {
     // For the accel solver we will use a derive methode
     // from velocity verlet. It assumes a constant acceleration

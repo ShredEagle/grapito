@@ -21,12 +21,15 @@ set(${TARGET_NAME}_HEADERS
     Components/CameraGuide.h
     Components/CameraTag.h
     Components/Controllable.h
+    Components/DelayDeletion.h
+    Components/DistanceJoint.h
     Components/GrappleControl.h
     Components/Mass.h
     Components/PivotJoint.h
     Components/PlayerData.h
     Components/Position.h
     Components/VisualOutline.h
+    Components/VisualPolygon.h
     Components/VisualRectangle.h
     Components/Body.h
     Components/AccelAndSpeed.h
@@ -35,6 +38,9 @@ set(${TARGET_NAME}_HEADERS
 
     Systems/CameraGuidedControl.h
     Systems/Control.h
+    Systems/DelayDeleter.h
+    Systems/GrappleCleanup.h
+    Systems/GrappleJointCreator.h
     Systems/Gravity.h
     Systems/LevelGeneration.h
     Systems/Render.h
@@ -43,6 +49,7 @@ set(${TARGET_NAME}_HEADERS
     Systems/RopeCreation.h
 
     TestScenes/CollisionTest.h
+    TestScenes/DistanceTest.h
     TestScenes/FrictionTest.h
     TestScenes/PivotTest.h
     TestScenes/SimpleCollisionTest.h
@@ -82,7 +89,10 @@ set(${TARGET_NAME}_SOURCES
 
     Systems/CameraGuidedControl.cpp
     Systems/Control.cpp
+    Systems/DelayDeleter.cpp
     Systems/Gravity.cpp
+    Systems/GrappleCleanup.cpp
+    Systems/GrappleJointCreator.cpp
     Systems/LevelGeneration.cpp
     Systems/Render.cpp
     Systems/AccelSolver.cpp
@@ -90,6 +100,7 @@ set(${TARGET_NAME}_SOURCES
     Systems/RopeCreation.cpp
 
     TestScenes/CollisionTest.cpp
+    TestScenes/DistanceTest.cpp
     TestScenes/FrictionTest.cpp
     TestScenes/SimpleCollisionTest.cpp
     TestScenes/SetPositionTest.cpp
@@ -139,12 +150,12 @@ add_executable(${TARGET_NAME}
 )
 
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    target_compile_options(${TARGET_NAME}
-        PRIVATE "-O3")
     #target_compile_options(${TARGET_NAME}
-    #    PRIVATE "-Wall" "-Wextra" "-fsanitize=address" "-fsanitize=undefined")
-    #target_link_options(${TARGET_NAME}
-    #    PRIVATE "-fsanitize=address" "-fsanitize=undefined")
+    #    PRIVATE "-O3")
+    target_compile_options(${TARGET_NAME}
+        PRIVATE "-Wall" "-Wextra" "-fsanitize=address" "-fsanitize=undefined")
+    target_link_options(${TARGET_NAME}
+        PRIVATE "-fsanitize=address" "-fsanitize=undefined")
 endif()
 
 target_compile_definitions(${TARGET_NAME} PRIVATE KIMBO_DEBUG)

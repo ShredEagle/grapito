@@ -57,6 +57,10 @@ static void drawImGui(graphics::ApplicationGlfw & aApplication, DebugUI & aUI, I
             {
                 ChangeScene(GameList::CollisionTest, aApplication, aUI);
             }
+            if(ImGui::MenuItem("Distance test"))
+            {
+                ChangeScene(GameList::DistanceTest, aApplication, aUI);
+            }
             if(ImGui::MenuItem("FrictionTest"))
             {
                 ChangeScene(GameList::FrictionTest, aApplication, aUI);
@@ -150,6 +154,7 @@ static void drawImGui(graphics::ApplicationGlfw & aApplication, DebugUI & aUI, I
         SliderFloat("Player air speed", &player::gAirSpeed, 30., 60.);
         SliderInt("Player air accel frames", &player::gAirNumberOfAccelFrame, 2, 15);
         SliderInt("Player air slow down frames", &player::gAirNumberOfSlowFrame, 2, 15);
+        SliderFloat("Player max air fall speed", &player::gAirMaxFallSpeed, -100.f, -30.f);
 
         Text("Jump tuning values");
         SliderFloat("Player impulse strength", &player::gJumpImpulse, 10., 60.);
@@ -158,6 +163,9 @@ static void drawImGui(graphics::ApplicationGlfw & aApplication, DebugUI & aUI, I
 
         Text("Wall tuning values");
         SliderFloat("Wall friction", &player::gWallFriction, 1.f, 20.f);
+
+        Text("Grapple tuning values");
+        SliderFloat("Rope distance joint factor", &player::gRopeDistanceJointFactor, 1.1f, 1.3f);
 
         End();
 

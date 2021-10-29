@@ -15,9 +15,10 @@ namespace grapito {
 
 struct WeldJoint;
 struct PivotJoint;
+struct DistanceJoint;
 struct Body;
 struct CollisionPair;
-struct JointConstraint;
+class JointConstraint;
 
 enum ShapeType
 {
@@ -31,6 +32,7 @@ enum CollisionType
     CollisionType_Moving_Env,
     CollisionType_Floor,
     CollisionType_Static_Env,
+    CollisionType_NoCollisionType,
     CollisionType_count,
 };
 
@@ -59,8 +61,8 @@ struct ContactFeature
     uint8_t indexIncident; 
 
     Position2 contactPoint = Position2::Zero();
-    float normalImpulse;
-    float tangentImpulse;
+    float normalImpulse = 0.f;
+    float tangentImpulse = 0.f;
     friend std::ostream &operator<<(std::ostream & os, const ContactFeature & cm);
 };
 
@@ -147,7 +149,6 @@ class ConstructedBody
     float invMoi;
 
     float friction;
-    bool noMaxFriction;
 
     //non owning pointer to Physics system vector
     Velocity * velocity;
@@ -226,7 +227,6 @@ struct VelocityConstraint
     float totalNormalAngularMass;
     float totalTangentAngularMass;
     float friction;
-    bool noMaxFriction;
     float restitution;
     Vec2 normal; 
     Vec2 tangent;
@@ -263,8 +263,8 @@ class JointConstraint
     {}
     virtual ~JointConstraint() = default;
 
-    virtual void InitVelocityConstraint(const GrapitoTimer & timer) = 0;
-    virtual void SolveVelocityConstraint() = 0;
+    virtual void InitVelocityConstraint(const GrapitoTimer & aTimer) = 0;
+    virtual void SolveVelocityConstraint(const GrapitoTimer & aTimer) = 0;
     virtual bool SolvePositionConstraint() = 0;
 
     ConstructedBody * cbA;
@@ -283,8 +283,8 @@ class WeldJointConstraint : public JointConstraint
             aunteater::weak_entity aEntity
             );
 
-    void InitVelocityConstraint(const GrapitoTimer & timer) override;
-    void SolveVelocityConstraint() override;
+    void InitVelocityConstraint(const GrapitoTimer & aTimer) override;
+    void SolveVelocityConstraint(const GrapitoTimer & aTimer) override;
     bool SolvePositionConstraint() override;
 
     protected:
@@ -323,8 +323,8 @@ class PivotJointConstraint : public JointConstraint
             aunteater::weak_entity aEntity
             );
 
-    void InitVelocityConstraint(const GrapitoTimer & timer) override;
-    void SolveVelocityConstraint() override;
+    void InitVelocityConstraint(const GrapitoTimer & aTimer) override;
+    void SolveVelocityConstraint(const GrapitoTimer & aTimer) override;
     bool SolvePositionConstraint() override;
 
     protected:
@@ -347,6 +347,56 @@ class PivotJointConstraint : public JointConstraint
     Vec2 mImpulse = Vec2::Zero();
     float axialMass;
     math::Matrix<2, 2, float> k = math::Matrix<2, 2, float>::Zero();
+
+    friend std::ostream &operator<<(std::ostream & os, const VelocityConstraint & vc);
+};
+
+class DistanceJointConstraint : public JointConstraint
+{
+    public:
+    DistanceJointConstraint(
+            const DistanceJoint & aDistanceJoint,
+            ConstructedBody * aBodyA,
+            ConstructedBody * aBodyB,
+            aunteater::weak_entity aEntity
+            );
+
+    void InitVelocityConstraint(const GrapitoTimer & aTimer) override;
+    void SolveVelocityConstraint(const GrapitoTimer & aTimer) override;
+    bool SolvePositionConstraint() override;
+
+    protected:
+    Velocity * velocityA;
+    BodyPosition * bodyPosA;
+    float invMassA;
+    float invMoiA;
+    Position2 localAnchorA;
+    Vec2 rA = Vec2::Zero();
+    Vec2 angVecA = Vec2::Zero();
+
+    Velocity * velocityB;
+    BodyPosition * bodyPosB;
+    float invMassB;
+    float invMoiB;
+    Position2 localAnchorB;
+    Vec2 rB = Vec2::Zero();
+    Vec2 angVecB = Vec2::Zero();
+
+    float mStiffness = 0.f;
+    float mDamping = 0.f;
+    float mMass = 0.f;
+    float mSoftMass = 0.f;
+    float mGamma = 0.f;
+    float mBias = 0.f;
+    float mImpulse = 0.f;
+    float mLowerImpulse = 0.f;
+    float mUpperImpulse = 0.f;
+    Vec2 mBaseDiffVector = Vec2::Zero();
+    Vec2 mCurrentDirection = Vec2::Zero();
+    float mBaseLength = 0.f;
+    float mMinBaseLength = 0.f;
+    float mMaxBaseLength = 0.f;
+    float mCurrentLength = 0.f;
 };
 }
 }

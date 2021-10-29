@@ -3,6 +3,8 @@
 #include "Entities.h"
 #include "Logging.h"
 
+#include "Systems/DelayDeleter.h"
+#include "Systems/GrappleCleanup.h"
 #include "TestScenes/SceneChanger.h"
 
 #include <Components/AccelAndSpeed.h>
@@ -17,6 +19,8 @@
 #include <Systems/AccelSolver.h>
 #include <Systems/CameraGuidedControl.h>
 #include <Systems/Control.h>
+#include <Systems/DelayDeleter.h>
+#include "Systems/GrappleJointCreator.h"
 #include <Systems/Gravity.h>
 #include <Systems/LevelGeneration.h>
 #include <Systems/Render.h>
@@ -35,33 +39,54 @@ Game_pendulum::Game_pendulum(graphics::ApplicationGlfw & aApplication, DebugUI &
     mUI{aUI}
 {
 
-    mSystemManager.add<LevelGeneration>();
     mSystemManager.add<Control>();
     mSystemManager.add<Gravity>();
     mSystemManager.add<RopeCreation>();
+    mSystemManager.add<GrappleJointCreator>();
 
     mSystemManager.add<AccelSolver>();
     mSystemManager.add<Physics>();
 
     mSystemManager.add<CameraGuidedControl>();
     mSystemManager.add<Render>(aApplication.getAppInterface());
+    mSystemManager.add<GrappleCleanup>();
+    mSystemManager.add<DelayDeleter>();
 
     // Camera
     aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera());
-    // Environment anchors
-
+    //floors
+    aunteater::weak_entity polygon = mEntityManager.addEntity(
+        makeAnchor(Position2{ 5.f, 7.f }, std::vector<Position2>{
+        Position2{ 0.f, 0.f }, Position2{ 1.5f, 0.f }, Position2{ 2.5f, 0.5f },
+            Position2{ 2.75f, 2.f }, Position2{ 2.f, 3.f }, Position2{ 0.5f, 2.5f },
+            Position2{ 0.f, 1.f }
+    }));
     aunteater::weak_entity floor = mEntityManager.addEntity(
-        makeAnchor(Position2{-20.f, -4.f}, math::Size<2, float>{40.f, 2.f} ));
-
+        makeAnchor(Position2{ -20.f, -4.f }, math::Size<2, float>{40.f, 2.f}));
     aunteater::weak_entity floor2 = mEntityManager.addEntity(
-        makeAnchor(Position2{20.f, -2.f}, math::Size<2, float>{40.f, 2.f} ));
-
-    aunteater::weak_entity wall = mEntityManager.addEntity(
-        makeAnchor(Position2{-20.f, -2.f}, math::Size<2, float>{2.f, 20.f} ));
+        makeAnchor(Position2{20.f, -2.f}, math::Size<2, float>{40.f, 2.f} ));    
+    mEntityManager.addEntity(
+            makeAnchor(Position2{ 15.f, 15.f }, math::Size<2, float>{40.f, 2.f}));
+    mEntityManager.addEntity(
+        makeAnchor(Position2{ 5.f, 25.f }, std::vector<Position2>{
+            Position2{ 0.f, 0.f }, Position2{ 11.5f, 0.f }, Position2{ 12.5f, 0.5f },
+            Position2{ 12.75f, 2.f }, Position2{ 12.f, 3.f }, Position2{ 0.5f, 3.f },
+            Position2{ 0.f, 1.f }
+    }));
+    mEntityManager.addEntity(
+        makeAnchor(Position2{ -10.f, 45.f }, std::vector<Position2>{
+        Position2{ 0.f, 0.f }, Position2{ 7.f, -5.f }, Position2{ 14.f, 0.f },
+    }));
+    //wall
+    mEntityManager.addEntity(
+        makeAnchor(Position2{-20.f, -2.f}, math::Size<2, float>{2.f, 100.f} ));
+    //wall2
+    mEntityManager.addEntity(
+        makeAnchor(Position2{ 60.f, -2.f }, math::Size<2, float>{2.f, 100.f}));
 
     // Player 1
     Controller controller = isGamepadPresent(Controller::Gamepad_0) ?
-                            Controller::Gamepad_0 : Controller::Keyboard;
+                            Controller::Gamepad_0 : Controller::KeyboardMouse;
 
     mEntityManager.addEntity(
         makePlayer(0, controller, math::sdr::gCyan)
@@ -79,8 +104,8 @@ Game_pendulum::Game_pendulum(graphics::ApplicationGlfw & aApplication, DebugUI &
 bool Game_pendulum::update(const GrapitoTimer & aTimer, const GameInputState & aInputState)
 {
     //aunteater::UpdateTiming<GrapitoTimer, GameInputState> timings;
-    InputState pauseInput = aInputState.get(Controller::Keyboard)[Command::Pause];
-    InputState step = aInputState.get(Controller::Keyboard)[Command::Step];
+    InputState pauseInput = aInputState.get(Controller::KeyboardMouse)[Command::Pause];
+    InputState step = aInputState.get(Controller::KeyboardMouse)[Command::Step];
 
     if (pauseInput.positiveEdge())
     {

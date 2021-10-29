@@ -56,7 +56,7 @@ class LevelGeneration : public aunteater::System<GrapitoTimer, GameInputState>
 public:
     LevelGeneration(aunteater::EntityManager & aEntityManager);
 
-    void update(const GrapitoTimer aTimer, const GameInputState &) override;
+    void update(const GrapitoTimer, const GameInputState &) override;
 
 private:
     static std::vector<TileIndex> listConnected(TileIndex aIndex);

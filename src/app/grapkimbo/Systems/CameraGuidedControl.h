@@ -25,7 +25,7 @@ class CameraGuidedControl : public aunteater::System<GrapitoTimer, GameInputStat
 public:
     CameraGuidedControl(aunteater::EntityManager & aEntityManager);
 
-    void update(const GrapitoTimer aTimer, const GameInputState & aInputState) override;
+    void update(const GrapitoTimer aTimer, const GameInputState &) override;
 
 private:
     const aunteater::FamilyHelp<Camera> mCameras;

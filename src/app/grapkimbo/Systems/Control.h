@@ -20,7 +20,7 @@ namespace grapito
 {
 
 typedef aunteater::Archetype<Controllable, Position, AccelAndSpeed, Mass, PlayerData> CartesianControlled;
-typedef aunteater::Archetype<Controllable, PlayerData> PolarControlled;
+typedef aunteater::Archetype<Controllable, AccelAndSpeed, PlayerData> PolarControlled;
 typedef aunteater::Archetype<Controllable, AccelAndSpeed, GrappleControl, Position, PlayerData> Grappler;
 
 class Control : public aunteater::System<GrapitoTimer, GameInputState>
@@ -29,7 +29,7 @@ class Control : public aunteater::System<GrapitoTimer, GameInputState>
 public:
     Control(aunteater::EntityManager & aEntityManager);
 
-    void update(const GrapitoTimer aTimer, const GameInputState & aInputState) override;
+    void update(const GrapitoTimer, const GameInputState & aInputState) override;
 
 private:
     std::pair<Position2, double> anchor(const Position2 aPosition);
