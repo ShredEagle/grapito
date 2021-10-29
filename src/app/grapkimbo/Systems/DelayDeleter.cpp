@@ -9,7 +9,7 @@ DelayDeleter::DelayDeleter(aunteater::EntityManager & aEntityManager) :
     mDeletable(aEntityManager)
 {}
 
-void DelayDeleter::update(const GrapitoTimer aTimer, const GameInputState & aInputState)
+void DelayDeleter::update(const GrapitoTimer, const GameInputState &)
 {
     // For the accel solver we will use a derive methode
     // from velocity verlet. It assumes a constant acceleration

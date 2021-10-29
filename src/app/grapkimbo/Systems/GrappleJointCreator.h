@@ -23,7 +23,7 @@ class GrappleJointCreator : public aunteater::System<GrapitoTimer, GameInputStat
 public:
     GrappleJointCreator(aunteater::EntityManager & aEntityManager);
 
-    void update(const GrapitoTimer aTimer, const GameInputState &) override;
+    void update(const GrapitoTimer, const GameInputState &) override;
 
 private:
     void handleThrow(RopeCreator & aRopeCreator);

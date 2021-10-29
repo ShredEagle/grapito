@@ -25,7 +25,7 @@ GrappleJointCreator::GrappleJointCreator(aunteater::EntityManager & aEntityManag
     mEntityManager{aEntityManager}
 {}
 
-void GrappleJointCreator::update(const GrapitoTimer aTimer, const GameInputState &)
+void GrappleJointCreator::update(const GrapitoTimer, const GameInputState &)
 {
     for (auto & ropeCreatorEntity : mRopeCreator)
     {

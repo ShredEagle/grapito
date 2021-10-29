@@ -22,7 +22,7 @@ class DelayDeleter : public aunteater::System<GrapitoTimer, GameInputState>
 public:
     DelayDeleter(aunteater::EntityManager & aEntityManager);
 
-    void update(const GrapitoTimer aTimer, const GameInputState & aInputState) override;
+    void update(const GrapitoTimer, const GameInputState &) override;
 
 private:
     const aunteater::FamilyHelp<Deletable> mDeletable;
