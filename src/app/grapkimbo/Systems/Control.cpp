@@ -153,19 +153,20 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
         auto & [controllable, playerData] = entity;
         const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
 
-        if (inputs[Jump].positiveEdge() && playerData.controlState & ControlState_Attached)
+        if (inputs[Jump].positiveEdge() && playerData.controlState & (ControlState_Attached | ControlState_Throwing))
         {
             detachPlayerFromGrapple(entity);
             playerData.controlState &= ~ControlState_Attached;
+            playerData.controlState &= ~ControlState_Throwing;
         }
     }
 
     //
     // Grapple candidates
     //
-    for(auto & entity : mGrapplers)
+    for(auto & player : mGrapplers)
     {
-        auto & [controllable, aas, grappleControl, geometry, playerData] = entity;
+        auto & [controllable, aas, grappleControl, geometry, playerData] = player;
         const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
 
         if (controllable.controller == Controller::KeyboardMouse)
@@ -177,18 +178,18 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
             playerData.mAimVector = aInputState.asDirection(controllable.controller, LeftHorizontalAxis, LeftVerticalAxis, 0.25f).normalize();
         }
 
-        if (inputs[Grapple].positiveEdge() && !(playerData.controlState & ControlState_Attached))
+        if (inputs[Grapple].positiveEdge() && !(playerData.controlState & (ControlState_Attached | ControlState_Throwing)))
         {
-            throwGrapple(entity, mEntityManager);
+            throwGrapple(player, mEntityManager);
             playerData.controlState |= ControlState_Throwing;
         }
+
         if (inputs[Grapple].negativeEdge() && playerData.controlState & ControlState_Throwing)
         {
-            attachPlayerToGrapple(entity, mEntityManager);
+            attachPlayerToGrapple(player, mEntityManager);
             playerData.controlState &= ~ControlState_Throwing;
             playerData.controlState |= ControlState_Attached;
         }
-
     }
 }
 

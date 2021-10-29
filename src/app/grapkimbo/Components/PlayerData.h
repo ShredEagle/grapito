@@ -42,13 +42,17 @@ struct PlayerData : public aunteater::Component<PlayerData>
 
     int id;
     math::sdr::Rgb color;
+
     PlayerCollisionStateFlags state = PlayerCollisionState_Jumping;
     ControlStateFlags controlState = 0;
-    aunteater::weak_entity grapple;
-    aunteater::weak_entity grappleAttachment;
+
     int wallClingFrameCounter = 0;
+
+    aunteater::weak_entity grapple = nullptr;
+    aunteater::weak_entity grappleAttachment = nullptr;
     aunteater::weak_entity mGrappleDistanceJoint = nullptr;
     aunteater::weak_entity mGrappleWeldJoint = nullptr;
+
     Vec2 mAimVector = Vec2::Zero();
 };
 

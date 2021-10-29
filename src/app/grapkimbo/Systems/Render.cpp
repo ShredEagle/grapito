@@ -140,8 +140,8 @@ void Render::update(const GrapitoTimer, const GameInputState &)
     }
 
     mTrivialLineStrip.render();
-    mTrivialPolygon.render();
     mTrivialShaping.render();
+    mTrivialPolygon.render();
     mCurving.render(beziers);
     debugDrawer->render();
 }

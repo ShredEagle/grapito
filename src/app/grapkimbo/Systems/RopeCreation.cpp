@@ -26,7 +26,6 @@ RopeCreation::RopeCreation(aunteater::EntityManager & aEntityManager) :
 void RopeCreation::addedEntity(aunteater::LiveEntity & aEntity)
 {
     RopeCreator & ropeCreator = aEntity.get<RopeCreator>();
-    Body & body = aEntity.get<Body>();
     Position & pos = aEntity.get<Position>();
     aunteater::weak_entity player = ropeCreator.mTargetEntity;
 
@@ -99,7 +98,7 @@ void RopeCreation::handleThrow(RopeCreator & aRopeCreator)
 }
 
 
-void RopeCreation::update(const GrapitoTimer aTimer, const GameInputState &)
+void RopeCreation::update(const GrapitoTimer, const GameInputState &)
 {
     for (auto & ropeCreatorEntity : mRopeCreator)
     {

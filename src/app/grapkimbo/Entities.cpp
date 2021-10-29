@@ -130,14 +130,14 @@ aunteater::Entity createRopeSegment(Position2 origin, Position2 end)
     return rope;
 }
 
-void throwGrapple(aunteater::weak_entity aEntity, aunteater::EntityManager & aEntityManager)
+void throwGrapple(aunteater::weak_entity aPlayer, aunteater::EntityManager & aEntityManager)
 {
-    Position2 grapplePos = static_cast<Position2>(aEntity->get<Position>().position.as<math::Vec>() + aEntity->get<Body>().massCenter.as<math::Vec>() + Vec2{.5f, .5f});
-    Vec2 grappleImpulse = aEntity->get<PlayerData>().mAimVector * player::gGrappleBaseImpulse;
-    aEntity->get<PlayerData>().grapple = aEntityManager.addEntity(aunteater::Entity()
+    Position2 grapplePos = static_cast<Position2>(aPlayer->get<Position>().position.as<math::Vec>() + aPlayer->get<Body>().massCenter.as<math::Vec>() + Vec2{.5f, .5f});
+    Vec2 grappleImpulse = aPlayer->get<PlayerData>().mAimVector * player::gGrappleBaseImpulse;
+    aPlayer->get<PlayerData>().grapple = aEntityManager.addEntity(aunteater::Entity()
             .add<Position>(
                 grapplePos,
-                math::Size<2, float>{0.f, 0.f}
+                math::Size<2, float>{1.f, 1.f}
                 )
             .add<Body>(
                 rope::grappleVertices,
@@ -156,12 +156,13 @@ void throwGrapple(aunteater::weak_entity aEntity, aunteater::EntityManager & aEn
 
     // IMPORTANT: bugfix by adding RopeCreator only after Body has been added.
     // It is required that Body observers are visited
-    aEntity->get<PlayerData>().grapple->add<RopeCreator>(aEntity);
+    aPlayer->get<PlayerData>().grapple->add<RopeCreator>(aPlayer);
 }
 
 void attachPlayerToGrapple(aunteater::weak_entity aPlayer, aunteater::EntityManager & aEntityManager)
 {
     assert(aPlayer->get<PlayerData>().grapple != nullptr);
+    assert(aPlayer->get<PlayerData>().grappleAttachment == nullptr);
 
     aunteater::weak_entity & grapple = aPlayer->get<PlayerData>().grapple;
     RopeCreator & ropeCreator = grapple->get<RopeCreator>();
@@ -206,9 +207,19 @@ void attachPlayerToGrapple(aunteater::weak_entity aPlayer, aunteater::EntityMana
 
 void detachPlayerFromGrapple(aunteater::weak_entity aPlayer)
 {
+    //Cleanup grapple entity
     aPlayer->get<PlayerData>().grapple->add<DelayDeletion>(60);
     aPlayer->get<PlayerData>().grapple->get<RopeCreator>().mTargetEntity = nullptr;
-    aPlayer->get<PlayerData>().grappleAttachment->markToRemove();
+    aPlayer->get<PlayerData>().grapple = nullptr;
+
+    //Cleanup rope pivot joint to player if it exists
+    if (aPlayer->get<PlayerData>().grappleAttachment != nullptr)
+    {
+        aPlayer->get<PlayerData>().grappleAttachment->markToRemove();
+        aPlayer->get<PlayerData>().grappleAttachment = nullptr;
+    }
+
+    //Cleanup grapple attachement to static environment if it exists
     if (aPlayer->get<PlayerData>().mGrappleWeldJoint != nullptr)
     {
         aPlayer->get<PlayerData>().mGrappleWeldJoint->markToRemove();
