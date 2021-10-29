@@ -15,7 +15,7 @@ namespace grapito
 struct VisualPolygon : public aunteater::Component<VisualPolygon>
 {
     explicit VisualPolygon(std::vector<Position2> & aVertices, math::sdr::Rgb aColor = math::sdr::gWhite) :
-        mVertices{std::move(aVertices)},
+        mVertices{aVertices},
         color{aColor}
     {}
 

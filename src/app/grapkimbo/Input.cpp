@@ -190,5 +190,23 @@ math::Vec<2, float> GameInputState::asDirection(Controller aController,
     return candidate.getNorm() > aDeadZone ? candidate : math::Vec<2, float>::Zero();
 }
 
+math::Vec<2, float> GameInputState::asDirection(Controller aController,
+    Command aHorizontalAxis,
+    Command aVerticalAxis,
+    float aHorizontalDeadZone,
+    float aVerticalDeadZone) const
+{
+    if (!isGamepad(aController))
+    {
+        return math::Vec<2, float>::Zero();
+    }
+
+    ControllerInputState input = get(aController);
+    math::Vec<2, float> candidate{ input[aHorizontalAxis], input[aVerticalAxis] };
+    candidate.x() = std::abs(candidate.x()) > aHorizontalDeadZone ? candidate.x() : 0.f;
+    candidate.y() = std::abs(candidate.y()) > aVerticalDeadZone ? candidate.y() : 0.f;
+    return candidate;
+}
+
 } // namespace grapito
 } // namespace ad

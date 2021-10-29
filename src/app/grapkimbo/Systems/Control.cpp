@@ -41,7 +41,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
         }
         else
         {
-            Vec2 direction = aInputState.asDirection(controllable.controller, LeftHorizontalAxis, LeftVerticalAxis, controller::gDeadzone);
+            Vec2 direction = aInputState.asDirection(controllable.controller, LeftHorizontalAxis, LeftVerticalAxis, controller::gHorizontalDeadZone, 0.f);
             horizontalAxis = direction.x();
         }
 
@@ -135,14 +135,6 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
                 }
             }
         }
-
-        playerData.state &= ~PlayerCollisionState_Walled;
-        playerData.state &= ~PlayerCollisionState_WalledLeft;
-        playerData.state &= ~PlayerCollisionState_WalledRight;
-
-        //Reset playerData transient state
-        playerData.state |= PlayerCollisionState_Jumping;
-        playerData.state &= ~PlayerCollisionState_Grounded;
     }
 
     //
@@ -150,14 +142,20 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
     //
     for(auto & entity : mPolarControllables)
     {
-        auto & [controllable, playerData] = entity;
+        auto & [controllable, aas, playerData] = entity;
         const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
 
         if (inputs[Jump].positiveEdge() && playerData.controlState & (ControlState_Attached | ControlState_Throwing))
         {
             detachPlayerFromGrapple(entity);
+            if (playerData.state & PlayerCollisionState_Jumping)
+            {
+                aas.speed *= 1.5f;
+                aas.speed += Vec2{ 0.f, player::gJumpImpulse };
+            }
             playerData.controlState &= ~ControlState_Attached;
             playerData.controlState &= ~ControlState_Throwing;
+
         }
     }
 
@@ -175,7 +173,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
         }
         else
         {
-            playerData.mAimVector = aInputState.asDirection(controllable.controller, LeftHorizontalAxis, LeftVerticalAxis, 0.25f).normalize();
+            playerData.mAimVector = aInputState.asDirection(controllable.controller, LeftHorizontalAxis, LeftVerticalAxis, controller::gDeadzone).normalize();
         }
 
         if (inputs[Grapple].positiveEdge() && !(playerData.controlState & (ControlState_Attached | ControlState_Throwing)))
@@ -190,6 +188,18 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
             playerData.controlState &= ~ControlState_Throwing;
             playerData.controlState |= ControlState_Attached;
         }
+    }
+
+
+    for (auto& [controllable, geometry, aas, mass, playerData] : mCartesianControllables)
+    {
+        playerData.state &= ~PlayerCollisionState_Walled;
+        playerData.state &= ~PlayerCollisionState_WalledLeft;
+        playerData.state &= ~PlayerCollisionState_WalledRight;
+
+        //Reset playerData transient state
+        playerData.state |= PlayerCollisionState_Jumping;
+        playerData.state &= ~PlayerCollisionState_Grounded;
     }
 }
 

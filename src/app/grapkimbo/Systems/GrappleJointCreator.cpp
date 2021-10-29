@@ -1,6 +1,7 @@
 #include "GrappleJointCreator.h"
 
 #include "../Configuration.h"
+#include "../Entities.h"
 
 #include "../Components/Body.h"
 #include "../Components/Position.h"
@@ -77,7 +78,7 @@ void GrappleJointCreator::update(const GrapitoTimer, const GameInputState &)
                         {
                             Position2 contactPoint = collisionPair->manifold.contacts[0].contactPoint;
                             Position2 localPointPlayer = playerBody.massCenter;
-                            Position2 localPointOther = static_cast<Position2>(contactPoint - otherEntity->get<Position>().position);
+                            Position2 localPointOther = getWorldPointInLocal(otherEntity->get<Body>(), otherEntity->get<Position>(), contactPoint);
 
                             playerData.mGrappleDistanceJoint = mEntityManager.addEntity(
                                     aunteater::Entity()
@@ -131,20 +132,16 @@ void GrappleJointCreator::update(const GrapitoTimer, const GameInputState &)
                         if (collisionPair->manifold.contacts.size() > 0)
                         {
                             Position2 contactPoint = collisionPair->manifold.contacts[0].contactPoint;
-                            Position2 localPointGrapple = static_cast<Position2>(contactPoint - pos.position);
-                            Position2 localPointOther = static_cast<Position2>(contactPoint - otherEntity->get<Position>().position);
-
+                            Position2 localPointGrapple = getWorldPointInLocal(body, pos, contactPoint);
+                            Position2 localPointOther = getWorldPointInLocal(otherEntity->get<Body>(), otherEntity->get<Position>(), contactPoint);
                             playerData.mGrappleWeldJoint = mEntityManager.addEntity(
                                     aunteater::Entity()
-                                    .add<WeldJoint>(
+                                    .add<PivotJoint>(
                                         localPointGrapple,
                                         localPointOther,
-                                        15.f,
-                                        0.5f,
                                         ropeCreatorEntity,
                                         otherEntity
                                     ));
-
                             break;
                         }
                     }
@@ -156,20 +153,20 @@ void GrappleJointCreator::update(const GrapitoTimer, const GameInputState &)
                 //If we did not successfuly attached the player
                 //to the environment during the rope phase we attach the
                 //player to the environment the grapple is welded to
-                WeldJoint & weldJoint = playerData.mGrappleWeldJoint->get<WeldJoint>();
+                PivotJoint & pivotJoint = playerData.mGrappleWeldJoint->get<PivotJoint>();
                 Position2 localPointPlayer = playerBody.massCenter;
                 playerData.mGrappleDistanceJoint = mEntityManager.addEntity(
                         aunteater::Entity()
                         .add<DistanceJoint>(
                             localPointPlayer,
-                            weldJoint.localAnchorB,
+                            pivotJoint.localAnchorB,
                             15.f,
                             0.8f,
                             1.f,
                             0.5f,
                             length * player::gRopeDistanceJointFactor,
                             player,
-                            weldJoint.bodyB
+                            pivotJoint.bodyB
                         ));
             }
         }

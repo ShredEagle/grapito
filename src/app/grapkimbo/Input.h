@@ -126,6 +126,11 @@ struct GameInputState
                                     Command aHorizontalAxis,
                                     Command aVerticalAxis,
                                     float aDeadZone) const;
+    math::Vec<2, float> asDirection(Controller aController,
+                                    Command aHorizontalAxis,
+                                    Command aVerticalAxis,
+                                    float aHorizontalDeadZone,
+                                    float aVerticalDeadZone) const;
 
     const ControllerInputState & get(Controller aController) const
     { return controllerState[(std::size_t)aController]; }

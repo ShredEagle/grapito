@@ -83,7 +83,7 @@ CollisionTest::CollisionTest(graphics::ApplicationGlfw & aApplication, DebugUI &
 
     for (int i = 0; i < 6; ++i)
     {
-        for (int j = 0; j < 50; ++j)
+        for (int j = 0; j < 10; ++j)
         {
             createBox({5.f + i * 1.5f, 5.f + j * 1.5f}, {0.5f, 0.5f}, (j + i * 5) % 3, mEntityManager);
         }

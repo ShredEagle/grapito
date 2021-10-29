@@ -695,6 +695,7 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
                         
                         contact,
                     });
+                    velocityConstraints.back().debugRender();
                 }
             }
         }
@@ -808,7 +809,7 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
             Position2 onEdgePoint = constraint.bodyPosA->c + clipPoint;
 
             Position2 point = constraint.bodyPosB->c + rB;
-            float separation = (point.as<math::Vec>() - onEdgePoint.as<math::Vec>()).dot(normal) - physic::gLinearSlop * 4.;
+            float separation = (point.as<math::Vec>() - onEdgePoint.as<math::Vec>()).dot(normal) - 4.f * physic::gLinearSlop;
 
             float C = std::min(0.f, std::max(-physic::gMaxLinearCorrection, physic::gBaumgarteFactor * (separation + physic::gLinearSlop)));
 
@@ -826,7 +827,7 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
             constraint.bodyPosB->p += constraint.invMassB * impulse;
             constraint.bodyPosB->a += math::Radian<float>{constraint.invMoiB * twoDVectorCross(rB, impulse)};
 
-            jointOkay = jointOkay && separation >= -4. * physic::gLinearSlop;
+            jointOkay = jointOkay && separation >= -3. * physic::gLinearSlop;
         }
 
         if (jointOkay)

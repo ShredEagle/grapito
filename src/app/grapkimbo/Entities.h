@@ -74,5 +74,10 @@ inline Position2 getLocalPointInWorld(Body & body, Position & pos, Position2 loc
     return transformPosition(pos.position + localPos.as<math::Vec>(), body.theta, pos.position + body.massCenter.as<math::Vec>());
 }
 
+inline Position2 getWorldPointInLocal(Body& body, Position& pos, Position2 worldPos)
+{
+    return static_cast<Position2>(transformPosition(worldPos, -body.theta, pos.position + body.massCenter.as<math::Vec>()) - pos.position);
+}
+
 } // namespace grapito
 } // namespace ad

@@ -105,20 +105,13 @@ void VelocityConstraint::debugRender()
 {
     debugDrawer->drawPoint({
             cf.contactPoint,
-            .05,
+            .1f,
             {0,0,255},
     });
-    /*
     debugDrawer->drawLine({
             cf.contactPoint,
-            cf.contactPoint + normal * 3,
-            .05,
-            {255,0,0},
-    });
-    debugDrawer->drawLine({
-            cf.contactPoint,
-            cf.contactPoint + cf.normalImpulse * normal * 3,
-            .05,
+            cf.contactPoint + cf.normalImpulse * normal,
+            .1f,
             {150,150,200},
     });
 
@@ -129,10 +122,9 @@ void VelocityConstraint::debugRender()
     debugDrawer->drawLine({
             cf.contactPoint,
             cf.contactPoint + speed.dot(normal) * normal,
-            .05,
+            .1f,
             {0,200,0},
     });
-    */
 }
 
 WeldJointConstraint::WeldJointConstraint(
@@ -149,7 +141,8 @@ WeldJointConstraint::WeldJointConstraint(
     invMoiB{aBodyB->invMoi},
     localAnchorB{aWeldJoint.localAnchorB},
     mStiffness{aWeldJoint.mStiffness},
-    mDamping{aWeldJoint.mDamping}
+    mDamping{aWeldJoint.mDamping},
+    mRefAngle{aBodyB->bodyRef.theta - aBodyA->bodyRef.theta}
 {}
 
 void WeldJointConstraint::InitVelocityConstraint(const GrapitoTimer & timer)
@@ -158,7 +151,6 @@ void WeldJointConstraint::InitVelocityConstraint(const GrapitoTimer & timer)
     bodyPosB = cbB->bodyPos;
     velocityA = cbA->velocity;
     velocityB = cbB->velocity;
-    mRefAngle = cbA->bodyPos->a - cbB->bodyPos->a;
     rA = transformVector(localAnchorA - (bodyPosA->c - bodyPosA->p).as<math::Position>(), bodyPosA->a);
     rB = transformVector(localAnchorB - (bodyPosB->c - bodyPosB->p).as<math::Position>(), bodyPosB->a);
     angVecA = {-rA.y(), rA.x()};
@@ -293,8 +285,8 @@ bool WeldJointConstraint::SolvePositionConstraint()
     math::Radian<float> aA = bodyPosA->a;
     math::Radian<float> aB = bodyPosB->a;
 
-    Vec2 rA = transformVector(localAnchorA - (cA - pA).as<math::Position>(), aA);
-    Vec2 rB = transformVector(localAnchorB - (cB - pB).as<math::Position>(), aB);
+    Vec2 rA = transformVector(localAnchorA + pA.as<math::Vec>() - cA.as<math::Position>(), aA);
+    Vec2 rB = transformVector(localAnchorB + pB.as<math::Vec>() - cB.as<math::Position>(), aB);
 
     float mA = invMassA;
     float iA = invMoiA;

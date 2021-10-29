@@ -133,7 +133,7 @@ aunteater::Entity createRopeSegment(Position2 origin, Position2 end)
 void throwGrapple(aunteater::weak_entity aPlayer, aunteater::EntityManager & aEntityManager)
 {
     Position2 grapplePos = static_cast<Position2>(aPlayer->get<Position>().position.as<math::Vec>() + aPlayer->get<Body>().massCenter.as<math::Vec>() + Vec2{.5f, .5f});
-    Vec2 grappleImpulse = aPlayer->get<PlayerData>().mAimVector * player::gGrappleBaseImpulse;
+    Vec2 grappleImpulse = aPlayer->get<PlayerData>().mAimVector * player::gGrappleBaseImpulse + aPlayer->get<AccelAndSpeed>().speed;
     aPlayer->get<PlayerData>().grapple = aEntityManager.addEntity(aunteater::Entity()
             .add<Position>(
                 grapplePos,

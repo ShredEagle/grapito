@@ -32,6 +32,7 @@ enum CollisionType
     CollisionType_Moving_Env,
     CollisionType_Floor,
     CollisionType_Static_Env,
+    CollisionType_NoCollisionType,
     CollisionType_count,
 };
 

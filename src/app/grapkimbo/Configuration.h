@@ -7,6 +7,7 @@
 #include <math/Vector.h>
 
 #include <glad/glad.h>
+#include <vector>
 
 namespace ad {
 namespace anchor
@@ -24,7 +25,9 @@ namespace camera
 
 namespace controller
 {
-    constexpr float gDeadzone = 0.4f;
+    constexpr float gDeadzone = 0.8f;
+    constexpr float gHorizontalDeadZone = 0.4f;
+    constexpr float gVerticalDeadZone = 0.2f;
 }
 
 
@@ -78,15 +81,15 @@ namespace physic
     //This represent the separation that we expect at rest
     constexpr float gLinearSlop = 0.0001f;
     constexpr float gAngularSlop = 2.f / 180 * math::pi<float>;
-    constexpr float gBaumgarteFactor = 0.6f;
+    constexpr float gBaumgarteFactor = 0.2f;
     constexpr float gMaxLinearCorrection = 0.2f;
-    constexpr int gMaxVelocityConstraintIteration = 20;
-    constexpr int gMaxPositionConstraintIteration = 20;
+    constexpr int gMaxVelocityConstraintIteration = 50;
+    constexpr int gMaxPositionConstraintIteration = 50;
 }
 
 namespace rope
 {
-    const inline std::array<grapito::Position2, 6> grappleVertices{
+    inline std::vector<grapito::Position2> grappleVertices{
         grapito::Position2{0.f, 0.f}, grapito::Position2{0.5f, 0.f},
         grapito::Position2{0.7f, 0.2f}, grapito::Position2{0.55f, 0.55f},
         grapito::Position2{0.2f, 0.7f}, grapito::Position2{0.f, 0.5f}};
