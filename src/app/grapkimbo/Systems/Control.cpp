@@ -173,7 +173,15 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
         }
         else
         {
-            playerData.mAimVector = aInputState.asDirection(controllable.controller, LeftHorizontalAxis, LeftVerticalAxis, controller::gDeadzone).normalize();
+            playerData.mAimVector = aInputState.asDirection(controllable.controller, LeftHorizontalAxis, LeftVerticalAxis, controller::gDeadzone);
+            if (playerData.mAimVector.getNorm() < 0.1f)
+            {
+                playerData.mAimVector = aas.speed.getNorm() > 0.1f ? aas.speed / aas.speed.getNorm() : Vec2{0.f, 0.2f};
+            }
+            else
+            {
+                playerData.mAimVector.normalize();
+            }
         }
 
         if (inputs[Grapple].positiveEdge() && !(playerData.controlState & (ControlState_Attached | ControlState_Throwing)))
