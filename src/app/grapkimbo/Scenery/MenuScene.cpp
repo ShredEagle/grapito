@@ -113,10 +113,18 @@ void MenuScene::renderMenu()
     mStrings.clear();
     for (std::size_t buttonId = 0; buttonId != mMenu.size(); ++buttonId)
     {
-        mTexting.prepareString(mMenu[buttonId].mText, {0.f, buttonY}, mStrings);
-        debugDrawer->drawOutline(mTexting.getStringBounds(mMenu[buttonId].mText, {0.f, buttonY}));
+        math::Position<2, GLfloat> buttonCenter{0.f, buttonY};
+
+        math::Rectangle<GLfloat> textBoundingBox =
+            mTexting.getStringBounds(mMenu[buttonId].mText, { 0.f, 0.f });
+        // The offset from the center of the bounding box to the initial pen position (origin)
+        math::Vec<2, GLfloat> centeringPenOffset = -textBoundingBox.center().as<math::Vec>();
+        mTexting.prepareString(mMenu[buttonId].mText, buttonCenter + centeringPenOffset, mStrings);
+        debugDrawer->drawOutline(
+            mTexting.getStringBounds(mMenu[buttonId].mText, buttonCenter + centeringPenOffset));
+
         mShaping.addRectangle({
-            Rectangle{ {0.f, buttonY}, menu::gButtonSize }.centered(),
+            Rectangle{ buttonCenter , menu::gButtonSize }.centered(),
             buttonId == mMenu.mSelected ? menu::gSelectedColor : menu::gButtonColor });
         buttonY -= incrementY;
     }

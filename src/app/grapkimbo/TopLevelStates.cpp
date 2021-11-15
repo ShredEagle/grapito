@@ -64,13 +64,13 @@ std::shared_ptr<MenuScene> setupMainMenu(std::shared_ptr<graphics::AppInterface>
     return std::make_shared<MenuScene>(
         Menu {
             std::vector<UiButton>{
-                { "Start Playing",
+                { "Start",
                   [](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface)
                     {
                         aMachine.emplaceState<RopeGame>(aAppInterface);
                     }
                 },
-                { "Drop your Grapple",
+                { "Drop Grapple",
                   [](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface)
                     {
                         aAppInterface->requestCloseApplication();
@@ -94,7 +94,7 @@ std::shared_ptr<MenuScene> setupPauseMenu(
                         aMachine.popState(); // this
                     }
                 },
-                { "Restart level",
+                { "Restart",
                   [](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface)
                     {
                         aMachine.popState(); // this
@@ -102,7 +102,7 @@ std::shared_ptr<MenuScene> setupPauseMenu(
                         aMachine.emplaceState<RopeGame>(aAppInterface); // new game
                     }
                 },
-                { "Exit to Main Menu",
+                { "Main Menu",
                   [](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface)
                     {
                         aMachine.popState(); // this
