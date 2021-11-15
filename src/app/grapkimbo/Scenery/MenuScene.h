@@ -6,6 +6,7 @@
 #include "../Utils/RenderEffect.h"
 
 #include <graphics/AppInterface.h>
+#include <graphics/Texting.h>
 #include <graphics/TrivialShaping.h>
 
 #include <math/Interpolation.h>
@@ -36,6 +37,11 @@ struct Menu
 
     auto size() const
     { return mButtons.size(); }
+
+    UiButton & operator[](std::size_t aButtonIndex)
+    {
+        return mButtons[aButtonIndex];
+    }
 
     std::vector<UiButton> mButtons;
     std::vector<UiButton>::size_type mSelected = 0;
@@ -85,6 +91,8 @@ private:
     std::shared_ptr<GameScene> mOptionalGameScene; 
     RenderEffect mRenderEffect;
     graphics::TrivialShaping mShaping;
+    graphics::Texting mTexting;
+    graphics::Texting::Mapping mStrings;
     math::Interpolation<
         GLfloat,
         GrapitoTimer::Value_t,

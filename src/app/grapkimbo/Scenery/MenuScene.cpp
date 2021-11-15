@@ -10,6 +10,8 @@
 
 #include <graphics/CameraUtilities.h>
 
+#include <resource/PathProvider.h>
+
 
 namespace ad {
 namespace grapito {
@@ -32,6 +34,7 @@ MenuScene::MenuScene(Menu aMenu,
     mOptionalGameScene{aGameScene},
     mRenderEffect{mAppInterface},
     mShaping{mAppInterface->getFramebufferSize()},
+    mTexting{resource::pathFor(menu::gFont), menu::gTextHeight, menu::gViewedHeight, mAppInterface},
     // Useless, it is setup before transitions. But there is no default ctor.
     mMenuXPosition{makeInterpolation(mAppInterface, 0.f, 0.f)} 
 {}
@@ -104,14 +107,18 @@ void MenuScene::renderMenu()
     GLfloat buttonY = menuHeight / 2.f - menu::gButtonSize.height() / 2.f;
     GLfloat incrementY = menu::gButtonSize.height() + menu::gButtonSpacing;
 
+    mStrings.clear();
     for (std::size_t buttonId = 0; buttonId != mMenu.size(); ++buttonId)
     {
+        mTexting.prepareString(mMenu[buttonId].mText, {0.f, buttonY}, mStrings);
         mShaping.addRectangle({
             Rectangle{ {0.f, buttonY}, menu::gButtonSize }.centered(),
             buttonId == mMenu.mSelected ? menu::gSelectedColor : menu::gButtonColor });
         buttonY -= incrementY;
     }
+    mTexting.updateInstances(mStrings);
     mShaping.render();
+    mTexting.render();
 }
 
 
