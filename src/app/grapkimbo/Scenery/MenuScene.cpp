@@ -6,6 +6,8 @@
 #include "../Configuration.h"
 #include "../Logging.h"
 
+#include "../Utils/DrawDebugStuff.h"
+
 #include <math/VectorUtilities.h>
 
 #include <graphics/CameraUtilities.h>
@@ -84,6 +86,7 @@ std::pair<TransitionProgress, UpdateStatus> MenuScene::scrollMenu(GrapitoTimer &
     Rectangle viewed = graphics::getViewRectangle(mAppInterface->getFramebufferSize(), menu::gViewedHeight);
     viewed.origin().x() = mMenuXPosition.advance(aTimer.delta());
     setViewedRectangle(mShaping, viewed);
+    debugDrawer->setViewedRectangle(viewed);
     renderMenu();
 
     return {
@@ -111,6 +114,7 @@ void MenuScene::renderMenu()
     for (std::size_t buttonId = 0; buttonId != mMenu.size(); ++buttonId)
     {
         mTexting.prepareString(mMenu[buttonId].mText, {0.f, buttonY}, mStrings);
+        debugDrawer->drawOutline(mTexting.getStringBounds(mMenu[buttonId].mText, {0.f, buttonY}));
         mShaping.addRectangle({
             Rectangle{ {0.f, buttonY}, menu::gButtonSize }.centered(),
             buttonId == mMenu.mSelected ? menu::gSelectedColor : menu::gButtonColor });

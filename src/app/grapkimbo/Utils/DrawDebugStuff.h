@@ -3,6 +3,7 @@
 #include "commons.h"
 
 #include <graphics/ApplicationGlfw.h>
+#include <graphics/CameraUtilities.h>
 #include <graphics/commons.h>
 #include <graphics/TrivialLineStrip.h>
 #include <graphics/TrivialShaping.h>
@@ -18,6 +19,16 @@ namespace ad
     {
         struct Rectangle
         {
+            /* implicit */
+            Rectangle(math::Rectangle<GLfloat> aRectangle,
+                      const math::sdr::Rgb & aColor = math::sdr::gGreen,
+                      const math::Matrix<3, 3> aTransform = math::Matrix<3, 3>::Identity()) :
+                origin{aRectangle.origin()},
+                dimension{aRectangle.dimension()},
+                transform{aTransform},
+                color{aColor}
+            {}
+
             Rectangle(
                 const grapito::Position2 & aOrigin,
                 const math::Size<2, float> & aDimension,
@@ -100,6 +111,7 @@ namespace ad
                     mTrivialShaping{aApplication.getAppInterface()->getWindowSize()},
                     mTrivialLineStrip{aApplication.getAppInterface()->getWindowSize()}
                 {}
+                // RFP I think overloading could be enough here (i.e. only draw() and drawOutline() methods)
                 void drawRectangle(Rectangle aRectangle);
                 void drawOutline(Rectangle aRectangle);
                 void drawLine(Line aLine);
@@ -108,6 +120,13 @@ namespace ad
                 //void drawPoint(Point aPoint);
                 void render();
                 void clear();
+
+                void setViewedRectangle(math::Rectangle<GLfloat> aViewedRectangle)
+                {
+                    graphics::setViewedRectangle(mTrivialShaping, aViewedRectangle);
+                    graphics::setViewedRectangle(mTrivialLineStrip, aViewedRectangle);
+                }
+
                 graphics::TrivialShaping mTrivialShaping;
                 graphics::TrivialLineStrip mTrivialLineStrip;
 

@@ -31,7 +31,6 @@ void Render::update(const GrapitoTimer, const GameInputState &)
 {
     mTrivialShaping.clearShapes();
     mTrivialLineStrip.clearLines();
-    debugDrawer->clear();
     mAppInterface->clear();
 
     for (auto & [geometry, body, visualRectangle] : mBodyRectangles)
@@ -83,8 +82,7 @@ void Render::update(const GrapitoTimer, const GameInputState &)
         setOrthographicView(mCurving,
                             {geometry.position, 0.f},
                             graphics::getViewVolume(mAppInterface->getWindowSize(), render::gViewedHeight, 1.f, 2.f));
-        setViewedRectangle(debugDrawer->mTrivialShaping, viewed);
-        setViewedRectangle(debugDrawer->mTrivialLineStrip, viewed);
+        debugDrawer->setViewedRectangle(viewed);
     }
 
     render();
@@ -96,7 +94,6 @@ void Render::render() const
     mTrivialLineStrip.render();
     mTrivialShaping.render();
     mCurving.render(mBeziers);
-    debugDrawer->render();
 }
 
 } // namespace grapito

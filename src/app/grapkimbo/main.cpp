@@ -59,12 +59,14 @@ int main(int /*argc*/, const char ** /*argv*/)
 
         while(application.handleEvents())
         {
+            debugDrawer->clear();
             inputState.readAll(application);
             timer.mark((float)glfwGetTime());
             if (topLevelFlow.update(timer, inputState) == UpdateStatus::SwapBuffers)
             {
                 drawImGui(application, debugUI, imguiState);
                 renderImGui();
+                debugDrawer->render();
                 application.swapBuffers();
             }
         }
