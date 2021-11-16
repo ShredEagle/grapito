@@ -80,6 +80,11 @@ public:
 
 private:
     std::pair<TransitionProgress, UpdateStatus> scrollMenu(GrapitoTimer & aTimer);
+
+    /// \brief Generate menu geometry and fonts, and update all vertex buffers of renderers.
+    void updateMenuBuffers();
+
+    /// \brief Have renderers draw the menu to screen.
     void renderMenu();
 
     Menu mMenu;
@@ -92,7 +97,6 @@ private:
     RenderEffect mRenderEffect;
     graphics::TrivialShaping mShaping;
     graphics::Texting mTexting;
-    graphics::Texting::Mapping mStrings;
     math::Interpolation<
         GLfloat,
         GrapitoTimer::Value_t,

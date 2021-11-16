@@ -29,7 +29,6 @@ Render::Render(aunteater::EntityManager & aEntityManager,
 
 void Render::update(const GrapitoTimer, const GameInputState &)
 {
-    mTrivialShaping.clearShapes();
     mTrivialLineStrip.clearLines();
     mAppInterface->clear();
 
@@ -40,11 +39,12 @@ void Render::update(const GrapitoTimer, const GameInputState &)
         );
     }
 
+    std::vector<graphics::TrivialShaping::Rectangle> shapes;
     for(const auto [geometry, visualRectangle] : mRectangles)
     {
         // TODO should control drawing of Scope::RopeStructure rectangles
         // based on Imgui widgets.
-        mTrivialShaping.addRectangle({
+        shapes.push_back({
             {
                 static_cast<math::Position<2, GLfloat>>(geometry.position),
                 static_cast<math::Size<2, GLfloat>>(geometry.dimension)  
@@ -53,6 +53,7 @@ void Render::update(const GrapitoTimer, const GameInputState &)
             visualRectangle.transform,
         });
     }
+    mTrivialShaping.updateInstances(shapes);
 
     for(const auto [geometry, visualOutline] : mOutlines)
     {

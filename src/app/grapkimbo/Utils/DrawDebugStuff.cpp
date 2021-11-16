@@ -55,9 +55,11 @@ namespace ad
                 return;
             }
 
+            std::vector<graphics::TrivialShaping::Rectangle> rectangles;
             for (auto rectangle : mRectangles)
             {
-                mTrivialShaping.addRectangle(
+                // TODO this should probably be the data member type, instead of having yet another triangle type.
+                rectangles.push_back(
                     {
                         {
                             rectangle.origin,
@@ -68,6 +70,7 @@ namespace ad
                     }
                 );
             }
+            mTrivialShaping.updateInstances(rectangles);
 
             for (auto line : mLines)
             {
@@ -103,7 +106,6 @@ namespace ad
 
         void DrawDebugStuff::clear()
         {
-            mTrivialShaping.clearShapes();
             mTrivialLineStrip.clearLines();
         }
     }
