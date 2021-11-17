@@ -53,6 +53,7 @@ void Render::update(const GrapitoTimer, const GameInputState &)
         );
     }
 
+    // shapes vector to receive all rectangle to be drawn by TrivialShaping renderer.
     std::vector<graphics::TrivialShaping::Rectangle> shapes;
     for(const auto [geometry, visualRectangle] : mRectangles)
     {
@@ -67,7 +68,6 @@ void Render::update(const GrapitoTimer, const GameInputState &)
             visualRectangle.transform,
         });
     }
-    mTrivialShaping.updateInstances(shapes);
 
     for(const auto [geometry, visualPolygon] : mPolygons)
     {
@@ -104,7 +104,7 @@ void Render::update(const GrapitoTimer, const GameInputState &)
 
     for (const auto & [geometry, body, data] : mCrosshairs)
     {
-        mTrivialShaping.addRectangle({
+        shapes.push_back({
                 {
                     static_cast<math::Position<2, GLfloat>>(geometry.position + body.massCenter.as<math::Vec>() + data.mAimVector * 5.f - Vec2{0.25f, 0.25f}),
                     {0.5f, 0.5f}
@@ -138,6 +138,7 @@ void Render::update(const GrapitoTimer, const GameInputState &)
         debugDrawer->setViewedRectangle(viewed);
     }
 
+    mTrivialShaping.updateInstances(shapes);
     render();
 }
 
