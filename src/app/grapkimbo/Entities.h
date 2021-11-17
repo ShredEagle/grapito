@@ -31,6 +31,7 @@ aunteater::Entity makeCamera(Position2 pos = {0.f, 0.f});
 
 
 aunteater::Entity makeAnchor(Position2 aPosition, math::Size<2, float> aSize);
+aunteater::Entity makeAnchor(Position2 aPosition, std::vector<Position2> aVertices);
 
 
 aunteater::Entity createRopeSegment(Position2 origin, Position2 endRR);
@@ -71,6 +72,11 @@ inline void setLocalPointToWorldPos(aunteater::Entity & aEntity, Position2 local
 inline Position2 getLocalPointInWorld(Body & body, Position & pos, Position2 localPos)
 {
     return transformPosition(pos.position + localPos.as<math::Vec>(), body.theta, pos.position + body.massCenter.as<math::Vec>());
+}
+
+inline Position2 getWorldPointInLocal(Body& body, Position& pos, Position2 worldPos)
+{
+    return static_cast<Position2>(transformPosition(worldPos, -body.theta, pos.position + body.massCenter.as<math::Vec>()) - pos.position);
 }
 
 } // namespace grapito

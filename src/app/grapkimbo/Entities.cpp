@@ -4,11 +4,13 @@
 #include "Components/CameraTag.h"
 #include "Components/Controllable.h"
 #include <Components/GrappleControl.h>
+#include "Components/DelayDeletion.h"
 #include "Components/PivotJoint.h"
 #include "Components/PlayerData.h"
 #include "Components/Position.h"
 #include "Components/RopeCreator.h"
 #include "Components/VisualOutline.h"
+#include "Components/VisualPolygon.h"
 #include "Components/VisualRectangle.h"
 #include "Components/Mass.h"
 
@@ -42,7 +44,7 @@ aunteater::Entity makePlayer(int aIndex,
             15.f,
             0.f,
             0.f,
-            false,
+            1.f,
             std::vector<CollisionType>{CollisionType_Static_Env}
             )
         .add<VisualRectangle>(aColor)
@@ -63,6 +65,23 @@ aunteater::Entity makeCamera(Position2 pos)
         ;
 }
 
+aunteater::Entity makeAnchor(Position2 aPosition, std::vector<Position2> aVertices)
+{
+    return aunteater::Entity()
+        .add<Body>(
+            aVertices,
+            BodyType_Static,
+            ShapeType_Hull,
+            CollisionType_Static_Env,
+            0.f,
+            0.f,
+            1.f
+            )
+        .add<Position>(aPosition, math::Size<2, float>{0.f, 0.f})
+        .add<AccelAndSpeed>()
+        .add<VisualPolygon>(aVertices, anchor::gColor)
+    ;
+}
 
 aunteater::Entity makeAnchor(math::Position<2, float> aPosition, math::Size<2, float> aSize)
 {
@@ -101,7 +120,7 @@ aunteater::Entity createRopeSegment(Position2 origin, Position2 end)
                 0.5f,
                 angle.value(),
                 0.f,
-                false,
+                0.1f,
                 std::vector<CollisionType>{CollisionType_Static_Env}
                 )
             .add<VisualRectangle>(math::sdr::gGreen, VisualRectangle::Scope::RopeStructure)
@@ -111,38 +130,39 @@ aunteater::Entity createRopeSegment(Position2 origin, Position2 end)
     return rope;
 }
 
-void throwGrapple(aunteater::weak_entity aEntity, aunteater::EntityManager & aEntityManager)
+void throwGrapple(aunteater::weak_entity aPlayer, aunteater::EntityManager & aEntityManager)
 {
-    math::Size<2, float> size{.25f, .25f};
-    Position2 grapplePos = static_cast<Position2>(aEntity->get<Position>().position.as<math::Vec>() + aEntity->get<Body>().massCenter.as<math::Vec>() + Vec2{.5f, .5f});
-    aEntity->get<PlayerData>().grapple = aEntityManager.addEntity(aunteater::Entity()
+    Position2 grapplePos = static_cast<Position2>(aPlayer->get<Position>().position.as<math::Vec>() + aPlayer->get<Body>().massCenter.as<math::Vec>() + Vec2{.5f, .5f});
+    Vec2 grappleImpulse = aPlayer->get<PlayerData>().mAimVector * player::gGrappleBaseImpulse + aPlayer->get<AccelAndSpeed>().speed;
+    aPlayer->get<PlayerData>().grapple = aEntityManager.addEntity(aunteater::Entity()
             .add<Position>(
                 grapplePos,
-                size
+                math::Size<2, float>{1.f, 1.f}
                 )
             .add<Body>(
-                math::Rectangle<float>{{0.f, 0.f}, size},
+                rope::grappleVertices,
                 BodyType_Dynamic,
                 ShapeType_Hull,
                 CollisionType_Moving_Env,
                 4.f,
                 0.f,
                 1.f,
-                true,
+                0.3f,
                 std::vector<CollisionType>{CollisionType_Static_Env}
                 )
-            .add<VisualRectangle>(math::sdr::gYellow)
-            .add<AccelAndSpeed>(Vec2{40.f, 40.f}, 0.f)
+            .add<VisualPolygon>(rope::grappleVertices, math::sdr::gYellow)
+            .add<AccelAndSpeed>(grappleImpulse, 0.f)
             );
 
     // IMPORTANT: bugfix by adding RopeCreator only after Body has been added.
     // It is required that Body observers are visited
-    aEntity->get<PlayerData>().grapple->add<RopeCreator>(aEntity);
+    aPlayer->get<PlayerData>().grapple->add<RopeCreator>(aPlayer);
 }
 
 void attachPlayerToGrapple(aunteater::weak_entity aPlayer, aunteater::EntityManager & aEntityManager)
 {
     assert(aPlayer->get<PlayerData>().grapple != nullptr);
+    assert(aPlayer->get<PlayerData>().grappleAttachment == nullptr);
 
     aunteater::weak_entity & grapple = aPlayer->get<PlayerData>().grapple;
     RopeCreator & ropeCreator = grapple->get<RopeCreator>();
@@ -187,8 +207,24 @@ void attachPlayerToGrapple(aunteater::weak_entity aPlayer, aunteater::EntityMana
 
 void detachPlayerFromGrapple(aunteater::weak_entity aPlayer)
 {
+    //Cleanup grapple entity
+    aPlayer->get<PlayerData>().grapple->add<DelayDeletion>(60);
     aPlayer->get<PlayerData>().grapple->get<RopeCreator>().mTargetEntity = nullptr;
-    aPlayer->get<PlayerData>().grappleAttachment->markToRemove();
+    aPlayer->get<PlayerData>().grapple = nullptr;
+
+    //Cleanup rope pivot joint to player if it exists
+    if (aPlayer->get<PlayerData>().grappleAttachment != nullptr)
+    {
+        aPlayer->get<PlayerData>().grappleAttachment->markToRemove();
+        aPlayer->get<PlayerData>().grappleAttachment = nullptr;
+    }
+
+    //Cleanup grapple attachement to static environment if it exists
+    if (aPlayer->get<PlayerData>().mGrappleWeldJoint != nullptr)
+    {
+        aPlayer->get<PlayerData>().mGrappleWeldJoint->markToRemove();
+        aPlayer->get<PlayerData>().mGrappleWeldJoint = nullptr;
+    }
 }
 
 } // namespace grapito

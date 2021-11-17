@@ -10,9 +10,9 @@ namespace ad {
 namespace grapito
 {
 
-struct WeldJoint : public aunteater::Component<WeldJoint>
+struct DistanceJoint : public aunteater::Component<DistanceJoint>
 {
-    explicit WeldJoint(
+    explicit DistanceJoint(
             Position2 aLocalAnchorA,
             Position2 aLocalAnchorB,
             float aFrequency,
@@ -20,8 +20,26 @@ struct WeldJoint : public aunteater::Component<WeldJoint>
             aunteater::weak_entity aBodyA,
             aunteater::weak_entity aBodyB
             ) :
+        DistanceJoint(aLocalAnchorA, aLocalAnchorB, aFrequency, aDampingRatio, 0.f, 0.f, aBodyA, aBodyB)
+    {
+    }
+    
+    explicit DistanceJoint(
+            Position2 aLocalAnchorA,
+            Position2 aLocalAnchorB,
+            float aFrequency,
+            float aDampingRatio,
+            float aMinSlackFactor,
+            float aMaxSlackFactor,
+            float aLength,
+            aunteater::weak_entity aBodyA,
+            aunteater::weak_entity aBodyB
+            ) :
         localAnchorA{std::move(aLocalAnchorA)},
         localAnchorB{std::move(aLocalAnchorB)},
+        mMinSlackFactor{aMinSlackFactor},
+        mMaxSlackFactor{aMaxSlackFactor},
+        mLength{aLength},
         bodyA{aBodyA},
         bodyB{aBodyB}
     {
@@ -35,11 +53,28 @@ struct WeldJoint : public aunteater::Component<WeldJoint>
                 );
     }
 
+    explicit DistanceJoint(
+            Position2 aLocalAnchorA,
+            Position2 aLocalAnchorB,
+            float aFrequency,
+            float aDampingRatio,
+            float aMinSlackFactor,
+            float aMaxSlackFactor,
+            aunteater::weak_entity aBodyA,
+            aunteater::weak_entity aBodyB
+            ) :
+        DistanceJoint(aLocalAnchorA, aLocalAnchorB, aFrequency, aDampingRatio, aMinSlackFactor, aMaxSlackFactor, -1.f, aBodyA, aBodyB)
+    {
+    }
+
     Position2 localAnchorA = Position2::Zero();
     Position2 localAnchorB = Position2::Zero();
 
     float mStiffness;
     float mDamping;
+    float mMinSlackFactor = 0.f;
+    float mMaxSlackFactor = 0.f;
+    float mLength = 0.f;
 
     aunteater::weak_entity bodyA;
     aunteater::weak_entity bodyB;

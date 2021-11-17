@@ -10,7 +10,7 @@ CameraGuidedControl::CameraGuidedControl(aunteater::EntityManager & aEntityManag
 {}
 
 
-void CameraGuidedControl::update(const GrapitoTimer aTimer, const GameInputState & aInputState)
+void CameraGuidedControl::update(const GrapitoTimer aTimer, const GameInputState &)
 {
     math::Vec<2, float> accumulatedPosition = math::Vec<2, float>::Zero();
     float totalInfluence = 0.;

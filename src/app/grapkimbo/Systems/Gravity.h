@@ -1,9 +1,10 @@
 #pragma once
 
-#include "Input.h"
+#include "../Input.h"
 
-#include "Components/Body.h"
-#include <Components/AccelAndSpeed.h>
+#include "../Components/PlayerData.h"
+#include "../Components/Body.h"
+#include "../Components/AccelAndSpeed.h"
 
 #include <aunteater/Archetype.h>
 #include <aunteater/FamilyHelp.h>
@@ -14,6 +15,7 @@ namespace grapito
 {
 
 typedef aunteater::Archetype<AccelAndSpeed, Body> Massive;
+typedef aunteater::Archetype<AccelAndSpeed, PlayerData> Player;
 
 class Gravity : public aunteater::System<GrapitoTimer, GameInputState>
 {
@@ -21,12 +23,13 @@ class Gravity : public aunteater::System<GrapitoTimer, GameInputState>
 public:
     Gravity(aunteater::EntityManager & aEntityManager);
 
-    void update(const GrapitoTimer aTimer, const GameInputState &) override;
+    void update(const GrapitoTimer, const GameInputState &) override;
 
     static constexpr double gAcceleration = 10.;
 
 private:
     const aunteater::FamilyHelp<Massive> mMassives;
+    const aunteater::FamilyHelp<Player> mPlayers;
 
 };
 

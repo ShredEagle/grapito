@@ -25,7 +25,7 @@ Control::Control(aunteater::EntityManager & aEntityManager) :
     mGrapplers{mEntityManager}
 {}
 
-void Control::update(const GrapitoTimer aTimer, const GameInputState & aInputState)
+void Control::update(const GrapitoTimer, const GameInputState & aInputState)
 {
     //
     // Air
@@ -33,8 +33,18 @@ void Control::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
     for(auto & [controllable, geometry, aas, mass, playerData] :  mCartesianControllables)
     {
         const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
-        Vec2 direction = aInputState.asDirection(controllable.controller, LeftHorizontalAxis, LeftVerticalAxis, controller::gDeadzone);
-        float horizontalAxis = direction.x();
+        float horizontalAxis;
+
+        if (controllable.controller == Controller::KeyboardMouse)
+        {
+            horizontalAxis = aInputState.asAxis(controllable.controller, Left, Right, LeftHorizontalAxis);
+        }
+        else
+        {
+            Vec2 direction = aInputState.asDirection(controllable.controller, LeftHorizontalAxis, LeftVerticalAxis, controller::gHorizontalDeadZone, 0.f);
+            horizontalAxis = direction.x();
+        }
+
         float horizontalAxisSign = horizontalAxis / std::abs(horizontalAxis);
 
         float groundSpeedAccelFactor = 1.f / player::gGroundNumberOfAccelFrame;
@@ -125,14 +135,6 @@ void Control::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
                 }
             }
         }
-
-        playerData.state &= ~PlayerCollisionState_Walled;
-        playerData.state &= ~PlayerCollisionState_WalledLeft;
-        playerData.state &= ~PlayerCollisionState_WalledRight;
-
-        //Reset playerData transient state
-        playerData.state |= PlayerCollisionState_Jumping;
-        playerData.state &= ~PlayerCollisionState_Grounded;
     }
 
     //
@@ -140,37 +142,72 @@ void Control::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
     //
     for(auto & entity : mPolarControllables)
     {
-        auto & [controllable, playerData] = entity;
+        auto & [controllable, aas, playerData] = entity;
         const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
 
-        if (inputs[Jump].positiveEdge() && playerData.controlState & ControlState_Attached)
+        if (inputs[Jump].positiveEdge() && playerData.controlState & (ControlState_Attached | ControlState_Throwing))
         {
             detachPlayerFromGrapple(entity);
+            if (playerData.state & PlayerCollisionState_Jumping)
+            {
+                aas.speed *= 1.5f;
+                aas.speed += Vec2{ 0.f, player::gJumpImpulse };
+            }
             playerData.controlState &= ~ControlState_Attached;
+            playerData.controlState &= ~ControlState_Throwing;
+
         }
     }
 
     //
     // Grapple candidates
     //
-    for(auto & entity : mGrapplers)
+    for(auto & player : mGrapplers)
     {
-        auto & [controllable, aas, grappleControl, geometry, playerData] = entity;
+        auto & [controllable, aas, grappleControl, geometry, playerData] = player;
         const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
 
-
-        if (inputs[Grapple].positiveEdge() && !(playerData.controlState & ControlState_Attached))
+        if (controllable.controller == Controller::KeyboardMouse)
         {
-            throwGrapple(entity, mEntityManager);
+            playerData.mAimVector = {1.0f, 1.0f};
+        }
+        else
+        {
+            playerData.mAimVector = aInputState.asDirection(controllable.controller, LeftHorizontalAxis, LeftVerticalAxis, controller::gDeadzone);
+            if (playerData.mAimVector.getNorm() < 0.1f)
+            {
+                playerData.mAimVector = aas.speed.getNorm() > 0.1f ? aas.speed / aas.speed.getNorm() : Vec2{0.f, 0.2f};
+            }
+            else
+            {
+                playerData.mAimVector.normalize();
+            }
+        }
+
+        if (inputs[Grapple].positiveEdge() && !(playerData.controlState & (ControlState_Attached | ControlState_Throwing)))
+        {
+            throwGrapple(player, mEntityManager);
             playerData.controlState |= ControlState_Throwing;
         }
+
         if (inputs[Grapple].negativeEdge() && playerData.controlState & ControlState_Throwing)
         {
-            attachPlayerToGrapple(entity, mEntityManager);
+            attachPlayerToGrapple(player, mEntityManager);
             playerData.controlState &= ~ControlState_Throwing;
             playerData.controlState |= ControlState_Attached;
         }
+    }
 
+
+    for (auto& [controllable, geometry, aas, mass, playerData] : mCartesianControllables)
+    {
+        playerData.state &= ~PlayerCollisionState_Walled;
+        playerData.state &= ~PlayerCollisionState_WalledLeft;
+        playerData.state &= ~PlayerCollisionState_WalledRight;
+
+        //Reset playerData transient state
+        playerData.state |= PlayerCollisionState_Jumping;
+        playerData.state &= ~PlayerCollisionState_Grounded;
     }
 }
 

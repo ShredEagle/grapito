@@ -16,6 +16,31 @@ namespace grapito
 struct Body : public aunteater::Component<Body>
 {
     explicit Body(
+        std::vector<Position2> aVertices,
+        BodyType aBodyType,
+        ShapeType aShapeType,
+        CollisionType aCollisionType,
+        float aMass = 1.f,
+        float aTheta = 0.f,
+        float aFriction = 0.f,
+        float gravityScale = 1.f,
+        std::vector<CollisionType> aAcceptedCollision = {}
+    ) :
+        mass{aMass},
+        moi{0.f},
+        gravityScale{gravityScale},
+        friction{aFriction},
+        theta{math::Radian<float>{aTheta}},
+        shape{aVertices},
+        bodyType{aBodyType},
+        shapeType{aShapeType},
+        collisionType{aCollisionType},
+        acceptedCollision{aAcceptedCollision}
+    {
+        updateData();
+    }
+
+    explicit Body(
         math::Rectangle<float> aBox,
         BodyType aBodyType,
         ShapeType aShapeType,
@@ -23,13 +48,13 @@ struct Body : public aunteater::Component<Body>
         float aMass = 1.f,
         float aTheta = 0.f,
         float aFriction = 0.f,
-        bool noMaxFriction = false,
+        float gravityScale = 1.f,
         std::vector<CollisionType> aAcceptedCollision = {}
     ) :
         mass{aMass},
         moi{0.f},
+        gravityScale{gravityScale},
         friction{aFriction},
-        noMaxFriction{noMaxFriction},
         theta{math::Radian<float>{aTheta}},
         shape{aBox},
         bodyType{aBodyType},
@@ -50,7 +75,7 @@ struct Body : public aunteater::Component<Body>
             Shape::Edge edge = shape.getEdge(i);
             Vec2 vertexA = edge.origin.as<math::Vec>();
             Vec2 vertexB = edge.end.as<math::Vec>();
-            float areaStep = twoDVectorCross(vertexA, vertexB) / 2.f;
+            float areaStep = std::abs(twoDVectorCross(vertexA, vertexB)) / 2.f;
             Vec2 centerStep = (vertexA + vertexB) / 3.f;
             float moiStep = areaStep * (vertexA.dot(vertexA) + vertexB.dot(vertexB) + vertexA.dot(vertexB)) / 6.f;
 
@@ -119,11 +144,11 @@ struct Body : public aunteater::Component<Body>
     float invMass;
     float moi;
     float invMoi;
+    float gravityScale;
     Position2 massCenter = {0.f, 0.f};
 
     float friction;
     float restitution;
-    bool noMaxFriction;
 
     math::Radian<float> theta;
 

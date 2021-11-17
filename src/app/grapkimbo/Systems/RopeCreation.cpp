@@ -26,39 +26,41 @@ RopeCreation::RopeCreation(aunteater::EntityManager & aEntityManager) :
 void RopeCreation::addedEntity(aunteater::LiveEntity & aEntity)
 {
     RopeCreator & ropeCreator = aEntity.get<RopeCreator>();
-    Body & body = aEntity.get<Body>();
     Position & pos = aEntity.get<Position>();
     aunteater::weak_entity player = ropeCreator.mTargetEntity;
 
     Position2 end = player->get<Position>().position + player->get<Body>().massCenter.as<math::Vec>();
-    Position2 origin = pos.position + body.massCenter.as<math::Vec>();
+    Position2 origin = pos.position;
 
     aunteater::weak_entity link = mEntityManager.addEntity(createRopeSegment(
         origin,
         end
     ));
 
-    /*mEntityManager.addEntity(
-            aunteater::Entity()
-            .add<PivotJoint>(
-                Position2{0., 0.},
-                player->get<Body>().massCenter,
-                link,
-                player
-            ));*/
-    mEntityManager.addEntity(
+    aunteater::weak_entity joint = mEntityManager.addEntity(
             aunteater::Entity()
             .add<PivotJoint>(
                 Position2{0.f, rope::ropeHalfwidth},
-                body.massCenter,
+                Position2{0.f, 0.f},
                 link,
                 &aEntity
             ));
     ropeCreator.mRopeSegments.push_back(link);
+    ropeCreator.mPivotJoints.push_back(joint);
 }
 
 void RopeCreation::removedEntity(aunteater::LiveEntity & aEntity)
 {
+    RopeCreator & creator = aEntity.get<RopeCreator>();
+    for(auto link : creator.mRopeSegments)
+    {
+        link->markToRemove();
+    }
+
+    for(auto joint : creator.mPivotJoints)
+    {
+        joint->markToRemove();
+    }
 }
 
 void RopeCreation::handleThrow(RopeCreator & aRopeCreator)
@@ -80,7 +82,7 @@ void RopeCreation::handleThrow(RopeCreator & aRopeCreator)
                     end
                 ));
 
-                mEntityManager.addEntity(
+                aunteater::weak_entity joint = mEntityManager.addEntity(
                         aunteater::Entity()
                         .add<PivotJoint>(
                             Position2{0.f, rope::ropeHalfwidth},
@@ -90,12 +92,13 @@ void RopeCreation::handleThrow(RopeCreator & aRopeCreator)
                         ));
 
                 aRopeCreator.mRopeSegments.push_back(link);
+                aRopeCreator.mPivotJoints.push_back(joint);
             }
         }
 }
 
 
-void RopeCreation::update(const GrapitoTimer aTimer, const GameInputState &)
+void RopeCreation::update(const GrapitoTimer, const GameInputState &)
 {
     for (auto & ropeCreatorEntity : mRopeCreator)
     {

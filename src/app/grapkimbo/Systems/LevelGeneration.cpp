@@ -17,7 +17,7 @@ LevelGeneration::LevelGeneration(aunteater::EntityManager & aEntityManager) :
 }
 
 
-void LevelGeneration::update(const GrapitoTimer aTimer, const GameInputState &)
+void LevelGeneration::update(const GrapitoTimer, const GameInputState &)
 {
     math::Vec<2, int> cameraPosition = static_cast<math::Vec<2, int>>(getCameraPosition());
     TileIndex newIndex = cameraPosition.cwDiv(gTileDimension.as<math::Vec>());

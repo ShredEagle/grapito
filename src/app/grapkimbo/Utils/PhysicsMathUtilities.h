@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../commons.h"
+#include "math/Constants.h"
 #include <math/Vector.h>
 
 namespace ad
@@ -57,6 +58,35 @@ static inline math::Matrix<3, 3, float> getInverse2by2(const math::Matrix<3, 3, 
         tempResultMatrix.at(2), tempResultMatrix.at(3), 0.f,
         0.f, 0.f, 0.f
     };
+}
+
+static inline void computeStiffnessDamping(
+        float & aStiffness,
+        float & aDamping,
+        float aFrequencyHertz,
+        float aDampingRatio,
+        float massA,
+        float massB
+        )
+{
+        float mass;
+
+        if (massA > 0.f && massB > 0.f)
+        {
+            mass = massA * massB / (massA + massB);
+        }
+        else if (massA > 0.f)
+        {
+            mass = massA;
+        }
+        else
+        {
+            mass = massB;
+        }
+
+        float omega = 2.f * math::pi<float> * aFrequencyHertz;
+        aStiffness = mass * omega * omega;
+        aDamping = 2.f * mass * aDampingRatio * omega;
 }
 
 }

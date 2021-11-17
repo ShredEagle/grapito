@@ -10,6 +10,7 @@
 #include "../Components/Position.h"
 #include "../Components/VisualRectangle.h"
 #include "../Components/WeldJoint.h"
+#include "../Components/DistanceJoint.h"
 
 #include "../Utils/CollisionBox.h"
 #include "../Utils/PhysicsStructs.h"
@@ -27,6 +28,7 @@ namespace grapito
 typedef aunteater::Archetype<Position, Body, AccelAndSpeed> PhysicalBody;
 typedef aunteater::Archetype<PivotJoint> Pivotable;
 typedef aunteater::Archetype<WeldJoint> Weldable;
+typedef aunteater::Archetype<DistanceJoint> Distanceable;
 
 static std::array<
     std::array<
@@ -85,6 +87,7 @@ private:
     BodyObserver bodyObserver;
     JointObserver<PivotJoint, PivotJointConstraint> pivotObserver;
     JointObserver<WeldJoint, WeldJointConstraint> weldObserver;
+    JointObserver<DistanceJoint, DistanceJointConstraint> distanceObserver;
 
     std::list<CollisionPair> collidingBodies;
 

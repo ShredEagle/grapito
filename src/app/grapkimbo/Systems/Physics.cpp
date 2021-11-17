@@ -76,6 +76,7 @@ void BodyObserver::removedEntity(aunteater::LiveEntity & aEntity)
     }
 
     mPhysicsSystem->constructedBodies.erase(aEntity.get<Body>().constructedBodyIt);
+    aEntity.get<Body>().constructedBodyIt = mPhysicsSystem->constructedBodies.end();
 }
 
 template<class T_joint, class T_joint_constraint>
@@ -123,14 +124,18 @@ void JointObserver<T_joint, T_joint_constraint>::removedEntity(aunteater::LiveEn
 {
     T_joint & joint = aEntity.get<T_joint>();
 
-    if (aEntity.get<PivotJoint>().bodyA->has<Body>())
+    if (aEntity.get<T_joint>().bodyA->template has<Body>() &&
+        aEntity.get<T_joint>().bodyA->template get<Body>().constructedBodyIt != mPhysicsSystem->constructedBodies.end()
+       )
     {
-        ConstructedBody & bodyA = *aEntity.get<PivotJoint>().bodyA->get<Body>().constructedBodyIt;
+        ConstructedBody & bodyA = *aEntity.get<T_joint>().bodyA->template get<Body>().constructedBodyIt;
         bodyA.jointItList.erase(joint.constructedBodyConstraintItA);
     }
-    if (aEntity.get<PivotJoint>().bodyB->has<Body>())
+    if (aEntity.get<T_joint>().bodyB->template has<Body>() &&
+        aEntity.get<T_joint>().bodyB->template get<Body>().constructedBodyIt != mPhysicsSystem->constructedBodies.end()
+       )
     {
-        ConstructedBody & bodyB = *aEntity.get<PivotJoint>().bodyB->get<Body>().constructedBodyIt;
+        ConstructedBody & bodyB = *aEntity.get<T_joint>().bodyB->template get<Body>().constructedBodyIt;
         bodyB.jointItList.erase(joint.constructedBodyConstraintItB);
     }
     mPhysicsSystem->jointConstraints.erase(joint.constraintIt);
@@ -164,7 +169,7 @@ static inline void addPair(ConstructedBody & bodyA, ConstructedBody & bodyB, std
     pairs.back().iteratorB = bodyB.contactList.insert(bodyB.contactList.end(), &(pairs.back()));
 }
 
-static inline const double distanceToLine(Position2 point, Position2 origin, Position2 end)
+static inline double distanceToLine(Position2 point, Position2 origin, Position2 end)
 {
     return (((end.x() - origin.x()) * (origin.y() - point.y())) - ((origin.x() - point.x()) * (end.y() - origin.y()))) / (origin - end).getNorm();
 }
@@ -176,7 +181,7 @@ static inline ContactManifold QueryFacePenetration(
 {
     ContactManifold resultManifold;
 
-    for (int i = 0; i < bodyA.box->shape.mFaceCount; ++i)
+    for (size_t i = 0; i < bodyA.box->shape.mFaceCount; ++i)
     {
         const Shape::Edge edgeA = bodyA.box->shape.getEdge(i);
         const Position2 support = bodyB.box->getSupport(-edgeA.normal);
@@ -246,7 +251,7 @@ static inline int findIncidentEdge(
     // (this is to get a correctly oriented reference frame)
     // so we compute the dot of all incident edges with the edgeDirection 
     // and we store the maximum
-    for (int i = 0; i < incidentShape.mFaceCount; ++i)
+    for (size_t i = 0; i < incidentShape.mFaceCount; ++i)
     {
         Shape::Edge edge = incidentShape.getEdge(i);
         
@@ -439,7 +444,7 @@ static inline void solveContactVelocityConstraint(VelocityConstraint & constrain
         float totalAngularTangentMass = constraint.totalTangentAngularMass;
 
         float lambda = -(1 / (totalMass + totalAngularTangentMass)) * (tangentSpeed);
-        float maxFriction = constraint.noMaxFriction ? std::numeric_limits<float>::max() : constraint.friction * cf.normalImpulse;
+        float maxFriction = constraint.friction * cf.normalImpulse;
         float newImpulseTangent = std::max(std::min(cf.tangentImpulse + lambda, maxFriction), -maxFriction);
         lambda = newImpulseTangent - cf.tangentImpulse;
         cf.tangentImpulse = newImpulseTangent;
@@ -476,11 +481,13 @@ static inline void solveContactVelocityConstraint(VelocityConstraint & constrain
 Physics::Physics(aunteater::EntityManager & aEntityManager) :
     bodyObserver{this},
     pivotObserver{this},
-    weldObserver{this}
+    weldObserver{this},
+    distanceObserver{this}
 {
     aEntityManager.getFamily<PhysicalBody>().registerObserver(&bodyObserver);
     aEntityManager.getFamily<Pivotable>().registerObserver(&pivotObserver);
     aEntityManager.getFamily<Weldable>().registerObserver(&weldObserver);
+    aEntityManager.getFamily<Distanceable>().registerObserver(&distanceObserver);
 
     //Initiliazing the query functions
     queryFunctions[ShapeType_Hull][ShapeType_Hull] = QueryFacePenetration;
@@ -493,7 +500,7 @@ Physics::Physics(aunteater::EntityManager & aEntityManager) :
     collisionBoxes.reserve(128);
 }
 
-void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputState)
+void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
 {
     velocities.clear();
     positions.clear();
@@ -681,7 +688,6 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
                         bodyRef->invMoi * crossA * crossA + bodyInc->invMoi * crossB * crossB,
                         bodyRef->invMoi * crossATangent * crossATangent + bodyInc->invMoi * crossBTangent * crossBTangent,
                         sqrt(bodyRef->friction * bodyInc->friction),
-                        bodyRef->noMaxFriction || bodyInc->noMaxFriction,
                         std::max(bodyRef->friction, bodyInc->friction),
                         manifold.normal,
                         tangent,
@@ -689,6 +695,7 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
                         
                         contact,
                     });
+                    velocityConstraints.back().debugRender();
                 }
             }
         }
@@ -736,7 +743,7 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
     {
         for (auto & constraint : jointConstraints)
         {
-            constraint->SolveVelocityConstraint();
+            constraint->SolveVelocityConstraint(aTimer);
         }
 
         for (VelocityConstraint & constraint : velocityConstraints)
@@ -802,9 +809,9 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
             Position2 onEdgePoint = constraint.bodyPosA->c + clipPoint;
 
             Position2 point = constraint.bodyPosB->c + rB;
-            float separation = (point.as<math::Vec>() - onEdgePoint.as<math::Vec>()).dot(normal) - physic::gLinearSlop * 4.;
+            float separation = (point.as<math::Vec>() - onEdgePoint.as<math::Vec>()).dot(normal) - 4.f * physic::gLinearSlop;
 
-            float C = std::min(0., std::max(-.2, .2 * (separation + physic::gLinearSlop)));
+            float C = std::min(0.f, std::max(-physic::gMaxLinearCorrection, physic::gBaumgarteFactor * (separation + physic::gLinearSlop)));
 
             float rnA = twoDVectorCross(rA, normal);
             float rnB = twoDVectorCross(rB, normal);
@@ -820,7 +827,7 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState & aInputSta
             constraint.bodyPosB->p += constraint.invMassB * impulse;
             constraint.bodyPosB->a += math::Radian<float>{constraint.invMoiB * twoDVectorCross(rB, impulse)};
 
-            jointOkay = jointOkay && separation >= -4. * physic::gLinearSlop;
+            jointOkay = jointOkay && separation >= -3. * physic::gLinearSlop;
         }
 
         if (jointOkay)
