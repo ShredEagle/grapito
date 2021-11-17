@@ -12,8 +12,6 @@
 
 #include <graphics/CameraUtilities.h>
 
-#include <resource/PathProvider.h>
-
 
 namespace ad {
 namespace grapito {
@@ -29,6 +27,7 @@ auto makeInterpolation(std::shared_ptr<graphics::AppInterface> aAppInterface, GL
 }
 
 MenuScene::MenuScene(Menu aMenu,
+                     const filesystem::path & aFontPath,
                      std::shared_ptr<graphics::AppInterface> aAppInterface,
                      std::shared_ptr<GameScene> aGameScene) :
     mMenu{std::move(aMenu)},
@@ -36,7 +35,7 @@ MenuScene::MenuScene(Menu aMenu,
     mOptionalGameScene{aGameScene},
     mRenderEffect{mAppInterface},
     mShaping{mAppInterface->getFramebufferSize()},
-    mTexting{resource::pathFor(menu::gFont), menu::gTextHeight, menu::gViewedHeight, mAppInterface},
+    mTexting{aFontPath, menu::gTextHeight, menu::gViewedHeight, mAppInterface},
     // Useless, it is setup before transitions. But there is no default ctor.
     mMenuXPosition{makeInterpolation(mAppInterface, 0.f, 0.f)} 
 {

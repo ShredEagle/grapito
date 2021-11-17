@@ -44,15 +44,16 @@ int main(int /*argc*/, const char ** /*argv*/)
         ad::grapito::ImguiState imguiState;
         DebugUI debugUI;
 
-        resource::ResourceManager resources{gRepositoryRoot / filesystem::path{"../grapito_media/assets/"}};
+        std::shared_ptr<resource::ResourceManager> resources =
+            std::make_shared<resource::ResourceManager>(gRepositoryRoot / filesystem::path{"../grapito_media/assets/"});
 
         // The splashscreens are the initial state
         // note: coordinates are used for window proportions
         StateMachine topLevelFlow{setupSplashScreen(application.getAppInterface()->getWindowSize(),
-                                                    resources)};
+                                                    *resources)};
 
         // The next state in the stack is the main menu
-        topLevelFlow.putNext(setupMainMenu(application.getAppInterface()));
+        topLevelFlow.putNext(setupMainMenu(resources, application.getAppInterface()));
 
         GrapitoTimer timer{static_cast<float>(glfwGetTime())};
         GameInputState inputState;

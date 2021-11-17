@@ -55,6 +55,7 @@ class MenuScene : public State
 {
 public:
     MenuScene(Menu aMenu,
+              const filesystem::path & aFontPath,
               std::shared_ptr<graphics::AppInterface> aAppInterface,
               std::shared_ptr<GameScene> aGameScene = nullptr);
 
