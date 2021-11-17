@@ -7,6 +7,8 @@
 
 #include <graphics/AppInterface.h>
 
+#include <resource/ResourceManager.h>
+
 #include <memory>
 
 
@@ -17,7 +19,8 @@ namespace grapito {
 class GameScene : public State, public std::enable_shared_from_this<GameScene>
 {
 public:
-    GameScene(std::shared_ptr<graphics::AppInterface> aAppInterface);
+    GameScene(std::shared_ptr<resource::ResourceManager> aResources,
+              std::shared_ptr<graphics::AppInterface> aAppInterface);
 
     UpdateStatus update(
         GrapitoTimer & aTimer,
@@ -36,6 +39,7 @@ protected:
 
 private:
     TimeSystemsUpdater mUpdater;
+    std::shared_ptr<resource::ResourceManager> mResources;
 }; 
 
 

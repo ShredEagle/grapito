@@ -6,6 +6,7 @@
 #include "../Utils/RenderEffect.h"
 
 #include <graphics/AppInterface.h>
+#include <graphics/Texting.h>
 #include <graphics/TrivialShaping.h>
 
 #include <math/Interpolation.h>
@@ -37,6 +38,11 @@ struct Menu
     auto size() const
     { return mButtons.size(); }
 
+    UiButton & operator[](std::size_t aButtonIndex)
+    {
+        return mButtons[aButtonIndex];
+    }
+
     std::vector<UiButton> mButtons;
     std::vector<UiButton>::size_type mSelected = 0;
 };
@@ -49,6 +55,7 @@ class MenuScene : public State
 {
 public:
     MenuScene(Menu aMenu,
+              const filesystem::path & aFontPath,
               std::shared_ptr<graphics::AppInterface> aAppInterface,
               std::shared_ptr<GameScene> aGameScene = nullptr);
 
@@ -74,6 +81,11 @@ public:
 
 private:
     std::pair<TransitionProgress, UpdateStatus> scrollMenu(GrapitoTimer & aTimer);
+
+    /// \brief Generate menu geometry and fonts, and update all vertex buffers of renderers.
+    void updateMenuBuffers();
+
+    /// \brief Have renderers draw the menu to screen.
     void renderMenu();
 
     Menu mMenu;
@@ -85,6 +97,7 @@ private:
     std::shared_ptr<GameScene> mOptionalGameScene; 
     RenderEffect mRenderEffect;
     graphics::TrivialShaping mShaping;
+    graphics::Texting mTexting;
     math::Interpolation<
         GLfloat,
         GrapitoTimer::Value_t,

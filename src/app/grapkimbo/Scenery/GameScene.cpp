@@ -11,8 +11,10 @@ namespace ad {
 namespace grapito {
 
 
-GameScene::GameScene(std::shared_ptr<graphics::AppInterface> aAppInterface) :
-    mAppInterface{std::move(aAppInterface)}
+GameScene::GameScene(std::shared_ptr<resource::ResourceManager> aResources,
+                     std::shared_ptr<graphics::AppInterface> aAppInterface) :
+    mAppInterface{std::move(aAppInterface)},
+    mResources{std::move(aResources)}
 {}
 
 
@@ -24,7 +26,7 @@ UpdateStatus GameScene::update(
     InputState gamePause = aInputs.get(Controller::KeyboardMouse)[Command::Start];
     if (gamePause.positiveEdge())
     {
-        aStateMachine.pushState(setupPauseMenu(mAppInterface, shared_from_this()));
+        aStateMachine.pushState(setupPauseMenu(mResources, mAppInterface, shared_from_this()));
         // Causes troubles with detection of next press of pause button
         // it would still be the same edge!
         //return aStateMachine.update(aTimer, aInputs);

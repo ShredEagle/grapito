@@ -35,10 +35,8 @@ Render::Render(aunteater::EntityManager & aEntityManager,
 
 void Render::update(const GrapitoTimer, const GameInputState &)
 {
-    mTrivialShaping.clearShapes();
     mTrivialLineStrip.clearLines();
     mTrivialPolygon.clearPolygons();
-    debugDrawer->clear();
     mAppInterface->clear();
 
     for (auto & [geometry, body, visualRectangle] : mBodyRectangles)
@@ -55,11 +53,13 @@ void Render::update(const GrapitoTimer, const GameInputState &)
         );
     }
 
+    // shapes vector to receive all rectangle to be drawn by TrivialShaping renderer.
+    std::vector<graphics::TrivialShaping::Rectangle> shapes;
     for(const auto [geometry, visualRectangle] : mRectangles)
     {
         // TODO should control drawing of Scope::RopeStructure rectangles
         // based on Imgui widgets.
-        mTrivialShaping.addRectangle({
+        shapes.push_back({
             {
                 static_cast<math::Position<2, GLfloat>>(geometry.position),
                 static_cast<math::Size<2, GLfloat>>(geometry.dimension)  
@@ -104,7 +104,7 @@ void Render::update(const GrapitoTimer, const GameInputState &)
 
     for (const auto & [geometry, body, data] : mCrosshairs)
     {
-        mTrivialShaping.addRectangle({
+        shapes.push_back({
                 {
                     static_cast<math::Position<2, GLfloat>>(geometry.position + body.massCenter.as<math::Vec>() + data.mAimVector * 5.f - Vec2{0.25f, 0.25f}),
                     {0.5f, 0.5f}
@@ -135,10 +135,10 @@ void Render::update(const GrapitoTimer, const GameInputState &)
         setOrthographicView(mCurving,
                             {geometry.position, 0.f},
                             graphics::getViewVolume(mAppInterface->getWindowSize(), render::gViewedHeight, 1.f, 2.f));
-        setViewedRectangle(debugDrawer->mTrivialShaping, viewed);
-        setViewedRectangle(debugDrawer->mTrivialLineStrip, viewed);
+        debugDrawer->setViewedRectangle(viewed);
     }
 
+    mTrivialShaping.updateInstances(shapes);
     render();
 }
 
@@ -149,7 +149,6 @@ void Render::render() const
     mTrivialShaping.render();
     mTrivialPolygon.render();
     mCurving.render(mBeziers);
-    debugDrawer->render();
 }
 
 } // namespace grapito

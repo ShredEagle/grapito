@@ -30,8 +30,9 @@ namespace ad {
 namespace grapito {
 
 
-RopeGame::RopeGame(std::shared_ptr<graphics::AppInterface> aAppInterface) :
-    GameScene{std::move(aAppInterface)}
+RopeGame::RopeGame(std::shared_ptr<resource::ResourceManager> aResources,
+                   std::shared_ptr<graphics::AppInterface> aAppInterface) :
+    GameScene{std::move(aResources), std::move(aAppInterface)}
 {
 
     mSystemManager.add<Control>();
