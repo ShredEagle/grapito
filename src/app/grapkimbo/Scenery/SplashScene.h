@@ -18,7 +18,7 @@ struct Splash
     template <class T_value>
     using Evaluator = std::function<T_value(GrapitoTimer::Value_t)>;
 
-    graphics::Image mImage;
+    arte::ImageRgba mImage;
     typename GrapitoTimer::Value_t mDuration; 
     Evaluator<math::hdr::Rgb> mBufferClearColor = [](auto){return math::hdr::gBlack;};
     Evaluator<GLfloat> mSpriteOpacity = [](auto){return 1.f;};

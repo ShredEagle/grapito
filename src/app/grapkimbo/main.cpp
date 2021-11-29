@@ -16,8 +16,6 @@
 
 #include <graphics/ApplicationGlfw.h>
 
-#include <renderer/Image.h>
-
 #include <resource/ResourceManager.h>
 
 #include <iostream>

@@ -49,13 +49,14 @@ UpdateStatus SplashScene::update(
     if (! mLoadedSprite)
     {
         mLoadedSprite = mSpriting.load(current().mImage);
-        mSpritePlacement_w = ((mScreenSize_w - current().mImage.dimension()) / 2).as<math::Position>();
+        mSpritePlacement_w = ((mScreenSize_w - current().mImage.dimensions()) / 2).as<math::Position>();
     }
 
     graphics::AppInterface::setClearColor(current().mBufferClearColor(aTimer.delta()));
     graphics::AppInterface::clear();
-    mSpriting.render(std::array<graphics::Spriting::Instance, 1>{ 
+    mSpriting.updateInstances(std::array<graphics::Spriting::Instance, 1>{ 
         graphics::Spriting::Instance{mSpritePlacement_w, *mLoadedSprite, current().mSpriteOpacity(aTimer.delta())} });
+    mSpriting.render();
     return UpdateStatus::SwapBuffers;
 }
 

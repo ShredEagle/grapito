@@ -19,7 +19,7 @@ std::shared_ptr<SplashScene> setupSplashScreen(math::Size<2, int> aResolution,
     std::shared_ptr<SplashScene> scene = std::make_unique<SplashScene>(aResolution);
     scene->splashes.push_back(
         {
-            graphics::Image{aResources.pathFor("images/splashes/splash.bmp").string()},
+            arte::ImageRgba{aResources.pathFor("images/splashes/splash.bmp")},
             splash::gDuration,
         });
 
@@ -40,7 +40,7 @@ std::shared_ptr<SplashScene> setupSplashScreen(math::Size<2, int> aResolution,
 
     scene->splashes.push_back(
         {
-            graphics::Image{aResources.pathFor("images/splashes/cpp.png").string()},
+            arte::ImageRgba{aResources.pathFor("images/splashes/cpp.png")},
             splash::gDuration,
             [interpolation = math::makeInterpolation<math::ease::SmoothStep>(math::hdr::gBlack,
                                                                              game::gClearColor,
