@@ -13,7 +13,7 @@
 #include <aunteater/Timer.h>
 
 #include <math/Angle.h>
-#include <math/Interpolation.h>
+#include <math/Interpolation/Interpolation.h>
 #include <math/Matrix.h>
 
 #include <iostream>

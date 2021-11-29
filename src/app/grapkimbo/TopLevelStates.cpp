@@ -6,7 +6,7 @@
 
 #include "Utils/CompositeTransition.h"
 
-#include <math/Interpolation.h>
+#include <math/Interpolation/Interpolation.h>
 
 
 namespace ad {
@@ -25,9 +25,9 @@ std::shared_ptr<SplashScene> setupSplashScreen(math::Size<2, int> aResolution,
 
     CompositeTransition<GLfloat, GrapitoTimer::Value_t> spriteOpacity(0.f);
     spriteOpacity.pushConstant(splash::gHiddenDuration)
-                 .pushInterpolation<math::ease::Linear>(1.f, splash::gLinearDuration)
+                 .pushInterpolation<math::None/*linear*/>(1.f, splash::gLinearDuration)
                  .pushConstant(splash::gConstantDuration)
-                 .pushInterpolation<math::ease::Linear>(0.f, splash::gLinearDuration)
+                 .pushInterpolation<math::None>(0.f, splash::gLinearDuration)
     // Useless: the behaviour is programmed to be "constant at last value anyway
     //             .pushConstant(splash::gHiddenDuration); // T
                  ;
@@ -42,9 +42,10 @@ std::shared_ptr<SplashScene> setupSplashScreen(math::Size<2, int> aResolution,
         {
             arte::ImageRgba{aResources.pathFor("images/splashes/cpp.png")},
             splash::gDuration,
-            [interpolation = math::makeInterpolation<math::ease::SmoothStep>(math::hdr::gBlack,
-                                                                             game::gClearColor,
-                                                                             splash::gDuration)]
+            [interpolation = 
+                math::makeInterpolation<math::None, math::ease::SmoothStep>(math::hdr::gBlack,
+                                                                            game::gClearColor,
+                                                                            splash::gDuration)]
                 (auto aDelta) mutable
                 {
                     return interpolation.advance(aDelta);

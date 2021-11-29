@@ -3,7 +3,7 @@
 
 #include <aunteater/Component.h>
 
-#include <math/Interpolation.h>
+#include <math/Interpolation/Interpolation.h>
 #include <math/Vector.h>
 
 #include <optional>
@@ -14,7 +14,7 @@ namespace ad {
 
 struct CameraGuide : public aunteater::Component<CameraGuide>
 {
-    using Interpolation_type = math::Interpolation<float, float, math::ease::SmoothStep<float>>;
+    using Interpolation_type = math::Interpolation<float, float, math::None, math::ease::SmoothStep>;
 
     enum class OnCompletion
     {
