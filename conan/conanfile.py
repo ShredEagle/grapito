@@ -26,6 +26,8 @@ class GrapitoConan(ConanFile):
         ("glad/0.1.34"),
         ("imgui/1.84.2"),
         ("spdlog/1.9.2"),
+        ("openal/1.21.1"),
+        ("vorbis/1.3.7"),
 
         ("aunteater/9cd7bd9340@adnn/develop"),
         ("graphics/b100c3e84d@adnn/develop"),
@@ -33,7 +35,8 @@ class GrapitoConan(ConanFile):
         ("websocket/ef5d5bf4d9@adnn/develop"),
     )
 
-    generators = "cmake_paths", "cmake_find_package", "CMakeToolchain"
+
+    generators = "cmake_paths", "cmake_find_package_multi", "CMakeToolchain"
     build_policy = "missing"
     # Otherwise, conan removes the imported imgui backends after build()
     # they are still required for the CMake config phase of package()

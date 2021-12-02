@@ -34,7 +34,8 @@ void RopeCreation::addedEntity(aunteater::LiveEntity & aEntity)
 
     aunteater::weak_entity link = mEntityManager.addEntity(createRopeSegment(
         origin,
-        end
+        end,
+        player->get<AccelAndSpeed>()
     ));
 
     aunteater::weak_entity joint = mEntityManager.addEntity(
@@ -79,7 +80,8 @@ void RopeCreation::handleThrow(RopeCreator & aRopeCreator)
             {
                 aunteater::weak_entity link = mEntityManager.addEntity(createRopeSegment(
                     origin,
-                    end
+                    end,
+                    player->get<AccelAndSpeed>()
                 ));
 
                 aunteater::weak_entity joint = mEntityManager.addEntity(
