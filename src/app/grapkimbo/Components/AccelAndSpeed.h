@@ -15,7 +15,7 @@ struct AccelAndSpeed : public aunteater::Component<AccelAndSpeed>
     explicit AccelAndSpeed(Vec2 baseSpeed = Vec2::Zero(), float aW = 0.f) :
         accel{Vec2::Zero()},
         speed{std::move(baseSpeed)},
-        oldSpeed{std::move(baseSpeed)},
+        oldSpeed{speed},
         w{aW}
     {}
 

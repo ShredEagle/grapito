@@ -46,8 +46,11 @@ RopeGame::RopeGame(std::shared_ptr<resource::ResourceManager> aResources,
     mSystemManager.add<CameraGuidedControl>();
     mSystemManager.add<GrappleCleanup>();
     mSystemManager.add<DelayDeleter>();
+
     mRenderSystem = mSystemManager.add<Render>(mAppInterface); 
-    
+    mRenderSystem->loadSpriteAnimation(
+        arte::AnimationSpriteSheet::LoadAseFile(mResources->pathFor("sprite_sheet/run.json"))
+    );
 
     // Camera
     aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera());

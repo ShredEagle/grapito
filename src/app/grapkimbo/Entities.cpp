@@ -1,5 +1,6 @@
 #include "Entities.h"
 
+#include "Components/AnimatedSprite.h"
 #include "Components/CameraGuide.h"
 #include "Components/CameraTag.h"
 #include "Components/Controllable.h"
@@ -31,6 +32,9 @@ aunteater::Entity makePlayer(int aIndex,
                              GrappleMode aGrappleMode)
 {
     aunteater::Entity player = aunteater::Entity()
+        .add<AnimatedSprite>("run",
+                             // TODO read the duration as expected
+                             math::makeParameterAnimation<math::FullRange, math::periodic::Repeat>(800.f, 1000.f))
         .add<Controllable>(aController)
         .add<GrappleControl>(aGrappleMode)
         .add<PlayerData>(aIndex, aColor)
@@ -47,7 +51,7 @@ aunteater::Entity makePlayer(int aIndex,
             1.f,
             std::vector<CollisionType>{CollisionType_Static_Env}
             )
-        .add<VisualRectangle>(aColor)
+        //.add<VisualRectangle>(aColor)
         .add<Mass>(player::gMass)
     ;
 

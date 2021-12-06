@@ -18,6 +18,8 @@ set(${TARGET_NAME}_HEADERS
     Utilities.h
 
     Components/AccelAndSpeed.h
+    Components/AnimatedSprite.h
+    Components/Body.h
     Components/CameraGuide.h
     Components/CameraTag.h
     Components/Controllable.h
@@ -28,12 +30,10 @@ set(${TARGET_NAME}_HEADERS
     Components/PivotJoint.h
     Components/PlayerData.h
     Components/Position.h
+    Components/RopeCreator.h
     Components/VisualOutline.h
     Components/VisualPolygon.h
     Components/VisualRectangle.h
-    Components/Body.h
-    Components/AccelAndSpeed.h
-    Components/RopeCreator.h
     Components/WeldJoint.h
 
     Systems/CameraGuidedControl.h
@@ -81,6 +81,7 @@ set(${TARGET_NAME}_HEADERS
 set(${TARGET_NAME}_SOURCES
     main.cpp
 
+    Configuration.cpp
     DebugUI.cpp
     Input.cpp
     Logging.cpp

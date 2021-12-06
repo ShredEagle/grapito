@@ -10,6 +10,7 @@
 #include <vector>
 
 namespace ad {
+namespace grapito {
 
 
 namespace anchor
@@ -41,6 +42,7 @@ namespace debug
 
 namespace game
 {
+    extern const math::Size<2, int> gAppResolution;
     constexpr math::hdr::Rgb gClearColor{0.1, 0.2, 0.3};
 } // namespace game
 
@@ -104,6 +106,7 @@ namespace player
 namespace render
 {
     constexpr float gViewedHeight = 50.f;
+    extern const GLfloat gSpritePixelWorldSize;
     constexpr GLsizei gBezierSubdivisions = 30;
 } // namespace render
 
@@ -137,4 +140,6 @@ namespace splash
     constexpr float gDuration = 2 * (gHiddenDuration + gLinearDuration) + gConstantDuration;
 } // namespace splash
 
+
+} // namespace grapito 
 } // namespace ad

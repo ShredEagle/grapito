@@ -25,15 +25,17 @@ Render::Render(aunteater::EntityManager & aEntityManager,
     mOutlines{mEntityManager},
     mRopes{mEntityManager},
     mCrosshairs{mEntityManager},
+    mSprites{mEntityManager},
     mCameras{mEntityManager},
     mAppInterface{aAppInterface},
     mTrivialShaping{aAppInterface->getWindowSize()},
     mTrivialLineStrip{aAppInterface->getWindowSize()},
     mTrivialPolygon{aAppInterface->getWindowSize()},
-    mCurving{render::gBezierSubdivisions}
+    mCurving{render::gBezierSubdivisions},
+    mSpriting{render::gSpritePixelWorldSize}
 {}
 
-void Render::update(const GrapitoTimer, const GameInputState &)
+void Render::update(const GrapitoTimer aTimer, const GameInputState &)
 {
     mTrivialLineStrip.clearLines();
     mTrivialPolygon.clearPolygons();
@@ -123,6 +125,20 @@ void Render::update(const GrapitoTimer, const GameInputState &)
             });
     }
 
+    { // Animated sprites
+        std::vector<graphics::Spriting::Instance> sprites;
+        for(const auto & [position, animatedSprite] : mSprites)
+        {
+            sprites.emplace_back(
+                position.position, 
+                mAnimator.at(
+                    animatedSprite.animation,
+                    animatedSprite.parameter(aTimer.delta())
+                ));
+        }
+        mSpriting.updateInstances(sprites);
+    }
+
     for(const auto & [cameraTag, geometry] : mCameras)
     {
         auto viewed = math::Rectangle<GLfloat>{
@@ -135,6 +151,7 @@ void Render::update(const GrapitoTimer, const GameInputState &)
         setOrthographicView(mCurving,
                             {geometry.position, 0.f},
                             graphics::getViewVolume(mAppInterface->getWindowSize(), render::gViewedHeight, 1.f, 2.f));
+        setViewedRectangle(mSpriting, viewed);
         debugDrawer->setViewedRectangle(viewed);
     }
 
@@ -149,7 +166,15 @@ void Render::render() const
     mTrivialShaping.render();
     mTrivialPolygon.render();
     mCurving.render(mBeziers);
+    mSpriting.render();
 }
+
+
+void Render::loadSpriteAnimation(const arte::AnimationSpriteSheet & aSpriteSheet)
+{
+    mAnimator.load(aSpriteSheet, mSpriting);
+}
+
 
 } // namespace grapito
 } // namespace ad
