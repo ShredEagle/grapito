@@ -3,7 +3,6 @@
 #include "CameraGuidedControl.h" // for Camera archetype
 #include "RopeCreation.h" // for RopeCreator archetype
 
-#include "../Components/AnimatedSprite.h"
 #include "../Components/Body.h"
 #include "../Components/CameraTag.h"
 #include "../Components/PlayerData.h"
@@ -11,6 +10,7 @@
 #include "../Components/VisualOutline.h"
 #include "../Components/VisualRectangle.h"
 #include "../Components/VisualPolygon.h"
+#include "../Components/VisualSprite.h"
 
 #include "../Utils/RopeUtilities.h"
 
@@ -38,7 +38,7 @@ typedef aunteater::Archetype<Position, Body, VisualRectangle> RenderedBodyRectan
 typedef aunteater::Archetype<Position, Body, VisualPolygon> RenderedBodyPolygon;
 typedef aunteater::Archetype<Position, VisualOutline> RenderedOutline;
 typedef aunteater::Archetype<Position, Body, PlayerData> AimVector;
-typedef aunteater::Archetype<Position, AnimatedSprite> RenderedSprite;
+typedef aunteater::Archetype<Position, VisualSprite> RenderedSprite;
 
 class Render : public aunteater::System<GrapitoTimer, GameInputState>
 {
@@ -51,8 +51,12 @@ public:
 
     void update(const GrapitoTimer aTimer, const GameInputState &) override;
 
-    //void loadSpriteAnimations(std::initializer_list<
-    void loadSpriteAnimation(const arte::AnimationSpriteSheet & aSpriteSheet);
+    /// \brief Load all animations from the sprite sheet range into the animator.
+    /// Those animations will then ben drawable by the Renderer.
+    template <class T_iterator>
+    void loadSpriteAnimations(T_iterator aSpriteSheetBegin, T_iterator aSpriteSheetEnd,
+                              graphics::sprite::Animator & aAnimator);
+                             
 
 private:
     aunteater::EntityManager & mEntityManager;
@@ -71,12 +75,23 @@ private:
     graphics::TrivialLineStrip mTrivialLineStrip;
     graphics::TrivialPolygon mTrivialPolygon;
     graphics::Curving mCurving;
-
-    graphics::sprite::Animator mAnimator;
     graphics::Spriting mSpriting;
 
     Spline mBeziers;
 };
+
+
+//
+// Implementations
+//
+template <class T_iterator>
+void Render::loadSpriteAnimations(T_iterator aSpriteSheetBegin, T_iterator aSpriteSheetEnd,
+                                  graphics::sprite::Animator & aAnimator)
+{
+    aAnimator.load(aSpriteSheetBegin, aSpriteSheetEnd, mSpriting);
+}
+
+
 
 } // namespace grapito
 } // namespace ad

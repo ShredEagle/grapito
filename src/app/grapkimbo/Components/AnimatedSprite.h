@@ -1,19 +1,21 @@
 #pragma once
 
 
+#include "../commons.h"
+
 #include <aunteater/Component.h>
 
 #include <functional>
 
 
 namespace ad {
-
-//TODO
-using StringId = std::string;
+namespace grapito {
 
 
 struct AnimatedSprite : public aunteater::Component<AnimatedSprite>
 {
+    AnimatedSprite() = default;
+
     template <class T_parameterAnimation>
     AnimatedSprite(StringId aAnimation, T_parameterAnimation aParameterAnimation) :
         animation{aAnimation},
@@ -29,4 +31,5 @@ struct AnimatedSprite : public aunteater::Component<AnimatedSprite>
 };
 
 
-} // namespace ad
+} // namespace grapito
+} // namespace ad 

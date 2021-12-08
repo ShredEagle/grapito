@@ -20,5 +20,9 @@ using Rectangle = math::Rectangle<float>;
 using GrapitoTimer = aunteater::Timer_base<float>;
 
 
-}
-}
+//TODO use some hashing here
+using StringId = std::string;
+
+
+} // namespace grapito
+} // namespace ad 

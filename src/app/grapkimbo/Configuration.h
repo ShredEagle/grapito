@@ -100,6 +100,8 @@ namespace player
     //constexpr double gPlayerWalkingSpeed = 7.;
     //constexpr double gPlayerGroundFriction = 0.25;
 
+    extern const float gIdleSpeedLimit;
+
 } // namespace player
 
 
@@ -140,6 +142,11 @@ namespace splash
     constexpr float gDuration = 2 * (gHiddenDuration + gLinearDuration) + gConstantDuration;
 } // namespace splash
 
+
+namespace spriteanimation
+{
+    extern const float gDefaultSpeed;
+} // namespace spriteanimation
 
 } // namespace grapito 
 } // namespace ad

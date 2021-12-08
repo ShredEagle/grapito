@@ -127,14 +127,9 @@ void Render::update(const GrapitoTimer aTimer, const GameInputState &)
 
     { // Animated sprites
         std::vector<graphics::Spriting::Instance> sprites;
-        for(const auto & [position, animatedSprite] : mSprites)
+        for(const auto & [position, visualSprite] : mSprites)
         {
-            sprites.emplace_back(
-                position.position, 
-                mAnimator.at(
-                    animatedSprite.animation,
-                    animatedSprite.parameter(aTimer.delta())
-                ));
+            sprites.emplace_back(position.position, visualSprite.sprite);
         }
         mSpriting.updateInstances(sprites);
     }
@@ -167,12 +162,6 @@ void Render::render() const
     mTrivialPolygon.render();
     mCurving.render(mBeziers);
     mSpriting.render();
-}
-
-
-void Render::loadSpriteAnimation(const arte::AnimationSpriteSheet & aSpriteSheet)
-{
-    mAnimator.load(aSpriteSheet, mSpriting);
 }
 
 

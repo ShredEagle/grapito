@@ -22,6 +22,7 @@
 #include <Systems/Render.h>
 #include <Systems/Physics.h>
 #include <Systems/RopeCreation.h>
+#include <Systems/TransitionAnimationState.h>
 
 #include <aunteater/Entity.h>
 
@@ -43,14 +44,25 @@ RopeGame::RopeGame(std::shared_ptr<resource::ResourceManager> aResources,
     mSystemManager.add<AccelSolver>();
     mSystemManager.add<Physics>();
 
+    std::shared_ptr<TransitionAnimationState> spriteAnimationSystem = 
+        mSystemManager.add<TransitionAnimationState>();
+
     mSystemManager.add<CameraGuidedControl>();
     mSystemManager.add<GrappleCleanup>();
     mSystemManager.add<DelayDeleter>();
 
     mRenderSystem = mSystemManager.add<Render>(mAppInterface); 
-    mRenderSystem->loadSpriteAnimation(
-        arte::AnimationSpriteSheet::LoadAseFile(mResources->pathFor("sprite_sheet/run.json"))
-    );
+
+    { // Load sprite animations
+        auto spriteSheets = {
+            arte::AnimationSpriteSheet::LoadAseFile(mResources->pathFor("sprite_sheet/idle.json")),
+            arte::AnimationSpriteSheet::LoadAseFile(mResources->pathFor("sprite_sheet/run.json")),
+        };
+
+        graphics::sprite::Animator animator;
+        mRenderSystem->loadSpriteAnimations(spriteSheets.begin(), spriteSheets.end(), animator);
+        spriteAnimationSystem->installAnimator(std::move(animator));
+    }
 
     // Camera
     aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera());
