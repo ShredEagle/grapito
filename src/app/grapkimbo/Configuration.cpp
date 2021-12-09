@@ -16,13 +16,15 @@ namespace game
 namespace player
 {
     const float gIdleSpeedLimit = 1;
+    const math::Size<2, float> gSize{5.6f, 7.5f};
 } // namespace player
 
 
 namespace render
 {
-    constexpr int horizontalSpriteScreenResolution = 800;
+    constexpr int horizontalSpriteScreenResolution = 600;
     const GLfloat gSpritePixelWorldSize = gViewedHeight / horizontalSpriteScreenResolution;
+    const GLfloat gSpriteOpacity = 1.f;
 } // namespace render
 
 

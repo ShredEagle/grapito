@@ -8,8 +8,10 @@ namespace grapito {
 enum class PlayerAnimation
 {
     Initial,
-    Idle,
-    Run,
+    IdleLeft,
+    IdleRight,
+    RunLeft,
+    RunRight,
 
     // Keep me last
     _Count,

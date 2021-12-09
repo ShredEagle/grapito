@@ -25,10 +25,9 @@ struct AnimationState
 {
     // TODO might probably be free functions' pointers
     AnimatedSprite mAnimatedSprite;
-    std::function<std::optional<PlayerAnimation>(
-        const AnimatedSprite & aAnimation,
-        const AccelAndSpeed & aAccelAndSpeed,
-        const PlayerData & aPlayerData)> mUpdate;
+    std::function<std::optional<PlayerAnimation>(const AnimatedSprite & aAnimation,
+                                                 const AccelAndSpeed & aAccelAndSpeed,
+                                                 const PlayerData & aPlayerData)> mUpdate;
 };
 
 

@@ -17,6 +17,7 @@ struct VisualSprite : public aunteater::Component<VisualSprite>
     {}
 
     graphics::LoadedSprite sprite;
+    math::Vec<2, int> mirroring{1, 1};
 };
 
 

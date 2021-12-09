@@ -1,6 +1,8 @@
 #pragma once
 
 
+#include "VisualSprite.h"
+
 #include "../commons.h"
 
 #include <aunteater/Component.h>
@@ -17,17 +19,19 @@ struct AnimatedSprite : public aunteater::Component<AnimatedSprite>
     AnimatedSprite() = default;
 
     template <class T_parameterAnimation>
-    AnimatedSprite(StringId aAnimation, T_parameterAnimation aParameterAnimation) :
+    AnimatedSprite(StringId aAnimation, T_parameterAnimation aParameterAnimation, bool aHorizontalMirroring = false) :
         animation{aAnimation},
         parameter{[paramAnimation = std::move(aParameterAnimation)](GLfloat aDelta) mutable
             {
                 return paramAnimation.advance(aDelta);
-            }}
+            }},
+        horizontalMirroring{aHorizontalMirroring}
     {}
 
     StringId animation;  
     // This provides type erasure for the parameter animation
     std::function<float(float)> parameter;
+    bool horizontalMirroring{false};
 };
 
 

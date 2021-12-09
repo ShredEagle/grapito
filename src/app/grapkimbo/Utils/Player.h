@@ -19,6 +19,15 @@ bool isIdle(const PlayerData & aPlayerData, const AccelAndSpeed & aAccelSpeed)
         && (std::abs(aAccelSpeed.speed.x()) < player::gIdleSpeedLimit);
 }
 
+bool isGoingLeft(const AccelAndSpeed & aAccelSpeed)
+{
+    return aAccelSpeed.speed.x() < -player::gIdleSpeedLimit;
+}
+
+bool isGoingRight(const AccelAndSpeed & aAccelSpeed)
+{
+    return aAccelSpeed.speed.x() > player::gIdleSpeedLimit;
+}
 
 } // namespace grapito
 } // namespace ad

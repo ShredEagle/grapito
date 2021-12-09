@@ -125,11 +125,14 @@ void Render::update(const GrapitoTimer aTimer, const GameInputState &)
             });
     }
 
-    { // Animated sprites
+    { // Sprites
         std::vector<graphics::Spriting::Instance> sprites;
         for(const auto & [position, visualSprite] : mSprites)
         {
-            sprites.emplace_back(position.position, visualSprite.sprite);
+            sprites.emplace_back(position.position,
+                                 visualSprite.sprite,
+                                 render::gSpriteOpacity,
+                                 visualSprite.mirroring);
         }
         mSpriting.updateInstances(sprites);
     }
