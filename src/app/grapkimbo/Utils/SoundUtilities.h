@@ -1,11 +1,15 @@
+#pragma once
+
+#include <spdlog/spdlog.h>
+
+#include <vorbis/vorbisfile.h>
+#include <al.h>
+#include <alc.h>
+
 #include <cstdint>
 #include <iostream>
 #include <string>
-#include <al.h>
-#include <alc.h>
-#include <tuple>
-#include <vector>
-#include <queue>
+#include <map>
 
 //Macro to get the file and line where the openAL call is made
 #define alCall(function, ...) alCallImpl(__FILE__, __LINE__, function, __VA_ARGS__)
@@ -15,42 +19,11 @@ namespace ad {
 namespace grapito {
 
 //Helper function to help handle openAL error which can be confusing
-bool check_al_errors(const std::string & filename, const std::uint_fast32_t line)
-{
-    ALenum error = alGetError();
-    if(error != AL_NO_ERROR)
-    {
-        std::cerr << "***ERROR*** (" << filename << ": " << line << ")\n" ;
-        switch(error)
-        {
-        case AL_INVALID_NAME:
-            std::cerr << "AL_INVALID_NAME: a bad name (ID) was passed to an OpenAL function";
-            break;
-        case AL_INVALID_ENUM:
-            std::cerr << "AL_INVALID_ENUM: an invalid enum value was passed to an OpenAL function";
-            break;
-        case AL_INVALID_VALUE:
-            std::cerr << "AL_INVALID_VALUE: an invalid value was passed to an OpenAL function";
-            break;
-        case AL_INVALID_OPERATION:
-            std::cerr << "AL_INVALID_OPERATION: the requested operation is not valid";
-            break;
-        case AL_OUT_OF_MEMORY:
-            std::cerr << "AL_OUT_OF_MEMORY: the requested operation resulted in OpenAL running out of memory";
-            throw "No more openAL memory for you";
-            break;
-        default:
-            std::cerr << "UNKNOWN AL ERROR: " << error;
-        }
-        std::cerr << std::endl;
-        return false;
-    }
-    return true;
-}
+bool check_al_errors(const std::string & filename, const std::uint_fast32_t line);
 
 //These template are here to handle the openAL function that returns non void values
 template<typename alFunction, typename... Params>
-auto alCallImpl(const char* filename,
+static auto alCallImpl(const char* filename,
     const std::uint_fast32_t line,
     alFunction function,
     Params... params)
@@ -62,7 +35,7 @@ auto alCallImpl(const char* filename,
 }
 //And void values
 template<typename alFunction, typename... Params>
-auto alCallImpl(const char* filename,
+static auto alCallImpl(const char* filename,
     const std::uint_fast32_t line,
     alFunction function,
     Params... params)
@@ -74,41 +47,11 @@ auto alCallImpl(const char* filename,
 
 //Helper function to help handle openAL context error which can be confusing
 //The code error are unfortunately different for context and not context
-bool check_alc_errors(const std::string& filename, const std::uint_fast32_t line, ALCdevice* device)
-{
-    ALCenum error = alcGetError(device);
-    if(error != ALC_NO_ERROR)
-    {
-        std::cerr << "***ERROR*** (" << filename << ": " << line << ")\n" ;
-        switch(error)
-        {
-        case ALC_INVALID_VALUE:
-            std::cerr << "ALC_INVALID_VALUE: an invalid value was passed to an OpenAL function";
-            break;
-        case ALC_INVALID_DEVICE:
-            std::cerr << "ALC_INVALID_DEVICE: a bad device was passed to an OpenAL function";
-            break;
-        case ALC_INVALID_CONTEXT:
-            std::cerr << "ALC_INVALID_CONTEXT: a bad context was passed to an OpenAL function";
-            break;
-        case ALC_INVALID_ENUM:
-            std::cerr << "ALC_INVALID_ENUM: an unknown enum value was passed to an OpenAL function";
-            break;
-        case ALC_OUT_OF_MEMORY:
-            std::cerr << "ALC_OUT_OF_MEMORY: an unknown enum value was passed to an OpenAL function";
-            break;
-        default:
-            std::cerr << "UNKNOWN ALC ERROR: " << error;
-        }
-        std::cerr << std::endl;
-        return false;
-    }
-    return true;
-}
+bool check_alc_errors(const std::string& filename, const std::uint_fast32_t line, ALCdevice* device);
 
 //These template are here to handle the openAL function that returns non void values
 template<typename alcFunction, typename ReturnType, typename... Params>
-auto alcCallImpl(const char* filename,
+static auto alcCallImpl(const char* filename,
                  const std::uint_fast32_t line,
                  alcFunction function,
                  ReturnType& returnValue,
@@ -122,7 +65,7 @@ auto alcCallImpl(const char* filename,
 
 //And void values
 template<typename alcFunction, typename... Params>
-auto alcCallImpl(const char* filename, 
+static auto alcCallImpl(const char* filename, 
                  const std::uint_fast32_t line, 
                  alcFunction function, 
                  ALCdevice* device, 
@@ -131,24 +74,6 @@ auto alcCallImpl(const char* filename,
 {
     function(std::forward<Params>(params)...);
     return check_alc_errors(filename,line,device);
-}
-
-std::vector<char> loadOggFile(const std::string & aFilename, ALenum & outFormat, ALsizei & outFreq);
-void playSound(std::vector<char> aAudioData, ALenum aFormat, ALsizei aFreq);
-
-enum AudioId
-{
-    TestSound,
-};
-
-//There is three step to play sound
-//First load the file into RAM
-//Second load the audio data into audio memory
-//Last play the sound
-class SoundManager
-{
-    private:
-        std::queue<std::tuple<AudioId, ALuint>> fileCache;
 }
 
 } // namespace grapito

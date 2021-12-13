@@ -50,6 +50,8 @@ set(${TARGET_NAME}_HEADERS
     Context/Localization.h
     Context/Resources.h
 
+    Ressources/SoundManager.h
+
     Systems/CameraGuidedControl.h
     Systems/Control.h
     Systems/DelayDeleter.h
@@ -143,6 +145,8 @@ set(${TARGET_NAME}_SOURCES
     TestScenes/Game_pendulum.cpp
     TestScenes/WeldTest.cpp
 
+    Ressources/SoundManager.cpp
+
     Scenery/GameScene.cpp
     Scenery/MenuScene.cpp
     Scenery/RopeGame.cpp
@@ -153,8 +157,8 @@ set(${TARGET_NAME}_SOURCES
     Utils/PhysicsStructs.cpp
     Utils/RenderEffect.cpp
     Utils/RopeUtilities.cpp
-    Utils/Shape.cpp
     Utils/SoundUtilities.cpp
+    Utils/Shape.cpp
 )
 
 source_group(TREE ${CMAKE_CURRENT_LIST_DIR}

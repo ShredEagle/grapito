@@ -1,5 +1,8 @@
 #include "SoundSystem.h"
 
+#include "../Components/SoundPlayer.h"
+
+#include <al.h>
 #include <alc.h>
 #include <spdlog/spdlog.h>
 
@@ -7,9 +10,11 @@ namespace ad {
 namespace grapito
 {
 
-SoundSystem::SoundSystem(aunteater::EntityManager & aEntityManager) :
-    mSounds(aEntityManager)
+SoundSystem::SoundSystem(aunteater::EntityManager & aEntityManager, SoundManager & aSoundManager) :
+    mSounds{aEntityManager},
+    mSoundManager{aSoundManager}
 {
+    aEntityManager.getFamily<SoundType>().registerObserver(this);
     mOpenALDevice = alcOpenDevice(nullptr);
     if(!mOpenALDevice)
     {
@@ -24,7 +29,7 @@ SoundSystem::SoundSystem(aunteater::EntityManager & aEntityManager) :
         }
         else
         {
-            if (!alcCall(alcMakeContextCurrent, contextIsCurrent, mOpenALDevice, mOpenALContext));
+            if (!alcCall(alcMakeContextCurrent, mContextIsCurrent, mOpenALDevice, mOpenALContext))
             {
                 spdlog::get("grapito")->error("Cannot set OpenAL to current context");
             }
@@ -34,9 +39,9 @@ SoundSystem::SoundSystem(aunteater::EntityManager & aEntityManager) :
 
 SoundSystem::~SoundSystem()
 {
-    if (contextIsCurrent)
+    if (mContextIsCurrent)
     {
-        if (!alcCall(alcMakeContextCurrent, contextIsCurrent, mOpenALDevice, nullptr))
+        if (!alcCall(alcMakeContextCurrent, mContextIsCurrent, mOpenALDevice, nullptr))
         {
             spdlog::get("grapito")->error("Well we're leaking audio memory now");
         }
@@ -49,14 +54,66 @@ SoundSystem::~SoundSystem()
         ALCboolean closed;
         if (!alcCall(alcCloseDevice, closed, mOpenALDevice, mOpenALDevice))
         {
-            spdlog::get("grapito")->error("Device just dissapeared and I don't know why");
+            spdlog::get("grapito")->error("Device just disappeared and I don't know why");
         }
 
     }
 }
 
+void SoundSystem::addedEntity(aunteater::LiveEntity &)
+{}
+
+void SoundSystem::removedEntity(aunteater::LiveEntity & aEntity)
+{
+    SoundPlayer & player = aEntity.get<SoundPlayer>();
+
+    for (auto sound : player.mSounds)
+    {
+        if (sound.mStopOnDelete)
+        {
+            mSoundManager.stopSound(sound.sourceId);
+        }
+    }
+}
+
+
 void SoundSystem::update(const GrapitoTimer, const GameInputState &)
 {
+    for (auto & [soundPlayer] : mSounds)
+    {
+        for (auto soundIterator = soundPlayer.mSounds.begin(); soundIterator != soundPlayer.mSounds.end(); ++soundIterator)
+        {
+            auto & sound = *soundIterator;
+            if (!sound.mPlaying)
+            {
+                OggSoundData & soundData = mSoundManager.loadFromCacheOrFetch({sound.mFilename, sound.mStreaming});
+                ALuint sourceId = mSoundManager.playSound(soundData);
+                sound.sourceId = sourceId;
+                mPlayingSources.emplace_back(PlayingSource{sourceId, soundIterator, soundPlayer});
+            }
+        }
+    }
+    std::vector<ALuint> sourceToDelete;
+
+    for (auto sourceIterator = mPlayingSources.begin(); sourceIterator != mPlayingSources.end();)
+    {
+        PlayingSource & playingSource = *sourceIterator;
+        ALint sourceState;
+        alCall(alGetSourcei, playingSource.mSource, AL_SOURCE_STATE, &sourceState);
+
+        if (sourceState == AL_STOPPED)
+        {
+            sourceToDelete.push_back(playingSource.mSource);
+            sourceIterator = mPlayingSources.erase(sourceIterator);
+            playingSource.mSoundPlayerReference.mSounds.erase(playingSource.mSoundDataDeleteIterator);
+        }
+        else
+        {
+            ++sourceIterator;
+        }
+    }
+
+    alCall(alDeleteSources, sourceToDelete.size(), sourceToDelete.data());
 }
 
 } // namespace grapito

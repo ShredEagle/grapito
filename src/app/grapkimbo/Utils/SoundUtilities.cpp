@@ -1,70 +1,70 @@
 #include "SoundUtilities.h"
 
-#include <vorbis/vorbisfile.h>
-
 namespace ad {
 namespace grapito {
 
-constexpr int BufferSize = 32768;
-
-std::vector<char> loadOggFile(const std::string &aFilename, ALenum & outFormat, ALsizei & outFreq)
+bool check_al_errors(const std::string & filename, const std::uint_fast32_t line)
 {
-    FILE * f = std::fopen(aFilename.c_str(), "rb");
-    vorbis_info * fileInfo;
-    OggVorbis_File oggFile;
-
-    //Get ogg vorbis file format from the file
-    ov_open(f, &oggFile, nullptr, 0);
-    //Get the info to fill out the format and frequency of the audio file
-    fileInfo = ov_info(&oggFile, -1);
-
-    if (fileInfo->channels == 1)
+    ALenum error = alGetError();
+    if(error != AL_NO_ERROR)
     {
-        outFormat = AL_FORMAT_MONO16;
+        spdlog::get("grapito")->error("***ERROR*** ({}: {})", filename, line);
+        switch(error)
+        {
+        case AL_INVALID_NAME:
+            spdlog::get("grapito")->error("AL_INVALID_NAME: a bad name (ID) was passed to an OpenAL function");
+            break;
+        case AL_INVALID_ENUM:
+            spdlog::get("grapito")->error("AL_INVALID_ENUM: an invalid enum value was passed to an OpenAL function");
+            break;
+        case AL_INVALID_VALUE:
+            spdlog::get("grapito")->error("AL_INVALID_VALUE: an invalid value was passed to an OpenAL function");
+            break;
+        case AL_INVALID_OPERATION:
+            spdlog::get("grapito")->error("AL_INVALID_OPERATION: the requested operation is not valid");
+            break;
+        case AL_OUT_OF_MEMORY:
+            spdlog::get("grapito")->error("AL_OUT_OF_MEMORY: the requested operation resulted in OpenAL running out of memory");
+            throw "No more openAL memory for you";
+            break;
+        default:
+            spdlog::get("grapito")->error("UNKNOWN AL ERROR: {}", error);
+        }
+        return false;
     }
-    else
-    {
-        outFormat = AL_FORMAT_STEREO16;
-    }
-
-    outFreq = fileInfo->rate;
-
-    long bytes;
-    char readBuffer[BufferSize];
-    int endian = 0; //0 for little endian 1 for big endian
-    int bitStream;
-    std::vector<char> dataBuffer;
-    do
-    {
-        //read from the file a readBuffer size amount of data
-        bytes = ov_read(&oggFile, readBuffer, BufferSize, endian, 2, 1, &bitStream);
-        //Add to the result dataBuffer the data that was read
-        dataBuffer.insert(dataBuffer.end(), readBuffer, readBuffer + bytes);
-    } while (bytes > 0);
-
-    ov_clear(&oggFile);
-
-    return dataBuffer;
+    return true;
 }
 
-void playSound(std::vector<char> aAudioData, ALenum aFormat, ALsizei aFreq)
+bool check_alc_errors(const std::string& filename, const std::uint_fast32_t line, ALCdevice* device)
 {
-    ALuint buffer;
-    alCall(alGenBuffers, 1, &buffer);
-    alCall(alBufferData, buffer, aFormat, aAudioData.data(), aAudioData.size(), aFreq);
+    ALCenum error = alcGetError(device);
+    if(error != ALC_NO_ERROR)
+    {
+        spdlog::get("grapito")->error("***ERROR*** ({}: {})", filename, line);
+        switch(error)
+        {
+        case ALC_INVALID_VALUE:
+            spdlog::get("grapito")->error("ALC_INVALID_VALUE: an invalid value was passed to an OpenAL function");
+            break;
+        case ALC_INVALID_DEVICE:
+            spdlog::get("grapito")->error("ALC_INVALID_DEVICE: a bad device was passed to an OpenAL function");
+            break;
+        case ALC_INVALID_CONTEXT:
+            spdlog::get("grapito")->error("ALC_INVALID_CONTEXT: a bad context was passed to an OpenAL function");
+            break;
+        case ALC_INVALID_ENUM:
+            spdlog::get("grapito")->error("ALC_INVALID_ENUM: an unknown enum value was passed to an OpenAL function");
+            break;
+        case ALC_OUT_OF_MEMORY:
+            spdlog::get("grapito")->error("ALC_OUT_OF_MEMORY: an unknown enum value was passed to an OpenAL function");
+            break;
+        default:
+            spdlog::get("grapito")->error("UNKNOWN ALC ERROR: {}", error);
+        }
+        return false;
+    }
+    return true;
+}
 
-    ALuint source;
-    alCall(alGenSources, 1, &source);
-    alCall(alSourcef, source, AL_PITCH, 1);
-    /*
-     * possible option for the source
-    alCall(alSourcef, source, AL_GAIN, 1.0f);
-    alCall(alSource3f, source, AL_POSITION, 0, 0, 0);
-    alCall(alSource3f, source, AL_VELOCITY, 0, 0, 0);
-    */
-    alCall(alSourcei, source, AL_LOOPING, AL_FALSE);
-    alCall(alSourcei, source, AL_BUFFER, buffer);
-    alCall(alSourcePlay, source);
-}
-}
-}
+} //grapito
+} //ad
