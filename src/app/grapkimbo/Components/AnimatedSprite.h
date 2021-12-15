@@ -28,7 +28,7 @@ struct AnimatedSprite : public aunteater::Component<AnimatedSprite>
         horizontalMirroring{aHorizontalMirroring}
     {}
 
-    StringId animation;  
+    StringId animation = StringId::Null();  
     // This provides type erasure for the parameter animation
     std::function<float(float)> parameter;
     bool horizontalMirroring{false};

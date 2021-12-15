@@ -3,11 +3,17 @@
 #include "../Configuration.h"
 #include "../Utils/Player.h"
 
+#include <handy/StringId_Interning.h>
+
 #include <math/Interpolation/ParameterAnimation.h>
 
 
 namespace ad {
 namespace grapito {
+
+
+const StringId idleSid = handy::internalizeString("idle");
+const StringId runSid = handy::internalizeString("run");
 
 
 enum class Mirroring
@@ -53,7 +59,7 @@ AnimationStateMachine makePlayerAnimationStateMachine(const graphics::sprite::An
 
 
     result.at(PlayerAnimation::IdleLeft) = {
-        makeLoopingAnimation("idle", aAnimator, Mirroring::Horizontal),
+        makeLoopingAnimation(idleSid, aAnimator, Mirroring::Horizontal),
         [](const AnimatedSprite & aAnimation, const AccelAndSpeed & aAccelAndSpeed, const PlayerData & aPlayerData) 
         -> std::optional<PlayerAnimation>
         {
@@ -74,7 +80,7 @@ AnimationStateMachine makePlayerAnimationStateMachine(const graphics::sprite::An
     };
 
     result.at(PlayerAnimation::IdleRight) = {
-        makeLoopingAnimation("idle", aAnimator, Mirroring::None),
+        makeLoopingAnimation(idleSid, aAnimator, Mirroring::None),
         [](const AnimatedSprite & aAnimation, const AccelAndSpeed & aAccelAndSpeed, const PlayerData & aPlayerData) 
         -> std::optional<PlayerAnimation>
         {
@@ -95,7 +101,7 @@ AnimationStateMachine makePlayerAnimationStateMachine(const graphics::sprite::An
     };
 
     result.at(PlayerAnimation::RunLeft) = {
-        makeLoopingAnimation("run", aAnimator, Mirroring::Horizontal),
+        makeLoopingAnimation(runSid, aAnimator, Mirroring::Horizontal),
         [](const AnimatedSprite & aAnimation, const AccelAndSpeed & aAccelAndSpeed, const PlayerData & aPlayerData)
         -> std::optional<PlayerAnimation>
         {
@@ -113,7 +119,7 @@ AnimationStateMachine makePlayerAnimationStateMachine(const graphics::sprite::An
     };
 
     result.at(PlayerAnimation::RunRight) = {
-        makeLoopingAnimation("run", aAnimator, Mirroring::None),
+        makeLoopingAnimation(runSid, aAnimator, Mirroring::None),
         [](const AnimatedSprite & aAnimation, const AccelAndSpeed & aAccelAndSpeed, const PlayerData & aPlayerData)
         -> std::optional<PlayerAnimation>
         {
