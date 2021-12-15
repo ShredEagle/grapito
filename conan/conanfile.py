@@ -28,11 +28,9 @@ class GrapitoConan(ConanFile):
 
         ("aunteater/e1602077f0@adnn/develop"),
         ("graphics/82b4f8dcb3@adnn/develop"),
-        ("math/b0a941d6c0@adnn/develop"),
+        ("math/ead49a29d9@adnn/develop"),
         ("websocket/1e3830b8b8@adnn/develop"),
     )
-
-    build_requires = ("cmake/3.20.4")
 
     generators = "cmake_paths", "cmake_find_package", "CMakeToolchain"
     build_policy = "missing"
