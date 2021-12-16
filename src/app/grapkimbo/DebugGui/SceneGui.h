@@ -113,12 +113,12 @@ static void drawImGui(graphics::ApplicationGlfw & aApplication, DebugUI & aUI, I
             "off",
         };
 
-        spdlog::apply_all([&](std::shared_ptr<spdlog::logger> logger) 
+        spdlog::apply_all([&](std::shared_ptr<spdlog::logger> logger)
             {
                 // I suspect this is the default logger which we are not using.
                 if (logger->name() == "") return;
 
-                ImGui::Text(logger->name().c_str());
+                ImGui::Text("%s", logger->name().c_str());
 
                 // Let's just hope that this fmt::string_view does terminate data() with a null character.
                 const char * current_item = spdlog::level::to_string_view(logger->level()).data();
