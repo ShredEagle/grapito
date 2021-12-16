@@ -26,10 +26,10 @@ class GrapitoConan(ConanFile):
         ("imgui/1.84.2"),
         ("spdlog/1.9.2"),
 
-        ("aunteater/e1602077f0@adnn/develop"),
-        ("graphics/82b4f8dcb3@adnn/develop"),
-        ("math/ead49a29d9@adnn/develop"),
-        ("websocket/1e3830b8b8@adnn/develop"),
+        ("aunteater/3e3e95d669@adnn/develop"),
+        ("graphics/4db5babbaf@adnn/develop"),
+        ("math/5d133d9943@adnn/develop"),
+        ("websocket/aa1006e3ff@adnn/develop"),
     )
 
     generators = "cmake_paths", "cmake_find_package", "CMakeToolchain"
