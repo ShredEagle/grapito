@@ -21,7 +21,7 @@ struct AnimatedSprite : public aunteater::Component<AnimatedSprite>
     template <class T_parameterAnimation>
     AnimatedSprite(StringId aAnimation, T_parameterAnimation aParameterAnimation, bool aHorizontalMirroring = false) :
         animation{aAnimation},
-        parameter{[paramAnimation = std::move(aParameterAnimation)](GLfloat aDelta) mutable
+        parameter{[paramAnimation = std::move(aParameterAnimation)](float aDelta) mutable
             {
                 return paramAnimation.advance(aDelta);
             }},
