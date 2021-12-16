@@ -22,6 +22,7 @@ public:
     GameScene(std::shared_ptr<resource::ResourceManager> aResources,
               std::shared_ptr<graphics::AppInterface> aAppInterface);
 
+    /// \brief Complete update step, including rendering.
     UpdateStatus update(
         GrapitoTimer & aTimer,
         const GameInputState & aInputs,
@@ -36,10 +37,10 @@ protected:
     aunteater::EntityManager mEntityManager;
     aunteater::SystemManager<GrapitoTimer, GameInputState> mSystemManager{mEntityManager};
     std::shared_ptr<graphics::AppInterface> mAppInterface;
+    std::shared_ptr<resource::ResourceManager> mResources;
 
 private:
     TimeSystemsUpdater mUpdater;
-    std::shared_ptr<resource::ResourceManager> mResources;
 }; 
 
 

@@ -76,8 +76,9 @@ jobs:
       - run: >
           conan create
           --build=missing
+          --profile:build build/${{ runner.os }}
+          --profile:host game
           -o ${{ steps.recipe.outputs.name }}:build_tests=True
-          -pr game
           -s compiler.cppstd=${{ matrix.cppstd }}
           conan/ ${{ steps.recipe.outputs.reference }}@
 
@@ -85,8 +86,9 @@ jobs:
       #- name: Prepare virtual run env
       #  run: >
       #    conan install -g virtualrunenv
+      #    --profile:build build/${{ runner.os }}
+      #    --profile:host game
       #    -o ${{ steps.recipe.outputs.name }}:build_tests=True
-      #    -pr game
       #    -s compiler.cppstd=${{ matrix.cppstd }}
       #    ${{ steps.recipe.outputs.reference }}@
       #

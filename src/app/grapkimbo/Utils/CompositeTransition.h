@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include <math/Interpolation.h>
+#include <math/Interpolation/Interpolation.h>
 
 #include <functional>
 #include <vector>
@@ -37,8 +37,10 @@ public:
     template <template <class> class TT_easeFunctor>
     CompositeTransition & pushInterpolation(const T_value & aTarget, T_parameter aDuration)
     {
+        // Note: only creates non-periodic parameter animations 
+        // (otherwise the interpolation step would not complete).
         mComponents.push_back(Component{
-            [evaluator = math::makeInterpolation<TT_easeFunctor>(mLastTarget, aTarget, aDuration)]
+            [evaluator = math::makeInterpolation<math::None, TT_easeFunctor>(mLastTarget, aTarget, aDuration)]
             (T_parameter aLocalInterpolationTime) mutable
             {
                 return evaluator.advance(aLocalInterpolationTime);

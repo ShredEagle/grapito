@@ -80,7 +80,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
         {
             if (std::abs(horizontalAxis) > 0.)
             {
-                if (std::abs(aas.speed.x()) <= player::gGroundSpeed)
+                if (std::abs(aas.speed.x()) <= player::gAirSpeed)
                 {
                     aas.speed += horizontalAxisSign * player::gAirSpeed * airSpeedAccelFactor * Vec2{1.f, 0.f};
                     aas.speed.x() = std::max(std::min(player::gAirSpeed, aas.speed.x()), -player::gAirSpeed);

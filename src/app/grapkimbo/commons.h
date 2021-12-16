@@ -3,6 +3,8 @@
 
 #include <aunteater/Timer.h>
 
+#include <handy/StringId.h>
+
 #include <math/Rectangle.h>
 #include <math/Vector.h>
 
@@ -20,5 +22,8 @@ using Rectangle = math::Rectangle<float>;
 using GrapitoTimer = aunteater::Timer_base<float>;
 
 
-}
-}
+using StringId = handy::StringId;
+
+
+} // namespace grapito
+} // namespace ad 

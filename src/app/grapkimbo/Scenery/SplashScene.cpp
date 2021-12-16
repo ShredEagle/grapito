@@ -2,6 +2,8 @@
 
 #include "../Configuration.h"
 
+#include <graphics/CameraUtilities.h>
+
 #include <math/VectorUtilities.h>
 
 
@@ -18,8 +20,15 @@ math::Size<2, int> getScreenSizeInWorld(math::Size<2, int> aBufferResolution)
 
 SplashScene::SplashScene(math::Size<2, int> aResolution) :
     mScreenSize_w{getScreenSizeInWorld(aResolution)},
-    mSpriting{mScreenSize_w}
-{}
+    mSpriting{}
+{
+    setViewedRectangle(
+        mSpriting,
+        math::Rectangle<GLfloat>{
+            math::Position<2, GLfloat>::Zero(), 
+            static_cast<math::Size<2, GLfloat>>(mScreenSize_w)
+        });
+}
 
 
 UpdateStatus SplashScene::update(
@@ -49,13 +58,19 @@ UpdateStatus SplashScene::update(
     if (! mLoadedSprite)
     {
         mLoadedSprite = mSpriting.load(current().mImage);
-        mSpritePlacement_w = ((mScreenSize_w - current().mImage.dimension()) / 2).as<math::Position>();
+        mSpritePlacement_w = ((mScreenSize_w - current().mImage.dimensions()) / 2).as<math::Position>();
     }
 
     graphics::AppInterface::setClearColor(current().mBufferClearColor(aTimer.delta()));
     graphics::AppInterface::clear();
-    mSpriting.render(std::array<graphics::Spriting::Instance, 1>{ 
-        graphics::Spriting::Instance{mSpritePlacement_w, *mLoadedSprite, current().mSpriteOpacity(aTimer.delta())} });
+    mSpriting.updateInstances(
+        std::array<graphics::Spriting::Instance, 1>{ 
+            graphics::Spriting::Instance{
+                static_cast<math::Position<2, GLfloat>>(mSpritePlacement_w),
+                *mLoadedSprite,
+                current().mSpriteOpacity(aTimer.delta())} 
+        });
+    mSpriting.render();
     return UpdateStatus::SwapBuffers;
 }
 
@@ -78,7 +93,6 @@ void SplashScene::onFramebufferResize(math::Size<2, int> aResolution)
 {
     // The size of the screen in world units (pixels)
     mScreenSize_w = getScreenSizeInWorld(aResolution);
-    mSpriting.setBufferResolution(mScreenSize_w); 
 }
 
 

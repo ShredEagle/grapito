@@ -20,7 +20,7 @@ namespace grapito {
 auto makeInterpolation(std::shared_ptr<graphics::AppInterface> aAppInterface, GLfloat aStartFactor, GLfloat aEndFactor)
 {
     GLfloat viewedWidth_w = math::getRatio<float>(aAppInterface->getFramebufferSize()) * menu::gViewedHeight;
-    return math::makeInterpolation<math::ease::SmoothStep>(
+    return math::makeInterpolation<math::None, math::ease::SmoothStep>(
         aStartFactor * viewedWidth_w,
         aEndFactor   * viewedWidth_w,
         menu::gTransitionDuration);

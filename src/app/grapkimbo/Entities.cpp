@@ -1,10 +1,12 @@
 #include "Entities.h"
 
+#include "Components/AnimatedSprite.h"
 #include "Components/CameraGuide.h"
 #include "Components/CameraTag.h"
 #include "Components/Controllable.h"
-#include <Components/GrappleControl.h>
 #include "Components/DelayDeletion.h"
+#include "Components/GrappleControl.h"
+#include "Components/Mass.h"
 #include "Components/PivotJoint.h"
 #include "Components/PlayerData.h"
 #include "Components/Position.h"
@@ -12,7 +14,7 @@
 #include "Components/VisualOutline.h"
 #include "Components/VisualPolygon.h"
 #include "Components/VisualRectangle.h"
-#include "Components/Mass.h"
+#include "Components/VisualSprite.h"
 
 #include "Utils/PhysicsStructs.h"
 #include "aunteater/EntityManager.h"
@@ -31,6 +33,8 @@ aunteater::Entity makePlayer(int aIndex,
                              GrappleMode aGrappleMode)
 {
     aunteater::Entity player = aunteater::Entity()
+        // The component will be populated by AnimationState system.
+        .add<AnimatedSprite>()
         .add<Controllable>(aController)
         .add<GrappleControl>(aGrappleMode)
         .add<PlayerData>(aIndex, aColor)
@@ -47,7 +51,8 @@ aunteater::Entity makePlayer(int aIndex,
             1.f,
             std::vector<CollisionType>{CollisionType_Static_Env}
             )
-        .add<VisualRectangle>(aColor)
+        //.add<VisualRectangle>(aColor)
+        .add<VisualSprite>() // handled by animation system
         .add<Mass>(player::gMass)
     ;
 

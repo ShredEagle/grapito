@@ -17,7 +17,12 @@ set(${TARGET_NAME}_HEADERS
     TopLevelStates.h
     Utilities.h
 
+    Animation/AnimationStateMachine.h
+    Animation/PlayerAnimation.h
+
     Components/AccelAndSpeed.h
+    Components/AnimatedSprite.h
+    Components/Body.h
     Components/CameraGuide.h
     Components/CameraTag.h
     Components/Controllable.h
@@ -28,12 +33,11 @@ set(${TARGET_NAME}_HEADERS
     Components/PivotJoint.h
     Components/PlayerData.h
     Components/Position.h
+    Components/RopeCreator.h
     Components/VisualOutline.h
     Components/VisualPolygon.h
     Components/VisualRectangle.h
-    Components/Body.h
-    Components/AccelAndSpeed.h
-    Components/RopeCreator.h
+    Components/VisualSprite.h
     Components/WeldJoint.h
 
     Systems/CameraGuidedControl.h
@@ -47,6 +51,7 @@ set(${TARGET_NAME}_HEADERS
     Systems/AccelSolver.h
     Systems/Physics.h
     Systems/RopeCreation.h
+    Systems/TransitionAnimationState.h
 
     TestScenes/CollisionTest.h
     TestScenes/DistanceTest.h
@@ -70,6 +75,7 @@ set(${TARGET_NAME}_HEADERS
     Utils/HomogeneousTransformation.h
     Utils/PhysicsMathUtilities.h
     Utils/PhysicsStructs.h
+    Utils/Player.h
     Utils/RenderEffect.h
     Utils/RopeUtilities.h
     Utils/Shape.h
@@ -81,11 +87,14 @@ set(${TARGET_NAME}_HEADERS
 set(${TARGET_NAME}_SOURCES
     main.cpp
 
+    Configuration.cpp
     DebugUI.cpp
     Input.cpp
     Logging.cpp
     Entities.cpp
     TopLevelStates.cpp
+
+    Animation/AnimationStateMachine.cpp
 
     Systems/CameraGuidedControl.cpp
     Systems/Control.cpp
@@ -98,6 +107,7 @@ set(${TARGET_NAME}_SOURCES
     Systems/AccelSolver.cpp
     Systems/Physics.cpp
     Systems/RopeCreation.cpp
+    Systems/TransitionAnimationState.cpp
 
     TestScenes/CollisionTest.cpp
     TestScenes/DistanceTest.cpp

@@ -10,6 +10,7 @@
 #include <vector>
 
 namespace ad {
+namespace grapito {
 
 
 namespace anchor
@@ -41,6 +42,7 @@ namespace debug
 
 namespace game
 {
+    extern const math::Size<2, int> gAppResolution;
     constexpr math::hdr::Rgb gClearColor{0.1, 0.2, 0.3};
 } // namespace game
 
@@ -75,7 +77,7 @@ namespace physic
 namespace player
 {
     constexpr float gMass = 80.f;
-    constexpr math::Size<2, float> gSize{0.8f, 1.9f};
+    extern const math::Size<2, float> gSize;
     constexpr float gInitialRopeLength = 3.f;
     constexpr math::Radian<float> gInitialAngle{math::pi<float>/3.f};
     //TODO(franz) replace with constexpr
@@ -98,13 +100,17 @@ namespace player
     //constexpr double gPlayerWalkingSpeed = 7.;
     //constexpr double gPlayerGroundFriction = 0.25;
 
+    extern const float gIdleSpeedLimit;
+
 } // namespace player
 
 
 namespace render
 {
     constexpr float gViewedHeight = 50.f;
+    extern const GLfloat gSpritePixelWorldSize;
     constexpr GLsizei gBezierSubdivisions = 30;
+    extern const GLfloat gSpriteOpacity;
 } // namespace render
 
 
@@ -137,4 +143,11 @@ namespace splash
     constexpr float gDuration = 2 * (gHiddenDuration + gLinearDuration) + gConstantDuration;
 } // namespace splash
 
+
+namespace spriteanimation
+{
+    extern const float gDefaultSpeed;
+} // namespace spriteanimation
+
+} // namespace grapito 
 } // namespace ad

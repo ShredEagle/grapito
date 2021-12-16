@@ -2,6 +2,8 @@
 
 #include "commons.h"
 
+#include "../Animation/PlayerAnimation.h"
+
 #include <aunteater/Component.h>
 
 #include <graphics/commons.h>
@@ -54,6 +56,11 @@ struct PlayerData : public aunteater::Component<PlayerData>
     aunteater::weak_entity mGrappleWeldJoint = nullptr;
 
     Vec2 mAimVector = Vec2::Zero();
+
+    // Note: Currently, the AnimatedSprite animationid is distinct from the player data current animation.
+    // This way, this enum can be specialized for player animation states, while AnimatedSprite remains generic,
+    // and several distinct PlayerAnimation states could use the same sprite animation.
+    PlayerAnimation mCurrentAnimation{PlayerAnimation::Initial};
 };
 
 

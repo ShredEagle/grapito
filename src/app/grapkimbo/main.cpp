@@ -16,8 +16,6 @@
 
 #include <graphics/ApplicationGlfw.h>
 
-#include <renderer/Image.h>
-
 #include <resource/ResourceManager.h>
 
 #include <iostream>
@@ -32,7 +30,7 @@ int main(int /*argc*/, const char ** /*argv*/)
     try
     {
         ad::graphics::ApplicationGlfw application(
-            "grapkimbo", 1600, 900,
+            "grapkimbo", game::gAppResolution.width(), game::gAppResolution.height(),
             ad::graphics::ApplicationGlfw::Window_Keep_Ratio);
         // Need to wait for the graphics logger initialized by ApplicationGlfw constructor.
         initializeLogging();

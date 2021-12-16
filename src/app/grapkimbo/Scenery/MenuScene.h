@@ -9,7 +9,7 @@
 #include <graphics/Texting.h>
 #include <graphics/TrivialShaping.h>
 
-#include <math/Interpolation.h>
+#include <math/Interpolation/Interpolation.h>
 
 #include <memory>
 #include <vector>
@@ -101,7 +101,8 @@ private:
     math::Interpolation<
         GLfloat,
         GrapitoTimer::Value_t,
-        math::ease::SmoothStep<GrapitoTimer::Value_t>> mMenuXPosition;
+        math::None,
+        math::ease::SmoothStep> mMenuXPosition;
 }; 
 
 
