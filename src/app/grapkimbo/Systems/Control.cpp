@@ -45,7 +45,8 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
             horizontalAxis = direction.x();
         }
 
-        float horizontalAxisSign = horizontalAxis / std::abs(horizontalAxis);
+        // TODO FP: Soething more robust to determine axis sign.
+        float horizontalAxisSign = horizontalAxis == 0 ? 1.f : (horizontalAxis / std::abs(horizontalAxis));
 
         float groundSpeedAccelFactor = 1.f / player::gGroundNumberOfAccelFrame;
         float groundFriction = 1.f / player::gGroundNumberOfSlowFrame;
@@ -105,7 +106,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
                 // Player wall succion
                 // This is to avoid unstucking yourself from the wall to easily
                 if (
-                    playerData.wallClingFrameCounter < 10 && 
+                    playerData.wallClingFrameCounter < 10 &&
                     ((playerData.state & PlayerCollisionState_WalledLeft && aas.speed.x() > 0.f) ||
                     (playerData.state & PlayerCollisionState_WalledRight && aas.speed.x() < 0.f))
                 )
@@ -117,7 +118,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
                 {
                     aas.speed.x() = playerData.state & PlayerCollisionState_WalledLeft ? -1.f : 1.f;
                 }
-                else 
+                else
                 {
                     playerData.wallClingFrameCounter = 0;
                 }
