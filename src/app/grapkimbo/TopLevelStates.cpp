@@ -33,7 +33,7 @@ std::shared_ptr<SplashScene> setupSplashScreen(math::Size<2, int> aResolution,
     std::shared_ptr<SplashScene> scene = std::make_unique<SplashScene>(aResolution);
     scene->splashes.push_back(
         {
-            arte::ImageRgba{aContext.resources.pathFor("images/splashes/splash.bmp")},
+            arte::ImageRgba{aContext.pathFor("images/splashes/splash.bmp")},
             splash::gDuration,
         });
 
@@ -54,7 +54,7 @@ std::shared_ptr<SplashScene> setupSplashScreen(math::Size<2, int> aResolution,
 
     scene->splashes.push_back(
         {
-            arte::ImageRgba{aContext.resources.pathFor("images/splashes/cpp.png")},
+            arte::ImageRgba{aContext.pathFor("images/splashes/cpp.png")},
             splash::gDuration,
             [interpolation = 
                 math::makeInterpolation<math::None, math::ease::SmoothStep>(math::hdr::gBlack,
@@ -94,7 +94,7 @@ std::shared_ptr<MenuScene> setupMainMenu(const std::shared_ptr<Context> & aConte
                 },
             },
         },
-        aContext->resources.pathFor(menu::gFont),
+        aContext->pathFor(menu::gFont),
         std::move(aAppInterface));
 }
 
@@ -130,7 +130,7 @@ std::shared_ptr<MenuScene> setupPauseMenu(
                 },
             },
         },
-        aContext->resources.pathFor(menu::gFont),
+        aContext->pathFor(menu::gFont),
         aAppInterface,
         std::move(aGameScene)
     );

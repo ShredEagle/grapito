@@ -55,8 +55,8 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
 
     { // Load sprite animations
         auto spriteSheets = {
-            arte::AnimationSpriteSheet::LoadAseFile(mContext->resources.pathFor("sprite_sheet/idle.json")),
-            arte::AnimationSpriteSheet::LoadAseFile(mContext->resources.pathFor("sprite_sheet/run.json")),
+            arte::AnimationSpriteSheet::LoadAseFile(mContext->pathFor("sprite_sheet/idle.json")),
+            arte::AnimationSpriteSheet::LoadAseFile(mContext->pathFor("sprite_sheet/run.json")),
         };
 
         graphics::sprite::Animator animator;
