@@ -6,20 +6,34 @@
 
 #include "Utils/CompositeTransition.h"
 
+#include <handy/StringId_Interning.h>
+
 #include <math/Interpolation/Interpolation.h>
+
+
+using namespace ad::handy::literals;
 
 
 namespace ad {
 namespace grapito {
 
 
+using handy::StringId;
+// Interning the strings allow to find them from the hash, if needed (debug).
+const StringId menu_start_sid   = handy::internalizeString("menu_start");
+const StringId menu_exit_sid    = handy::internalizeString("menu_exit");
+const StringId menu_resume_sid  = handy::internalizeString("menu_resume");
+const StringId menu_restart_sid = handy::internalizeString("menu_restart");
+const StringId menu_main_sid    = handy::internalizeString("menu_main");
+
+
 std::shared_ptr<SplashScene> setupSplashScreen(math::Size<2, int> aResolution,
-                                               const resource::ResourceManager & aResources)
+                                               const Context & aContext)
 {
     std::shared_ptr<SplashScene> scene = std::make_unique<SplashScene>(aResolution);
     scene->splashes.push_back(
         {
-            arte::ImageRgba{aResources.pathFor("images/splashes/splash.bmp")},
+            arte::ImageRgba{aContext.resources.pathFor("images/splashes/splash.bmp")},
             splash::gDuration,
         });
 
@@ -40,7 +54,7 @@ std::shared_ptr<SplashScene> setupSplashScreen(math::Size<2, int> aResolution,
 
     scene->splashes.push_back(
         {
-            arte::ImageRgba{aResources.pathFor("images/splashes/cpp.png")},
+            arte::ImageRgba{aContext.resources.pathFor("images/splashes/cpp.png")},
             splash::gDuration,
             [interpolation = 
                 math::makeInterpolation<math::None, math::ease::SmoothStep>(math::hdr::gBlack,
@@ -60,19 +74,19 @@ std::shared_ptr<SplashScene> setupSplashScreen(math::Size<2, int> aResolution,
 }
 
 
-std::shared_ptr<MenuScene> setupMainMenu(const std::shared_ptr<resource::ResourceManager> & aResources,
+std::shared_ptr<MenuScene> setupMainMenu(const std::shared_ptr<Context> & aContext,
                                          std::shared_ptr<graphics::AppInterface> aAppInterface)
 {
     return std::make_shared<MenuScene>(
         Menu {
             std::vector<UiButton>{
-                { "Start",
-                  [aResources](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface)
+                { aContext->translate(menu_start_sid),
+                  [aContext](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface)
                     {
-                        aMachine.emplaceState<RopeGame>(aResources, aAppInterface);
+                        aMachine.emplaceState<RopeGame>(aContext, aAppInterface);
                     }
                 },
-                { "Drop Grapple",
+                { aContext->translate(menu_exit_sid),
                   [](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface)
                     {
                         aAppInterface->requestCloseApplication();
@@ -80,34 +94,34 @@ std::shared_ptr<MenuScene> setupMainMenu(const std::shared_ptr<resource::Resourc
                 },
             },
         },
-        aResources->pathFor(menu::gFont),
+        aContext->resources.pathFor(menu::gFont),
         std::move(aAppInterface));
 }
 
 
 std::shared_ptr<MenuScene> setupPauseMenu(
-    const std::shared_ptr<resource::ResourceManager> & aResources,
+    const std::shared_ptr<Context> & aContext,
     std::shared_ptr<graphics::AppInterface> & aAppInterface,
     std::shared_ptr<GameScene> aGameScene)
 {
     return std::make_shared<MenuScene>(
         Menu {
             std::vector<UiButton>{
-                { "Resume",
+                { aContext->translate(menu_resume_sid),
                   [](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> &)
                     {
                         aMachine.popState(); // this
                     }
                 },
-                { "Restart",
-                  [aResources](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface)
+                { aContext->translate(menu_restart_sid),
+                  [aContext](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface)
                     {
                         aMachine.popState(); // this
                         aMachine.popState(); // running game
-                        aMachine.emplaceState<RopeGame>(aResources, aAppInterface); // new game
+                        aMachine.emplaceState<RopeGame>(aContext, aAppInterface); // new game
                     }
                 },
-                { "Main Menu",
+                { aContext->translate(menu_main_sid),
                   [](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface)
                     {
                         aMachine.popState(); // this
@@ -116,7 +130,7 @@ std::shared_ptr<MenuScene> setupPauseMenu(
                 },
             },
         },
-        aResources->pathFor(menu::gFont),
+        aContext->resources.pathFor(menu::gFont),
         aAppInterface,
         std::move(aGameScene)
     );

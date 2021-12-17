@@ -12,7 +12,7 @@ class Render;
 class RopeGame : public GameScene
 {
 public:
-    RopeGame(std::shared_ptr<resource::ResourceManager> aResources,
+    RopeGame(std::shared_ptr<Context> aContext,
              std::shared_ptr<graphics::AppInterface> aAppInterface);
 
     void render() const override;

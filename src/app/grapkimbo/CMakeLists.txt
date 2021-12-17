@@ -40,6 +40,9 @@ set(${TARGET_NAME}_HEADERS
     Components/VisualSprite.h
     Components/WeldJoint.h
 
+    Context/Context.h
+    Context/Localization.h
+
     Systems/CameraGuidedControl.h
     Systems/Control.h
     Systems/DelayDeleter.h
@@ -95,6 +98,8 @@ set(${TARGET_NAME}_SOURCES
     TopLevelStates.cpp
 
     Animation/AnimationStateMachine.cpp
+
+    Context/Localization.cpp
 
     Systems/CameraGuidedControl.cpp
     Systems/Control.cpp

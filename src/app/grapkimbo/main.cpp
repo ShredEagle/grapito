@@ -5,6 +5,8 @@
 #include "Logging.h"
 #include "TopLevelStates.h"
 
+#include "Context/Context.h"
+
 #include "DebugGui/SceneGui.h"
 
 #include "Scenery/RopeGame.h"
@@ -15,8 +17,6 @@
 #include <aunteater/Timer.h>
 
 #include <graphics/ApplicationGlfw.h>
-
-#include <resource/ResourceManager.h>
 
 #include <iostream>
 
@@ -42,16 +42,17 @@ int main(int /*argc*/, const char ** /*argv*/)
         ad::grapito::ImguiState imguiState;
         DebugUI debugUI;
 
-        std::shared_ptr<resource::ResourceManager> resources =
-            std::make_shared<resource::ResourceManager>(gRepositoryRoot / filesystem::path{"../grapito_media/assets/"});
+        std::shared_ptr<Context> context = 
+            std::make_shared<Context>(gRepositoryRoot / filesystem::path{"../grapito_media/assets/"});
+        context->locale.setLanguage("es");
 
         // The splashscreens are the initial state
         // note: coordinates are used for window proportions
         StateMachine topLevelFlow{setupSplashScreen(application.getAppInterface()->getWindowSize(),
-                                                    *resources)};
+                                                    *context)};
 
         // The next state in the stack is the main menu
-        topLevelFlow.putNext(setupMainMenu(resources, application.getAppInterface()));
+        topLevelFlow.putNext(setupMainMenu(context, application.getAppInterface()));
 
         GrapitoTimer timer{static_cast<float>(glfwGetTime())};
         GameInputState inputState;
