@@ -51,7 +51,7 @@ namespace menu
 {
     constexpr int gBlurringPasses = 6;
     constexpr float gViewedHeight = 1000.f;
-    constexpr math::Size<2, GLfloat> gButtonSize{360.f, 80.f};
+    constexpr math::Size<2, GLfloat> gButtonSize{400.f, 80.f};
     constexpr const char * gFont = "fonts/dejavu-fonts-ttf-2.37/ttf/DejaVuSans.ttf";
     constexpr GLfloat gTextHeight = 0.65f * gButtonSize.height();
     constexpr float gButtonSpacing = 100.f;

@@ -31,9 +31,9 @@ namespace ad {
 namespace grapito {
 
 
-RopeGame::RopeGame(std::shared_ptr<resource::ResourceManager> aResources,
+RopeGame::RopeGame(std::shared_ptr<Context> aContext,
                    std::shared_ptr<graphics::AppInterface> aAppInterface) :
-    GameScene{std::move(aResources), std::move(aAppInterface)}
+    GameScene{std::move(aContext), std::move(aAppInterface)}
 {
 
     mSystemManager.add<Control>();
@@ -55,8 +55,8 @@ RopeGame::RopeGame(std::shared_ptr<resource::ResourceManager> aResources,
 
     { // Load sprite animations
         auto spriteSheets = {
-            arte::AnimationSpriteSheet::LoadAseFile(mResources->pathFor("sprite_sheet/idle.json")),
-            arte::AnimationSpriteSheet::LoadAseFile(mResources->pathFor("sprite_sheet/run.json")),
+            arte::AnimationSpriteSheet::LoadAseFile(mContext->resources.pathFor("sprite_sheet/idle.json")),
+            arte::AnimationSpriteSheet::LoadAseFile(mContext->resources.pathFor("sprite_sheet/run.json")),
         };
 
         graphics::sprite::Animator animator;
