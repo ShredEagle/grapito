@@ -2,8 +2,7 @@
 
 
 #include "Localization.h"
-
-#include <resource/ResourceLocator.h>
+#include "Resources.h"
 
 
 namespace ad {
@@ -21,7 +20,9 @@ struct Context
 
     filesystem::path pathFor(const filesystem::path &aAsset) const;
 
-    resource::ResourceLocator resourceLocator;
+    const arte::AnimationSpriteSheet & loadAnimationSpriteSheet(const filesystem::path &aAsset);
+
+    Resources resources;
     Locale locale;
 };
 
@@ -30,8 +31,8 @@ struct Context
 // Implementations
 //
 inline Context::Context(const filesystem::path aRoot) :
-    resourceLocator{std::move(aRoot)},
-    locale{resourceLocator.pathFor("localization/strings.json")}
+    resources{{std::move(aRoot)}},
+    locale{resources.locator.pathFor("localization/strings.json")}
 {}
 
 
@@ -43,7 +44,13 @@ inline const std::string & Context::translate(StringId aStringId) const
 
 inline filesystem::path Context::pathFor(const filesystem::path &aAsset) const
 {
-    return resourceLocator.pathFor(aAsset);
+    return resources.locator.pathFor(aAsset);
+}
+
+
+inline const arte::AnimationSpriteSheet & Context::loadAnimationSpriteSheet(const filesystem::path &aAsset)
+{
+    return resources.animationSpriteSheets.load(aAsset, resources.locator); 
 }
 
 
