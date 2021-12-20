@@ -42,6 +42,7 @@ set(${TARGET_NAME}_HEADERS
 
     Context/Context.h
     Context/Localization.h
+    Context/Resources.h
 
     Systems/CameraGuidedControl.h
     Systems/Control.h
