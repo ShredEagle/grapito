@@ -147,6 +147,7 @@ find_package(Graphics CONFIG REQUIRED COMPONENTS arte graphics resource)
 find_package(Math CONFIG REQUIRED COMPONENTS math)
 find_package(Websocket CONFIG REQUIRED COMPONENTS websocket)
 
+find_package(Boost REQUIRED COMPONENTS program_options)
 find_package(glad REQUIRED)
 find_package(imgui REQUIRED)
 find_package(spdlog REQUIRED)
@@ -191,6 +192,7 @@ target_link_libraries(${TARGET_NAME}
         ad::resource
         ad::websocket
 
+        Boost::program_options
         glad::glad
         imgui::imgui
         spdlog::libspdlog

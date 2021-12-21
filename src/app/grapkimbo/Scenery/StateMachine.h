@@ -89,12 +89,24 @@ public:
 };
 
 
+/// \brief A dummy state added as the first in a state machine constructed without an explicit initial state.
+/// It just allows to make a normal transition to the next state.
+class EmptyState : public State
+{
+    UpdateStatus update(GrapitoTimer & , const GameInputState & , StateMachine &) override
+    {
+        return UpdateStatus::KeepFrame;
+    }
+};
+
+
 using State_ptr = std::shared_ptr<State>;
 
 class StateMachine
 {
 public:
-    StateMachine(State_ptr aInitialState);
+    StateMachine(std::shared_ptr<State> aInitialState);
+    StateMachine();
 
     UpdateStatus update(GrapitoTimer & aTimer, const GameInputState & aInputs);
 
@@ -142,6 +154,14 @@ inline StateMachine::StateMachine(std::shared_ptr<State> aInitialState) :
     mActiveState.first->beforeEnter();
 }
 
+
+inline StateMachine::StateMachine() :
+    StateMachine{std::make_shared<EmptyState>()}
+{
+    // Otherwise, the assertion that the active state cannot be "Entering" 
+    // when it is not at the top will not hold true.
+    mActiveState.second = Phase::Updating;
+}
 
 inline void StateMachine::enterNextState()
 {

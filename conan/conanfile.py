@@ -22,6 +22,7 @@ class GrapitoConan(ConanFile):
     }
 
     requires = (
+        ("boost/1.77.0"),
         ("glad/0.1.34"),
         ("imgui/1.84.2"),
         ("spdlog/1.9.2"),
