@@ -54,14 +54,11 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     mRenderSystem = mSystemManager.add<Render>(mAppInterface); 
 
     { // Load sprite animations
-        // Note: It is not obvious that it is better to maintain a permanent instance of the sprite sheet
+        // Note: It is not obvious whether it is better to maintain a permanent instance of the sprite sheet
         // (trading RAM for better load times), but this is a good pretext to use the ResourceManager.
         auto spriteSheets = {
-            // TODO C++20 should work with reference wrappers.
-            //std::ref(mContext->loadAnimationSpriteSheet("sprite_sheet/idle.json")),
-            //std::ref(mContext->loadAnimationSpriteSheet("sprite_sheet/run.json")),
-            mContext->loadAnimationSpriteSheet("sprite_sheet/idle.json"),
-            mContext->loadAnimationSpriteSheet("sprite_sheet/run.json"),
+            std::ref(mContext->loadAnimationSpriteSheet("sprite_sheet/idle.json")),
+            std::ref(mContext->loadAnimationSpriteSheet("sprite_sheet/run.json")),
         };
 
         graphics::sprite::Animator animator;
