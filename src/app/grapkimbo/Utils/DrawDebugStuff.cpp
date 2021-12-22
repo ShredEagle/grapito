@@ -38,6 +38,24 @@ namespace ad
             });
         }
 
+        void DrawDebugStuff::drawCross(const Cross & aCross)
+        {
+            grapito::Vec2 slashOffset{aCross.size / 2.f, aCross.size / 2.f};
+            grapito::Vec2 antislashOffset{aCross.size / 2.f, -aCross.size / 2.f};
+            mLines.push_back({
+                aCross.center - slashOffset,
+                aCross.center + slashOffset,
+                0.,
+                aCross.color,
+            });
+            mLines.push_back({
+                aCross.center - antislashOffset,
+                aCross.center + antislashOffset,
+                0.,
+                aCross.color,
+            });
+        }
+
         void DrawDebugStuff::drawLine(Line aLine)
         {
             mLines.push_back(aLine);

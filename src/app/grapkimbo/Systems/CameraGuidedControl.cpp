@@ -1,5 +1,9 @@
 #include "CameraGuidedControl.h"
 
+#include "../Configuration.h"
+
+#include "../Utils/DrawDebugStuff.h"
+
 
 namespace ad {
 namespace grapito {
@@ -31,9 +35,11 @@ void CameraGuidedControl::update(const GrapitoTimer aTimer, const GameInputState
         totalInfluence += cameraGuide.influence;
     }
 
+    // We know there is only one camera, but this allows to treat the camera an any other entity.
     for(const auto camera : mCameras)
     {
         camera->get<Position>().position = (accumulatedPosition / totalInfluence).as<math::Position>() ;
+        debugDrawer->drawCross({camera->get<Position>().position, debug::gCrossSize, math::sdr::gMagenta});
     }
 }
 

@@ -36,7 +36,11 @@ namespace controller
 
 namespace debug
 {
-    constexpr float gStepTimeIncrement = 0.016f;
+    extern const float gCrossSize;
+    extern const math::sdr::Rgb gDirectControlDrawColor;
+    extern const Size2 gDirectControlDrawSize;
+    extern const float gDirectControlSpeed;
+    extern const float gStepTimeIncrement;
 };
 
 
@@ -76,6 +80,7 @@ namespace physic
 
 namespace player
 {
+    extern const float gCameraWeight;
     constexpr float gMass = 80.f;
     extern const math::Size<2, float> gSize;
     constexpr float gInitialRopeLength = 3.f;

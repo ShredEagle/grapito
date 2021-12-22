@@ -16,6 +16,8 @@
 #include "Components/VisualRectangle.h"
 #include "Components/VisualSprite.h"
 
+#include "Components/Debug/DirectControlTag.h"
+
 #include "Utils/PhysicsStructs.h"
 #include "aunteater/EntityManager.h"
 #include "commons.h"
@@ -26,6 +28,15 @@
 namespace ad {
 namespace grapito
 {
+
+aunteater::Entity makeDirectControllable(Controller aController, Position2 aInitialPosition)
+{
+    return aunteater::Entity{}
+        .add<Controllable>(aController)
+        .add<debug::DirectControlTag>()
+        .add<Position>(aInitialPosition, Size2{0.f, 0.f})
+        ;
+}
 
 aunteater::Entity makePlayer(int aIndex,
                              Controller aController,

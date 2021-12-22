@@ -40,6 +40,8 @@ set(${TARGET_NAME}_HEADERS
     Components/VisualSprite.h
     Components/WeldJoint.h
 
+    Components/Debug/DirectControlTag.h
+
     Context/Context.h
     Context/Localization.h
     Context/Resources.h
@@ -56,6 +58,8 @@ set(${TARGET_NAME}_HEADERS
     Systems/Physics.h
     Systems/RopeCreation.h
     Systems/TransitionAnimationState.h
+
+    Systems/Debug/DirectControl.h
 
     TestScenes/CollisionTest.h
     TestScenes/DistanceTest.h
@@ -114,6 +118,8 @@ set(${TARGET_NAME}_SOURCES
     Systems/Physics.cpp
     Systems/RopeCreation.cpp
     Systems/TransitionAnimationState.cpp
+
+    Systems/Debug/DirectControl.cpp
 
     TestScenes/CollisionTest.cpp
     TestScenes/DistanceTest.cpp

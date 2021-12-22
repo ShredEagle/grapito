@@ -8,6 +8,17 @@ namespace grapito {
 
 constexpr float gGigantismDampeningFactor = 2.f;
 
+
+namespace debug
+{
+    const float gCrossSize = 3.f;
+    const math::sdr::Rgb gDirectControlDrawColor = math::sdr::gBlue;
+    const Size2 gDirectControlDrawSize{gCrossSize, gCrossSize};
+    const float gDirectControlSpeed = 50.f;
+    const float gStepTimeIncrement = 0.016f;
+} // namespace debug
+
+
 namespace game
 {
     const math::Size<2, int> gAppResolution{1600, 900};
@@ -16,6 +27,7 @@ namespace game
 
 namespace player
 {
+    const float gCameraWeight = 1.f;
     const float gIdleSpeedLimit = 1;
     const math::Size<2, float> gSize = math::Size<2, float>{5.6f, 7.5f} / gGigantismDampeningFactor;
     const float gGrappleFriction = 0.5f;

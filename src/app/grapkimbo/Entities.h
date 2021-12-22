@@ -22,12 +22,16 @@ namespace grapito
 {
 
 
+aunteater::Entity makeCamera(Position2 pos = {0.f, 0.f});
+
+aunteater::Entity makeDirectControllable(Controller aController,
+                                         Position2 aInitialPosition = {0.f, 0.f});
+                             
+
 aunteater::Entity makePlayer(int aIndex,
                              Controller aController,
                              math::sdr::Rgb aColor,
                              GrappleMode aGrappleMode = GrappleMode::Closest);
-
-aunteater::Entity makeCamera(Position2 pos = {0.f, 0.f});
 
 
 aunteater::Entity makeAnchor(Position2 aPosition, math::Size<2, float> aSize);

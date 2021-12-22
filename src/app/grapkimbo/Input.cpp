@@ -34,6 +34,7 @@ const GamepadInputConfig gGamepadConfig = {
     GamepadInputMapping{Jump,       GLFW_GAMEPAD_BUTTON_A, Button},
     GamepadInputMapping{Grapple,    GLFW_GAMEPAD_BUTTON_B, Button},
     GamepadInputMapping{ChangeMode, GLFW_GAMEPAD_BUTTON_Y, Button},
+    GamepadInputMapping{R3,         GLFW_GAMEPAD_BUTTON_RIGHT_THUMB, Button},
     GamepadInputMapping{Start,      GLFW_GAMEPAD_BUTTON_START, Button},
     GamepadInputMapping{LeftHorizontalAxis,  GLFW_GAMEPAD_AXIS_LEFT_X, Axis},
     GamepadInputMapping{LeftVerticalAxis,    GLFW_GAMEPAD_AXIS_LEFT_Y, AxisInverted},

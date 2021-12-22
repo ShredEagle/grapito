@@ -1,9 +1,11 @@
 #include "RopeGame.h"
 
 #include "../Entities.h"
+
 #include "Systems/DelayDeleter.h"
 #include "Systems/GrappleCleanup.h"
 #include "Systems/GrappleJointCreator.h"
+#include "Systems/Debug/DirectControl.h"
 
 #include <Components/AccelAndSpeed.h>
 #include <Components/Body.h>
@@ -35,6 +37,8 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
                    std::shared_ptr<graphics::AppInterface> aAppInterface) :
     GameScene{std::move(aContext), std::move(aAppInterface)}
 {
+
+    mSystemManager.add<debug::DirectControl>();
 
     mSystemManager.add<Control>();
     mSystemManager.add<Gravity>();
@@ -150,7 +154,12 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
 
     mEntityManager.addEntity(
         makePlayer(0, controller, math::sdr::gCyan)
-            .add<CameraGuide>(1.0f));
+            .add<CameraGuide>(player::gCameraWeight));
+
+    // Debug direct control (for camera influence)
+    mEntityManager.addEntity(
+        makeDirectControllable(controller)
+    );
 
     // Player 2
     if (isGamepadPresent(Controller::Gamepad_1))
