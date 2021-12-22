@@ -144,6 +144,7 @@ void throwGrapple(aunteater::weak_entity aPlayer, aunteater::EntityManager & aEn
                 grapplePos,
                 math::Size<2, float>{1.f, 1.f}
                 )
+            // TODO (Franz): named "configuration" instead of magic numbers.
             .add<Body>(
                 rope::grappleVertices,
                 BodyType_Dynamic,
@@ -151,7 +152,7 @@ void throwGrapple(aunteater::weak_entity aPlayer, aunteater::EntityManager & aEn
                 CollisionType_Moving_Env,
                 4.f,
                 0.f,
-                1.f,
+                player::gGrappleFriction,
                 0.3f,
                 std::vector<CollisionType>{CollisionType_Static_Env}
                 )

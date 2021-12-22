@@ -6,6 +6,7 @@
 namespace ad {
 namespace grapito {
 
+constexpr float gGigantismDampeningFactor = 2.f;
 
 namespace game
 {
@@ -16,13 +17,14 @@ namespace game
 namespace player
 {
     const float gIdleSpeedLimit = 1;
-    const math::Size<2, float> gSize{5.6f, 7.5f};
+    const math::Size<2, float> gSize = math::Size<2, float>{5.6f, 7.5f} / gGigantismDampeningFactor;
+    const float gGrappleFriction = 0.5f;
 } // namespace player
 
 
 namespace render
 {
-    constexpr int horizontalSpriteScreenResolution = 600;
+    constexpr int horizontalSpriteScreenResolution = 600 * gGigantismDampeningFactor;
     const GLfloat gSpritePixelWorldSize = gViewedHeight / horizontalSpriteScreenResolution;
     const GLfloat gSpriteOpacity = 1.f;
 } // namespace render

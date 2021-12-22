@@ -80,7 +80,7 @@ namespace player
     extern const math::Size<2, float> gSize;
     constexpr float gInitialRopeLength = 3.f;
     constexpr math::Radian<float> gInitialAngle{math::pi<float>/3.f};
-    //TODO(franz) replace with constexpr
+    //TODO(franz) move to impl file
     inline float gAcceleration = 70.f;
     inline float gGroundSpeed = 20.f;
     inline int gGroundNumberOfAccelFrame = 4;
@@ -92,7 +92,8 @@ namespace player
     inline float gJumpImpulse = 24.f; // m/s
     inline float gWallFriction = 4.f; // m/s
     inline float gDoubleJumpFactor = 1.3f; // m/s
-    inline float gGrappleBaseImpulse = 40.f;
+    inline float gGrappleBaseImpulse = 70.f;
+    extern const float gGrappleFriction;
     inline float gRopeDistanceJointFactor = 1.1f;
     //static constexpr double gAirControlAcceleration = 12.; // m/s
     //constexpr double gAcceleration = 10.;
