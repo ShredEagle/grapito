@@ -50,6 +50,8 @@ set(${TARGET_NAME}_HEADERS
     Systems/CameraGuidedControl.h
     Systems/Control.h
     Systems/DelayDeleter.h
+    Systems/GameRule.h
+    Systems/Gravity.h
     Systems/GrappleCleanup.h
     Systems/GrappleJointCreator.h
     Systems/Gravity.h
@@ -111,6 +113,7 @@ set(${TARGET_NAME}_SOURCES
     Systems/CameraGuidedControl.cpp
     Systems/Control.cpp
     Systems/DelayDeleter.cpp
+    Systems/GameRule.cpp
     Systems/Gravity.cpp
     Systems/GrappleCleanup.cpp
     Systems/GrappleJointCreator.cpp

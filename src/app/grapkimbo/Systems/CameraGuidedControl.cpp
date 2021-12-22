@@ -11,7 +11,8 @@ namespace grapito {
 
 CameraGuidedControl::CameraGuidedControl(aunteater::EntityManager & aEntityManager) :
     mCameras{aEntityManager},
-    mCameraPoints{aEntityManager}
+    mCameraPoints{aEntityManager},
+    mCameraLimiters{aEntityManager}
 {}
 
 
@@ -41,16 +42,9 @@ void CameraGuidedControl::update(const GrapitoTimer aTimer, const GameInputState
     math::Vec<2, float> accumulatedPosition = math::Vec<2, float>::Zero();
     float totalInfluence = 0.;
 
-    float lowerLimit = std::numeric_limits<float>::max();
-    float upperLimit = std::numeric_limits<float>::lowest();
-
     for (auto cameraPoint : mCameraPoints)
     {
-        auto & [cameraGuide, cameraLimits, geometry] = cameraPoint;
-
-        lowerLimit = std::min(lowerLimit, geometry.position.y() + cameraLimits.below);
-        upperLimit = std::max(upperLimit, geometry.position.y() + cameraLimits.above);
-
+        auto & [cameraGuide, geometry] = cameraPoint;
         if (cameraGuide.influenceInterpolation) 
         {
             cameraGuide.influence = cameraGuide.influenceInterpolation->advance(aTimer.delta());
@@ -65,6 +59,14 @@ void CameraGuidedControl::update(const GrapitoTimer aTimer, const GameInputState
 
         accumulatedPosition += guidePosition.as<math::Vec>() * cameraGuide.influence;
         totalInfluence += cameraGuide.influence;
+    }
+
+    float lowerLimit = std::numeric_limits<float>::max();
+    float upperLimit = std::numeric_limits<float>::lowest();
+    for (const auto & [cameraLimits, geometry] : mCameraLimiters)
+    {
+        lowerLimit = std::min(lowerLimit, geometry.position.y() + cameraLimits.below);
+        upperLimit = std::max(upperLimit, geometry.position.y() + cameraLimits.above);
     }
 
     Position2 cameraPosition =

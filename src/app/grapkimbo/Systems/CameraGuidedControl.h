@@ -18,7 +18,10 @@ namespace grapito
 {
 
 using Camera = aunteater::Archetype<CameraTag, Position>;
-using CameraPoints = aunteater::Archetype<CameraGuide, CameraLimits, Position>;
+using CameraPoints = aunteater::Archetype<CameraGuide, Position>;
+// the CameraLimits are accessed via a separate family, instead of merged into CameraPoints.
+// this is because for player-eliminiation fade-out guides, limits would be a nuisance.
+using CameraLimiter = aunteater::Archetype<CameraLimits, Position>;
 
 
 class CameraGuidedControl : public aunteater::System<GrapitoTimer, GameInputState>
@@ -31,6 +34,7 @@ public:
 private:
     const aunteater::FamilyHelp<Camera> mCameras;
     const aunteater::FamilyHelp<CameraPoints> mCameraPoints;
+    const aunteater::FamilyHelp<CameraLimiter> mCameraLimiters;
 
 };
 

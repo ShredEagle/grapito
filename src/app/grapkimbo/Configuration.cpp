@@ -22,6 +22,7 @@ namespace debug
 namespace game
 {
     const math::Size<2, int> gAppResolution{1600, 900};
+    const float gCompetitorEliminationDistance = 15.f + (render::gViewedHeight / 2.f);
 } // namespace game
 
 

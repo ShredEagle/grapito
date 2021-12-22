@@ -19,6 +19,7 @@
 #include <Systems/AccelSolver.h>
 #include <Systems/CameraGuidedControl.h>
 #include <Systems/Control.h>
+#include <Systems/GameRule.h>
 #include <Systems/Gravity.h>
 #include <Systems/LevelGeneration.h>
 #include <Systems/Render.h>
@@ -54,6 +55,9 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     mSystemManager.add<CameraGuidedControl>();
     mSystemManager.add<GrappleCleanup>();
     mSystemManager.add<DelayDeleter>();
+
+    // Done after CameraGuidedControl, to avoid having two camera guides on the frame a player is killed.
+    mSystemManager.add<GameRule>();
 
     mRenderSystem = mSystemManager.add<Render>(mAppInterface); 
 

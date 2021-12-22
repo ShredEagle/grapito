@@ -23,6 +23,9 @@ namespace camera
 {
     constexpr float gAnchorGuideFadeIn = 2.f;
     constexpr float gAnchorGuideFadeOut = 0.8f;
+
+    // When a competitor is eliminated, the duration for its camera guide fade out.
+    constexpr float gCompetitorGuideFadeOut = 2.f;
 }
 
 
@@ -48,6 +51,9 @@ namespace game
 {
     extern const math::Size<2, int> gAppResolution;
     constexpr math::hdr::Rgb gClearColor{0.1, 0.2, 0.3};
+    // If a competitor fall below this vertical limit, it is eliminated.
+    extern const float gCompetitorEliminationDistance;
+
 } // namespace game
 
 

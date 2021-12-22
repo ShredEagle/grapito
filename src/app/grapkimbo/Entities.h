@@ -33,6 +33,7 @@ aunteater::Entity makePlayer(int aIndex,
                              math::sdr::Rgb aColor,
                              GrappleMode aGrappleMode = GrappleMode::Closest);
 
+void kill(aunteater::weak_entity aPlayer, aunteater::EntityManager & aEntityManager);
 
 aunteater::Entity makeAnchor(Position2 aPosition, math::Size<2, float> aSize);
 aunteater::Entity makeAnchor(Position2 aPosition, std::vector<Position2> aVertices);
@@ -40,7 +41,7 @@ aunteater::Entity makeAnchor(Position2 aPosition, std::vector<Position2> aVertic
 
 aunteater::Entity createRopeSegment(Position2 origin, Position2 endRR);
 
-void throwGrapple(aunteater::weak_entity aEntity, aunteater::EntityManager & aEntityManager);
+void throwGrapple(aunteater::weak_entity aPlayer, aunteater::EntityManager & aEntityManager);
 
 void attachPlayerToGrapple(aunteater::weak_entity aPlayer, aunteater::EntityManager & aEntityManager);
 

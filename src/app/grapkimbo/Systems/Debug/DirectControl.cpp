@@ -5,6 +5,7 @@
 #include "../../Utils/DrawDebugStuff.h"
 
 #include "../../Components/CameraGuide.h"
+#include "../../Components/CameraLimits.h"
 
 
 namespace ad {
@@ -26,10 +27,13 @@ void DirectControl::update(const GrapitoTimer aTimer, const GameInputState & aIn
             if (directControllable->has<CameraGuide>())
             {
                 directControllable->markComponentToRemove<CameraGuide>();
+                directControllable->markComponentToRemove<CameraLimits>();
             }
             else
             {
                 directControllable->add<CameraGuide>(player::gCameraGuideWeight);
+                directControllable->add<CameraLimits>(player::gCameraLimits[0], player::gCameraLimits[1]);
+        
             }
         }
 

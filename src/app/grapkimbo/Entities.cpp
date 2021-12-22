@@ -33,7 +33,6 @@ namespace grapito
 aunteater::Entity makeDirectControllable(Controller aController, Position2 aInitialPosition)
 {
     return aunteater::Entity{}
-        .add<CameraLimits>(player::gCameraLimits[0], player::gCameraLimits[1])
         .add<Controllable>(aController)
         .add<debug::DirectControlTag>()
         .add<Position>(aInitialPosition, Size2{0.f, 0.f})
@@ -72,6 +71,31 @@ aunteater::Entity makePlayer(int aIndex,
     //aPendular.connected->add<CameraGuide>(math::makeInterpolation<math::ease::SmoothStep>(0., 1., 0.3));
 
     return player;
+}
+
+
+void kill(aunteater::weak_entity aPlayer, aunteater::EntityManager & aEntityManager)
+{
+    if (aPlayer->get<PlayerData>().grapple != nullptr)
+    {
+        detachPlayerFromGrapple(aPlayer);
+    }
+
+    // Killing the player will remove its camera guide, make a smooth transition
+    {
+        CameraGuide smoothOut = aPlayer->get<CameraGuide>();
+        smoothOut.influenceInterpolation = 
+            math::makeInterpolation<math::None, math::ease::SmoothStep>
+                                   (player::gCameraGuideWeight, 0.f, camera::gCompetitorGuideFadeOut);
+        smoothOut.completionBehaviour = CameraGuide::OnCompletion::Remove;
+
+        aEntityManager.addEntity(aunteater::Entity{}
+            .add<CameraGuide>(smoothOut)
+            .add<Position>(aPlayer->get<Position>())
+        );
+    }
+
+    aPlayer->markToRemove();
 }
 
 
