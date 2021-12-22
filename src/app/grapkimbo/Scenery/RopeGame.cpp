@@ -154,7 +154,9 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
 
     mEntityManager.addEntity(
         makePlayer(0, controller, math::sdr::gCyan)
-            .add<CameraGuide>(player::gCameraWeight));
+            .add<CameraGuide>(player::gCameraGuideWeight, player::gCameraGuideOffset)
+            .add<CameraLimits>(player::gCameraLimits[0], player::gCameraLimits[1])
+    );
 
     // Debug direct control (for camera influence)
     mEntityManager.addEntity(

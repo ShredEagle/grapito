@@ -80,7 +80,9 @@ namespace physic
 
 namespace player
 {
-    extern const float gCameraWeight;
+    extern const Vec2 gCameraGuideOffset;
+    extern const float gCameraGuideWeight;
+    extern const std::array<float, 2> gCameraLimits;
     constexpr float gMass = 80.f;
     extern const math::Size<2, float> gSize;
     constexpr float gInitialRopeLength = 3.f;

@@ -24,6 +24,7 @@ set(${TARGET_NAME}_HEADERS
     Components/AnimatedSprite.h
     Components/Body.h
     Components/CameraGuide.h
+    Components/CameraLimits.h
     Components/CameraTag.h
     Components/Controllable.h
     Components/DelayDeletion.h
@@ -77,6 +78,7 @@ set(${TARGET_NAME}_HEADERS
     Scenery/SplashScene.h
     Scenery/StateMachine.h
 
+    Utils/Camera.h
     Utils/CollisionBox.h
     Utils/CompositeTransition.h
     Utils/DrawDebugStuff.h

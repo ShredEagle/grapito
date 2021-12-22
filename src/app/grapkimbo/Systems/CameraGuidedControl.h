@@ -4,6 +4,7 @@
 #include "../Input.h"
 
 #include "../Components/CameraGuide.h"
+#include "../Components/CameraLimits.h"
 #include "../Components/CameraTag.h"
 #include "../Components/Position.h"
 
@@ -17,7 +18,7 @@ namespace grapito
 {
 
 using Camera = aunteater::Archetype<CameraTag, Position>;
-using CameraPoints = aunteater::Archetype<CameraGuide, Position>;
+using CameraPoints = aunteater::Archetype<CameraGuide, CameraLimits, Position>;
 
 
 class CameraGuidedControl : public aunteater::System<GrapitoTimer, GameInputState>

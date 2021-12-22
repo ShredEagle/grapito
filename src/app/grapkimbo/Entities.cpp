@@ -2,6 +2,7 @@
 
 #include "Components/AnimatedSprite.h"
 #include "Components/CameraGuide.h"
+#include "Components/CameraLimits.h"
 #include "Components/CameraTag.h"
 #include "Components/Controllable.h"
 #include "Components/DelayDeletion.h"
@@ -32,6 +33,7 @@ namespace grapito
 aunteater::Entity makeDirectControllable(Controller aController, Position2 aInitialPosition)
 {
     return aunteater::Entity{}
+        .add<CameraLimits>(player::gCameraLimits[0], player::gCameraLimits[1])
         .add<Controllable>(aController)
         .add<debug::DirectControlTag>()
         .add<Position>(aInitialPosition, Size2{0.f, 0.f})

@@ -2,6 +2,7 @@
 
 #include "../Configuration.h"
 
+#include "../Utils/Camera.h"
 #include "../Utils/DrawDebugStuff.h"
 
 
@@ -14,13 +15,41 @@ CameraGuidedControl::CameraGuidedControl(aunteater::EntityManager & aEntityManag
 {}
 
 
+Position2 placeCamera(Position2 aAveragePosition, float aLowerLimit, float aUpperLimit)
+{
+    // Important: this expects that the window ratio cannot change.
+    math::Rectangle<GLfloat> viewed = 
+        getViewedRectangle(aAveragePosition, math::getRatio<GLfloat>(game::gAppResolution));
+
+    // Lower limit has lower priority, handle it first so it can be overriden
+    if(viewed.yMin() > aLowerLimit)
+    {
+        viewed.y() -= (viewed.yMin() - aLowerLimit);
+    }
+
+    if(viewed.yMax() < aUpperLimit)
+    {
+        viewed.y() += (aUpperLimit - viewed.yMax());
+    }
+
+    return viewed.center();
+}
+
+
 void CameraGuidedControl::update(const GrapitoTimer aTimer, const GameInputState &)
 {
     math::Vec<2, float> accumulatedPosition = math::Vec<2, float>::Zero();
     float totalInfluence = 0.;
+
+    float lowerLimit = std::numeric_limits<float>::max();
+    float upperLimit = std::numeric_limits<float>::lowest();
+
     for (auto cameraPoint : mCameraPoints)
     {
-        auto & [cameraGuide, geometry] = cameraPoint;
+        auto & [cameraGuide, cameraLimits, geometry] = cameraPoint;
+
+        lowerLimit = std::min(lowerLimit, geometry.position.y() + cameraLimits.below);
+        upperLimit = std::max(upperLimit, geometry.position.y() + cameraLimits.above);
 
         if (cameraGuide.influenceInterpolation) 
         {
@@ -31,17 +60,25 @@ void CameraGuidedControl::update(const GrapitoTimer aTimer, const GameInputState
                 cameraPoint->markComponentToRemove<CameraGuide>();
             }
         }
-        accumulatedPosition += geometry.position.as<math::Vec>() * cameraGuide.influence;
+        Position2 guidePosition = geometry.position + cameraGuide.offset;
+        debugDrawer->drawCross({guidePosition, debug::gCrossSize, math::sdr::gBlue});
+
+        accumulatedPosition += guidePosition.as<math::Vec>() * cameraGuide.influence;
         totalInfluence += cameraGuide.influence;
     }
+
+    Position2 cameraPosition =
+        placeCamera((accumulatedPosition / totalInfluence).as<math::Position>(),
+                    lowerLimit, upperLimit);
 
     // We know there is only one camera, but this allows to treat the camera an any other entity.
     for(const auto camera : mCameras)
     {
-        camera->get<Position>().position = (accumulatedPosition / totalInfluence).as<math::Position>() ;
-        debugDrawer->drawCross({camera->get<Position>().position, debug::gCrossSize, math::sdr::gMagenta});
+        camera->get<Position>().position = cameraPosition;
+        debugDrawer->drawCross({cameraPosition, debug::gCrossSize, math::sdr::gMagenta});
     }
 }
+
 
 } // namespace grapito
 } // namespace ad

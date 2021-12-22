@@ -1,14 +1,15 @@
 #include "Render.h"
 
 #include "../Configuration.h"
+
+#include "../Utils/Camera.h"
 #include "../Utils/DrawDebugStuff.h"
 #include "../Utils/RopeUtilities.h"
-#include <graphics/TrivialPolygon.h>
 
+#include <graphics/TrivialPolygon.h>
 #include <graphics/CameraUtilities.h>
 
 #include <math/Transformations.h>
-#include <math/VectorUtilities.h>
 
 
 namespace ad {
@@ -139,10 +140,9 @@ void Render::update(const GrapitoTimer aTimer, const GameInputState &)
 
     for(const auto & [cameraTag, geometry] : mCameras)
     {
-        auto viewed = math::Rectangle<GLfloat>{
-            static_cast<math::Position<2, GLfloat>>(geometry.position),
-            math::makeSizeFromHeight(render::gViewedHeight, math::getRatio<GLfloat>(mAppInterface->getWindowSize()))
-        }.centered();
+        math::Rectangle<GLfloat> viewed = 
+            getViewedRectangle(geometry.position,
+                               math::getRatio<GLfloat>(mAppInterface->getWindowSize()));
         setViewedRectangle(mTrivialShaping, viewed);
         setViewedRectangle(mTrivialLineStrip, viewed);
         setViewedRectangle(mTrivialPolygon, viewed);

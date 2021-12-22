@@ -29,7 +29,7 @@ void DirectControl::update(const GrapitoTimer aTimer, const GameInputState & aIn
             }
             else
             {
-                directControllable->add<CameraGuide>(player::gCameraWeight);
+                directControllable->add<CameraGuide>(player::gCameraGuideWeight);
             }
         }
 
