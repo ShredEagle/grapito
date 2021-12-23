@@ -48,10 +48,15 @@ void CameraGuidedControl::update(const GrapitoTimer aTimer, const GameInputState
         if (cameraGuide.influenceInterpolation) 
         {
             cameraGuide.influence = cameraGuide.influenceInterpolation->advance(aTimer.delta());
-            if (cameraGuide.completionBehaviour == CameraGuide::OnCompletion::Remove
+            if (cameraGuide.completionBehaviour == CameraGuide::OnCompletion::RemoveComponent
                 && cameraGuide.influenceInterpolation->isCompleted())
             {
                 cameraPoint->markComponentToRemove<CameraGuide>();
+            }
+            else if (cameraGuide.completionBehaviour == CameraGuide::OnCompletion::RemoveEntity
+                     && cameraGuide.influenceInterpolation->isCompleted())
+            {
+                cameraPoint->markToRemove();
             }
         }
         Position2 guidePosition = geometry.position + cameraGuide.offset;

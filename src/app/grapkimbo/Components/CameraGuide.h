@@ -21,7 +21,8 @@ struct CameraGuide : public aunteater::Component<CameraGuide>
 
     enum class OnCompletion
     {
-        Remove,
+        RemoveComponent,
+        RemoveEntity,
         Keep,
     };
 
