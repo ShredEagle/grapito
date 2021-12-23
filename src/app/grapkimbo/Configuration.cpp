@@ -9,6 +9,11 @@ namespace grapito {
 constexpr float gGigantismDampeningFactor = 2.f;
 
 
+namespace camera
+{
+    const float gCompetitorGuideFadeOutDuration = 1.5f;
+} // namespace camera
+
 namespace debug
 {
     const float gCrossSize = 3.f;

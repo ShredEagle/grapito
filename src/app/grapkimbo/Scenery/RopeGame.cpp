@@ -153,13 +153,12 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
 
 
     // Player 1
-    Controller controller = isGamepadPresent(Controller::Gamepad_0) ?
-                            Controller::Gamepad_0 : Controller::KeyboardMouse;
+    //Controller controller = isGamepadPresent(Controller::Gamepad_0) ?
+    //                        Controller::Gamepad_0 : Controller::KeyboardMouse;
+    Controller controller = Controller::Gamepad_0;
 
     mEntityManager.addEntity(
         makePlayer(0, controller, math::sdr::gCyan)
-            .add<CameraGuide>(player::gCameraGuideWeight, player::gCameraGuideOffset)
-            .add<CameraLimits>(player::gCameraLimits[0], player::gCameraLimits[1])
     );
 
     // Debug direct control (for camera influence)
@@ -168,10 +167,14 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     );
 
     // Player 2
-    if (isGamepadPresent(Controller::Gamepad_1))
     {
-        mEntityManager.addEntity(
-            makePlayer(1, Controller::Gamepad_1, math::sdr::gMagenta));
+        //Controller controller = Controller::Gamepad_1;
+        Controller controller = Controller::KeyboardMouse;
+        if (isGamepadPresent(controller))
+        {
+            mEntityManager.addEntity(
+                makePlayer(1, controller, math::sdr::gMagenta));
+        }
     }
 }
 

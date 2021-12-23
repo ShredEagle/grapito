@@ -16,6 +16,18 @@ CameraGuidedControl::CameraGuidedControl(aunteater::EntityManager & aEntityManag
 {}
 
 
+Influence accumulateCameraGuides(const aunteater::FamilyHelp<CameraPoint> & aCameraPoints)
+{
+    Influence result{};
+    for (auto & [cameraGuide, geometry] : aCameraPoints)
+    {
+        result.accumulatedPosition += weightedGuideContribution(geometry, cameraGuide);
+        result.totalWeight += cameraGuide.influence;
+    }
+    return result;
+}
+
+
 Position2 placeCamera(Position2 aAveragePosition, float aLowerLimit, float aUpperLimit)
 {
     // Important: this expects that the window ratio cannot change.

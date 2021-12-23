@@ -25,7 +25,7 @@ namespace camera
     constexpr float gAnchorGuideFadeOut = 0.8f;
 
     // When a competitor is eliminated, the duration for its camera guide fade out.
-    constexpr float gCompetitorGuideFadeOut = 2.f;
+    extern const float gCompetitorGuideFadeOutDuration;
 }
 
 

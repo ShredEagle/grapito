@@ -18,7 +18,7 @@ namespace grapito
 {
 
 using Camera = aunteater::Archetype<CameraTag, Position>;
-using CameraPoints = aunteater::Archetype<CameraGuide, Position>;
+using CameraPoint = aunteater::Archetype<CameraGuide, Position>;
 // the CameraLimits are accessed via a separate family, instead of merged into CameraPoints.
 // this is because for player-eliminiation fade-out guides, limits would be a nuisance.
 using CameraLimiter = aunteater::Archetype<CameraLimits, Position>;
@@ -33,10 +33,21 @@ public:
 
 private:
     const aunteater::FamilyHelp<Camera> mCameras;
-    const aunteater::FamilyHelp<CameraPoints> mCameraPoints;
+    const aunteater::FamilyHelp<CameraPoint> mCameraPoints;
     const aunteater::FamilyHelp<CameraLimiter> mCameraLimiters;
 
 };
+
+
+struct Influence
+{
+    math::Vec<2, float> accumulatedPosition{math::Vec<2, float>::Zero()};
+    float totalWeight;
+};
+
+/// \brief Sum all the camera points in `aCameraPoints` into an Influence instance.
+Influence accumulateCameraGuides(const aunteater::FamilyHelp<CameraPoint> & aCameraPoints);
+
 
 } // namespace grapito
 } // namespace ad

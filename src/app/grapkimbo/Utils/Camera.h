@@ -20,5 +20,11 @@ inline math::Rectangle<GLfloat> getViewedRectangle(Position2 aCameraPosition, fl
 }
 
 
+inline Vec2 weightedGuideContribution(const Position & aGeometry, const CameraGuide & aCameraGuide)
+{
+    Position2 guidePosition = aGeometry.position + aCameraGuide.offset;
+    return guidePosition.as<math::Vec>() * aCameraGuide.influence;
+}
+
 } // namespace grapito
 } // namespace ad

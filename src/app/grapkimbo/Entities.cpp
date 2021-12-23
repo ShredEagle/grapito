@@ -46,12 +46,8 @@ aunteater::Entity makePlayer(int aIndex,
 {
     aunteater::Entity player = aunteater::Entity()
         // The component will be populated by AnimationState system.
-        .add<AnimatedSprite>()
-        .add<Controllable>(aController)
-        .add<GrappleControl>(aGrappleMode)
-        .add<PlayerData>(aIndex, aColor)
         .add<AccelAndSpeed>()
-        .add<Position>(Position2{3.f, 3.f}, player::gSize) // The position will be set by pendulum simulation
+        .add<AnimatedSprite>()
         .add<Body>(
             math::Rectangle<float>{{0.f, 0.f}, player::gSize},
             BodyType_Dynamic,
@@ -63,9 +59,15 @@ aunteater::Entity makePlayer(int aIndex,
             1.f,
             std::vector<CollisionType>{CollisionType_Static_Env}
             )
-        //.add<VisualRectangle>(aColor)
-        .add<VisualSprite>() // handled by animation system
+        .add<CameraGuide>(player::gCameraGuideWeight, player::gCameraGuideOffset)
+        .add<CameraLimits>(player::gCameraLimits[0], player::gCameraLimits[1])
+        .add<Controllable>(aController)
+        .add<GrappleControl>(aGrappleMode)
         .add<Mass>(player::gMass)
+        .add<PlayerData>(aIndex, aColor)
+        .add<Position>(Position2{3.f, 3.f}, player::gSize) // The position will be set by pendulum simulation
+        .add<VisualRectangle>(aColor)
+        .add<VisualSprite>() // handled by animation system
     ;
 
     //aPendular.connected->add<CameraGuide>(math::makeInterpolation<math::ease::SmoothStep>(0., 1., 0.3));
@@ -86,8 +88,8 @@ void kill(aunteater::weak_entity aPlayer, aunteater::EntityManager & aEntityMana
         CameraGuide smoothOut = aPlayer->get<CameraGuide>();
         smoothOut.influenceInterpolation = 
             math::makeInterpolation<math::None, math::ease::SmoothStep>
-                                   (player::gCameraGuideWeight, 0.f, camera::gCompetitorGuideFadeOut);
-        smoothOut.completionBehaviour = CameraGuide::OnCompletion::Remove;
+                                   (smoothOut.influence, 0.f, camera::gCompetitorGuideFadeOutDuration);
+        smoothOut.completionBehaviour = CameraGuide::OnCompletion::RemoveEntity;
 
         aEntityManager.addEntity(aunteater::Entity{}
             .add<CameraGuide>(smoothOut)

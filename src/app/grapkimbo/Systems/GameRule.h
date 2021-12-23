@@ -14,7 +14,7 @@ namespace ad {
 namespace grapito {
 
 
-using Competitor = aunteater::Archetype<PlayerData, Position>;
+using Competitor = aunteater::Archetype<CameraGuide, PlayerData, Position>;
 
 
 class GameRule : public aunteater::System<GrapitoTimer, GameInputState>
@@ -28,6 +28,7 @@ private:
     aunteater::EntityManager & mEntityManager;
     const aunteater::FamilyHelp<Competitor> mCompetitors;
     const aunteater::FamilyHelp<Camera> mCameras;
+    const aunteater::FamilyHelp<CameraPoint> mCameraPoints;
 };
 
 
