@@ -56,7 +56,7 @@ class FreeSoloPhase : public PhaseBase
         StateMachine & aStateMachine) override
     {
         // TODO This should be handled for all active controllers, there might not even be a gamepad.
-        if (aInputs.get(Controller::Gamepad_0)[Start].positiveEdge())
+        if (aInputs.get(Controller::Gamepad_0)[Back].positiveEdge())
         {
             aStateMachine.putNext(getPhase(GameRule::Competition));
             aStateMachine.popState();
