@@ -102,6 +102,8 @@ class EmptyState : public State
 
 using State_ptr = std::shared_ptr<State>;
 
+// TODO Ad 2012/12/23: This StateMachine class is sometimes used as a generic state machine (e.g. GameRule system)
+// Yet the UpdateStatus return type is somewhat coupled to the top-level flow state machine.
 class StateMachine
 {
 public:

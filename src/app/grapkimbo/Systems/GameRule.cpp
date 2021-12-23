@@ -10,15 +10,90 @@
 namespace ad {
 namespace grapito {
 
+
+class PhaseBase : public State
+{
+public:
+    PhaseBase(GameRule & aGameRule) :
+        mGameRule{aGameRule}
+    {}
+
+protected:
+    std::shared_ptr<State> getPhase(GameRule::Phase aPhase)
+    {
+        return mGameRule.mPhases[aPhase];
+    }
+
+    GameRule & mGameRule;
+};
+
+
+class CompetitionPhase : public PhaseBase
+{
+    using PhaseBase::PhaseBase;
+
+    UpdateStatus update(
+        GrapitoTimer &,
+        const GameInputState & aInputs,
+        StateMachine & aStateMachine) override
+    {
+        mGameRule.eliminateCompetitors();
+
+        // Note: This will have absolutely no impact, nested state machines
+        // update status is not checked.
+        return UpdateStatus::SwapBuffers;
+    }
+};
+
+
+class FreeSoloPhase : public PhaseBase
+{
+    using PhaseBase::PhaseBase;
+
+    UpdateStatus update(
+        GrapitoTimer &,
+        const GameInputState & aInputs,
+        StateMachine & aStateMachine) override
+    {
+        // TODO This should be handled for all active controllers, there might not even be a gamepad.
+        if (aInputs.get(Controller::Gamepad_0)[Start].positiveEdge())
+        {
+            aStateMachine.putNext(getPhase(GameRule::Competition));
+            aStateMachine.popState();
+        }
+        // Note: This will have absolutely no impact, nested state machines
+        // update status is not checked.
+        return UpdateStatus::SwapBuffers;
+    }
+};
+
+
+GameRule::PhasesArray setupGamePhases(GameRule & aGameRule)
+{
+    GameRule::PhasesArray result;
+    result[GameRule::FreeSolo] = std::make_shared<FreeSoloPhase>(aGameRule);
+    result[GameRule::Competition] = std::make_shared<CompetitionPhase>(aGameRule);
+    return result;
+}
+
+
 GameRule::GameRule(aunteater::EntityManager & aEntityManager) :
     mEntityManager{aEntityManager},
     mCompetitors{aEntityManager},
     mCameras{aEntityManager},
-    mCameraPoints{aEntityManager}
+    mCameraPoints{aEntityManager},
+    mPhases{setupGamePhases(*this)},
+    mPhaseMachine{mPhases[FreeSolo]}
 {}
 
 
-void GameRule::update(const GrapitoTimer, const GameInputState &)
+void GameRule::update(const GrapitoTimer aTimer, const GameInputState & aInput)
+{
+    //mPhaseMachine.update(aTimer, aInput);
+}
+
+
+void GameRule::eliminateCompetitors()
 {
     // There is the one camera
     Position2 cameraPosition = mCameras.begin()->get<Position>().position;
