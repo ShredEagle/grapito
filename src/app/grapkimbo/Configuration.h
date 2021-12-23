@@ -53,7 +53,8 @@ namespace game
     constexpr math::hdr::Rgb gClearColor{0.1, 0.2, 0.3};
     // If a competitor fall below this vertical limit, it is eliminated.
     extern const float gCompetitorEliminationDistance;
-
+    extern const float gCongratulationPhaseDuration;
+    extern const Position2 gCongratulationScreenPosition;
 } // namespace game
 
 

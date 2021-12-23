@@ -41,9 +41,8 @@ std::vector<aunteater::Entity> setupPlayers()
 
     // Player 1
     {
-        //Controller controller = isGamepadPresent(Controller::Gamepad_0) ?
-        //                        Controller::Gamepad_0 : Controller::KeyboardMouse;
-        Controller controller = Controller::Gamepad_0;
+        Controller controller = isGamepadPresent(Controller::Gamepad_0) ?
+                                Controller::Gamepad_0 : Controller::KeyboardMouse;
         players.push_back(makePlayer(0, controller, math::sdr::gCyan));
     }
 

@@ -174,6 +174,7 @@ inline void StateMachine::enterNextState()
 inline UpdateStatus StateMachine::update(const GrapitoTimer & aTimer, const GameInputState & aInputs)
 {
     // If the active state is not the top of the stack anymore, the active state is being exited.
+    // TODO If the same shared_ptr is added on top of itself, the transtion is not taking place!
     if (mActiveState.first.get() != mStates.back().get())
     {
         // Only "Updating" should be able to move to "Exiting".

@@ -4,7 +4,10 @@
 #include "../Entities.h"
 #include "../Logging.h"
 
+#include "../Components/ScreenPosition.h"
+
 #include "../Utils/Camera.h"
+#include "../Utils/CompositeTransition.h"
 
 
 namespace ad {
@@ -32,6 +35,58 @@ protected:
     GameRule & mGameRule;
 };
 
+class CongratulationPhase : public PhaseBase
+{
+    static constexpr Position2 gOutside = {-2000.f, -100.f};
+
+public:
+    CongratulationPhase(GameRule & aGameRule) :
+        PhaseBase{aGameRule},
+        mHudPositionInterpolation{gOutside}
+    {
+        mHudPositionInterpolation
+            .pushInterpolation<math::None>(game::gCongratulationScreenPosition,
+                                           game::gCongratulationPhaseDuration * (1./3.))
+            .pushConstant(game::gCongratulationPhaseDuration * (2./3.));
+    }
+
+private:
+    void beforeEnter() override
+    {
+        mHudPositionInterpolation.reset();
+        mHudText = getEntityManager().addEntity(makeHudText("Winning", gOutside));
+    }
+
+
+    UpdateStatus update(
+            const GrapitoTimer & aTimer,
+            const GameInputState & aInputs,
+            StateMachine & aStateMachine) override
+    {
+        mHudText->get<ScreenPosition>().position =
+            mHudPositionInterpolation.advance(aTimer.delta());
+        if(mHudPositionInterpolation.isCompleted())
+        {
+            aStateMachine.putNext(getPhase(GameRule::Competition));
+            aStateMachine.popState();
+        }
+
+        // Note: This will have absolutely no impact, nested state machines
+        // update status is not checked.
+        return UpdateStatus::SwapBuffers;
+    }
+
+
+    void beforeExit() override
+    {
+        mHudText->markToRemove();
+    }
+
+
+    CompositeTransition<Position2, float> mHudPositionInterpolation;
+    aunteater::weak_entity mHudText{nullptr};
+};
+
 
 class CompetitionPhase : public PhaseBase
 {
@@ -57,7 +112,13 @@ class CompetitionPhase : public PhaseBase
         const GameInputState & aInputs,
         StateMachine & aStateMachine) override
     {
-        mGameRule.eliminateCompetitors();
+        if (mGameRule.eliminateCompetitors() == 1)
+        {
+            // There is a winner
+            ADLOG(info)("Climb over.");
+            aStateMachine.putNext(getPhase(GameRule::Congratulation));
+            aStateMachine.popState();
+        }
 
         // Note: This will have absolutely no impact, nested state machines
         // update status is not checked.
@@ -83,7 +144,7 @@ class FreeSoloPhase : public PhaseBase
         StateMachine & aStateMachine) override
     {
         // TODO This should be handled for all active controllers, there might not even be a gamepad.
-        if (aInputs.get(Controller::Gamepad_0)[Back].positiveEdge())
+        if (aInputs.get(Controller::Gamepad_0)[Back].positiveEdge() && (mGameRule.mPlayers.size() > 1))
         {
             aStateMachine.putNext(getPhase(GameRule::Competition));
             aStateMachine.popState();
@@ -108,6 +169,7 @@ GameRule::PhasesArray setupGamePhases(GameRule & aGameRule)
     GameRule::PhasesArray result;
     result[GameRule::FreeSolo] = std::make_shared<FreeSoloPhase>(aGameRule);
     result[GameRule::Competition] = std::make_shared<CompetitionPhase>(aGameRule);
+    result[GameRule::Congratulation] = std::make_shared<CongratulationPhase>(aGameRule);
     return result;
 }
 
@@ -129,11 +191,12 @@ void GameRule::update(const GrapitoTimer aTimer, const GameInputState & aInput)
 }
 
 
-void GameRule::eliminateCompetitors()
+std::size_t GameRule::eliminateCompetitors()
 {
     // There is the one camera
     Position2 cameraPosition = mCameras.begin()->get<Position>().position;
 
+    std::size_t remainingCompetitors = 0;
     for (auto competitor : mCompetitors)
     {
         auto & [cameraGuide, playerData, geometry] = competitor;            
@@ -148,8 +211,12 @@ void GameRule::eliminateCompetitors()
             // provide a competitor where the archetype of a player is expected.
             kill(competitor);
         }
-
+        else
+        {
+            ++remainingCompetitors;
+        }
     }
+    return remainingCompetitors;
 }
 
 

@@ -27,6 +27,7 @@ class GameRule : public aunteater::System<GrapitoTimer, GameInputState>
     {
         FreeSolo,
         Competition, 
+        Congratulation,
 
         _End,
     };
@@ -38,6 +39,7 @@ class GameRule : public aunteater::System<GrapitoTimer, GameInputState>
     friend class PhaseBase;
     friend class FreeSoloPhase;
     friend class CompetitionPhase;
+    friend class CongratulationPhase;
 
 public:
     GameRule(aunteater::EntityManager & aEntityManager, std::vector<aunteater::Entity> aPlayers);
@@ -50,8 +52,10 @@ private:
 
     /// \brief Remove all competitors from the game.
     void killAllCompetitors(); // Can you tell I watched squid game recently?
+
     /// \brief Apply the elimination rule to each competitor, removing competitors failing the test.
-    void eliminateCompetitors();
+    /// \return The number of competitors remaining in the game after this step of eliminations.
+    std::size_t eliminateCompetitors();
 
     void prepareCameraFadeOut(Position2 aCameraPosition, const Position & aGeometry, CameraGuide & aCameraGuide);
 

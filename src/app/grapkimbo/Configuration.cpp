@@ -28,6 +28,8 @@ namespace game
 {
     const math::Size<2, int> gAppResolution{1600, 900};
     const float gCompetitorEliminationDistance = 15.f + (render::gViewedHeight / 2.f);
+    const float gCongratulationPhaseDuration = 3.f;
+    const Position2 gCongratulationScreenPosition{-200.f, -100.f};
 } // namespace game
 
 
