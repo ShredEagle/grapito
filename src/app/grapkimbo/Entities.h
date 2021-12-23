@@ -33,7 +33,7 @@ aunteater::Entity makePlayer(int aIndex,
                              math::sdr::Rgb aColor,
                              GrappleMode aGrappleMode = GrappleMode::Closest);
 
-void kill(aunteater::weak_entity aPlayer, aunteater::EntityManager & aEntityManager);
+void kill(aunteater::weak_entity aPlayer);
 
 aunteater::Entity makeAnchor(Position2 aPosition, math::Size<2, float> aSize);
 aunteater::Entity makeAnchor(Position2 aPosition, std::vector<Position2> aVertices);

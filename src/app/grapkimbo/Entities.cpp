@@ -76,25 +76,11 @@ aunteater::Entity makePlayer(int aIndex,
 }
 
 
-void kill(aunteater::weak_entity aPlayer, aunteater::EntityManager & aEntityManager)
+void kill(aunteater::weak_entity aPlayer)
 {
     if (aPlayer->get<PlayerData>().grapple != nullptr)
     {
         detachPlayerFromGrapple(aPlayer);
-    }
-
-    // Killing the player will remove its camera guide, make a smooth transition
-    {
-        CameraGuide smoothOut = aPlayer->get<CameraGuide>();
-        smoothOut.influenceInterpolation = 
-            math::makeInterpolation<math::None, math::ease::SmoothStep>
-                                   (smoothOut.influence, 0.f, camera::gCompetitorGuideFadeOutDuration);
-        smoothOut.completionBehaviour = CameraGuide::OnCompletion::RemoveEntity;
-
-        aEntityManager.addEntity(aunteater::Entity{}
-            .add<CameraGuide>(smoothOut)
-            .add<Position>(aPlayer->get<Position>())
-        );
     }
 
     aPlayer->markToRemove();

@@ -34,10 +34,36 @@ namespace ad {
 namespace grapito {
 
 
+std::vector<aunteater::Entity> setupPlayers()
+{
+    std::vector<aunteater::Entity> players;
+
+    // Player 1
+    {
+        //Controller controller = isGamepadPresent(Controller::Gamepad_0) ?
+        //                        Controller::Gamepad_0 : Controller::KeyboardMouse;
+        Controller controller = Controller::Gamepad_0;
+        players.push_back(makePlayer(0, controller, math::sdr::gCyan));
+    }
+
+    // Player 2
+    {
+        Controller controller = Controller::Gamepad_1;
+        if (isGamepadPresent(controller))
+        {
+            players.push_back(makePlayer(1, controller, math::sdr::gMagenta));
+        }
+    }
+
+    return players;
+}
+
+
 RopeGame::RopeGame(std::shared_ptr<Context> aContext,
                    std::shared_ptr<graphics::AppInterface> aAppInterface) :
     GameScene{std::move(aContext), std::move(aAppInterface)}
 {
+    std::vector<aunteater::Entity> players = setupPlayers();
 
     mSystemManager.add<debug::DirectControl>();
 
@@ -57,7 +83,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     mSystemManager.add<DelayDeleter>();
 
     // Done after CameraGuidedControl, to avoid having two camera guides on the frame a player is killed.
-    mSystemManager.add<GameRule>();
+    mSystemManager.add<GameRule>(players);
 
     mRenderSystem = mSystemManager.add<Render>(mAppInterface); 
 
@@ -151,31 +177,23 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
             makeAnchor(Position2{ gLevelHalfWidth, -2.f }, math::Size<2, float>{2.f, 100.f}));
     }
 
-
-    // Player 1
-    //Controller controller = isGamepadPresent(Controller::Gamepad_0) ?
-    //                        Controller::Gamepad_0 : Controller::KeyboardMouse;
-    Controller controller = Controller::Gamepad_0;
-
-    mEntityManager.addEntity(
-        makePlayer(0, controller, math::sdr::gCyan)
-    );
-
-    // Debug direct control (for camera influence)
-    mEntityManager.addEntity(
-        makeDirectControllable(controller)
-    );
-
-    // Player 2
+    //
+    // Players
+    //
     {
-        //Controller controller = Controller::Gamepad_1;
-        Controller controller = Controller::KeyboardMouse;
-        if (isGamepadPresent(controller))
+        for (const auto & player : players)
         {
-            mEntityManager.addEntity(
-                makePlayer(1, controller, math::sdr::gMagenta));
+            mEntityManager.addEntity(player);
         }
+
+        // Debug direct control (for camera influence)
+        mEntityManager.addEntity(
+            makeDirectControllable(players[0].get<Controllable>().controller)
+        );
+
     }
+
+
 }
 
 

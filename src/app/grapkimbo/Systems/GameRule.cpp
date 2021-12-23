@@ -77,11 +77,12 @@ GameRule::PhasesArray setupGamePhases(GameRule & aGameRule)
 }
 
 
-GameRule::GameRule(aunteater::EntityManager & aEntityManager) :
+GameRule::GameRule(aunteater::EntityManager & aEntityManager, std::vector<aunteater::Entity> aPlayers) :
     mEntityManager{aEntityManager},
     mCompetitors{aEntityManager},
     mCameras{aEntityManager},
     mCameraPoints{aEntityManager},
+    mPlayers{std::move(aPlayers)},
     mPhases{setupGamePhases(*this)},
     mPhaseMachine{mPhases[FreeSolo]}
 {}
@@ -105,25 +106,57 @@ void GameRule::eliminateCompetitors()
         {
             ADLOG(info)("Player {} eliminated!", playerData.id);
 
-            // Patch the camera guide:
-            // A player has a CameraGuide, but also CameraLimits, and the limits override the position computed from the guide.
-            // A fade-out-guide entity will be added to smoothly transition the camera once the competitor is removed, but 
-            // it will not use CameraLimits. So we need to compute the equivalent guide position.
-            Influence cameraInfluence = accumulateCameraGuides(mCameraPoints);
-            Vec2 withoutEliminated = cameraInfluence.accumulatedPosition - weightedGuideContribution(geometry, cameraGuide);
-
-            // The guide position that should be added to keep the camera position unchanged, after the competitor entity is removed.
-            Position2 patchedGuidePosition = (cameraPosition * cameraInfluence.totalWeight - withoutEliminated) / cameraGuide.influence;
-            // The fade-out-guide will be copied from the player CameraGuide: write the result there.
-            // with the added benefit that if several competitors are elmininated in the same step, this will remain correct.
-            cameraGuide.offset = patchedGuidePosition - geometry.position;
+            prepareCameraFadeOut(cameraPosition, geometry, cameraGuide);
 
             // Remove the player from the game, and 
             // TODO This is a good example of circumventing the type system with entities:
             // provide a competitor where the archetype of a player is expected.
-            kill(competitor, mEntityManager);
+            kill(competitor);
         }
 
+    }
+}
+
+
+void GameRule::prepareCameraFadeOut(Position2 aCameraPosition,
+                                    const Position & aGeometry,
+                                    CameraGuide & aCameraGuide)
+{
+    // Patch the camera guide:
+    // A player has a CameraGuide, but also CameraLimits, and the limits override the position computed from the guide.
+    // A fade-out-guide entity will be added to smoothly transition the camera once the competitor is removed, but 
+    // it will not use CameraLimits. So we need to compute the equivalent guide position.
+    Influence cameraInfluence = accumulateCameraGuides(mCameraPoints);
+    Vec2 withoutEliminated = cameraInfluence.accumulatedPosition - weightedGuideContribution(aGeometry, aCameraGuide);
+
+    // The guide position that should be added to keep the camera position unchanged, after the competitor entity is removed.
+    Position2 patchedGuidePosition = (aCameraPosition * cameraInfluence.totalWeight - withoutEliminated) 
+                                     / aCameraGuide.influence;
+    // The fade-out-guide will be copied from the player CameraGuide: write the result there.
+    // with the added benefit that if several competitors are elmininated in the same step, this will remain correct.
+    aCameraGuide.offset = patchedGuidePosition - aGeometry.position;
+
+    // Prepare the smooth fade-out camera transition.
+    {
+        CameraGuide smoothOut = aCameraGuide;
+        smoothOut.influenceInterpolation = 
+            math::makeInterpolation<math::None, math::ease::SmoothStep>
+                                   (smoothOut.influence, 0.f, camera::gCompetitorGuideFadeOutDuration);
+        smoothOut.completionBehaviour = CameraGuide::OnCompletion::RemoveEntity;
+
+        mEntityManager.addEntity(aunteater::Entity{}
+            .add<CameraGuide>(smoothOut)
+            .add<Position>(aGeometry)
+        );
+    }
+}
+
+
+void GameRule::killAllCompetitors()
+{
+    for (auto competitor : mCompetitors)
+    {
+        kill(competitor);
     }
 }
 
