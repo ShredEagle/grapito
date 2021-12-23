@@ -18,17 +18,47 @@
 
 #include <graphics/ApplicationGlfw.h>
 
+#include <boost/program_options.hpp>
+
 #include <iostream>
 
 
 using namespace ad;
 using namespace ad::grapito;
 
+namespace po = boost::program_options;
 
-int main(int /*argc*/, const char ** /*argv*/)
+po::variables_map handleCommandLine(int argc, const char ** argv)
+{
+    po::options_description desc("Allowed options");
+    desc.add_options()
+        ("help", "Produce help message.")
+        ("skip_splash", po::bool_switch(), "Skip splash screens.");
+
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+
+    if (vm.count("help")) 
+    {
+        std::cout << desc << "\n";
+    }
+
+    return vm;
+}      
+
+
+int main(int argc, const char ** argv)
 {
     try
     {
+        po::variables_map arguments = handleCommandLine(argc, argv);
+
+        if (arguments.count("help")) 
+        {
+            std::exit(EXIT_SUCCESS);
+        }
+
         ad::graphics::ApplicationGlfw application(
             "grapkimbo", game::gAppResolution.width(), game::gAppResolution.height(),
             ad::graphics::ApplicationGlfw::Window_Keep_Ratio);
@@ -46,13 +76,19 @@ int main(int /*argc*/, const char ** /*argv*/)
             std::make_shared<Context>(gRepositoryRoot / filesystem::path{"../grapito_media/assets/"});
         context->locale.setLanguage("es");
 
-        // The splashscreens are the initial state
-        // note: coordinates are used for window proportions
-        StateMachine topLevelFlow{setupSplashScreen(application.getAppInterface()->getWindowSize(),
-                                                    *context)};
+        StateMachine topLevelFlow;
+        
+        // Important: Here states are added to the top with pushState, so they are added in reverse order.
 
         // The next state in the stack is the main menu
-        topLevelFlow.putNext(setupMainMenu(context, application.getAppInterface()));
+        topLevelFlow.pushState(setupMainMenu(context, application.getAppInterface()));
+
+        if (!arguments["skip_splash"].as<bool>())
+        {
+            // note: coordinates are used for window proportions
+            topLevelFlow.pushState(setupSplashScreen(application.getAppInterface()->getWindowSize(),
+                                                     *context));
+        }
 
         GrapitoTimer timer{static_cast<float>(glfwGetTime())};
         GameInputState inputState;

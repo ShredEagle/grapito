@@ -84,6 +84,12 @@ public:
         return mCompleted;
     }
 
+    void reset()
+    {
+        mCurrent = 0;
+        mLocalTime = 0;
+        mCompleted = false;
+    }
 
 private:
     T_parameter getLastEndTime()

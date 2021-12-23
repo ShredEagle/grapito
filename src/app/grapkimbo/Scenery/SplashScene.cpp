@@ -32,7 +32,7 @@ SplashScene::SplashScene(math::Size<2, int> aResolution) :
 
 
 UpdateStatus SplashScene::update(
-    GrapitoTimer & aTimer,
+    const GrapitoTimer & aTimer,
     const GameInputState & aInputs,
     StateMachine & aStateMachine)
 {

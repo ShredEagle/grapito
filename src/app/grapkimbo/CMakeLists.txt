@@ -24,6 +24,7 @@ set(${TARGET_NAME}_HEADERS
     Components/AnimatedSprite.h
     Components/Body.h
     Components/CameraGuide.h
+    Components/CameraLimits.h
     Components/CameraTag.h
     Components/Controllable.h
     Components/DelayDeletion.h
@@ -34,11 +35,15 @@ set(${TARGET_NAME}_HEADERS
     Components/PlayerData.h
     Components/Position.h
     Components/RopeCreator.h
+    Components/ScreenPosition.h
+    Components/Text.h
     Components/VisualOutline.h
     Components/VisualPolygon.h
     Components/VisualRectangle.h
     Components/VisualSprite.h
     Components/WeldJoint.h
+
+    Components/Debug/DirectControlTag.h
 
     Context/Context.h
     Context/Localization.h
@@ -47,15 +52,20 @@ set(${TARGET_NAME}_HEADERS
     Systems/CameraGuidedControl.h
     Systems/Control.h
     Systems/DelayDeleter.h
+    Systems/GameRule.h
+    Systems/Gravity.h
     Systems/GrappleCleanup.h
     Systems/GrappleJointCreator.h
     Systems/Gravity.h
+    Systems/Hud.h
     Systems/LevelGeneration.h
     Systems/Render.h
     Systems/AccelSolver.h
     Systems/Physics.h
     Systems/RopeCreation.h
     Systems/TransitionAnimationState.h
+
+    Systems/Debug/DirectControl.h
 
     TestScenes/CollisionTest.h
     TestScenes/DistanceTest.h
@@ -73,6 +83,7 @@ set(${TARGET_NAME}_HEADERS
     Scenery/SplashScene.h
     Scenery/StateMachine.h
 
+    Utils/Camera.h
     Utils/CollisionBox.h
     Utils/CompositeTransition.h
     Utils/DrawDebugStuff.h
@@ -105,15 +116,19 @@ set(${TARGET_NAME}_SOURCES
     Systems/CameraGuidedControl.cpp
     Systems/Control.cpp
     Systems/DelayDeleter.cpp
+    Systems/GameRule.cpp
     Systems/Gravity.cpp
     Systems/GrappleCleanup.cpp
     Systems/GrappleJointCreator.cpp
+    Systems/Hud.cpp
     Systems/LevelGeneration.cpp
     Systems/Render.cpp
     Systems/AccelSolver.cpp
     Systems/Physics.cpp
     Systems/RopeCreation.cpp
     Systems/TransitionAnimationState.cpp
+
+    Systems/Debug/DirectControl.cpp
 
     TestScenes/CollisionTest.cpp
     TestScenes/DistanceTest.cpp
@@ -147,6 +162,7 @@ find_package(Graphics CONFIG REQUIRED COMPONENTS arte graphics resource)
 find_package(Math CONFIG REQUIRED COMPONENTS math)
 find_package(Websocket CONFIG REQUIRED COMPONENTS websocket)
 
+find_package(Boost REQUIRED COMPONENTS program_options)
 find_package(glad REQUIRED)
 find_package(imgui REQUIRED)
 find_package(spdlog REQUIRED)
@@ -191,6 +207,7 @@ target_link_libraries(${TARGET_NAME}
         ad::resource
         ad::websocket
 
+        Boost::program_options
         glad::glad
         imgui::imgui
         spdlog::libspdlog

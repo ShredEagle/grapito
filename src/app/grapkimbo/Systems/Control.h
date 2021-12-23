@@ -2,13 +2,13 @@
 
 #include "Input.h"
 
-#include <Components/Controllable.h>
-#include <Components/Body.h>
 #include <Components/AccelAndSpeed.h>
+#include <Components/Body.h>
+#include <Components/Controllable.h>
 #include <Components/GrappleControl.h>
+#include <Components/Mass.h>
 #include <Components/PlayerData.h>
 #include <Components/Position.h>
-#include <Components/Mass.h>
 
 #include <aunteater/Archetype.h>
 #include <aunteater/FamilyHelp.h>

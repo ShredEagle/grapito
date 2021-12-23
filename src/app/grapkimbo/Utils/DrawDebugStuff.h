@@ -104,6 +104,13 @@ namespace ad
             math::sdr::Rgb color;
         };
 
+        struct Cross
+        {
+            math::Position<2, GLfloat> center;
+            float size;
+            math::sdr::Rgb color;
+        };
+
         class DrawDebugStuff
         {
             public:
@@ -118,6 +125,7 @@ namespace ad
                 void drawPoint(Point aPoint);
                 //void drawArrow(Arrow aArrow);
                 //void drawPoint(Point aPoint);
+                void drawCross(const Cross & aCross);
                 void render();
                 void clear();
 
@@ -144,4 +152,4 @@ namespace ad
     /// (it might only matter when we go down the concurrency path)
     /// TODO rename to gDebugDrawer
     inline std::unique_ptr<debug::DrawDebugStuff> debugDrawer;
-} // namespace
+} // namespace ad

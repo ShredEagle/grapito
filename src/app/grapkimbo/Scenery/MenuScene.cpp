@@ -44,7 +44,7 @@ MenuScene::MenuScene(Menu aMenu,
 
 
 UpdateStatus MenuScene::update(
-        GrapitoTimer & aTimer,
+        const GrapitoTimer & aTimer,
         const GameInputState & aInputs,
         StateMachine & aStateMachine)
 {
@@ -87,7 +87,7 @@ void MenuScene::beforeExit()
 }
 
 
-std::pair<TransitionProgress, UpdateStatus> MenuScene::scrollMenu(GrapitoTimer & aTimer)
+std::pair<TransitionProgress, UpdateStatus> MenuScene::scrollMenu(const GrapitoTimer & aTimer)
 {
     Rectangle viewed = graphics::getViewRectangle(mAppInterface->getFramebufferSize(), menu::gViewedHeight);
     viewed.origin().x() = mMenuXPosition.advance(aTimer.delta());

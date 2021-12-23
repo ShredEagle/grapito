@@ -45,7 +45,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
             horizontalAxis = direction.x();
         }
 
-        // TODO FP: Soething more robust to determine axis sign.
+        // TODO FP: Something more robust to determine axis sign.
         float horizontalAxisSign = horizontalAxis == 0 ? 1.f : (horizontalAxis / std::abs(horizontalAxis));
 
         float groundSpeedAccelFactor = 1.f / player::gGroundNumberOfAccelFrame;

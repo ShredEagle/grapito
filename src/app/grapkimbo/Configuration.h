@@ -23,6 +23,9 @@ namespace camera
 {
     constexpr float gAnchorGuideFadeIn = 2.f;
     constexpr float gAnchorGuideFadeOut = 0.8f;
+
+    // When a competitor is eliminated, the duration for its camera guide fade out.
+    extern const float gCompetitorGuideFadeOutDuration;
 }
 
 
@@ -36,7 +39,11 @@ namespace controller
 
 namespace debug
 {
-    constexpr float gStepTimeIncrement = 0.016f;
+    extern const float gCrossSize;
+    extern const math::sdr::Rgb gDirectControlDrawColor;
+    extern const Size2 gDirectControlDrawSize;
+    extern const float gDirectControlSpeed;
+    extern const float gStepTimeIncrement;
 };
 
 
@@ -44,7 +51,19 @@ namespace game
 {
     extern const math::Size<2, int> gAppResolution;
     constexpr math::hdr::Rgb gClearColor{0.1, 0.2, 0.3};
+    // If a competitor fall below this vertical limit, it is eliminated.
+    extern const float gCompetitorEliminationDistance;
+    extern const float gCongratulationPhaseDuration;
+    extern const Position2 gCongratulationScreenPosition;
 } // namespace game
+
+
+namespace hud
+{
+    extern const float gViewedHeight;
+    extern const char * const gFont;
+    extern const GLfloat gTextHeight;
+}
 
 
 namespace menu
@@ -76,11 +95,14 @@ namespace physic
 
 namespace player
 {
+    extern const Vec2 gCameraGuideOffset;
+    extern const float gCameraGuideWeight;
+    extern const std::array<float, 2> gCameraLimits;
     constexpr float gMass = 80.f;
     extern const math::Size<2, float> gSize;
     constexpr float gInitialRopeLength = 3.f;
     constexpr math::Radian<float> gInitialAngle{math::pi<float>/3.f};
-    //TODO(franz) replace with constexpr
+    //TODO(franz) move to impl file
     inline float gAcceleration = 70.f;
     inline float gGroundSpeed = 20.f;
     inline int gGroundNumberOfAccelFrame = 4;
@@ -92,7 +114,8 @@ namespace player
     inline float gJumpImpulse = 24.f; // m/s
     inline float gWallFriction = 4.f; // m/s
     inline float gDoubleJumpFactor = 1.3f; // m/s
-    inline float gGrappleBaseImpulse = 40.f;
+    inline float gGrappleBaseImpulse = 70.f;
+    extern const float gGrappleFriction;
     inline float gRopeDistanceJointFactor = 1.1f;
     //static constexpr double gAirControlAcceleration = 12.; // m/s
     //constexpr double gAcceleration = 10.;

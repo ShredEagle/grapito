@@ -13,6 +13,8 @@ static inline float twoDVectorCross(Vec2 v, Vec2 w)
     return v.x() * w.y() - v.y() * w.x();
 }
 
+// TODO Franz: Why are the free functions static?
+// 
 // Solve m * x = v
 static inline Vec2 solveMatrix(math::Matrix<2, 2, float> m, Vec2 v)
 {

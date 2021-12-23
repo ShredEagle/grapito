@@ -31,7 +31,7 @@ public:
     SplashScene(math::Size<2, int> aResolution);
 
     UpdateStatus update(
-        GrapitoTimer & aTimer,
+        const GrapitoTimer & aTimer,
         const GameInputState & aInputs,
         StateMachine & aStateMachine) override;
 

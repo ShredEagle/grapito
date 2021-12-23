@@ -60,7 +60,7 @@ public:
     /// \return True if  the frame buffer should be swapped.
     /// \note Leaves the door open to timer manipulation (e.g. debug stepping).
     virtual UpdateStatus update(
-        GrapitoTimer & aTimer,
+        const GrapitoTimer & aTimer,
         const GameInputState & aInputs,
         StateMachine & aStateMachine) = 0;
 
@@ -69,13 +69,13 @@ public:
     // Note: StateMachine argument is made a const reference, to intentionally prevent
     // transition from altering the sequence of states.
     virtual std::pair<TransitionProgress, UpdateStatus> enter(
-        GrapitoTimer &,
+        const GrapitoTimer &,
         const GameInputState &,
         const StateMachine &)
     { return {TransitionProgress::None, UpdateStatus::KeepFrame}; }
 
     virtual std::pair<TransitionProgress, UpdateStatus> exit(
-        GrapitoTimer &,
+        const GrapitoTimer &,
         const GameInputState &,
         const StateMachine &)
     { return {TransitionProgress::None, UpdateStatus::KeepFrame}; }
@@ -89,14 +89,28 @@ public:
 };
 
 
+/// \brief A dummy state added as the first in a state machine constructed without an explicit initial state.
+/// It just allows to make a normal transition to the next state.
+class EmptyState : public State
+{
+    UpdateStatus update(const GrapitoTimer &, const GameInputState &, StateMachine &) override
+    {
+        return UpdateStatus::KeepFrame;
+    }
+};
+
+
 using State_ptr = std::shared_ptr<State>;
 
+// TODO Ad 2012/12/23: This StateMachine class is sometimes used as a generic state machine (e.g. GameRule system)
+// Yet the UpdateStatus return type is somewhat coupled to the top-level flow state machine.
 class StateMachine
 {
 public:
-    StateMachine(State_ptr aInitialState);
+    StateMachine(std::shared_ptr<State> aInitialState);
+    StateMachine();
 
-    UpdateStatus update(GrapitoTimer & aTimer, const GameInputState & aInputs);
+    UpdateStatus update(const GrapitoTimer & aTimer, const GameInputState & aInputs);
 
     State & topState();
 
@@ -143,15 +157,24 @@ inline StateMachine::StateMachine(std::shared_ptr<State> aInitialState) :
 }
 
 
+inline StateMachine::StateMachine() :
+    StateMachine{std::make_shared<EmptyState>()}
+{
+    // Otherwise, the assertion that the active state cannot be "Entering" 
+    // when it is not at the top will not hold true.
+    mActiveState.second = Phase::Updating;
+}
+
 inline void StateMachine::enterNextState()
 {
     mActiveState = std::make_pair(mStates.back(), Phase::Entering);
 }
 
 
-inline UpdateStatus StateMachine::update(GrapitoTimer & aTimer, const GameInputState & aInputs)
+inline UpdateStatus StateMachine::update(const GrapitoTimer & aTimer, const GameInputState & aInputs)
 {
     // If the active state is not the top of the stack anymore, the active state is being exited.
+    // TODO If the same shared_ptr is added on top of itself, the transtion is not taking place!
     if (mActiveState.first.get() != mStates.back().get())
     {
         // Only "Updating" should be able to move to "Exiting".

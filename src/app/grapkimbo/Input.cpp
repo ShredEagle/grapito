@@ -19,6 +19,7 @@ const KeyboardInputConfig gKeyboardConfig = {
     KeyboardInputMapping{Jump,      GLFW_KEY_SPACE},
     KeyboardInputMapping{Grapple,   GLFW_KEY_X},
     KeyboardInputMapping{Start,     GLFW_KEY_ENTER},
+    KeyboardInputMapping{Back,      GLFW_KEY_BACKSPACE},
 
     // Debugging
     KeyboardInputMapping{Pause, GLFW_KEY_P},
@@ -34,7 +35,9 @@ const GamepadInputConfig gGamepadConfig = {
     GamepadInputMapping{Jump,       GLFW_GAMEPAD_BUTTON_A, Button},
     GamepadInputMapping{Grapple,    GLFW_GAMEPAD_BUTTON_B, Button},
     GamepadInputMapping{ChangeMode, GLFW_GAMEPAD_BUTTON_Y, Button},
+    GamepadInputMapping{R3,         GLFW_GAMEPAD_BUTTON_RIGHT_THUMB, Button},
     GamepadInputMapping{Start,      GLFW_GAMEPAD_BUTTON_START, Button},
+    GamepadInputMapping{Back,       GLFW_GAMEPAD_BUTTON_BACK, Button},
     GamepadInputMapping{LeftHorizontalAxis,  GLFW_GAMEPAD_AXIS_LEFT_X, Axis},
     GamepadInputMapping{LeftVerticalAxis,    GLFW_GAMEPAD_AXIS_LEFT_Y, AxisInverted},
     GamepadInputMapping{RightHorizontalAxis, GLFW_GAMEPAD_AXIS_RIGHT_X, Axis},

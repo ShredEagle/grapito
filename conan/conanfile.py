@@ -22,12 +22,13 @@ class GrapitoConan(ConanFile):
     }
 
     requires = (
+        ("boost/1.77.0"),
         ("glad/0.1.34"),
         ("imgui/1.84.2"),
         ("spdlog/1.9.2"),
 
         ("aunteater/9cd7bd9340@adnn/develop"),
-        ("graphics/d2b9318921@adnn/develop"),
+        ("graphics/b100c3e84d@adnn/develop"),
         ("math/017e7c42bf@adnn/develop"),
         ("websocket/ef5d5bf4d9@adnn/develop"),
     )
