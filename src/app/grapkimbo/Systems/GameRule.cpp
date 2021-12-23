@@ -33,7 +33,7 @@ class CompetitionPhase : public PhaseBase
     using PhaseBase::PhaseBase;
 
     UpdateStatus update(
-        GrapitoTimer &,
+        const GrapitoTimer &,
         const GameInputState & aInputs,
         StateMachine & aStateMachine) override
     {
@@ -51,7 +51,7 @@ class FreeSoloPhase : public PhaseBase
     using PhaseBase::PhaseBase;
 
     UpdateStatus update(
-        GrapitoTimer &,
+        const GrapitoTimer &,
         const GameInputState & aInputs,
         StateMachine & aStateMachine) override
     {
@@ -89,7 +89,7 @@ GameRule::GameRule(aunteater::EntityManager & aEntityManager) :
 
 void GameRule::update(const GrapitoTimer aTimer, const GameInputState & aInput)
 {
-    //mPhaseMachine.update(aTimer, aInput);
+    mPhaseMachine.update(aTimer, aInput);
 }
 
 

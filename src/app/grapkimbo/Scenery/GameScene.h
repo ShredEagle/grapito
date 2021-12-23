@@ -23,7 +23,7 @@ public:
 
     /// \brief Complete update step, including rendering.
     UpdateStatus update(
-        GrapitoTimer & aTimer,
+        const GrapitoTimer & aTimer,
         const GameInputState & aInputs,
         StateMachine & aStateMachine) override;
 

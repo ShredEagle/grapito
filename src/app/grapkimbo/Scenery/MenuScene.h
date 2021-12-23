@@ -60,18 +60,18 @@ public:
               std::shared_ptr<GameScene> aGameScene = nullptr);
 
     UpdateStatus update(
-        GrapitoTimer & aTimer,
+        const GrapitoTimer & aTimer,
         const GameInputState & aInputs,
         StateMachine & aStateMachine) override;
 
     std::pair<TransitionProgress, UpdateStatus> enter(
-        GrapitoTimer & aTimer,
+        const GrapitoTimer & aTimer,
         const GameInputState &,
         const StateMachine &) override
     { return scrollMenu(aTimer); }
 
     std::pair<TransitionProgress, UpdateStatus> exit(
-        GrapitoTimer & aTimer,
+        const GrapitoTimer & aTimer,
         const GameInputState &,
         const StateMachine &) override
     { return scrollMenu(aTimer); }
@@ -80,7 +80,7 @@ public:
     void beforeExit() override;
 
 private:
-    std::pair<TransitionProgress, UpdateStatus> scrollMenu(GrapitoTimer & aTimer);
+    std::pair<TransitionProgress, UpdateStatus> scrollMenu(const GrapitoTimer & aTimer);
 
     /// \brief Generate menu geometry and fonts, and update all vertex buffers of renderers.
     void updateMenuBuffers();

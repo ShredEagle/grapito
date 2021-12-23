@@ -19,7 +19,7 @@ GameScene::GameScene(std::shared_ptr<Context> aContext,
 
 
 UpdateStatus GameScene::update(
-    GrapitoTimer & aTimer,
+    const GrapitoTimer & aTimer,
     const GameInputState & aInputs,
     StateMachine & aStateMachine)
 {
@@ -43,14 +43,17 @@ UpdateStatus GameScene::update(
 
     if (!mSystemManager.isPaused() || debugStep.positiveEdge())
     {
+        // Make a copy, so the timer values can be modified for stepping.
+        GrapitoTimer timerCopy = aTimer;
         if (mSystemManager.isPaused())
         {
+            // TODO
             // The delta will be correct, but the resulting simulation time might not be
-            // if current delta() (computer from real time in main) is not zero.
-            aTimer.mark(aTimer.simulationTime() + debug::gStepTimeIncrement);
+            // if current delta() (computed from real time in main) is not zero.
+            timerCopy.mark(timerCopy.simulationTime() + debug::gStepTimeIncrement);
         }
 
-        mSystemManager.step(aTimer, aInputs, mUpdater);
+        mSystemManager.step(timerCopy, aInputs, mUpdater);
         log(mUpdater);
         return UpdateStatus::SwapBuffers;
     }

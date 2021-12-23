@@ -60,7 +60,7 @@ public:
     /// \return True if  the frame buffer should be swapped.
     /// \note Leaves the door open to timer manipulation (e.g. debug stepping).
     virtual UpdateStatus update(
-        GrapitoTimer & aTimer,
+        const GrapitoTimer & aTimer,
         const GameInputState & aInputs,
         StateMachine & aStateMachine) = 0;
 
@@ -69,13 +69,13 @@ public:
     // Note: StateMachine argument is made a const reference, to intentionally prevent
     // transition from altering the sequence of states.
     virtual std::pair<TransitionProgress, UpdateStatus> enter(
-        GrapitoTimer &,
+        const GrapitoTimer &,
         const GameInputState &,
         const StateMachine &)
     { return {TransitionProgress::None, UpdateStatus::KeepFrame}; }
 
     virtual std::pair<TransitionProgress, UpdateStatus> exit(
-        GrapitoTimer &,
+        const GrapitoTimer &,
         const GameInputState &,
         const StateMachine &)
     { return {TransitionProgress::None, UpdateStatus::KeepFrame}; }
@@ -93,7 +93,7 @@ public:
 /// It just allows to make a normal transition to the next state.
 class EmptyState : public State
 {
-    UpdateStatus update(GrapitoTimer & , const GameInputState & , StateMachine &) override
+    UpdateStatus update(const GrapitoTimer &, const GameInputState &, StateMachine &) override
     {
         return UpdateStatus::KeepFrame;
     }
@@ -110,7 +110,7 @@ public:
     StateMachine(std::shared_ptr<State> aInitialState);
     StateMachine();
 
-    UpdateStatus update(GrapitoTimer & aTimer, const GameInputState & aInputs);
+    UpdateStatus update(const GrapitoTimer & aTimer, const GameInputState & aInputs);
 
     State & topState();
 
@@ -171,7 +171,7 @@ inline void StateMachine::enterNextState()
 }
 
 
-inline UpdateStatus StateMachine::update(GrapitoTimer & aTimer, const GameInputState & aInputs)
+inline UpdateStatus StateMachine::update(const GrapitoTimer & aTimer, const GameInputState & aInputs)
 {
     // If the active state is not the top of the stack anymore, the active state is being exited.
     if (mActiveState.first.get() != mStates.back().get())
