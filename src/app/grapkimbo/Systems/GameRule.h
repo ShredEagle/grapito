@@ -45,6 +45,9 @@ public:
     void update(const GrapitoTimer aTimer, const GameInputState & aInput) override;
 
 private:
+    /// \brief Reset all competitors to their initial state.
+    void resetCompetitors();
+
     /// \brief Remove all competitors from the game.
     void killAllCompetitors(); // Can you tell I watched squid game recently?
     /// \brief Apply the elimination rule to each competitor, removing competitors failing the test.

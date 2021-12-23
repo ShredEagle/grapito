@@ -57,6 +57,14 @@ namespace game
 } // namespace game
 
 
+namespace hud
+{
+    extern const float gViewedHeight;
+    extern const char * const gFont;
+    extern const GLfloat gTextHeight;
+}
+
+
 namespace menu
 {
     constexpr int gBlurringPasses = 6;

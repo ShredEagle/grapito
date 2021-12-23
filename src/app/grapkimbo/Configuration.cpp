@@ -31,6 +31,14 @@ namespace game
 } // namespace game
 
 
+namespace hud
+{
+    extern const float gViewedHeight = menu::gViewedHeight;
+    extern const char * const gFont = menu::gFont;
+    extern const GLfloat gTextHeight = menu::gTextHeight * 2;
+}
+
+
 namespace player
 {
     const Vec2 gCameraGuideOffset{0.f, 15.f};

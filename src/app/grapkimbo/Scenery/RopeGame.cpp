@@ -21,6 +21,7 @@
 #include <Systems/Control.h>
 #include <Systems/GameRule.h>
 #include <Systems/Gravity.h>
+#include <Systems/Hud.h>
 #include <Systems/LevelGeneration.h>
 #include <Systems/Render.h>
 #include <Systems/Physics.h>
@@ -86,6 +87,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     mSystemManager.add<GameRule>(players);
 
     mRenderSystem = mSystemManager.add<Render>(mAppInterface); 
+    mSystemManager.add<Hud>(mContext->pathFor(hud::gFont), mAppInterface); 
 
     { // Load sprite animations
         // Note: It is not obvious whether it is better to maintain a permanent instance of the sprite sheet
@@ -192,8 +194,6 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
         );
 
     }
-
-
 }
 
 

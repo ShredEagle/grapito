@@ -12,6 +12,8 @@
 #include "Components/PlayerData.h"
 #include "Components/Position.h"
 #include "Components/RopeCreator.h"
+#include "Components/ScreenPosition.h"
+#include "Components/Text.h"
 #include "Components/VisualOutline.h"
 #include "Components/VisualPolygon.h"
 #include "Components/VisualRectangle.h"
@@ -38,6 +40,15 @@ aunteater::Entity makeDirectControllable(Controller aController, Position2 aInit
         .add<Position>(aInitialPosition, Size2{0.f, 0.f})
         ;
 }
+
+
+aunteater::Entity makeHudText(std::string aMessage, Position2 aScreenPosition)
+{
+    return aunteater::Entity{}
+        .add<ScreenPosition>(aScreenPosition)
+        .add<Text>(std::move(aMessage));
+}
+
 
 aunteater::Entity makePlayer(int aIndex,
                              Controller aController,

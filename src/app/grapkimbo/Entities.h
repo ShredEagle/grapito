@@ -28,6 +28,8 @@ aunteater::Entity makeDirectControllable(Controller aController,
                                          Position2 aInitialPosition = {0.f, 0.f});
                              
 
+aunteater::Entity makeHudText(std::string aMessage, Position2 aScreenPosition);
+
 aunteater::Entity makePlayer(int aIndex,
                              Controller aController,
                              math::sdr::Rgb aColor,

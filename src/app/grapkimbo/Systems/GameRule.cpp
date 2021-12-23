@@ -24,6 +24,11 @@ protected:
         return mGameRule.mPhases[aPhase];
     }
 
+    aunteater::EntityManager & getEntityManager()
+    {
+        return mGameRule.mEntityManager;
+    }
+
     GameRule & mGameRule;
 };
 
@@ -31,6 +36,21 @@ protected:
 class CompetitionPhase : public PhaseBase
 {
     using PhaseBase::PhaseBase;
+
+    void beforeEnter() override
+    {
+        mGameRule.resetCompetitors();
+    }
+
+    std::pair<TransitionProgress, UpdateStatus> enter(
+        const GrapitoTimer &,
+        const GameInputState &,
+        const StateMachine &) override
+    {
+        // Ensure update() does not execute on the same step as beforeEnter()
+        // Otherwise, there is a risk the newly placed players are eliminated in the same step.
+        return {TransitionProgress::Complete, UpdateStatus::SwapBuffers};
+    }
 
     UpdateStatus update(
         const GrapitoTimer &,
@@ -50,6 +70,13 @@ class FreeSoloPhase : public PhaseBase
 {
     using PhaseBase::PhaseBase;
 
+
+    void beforeEnter() override
+    {
+        mHudText = getEntityManager().addEntity(makeHudText("Free Solo", {-500.f, 300.f}));
+    }
+
+
     UpdateStatus update(
         const GrapitoTimer &,
         const GameInputState & aInputs,
@@ -65,6 +92,14 @@ class FreeSoloPhase : public PhaseBase
         // update status is not checked.
         return UpdateStatus::SwapBuffers;
     }
+
+
+    void beforeExit() override
+    {
+        mHudText->markToRemove();
+    }
+
+    aunteater::weak_entity mHudText;
 };
 
 
@@ -148,6 +183,17 @@ void GameRule::prepareCameraFadeOut(Position2 aCameraPosition,
             .add<CameraGuide>(smoothOut)
             .add<Position>(aGeometry)
         );
+    }
+}
+
+
+void GameRule::resetCompetitors()
+{
+    killAllCompetitors();
+
+    for (const auto & player : mPlayers)
+    {
+        mEntityManager.addEntity(player);
     }
 }
 

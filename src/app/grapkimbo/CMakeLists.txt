@@ -35,6 +35,8 @@ set(${TARGET_NAME}_HEADERS
     Components/PlayerData.h
     Components/Position.h
     Components/RopeCreator.h
+    Components/ScreenPosition.h
+    Components/Text.h
     Components/VisualOutline.h
     Components/VisualPolygon.h
     Components/VisualRectangle.h
@@ -55,6 +57,7 @@ set(${TARGET_NAME}_HEADERS
     Systems/GrappleCleanup.h
     Systems/GrappleJointCreator.h
     Systems/Gravity.h
+    Systems/Hud.h
     Systems/LevelGeneration.h
     Systems/Render.h
     Systems/AccelSolver.h
@@ -117,6 +120,7 @@ set(${TARGET_NAME}_SOURCES
     Systems/Gravity.cpp
     Systems/GrappleCleanup.cpp
     Systems/GrappleJointCreator.cpp
+    Systems/Hud.cpp
     Systems/LevelGeneration.cpp
     Systems/Render.cpp
     Systems/AccelSolver.cpp
