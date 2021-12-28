@@ -222,7 +222,7 @@ target_link_libraries(${TARGET_NAME}
         Boost::program_options
         glad::glad
         imgui::imgui
-        spdlog::libspdlog
+        spdlog::spdlog
         OpenAL::OpenAL
         Vorbis::vorbisfile
 )
