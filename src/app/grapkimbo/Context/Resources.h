@@ -16,6 +16,8 @@ struct Resources
     resource::ResourceLocator locator;
     resource::ResourceManager<arte::AnimationSpriteSheet, 
                               &arte::AnimationSpriteSheet::LoadAseFile> animationSpriteSheets;
+    resource::ResourceManager<OggSoundData, 
+                              OggSoundData::LoadOggFile> animationSpriteSheets;
 };
 
 } // namespace grapito

@@ -36,7 +36,7 @@ set(${TARGET_NAME}_HEADERS
     Components/Position.h
     Components/RopeCreator.h
     Components/ScreenPosition.h
-    Components/Sound.h
+    Components/SoundPlayer.h
     Components/Text.h
     Components/VisualOutline.h
     Components/VisualPolygon.h
