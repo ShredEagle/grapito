@@ -73,13 +73,34 @@ enum ButtonStatus
     PositiveEdge, // just pressed
 };
 
+
+struct AxisStatus
+{
+    float previous{0.f};
+    float current{0.f};
+
+    AxisStatus & operator=(float aNewValue)
+    {
+        previous = current;
+        current = aNewValue;
+        return *this;
+    }
+
+    operator float () const
+    {
+        return current;
+    }
+};
+
 struct InputState
 {
-    std::variant<ButtonStatus, float> state;
+    std::variant<AxisStatus, ButtonStatus> state;
 
     operator bool() const
     {
-        return std::get<ButtonStatus>(state) >= ButtonStatus::Pressed;
+        // By comparing to a variant, it will return false if the current alternative is not a ButtonStatus
+        // (instead of throwing bad_variant_access).
+        return state >= std::variant<AxisStatus, ButtonStatus>{ButtonStatus::Pressed};
     }
 
     bool positiveEdge() const
@@ -94,7 +115,12 @@ struct InputState
 
     operator float() const
     {
-        return std::get<float>(state);
+        return std::get<AxisStatus>(state);
+    }
+
+    AxisStatus & axis()
+    {
+        return std::get<AxisStatus>(state);
     }
 };
 

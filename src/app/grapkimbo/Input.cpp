@@ -91,10 +91,10 @@ void readJoystick(int aGlfwJoystickId, const GamepadInputConfig & aConfig, Contr
                 handleButtonEdges(aState[mapping->command], gamepadState.buttons[mapping->glGamePadCode]);
                 break;
             case Axis:
-                aState[mapping->command].state = + gamepadState.axes[mapping->glGamePadCode];
+                aState[mapping->command].axis() = + gamepadState.axes[mapping->glGamePadCode];
                 break;
             case AxisInverted:
-                aState[mapping->command].state = - gamepadState.axes[mapping->glGamePadCode];
+                aState[mapping->command].axis() = - gamepadState.axes[mapping->glGamePadCode];
                 break;
             }
         }
@@ -106,8 +106,8 @@ void readMouse(ControllerInputState & aState, graphics::ApplicationGlfw & aAppli
     float xPos, yPos;
     aApplication.getMousePos(xPos, yPos);
 
-    aState[MouseXPos].state = xPos;
-    aState[MouseYPos].state = yPos;
+    aState[MouseXPos].axis() = xPos;
+    aState[MouseYPos].axis() = yPos;
 }
 
 
