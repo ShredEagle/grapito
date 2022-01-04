@@ -88,6 +88,7 @@ set(${TARGET_NAME}_HEADERS
     Utils/CompositeTransition.h
     Utils/DrawDebugStuff.h
     Utils/HomogeneousTransformation.h
+    Utils/MenuControls.h
     Utils/PhysicsMathUtilities.h
     Utils/PhysicsStructs.h
     Utils/Player.h

@@ -113,6 +113,12 @@ struct InputState
         return std::get<ButtonStatus>(state) == ButtonStatus::NegativeEdge;
     }
 
+    operator ButtonStatus() const
+    {
+        return std::get<ButtonStatus>(state);
+    }
+
+
     operator float() const
     {
         return std::get<AxisStatus>(state);
@@ -146,11 +152,17 @@ constexpr bool isGamepad(Controller aController);
 
 bool isGamepadPresent(Controller aController);
 
+enum class AxisSign
+{
+    Positive,
+    Negative
+};
 
 struct GameInputState
 {
     void readAll(graphics::ApplicationGlfw & aApplication);
     float asAxis(Controller aController, Command aNegativeButton, Command aPositiveButton, Command aGamepadAxis) const;
+    ButtonStatus asButton(Controller aController, Command aButton, Command aGamepadAxis, AxisSign aSign, float aDeadZone) const;
     math::Vec<2, float> asDirection(Controller aController,
                                     Command aHorizontalAxis,
                                     Command aVerticalAxis,

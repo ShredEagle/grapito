@@ -5,6 +5,8 @@
 #include "../Configuration.h"
 #include "../Logging.h"
 #include "../TopLevelStates.h"
+
+#include "../Utils/MenuControls.h"
     
 
 namespace ad {
@@ -23,8 +25,7 @@ UpdateStatus GameScene::update(
     const GameInputState & aInputs,
     StateMachine & aStateMachine)
 {
-    InputState gamePause = aInputs.get(Controller::KeyboardMouse)[Command::Start];
-    if (gamePause.positiveEdge())
+    if (isPositiveEdge(aInputs, Start))
     {
         aStateMachine.pushState(setupPauseMenu(mContext, mAppInterface, shared_from_this()));
         // Causes troubles with detection of next press of pause button
