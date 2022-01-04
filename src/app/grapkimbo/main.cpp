@@ -23,6 +23,8 @@
 #include <iostream>
 
 
+//#define EN_MODE_LAFF
+
 using namespace ad;
 using namespace ad::grapito;
 
@@ -73,7 +75,11 @@ int main(int argc, const char ** argv)
         DebugUI debugUI;
 
         std::shared_ptr<Context> context = 
+#if defined(EN_MODE_LAFF)
+            std::make_shared<Context>(filesystem::path{"assets/"});
+#else
             std::make_shared<Context>(gRepositoryRoot / filesystem::path{"../grapito_media/assets/"});
+#endif
         context->locale.setLanguage("es");
 
         StateMachine topLevelFlow;
