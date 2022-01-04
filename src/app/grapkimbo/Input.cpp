@@ -1,5 +1,7 @@
 #include "Input.h"
 
+#include "Logging.h"
+
 #include <GLFW/glfw3.h>
 
 #include <cassert>
@@ -45,17 +47,17 @@ const GamepadInputConfig gGamepadConfig = {
 };
 
 
-void handleButtonEdges(InputState & aInputState, int aGlfwState)
+void handleButtonEdges(InputState & aInputState, bool aCurrentlyPressed)
 {
-    if(aInputState && aGlfwState)
+    if(aInputState && aCurrentlyPressed)
     {
         aInputState.state = Pressed;
     }
-    else if(aInputState && ! aGlfwState)
+    else if(aInputState && ! aCurrentlyPressed)
     {
         aInputState.state = NegativeEdge;
     }
-    else if(! aInputState && aGlfwState)
+    else if(! aInputState && aCurrentlyPressed)
     {
         aInputState.state = PositiveEdge;
     }
@@ -91,10 +93,10 @@ void readJoystick(int aGlfwJoystickId, const GamepadInputConfig & aConfig, Contr
                 handleButtonEdges(aState[mapping->command], gamepadState.buttons[mapping->glGamePadCode]);
                 break;
             case Axis:
-                aState[mapping->command].state = + gamepadState.axes[mapping->glGamePadCode];
+                aState[mapping->command].axis() = + gamepadState.axes[mapping->glGamePadCode];
                 break;
             case AxisInverted:
-                aState[mapping->command].state = - gamepadState.axes[mapping->glGamePadCode];
+                aState[mapping->command].axis() = - gamepadState.axes[mapping->glGamePadCode];
                 break;
             }
         }
@@ -106,8 +108,8 @@ void readMouse(ControllerInputState & aState, graphics::ApplicationGlfw & aAppli
     float xPos, yPos;
     aApplication.getMousePos(xPos, yPos);
 
-    aState[MouseXPos].state = xPos;
-    aState[MouseYPos].state = yPos;
+    aState[MouseXPos].axis() = xPos;
+    aState[MouseYPos].axis() = yPos;
 }
 
 
@@ -172,6 +174,43 @@ float GameInputState::asAxis(Controller aController,
         axis = input[aGamepadAxis];
     }
     return axis;
+}
+
+
+ButtonStatus GameInputState::asButton(Controller aController,
+                                      Command aButton,
+                                      Command aGamepadAxis,
+                                      AxisSign aSign,
+                                      float aDeadZone) const
+{
+    assert(aDeadZone >= 0.f);
+
+    ControllerInputState input = get(aController);
+    if (isGamepad(aController))
+    {
+        auto isPressed = [aSign, aDeadZone](float aValue) -> bool
+        {
+            switch(aSign)
+            {
+                case AxisSign::Negative:
+                    return aValue < -aDeadZone;
+                // For invalid values, consider it positive case the default
+                case AxisSign::Positive:
+                default:
+                    return aValue > aDeadZone;
+            }
+        };
+
+        // Note: this will not really store the previous status, but only whether it was pressed or not.
+        // i.e. it is loosing the edge, but this should have no impact.
+        InputState inState{isPressed(input[aGamepadAxis].axis().previous) ? Pressed : Released};
+        handleButtonEdges(inState, isPressed(input[aGamepadAxis].axis().current));
+        return inState;
+    }
+    else
+    {
+        return input[aButton];
+    }
 }
 
 

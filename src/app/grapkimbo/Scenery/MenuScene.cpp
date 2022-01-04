@@ -7,6 +7,7 @@
 #include "../Logging.h"
 
 #include "../Utils/DrawDebugStuff.h"
+#include "../Utils/MenuControls.h"
 
 #include <math/VectorUtilities.h>
 
@@ -51,17 +52,17 @@ UpdateStatus MenuScene::update(
     // Note: The logic eagerly re-creates the text buffers each time the selection change.
     // This is currently not necessary, but make the logic a bit simpler.
 
-    if (aInputs.get(Controller::KeyboardMouse)[Command::Up].positiveEdge())
+    if (isPositiveEdge(aInputs, Up, LeftVerticalAxis, AxisSign::Positive))
     {
         mMenu.mSelected = std::min(mMenu.mSelected - 1, mMenu.size() - 1);
         updateMenuBuffers();
     }
-    else if (aInputs.get(Controller::KeyboardMouse)[Command::Down].positiveEdge())
+    else if (isPositiveEdge(aInputs, Down, LeftVerticalAxis, AxisSign::Negative))
     {
         mMenu.mSelected = (mMenu.mSelected + 1) % mMenu.size();
         updateMenuBuffers();
     }
-    else if (aInputs.get(Controller::KeyboardMouse)[Command::Start].positiveEdge())
+    else if (isPositiveEdge(aInputs, Start))
     {
         mMenu.selected().mCallback(aStateMachine, mAppInterface);
         // When the menu is poping itself, the OpenGL is issuing an error when return SwapBuffers:

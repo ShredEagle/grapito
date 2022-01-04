@@ -73,13 +73,34 @@ enum ButtonStatus
     PositiveEdge, // just pressed
 };
 
+
+struct AxisStatus
+{
+    float previous{0.f};
+    float current{0.f};
+
+    AxisStatus & operator=(float aNewValue)
+    {
+        previous = current;
+        current = aNewValue;
+        return *this;
+    }
+
+    operator float () const
+    {
+        return current;
+    }
+};
+
 struct InputState
 {
-    std::variant<ButtonStatus, float> state;
+    std::variant<AxisStatus, ButtonStatus> state;
 
     operator bool() const
     {
-        return std::get<ButtonStatus>(state) >= ButtonStatus::Pressed;
+        // By comparing to a variant, it will return false if the current alternative is not a ButtonStatus
+        // (instead of throwing bad_variant_access).
+        return state >= std::variant<AxisStatus, ButtonStatus>{ButtonStatus::Pressed};
     }
 
     bool positiveEdge() const
@@ -92,9 +113,20 @@ struct InputState
         return std::get<ButtonStatus>(state) == ButtonStatus::NegativeEdge;
     }
 
+    operator ButtonStatus() const
+    {
+        return std::get<ButtonStatus>(state);
+    }
+
+
     operator float() const
     {
-        return std::get<float>(state);
+        return std::get<AxisStatus>(state);
+    }
+
+    AxisStatus & axis()
+    {
+        return std::get<AxisStatus>(state);
     }
 };
 
@@ -120,11 +152,17 @@ constexpr bool isGamepad(Controller aController);
 
 bool isGamepadPresent(Controller aController);
 
+enum class AxisSign
+{
+    Positive,
+    Negative
+};
 
 struct GameInputState
 {
     void readAll(graphics::ApplicationGlfw & aApplication);
     float asAxis(Controller aController, Command aNegativeButton, Command aPositiveButton, Command aGamepadAxis) const;
+    ButtonStatus asButton(Controller aController, Command aButton, Command aGamepadAxis, AxisSign aSign, float aDeadZone) const;
     math::Vec<2, float> asDirection(Controller aController,
                                     Command aHorizontalAxis,
                                     Command aVerticalAxis,
