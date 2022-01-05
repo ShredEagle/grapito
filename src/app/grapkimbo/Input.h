@@ -34,7 +34,7 @@ enum Command {
     MouseYPos,
 
     // Always leave that as last element, until we have reflection for enums
-    EndCommand,
+    _EndCommand,
 };
 
 
@@ -94,13 +94,15 @@ struct AxisStatus
 
 struct InputState
 {
-    std::variant<AxisStatus, ButtonStatus> state;
+    // Note: The order is important, GameInputState initialization code assumes the default alternative
+    // is a ButtonStatus (and explicitly default initializes the rest).
+    std::variant<ButtonStatus, AxisStatus> state;
 
     operator bool() const
     {
         // By comparing to a variant, it will return false if the current alternative is not a ButtonStatus
         // (instead of throwing bad_variant_access).
-        return state >= std::variant<AxisStatus, ButtonStatus>{ButtonStatus::Pressed};
+        return state >= std::variant<ButtonStatus, AxisStatus>{ButtonStatus::Pressed};
     }
 
     bool positiveEdge() const
@@ -132,7 +134,7 @@ struct InputState
 
 
 // The index is the command
-using ControllerInputState = std::array<InputState, EndCommand>;
+using ControllerInputState = std::array<InputState, _EndCommand>;
 
 
 enum class Controller
@@ -144,9 +146,18 @@ enum class Controller
     Gamepad_3,
 
     // Always leave that as last element, until we have reflection for enums
-    End,
+    _End,
 };
 
+constexpr std::size_t gControllerCount = static_cast<std::size_t>(Controller::_End);
+
+constexpr std::array<Controller, gControllerCount> gAllControllers{
+    Controller::KeyboardMouse,
+    Controller::Gamepad_0,
+    Controller::Gamepad_1, 
+    Controller::Gamepad_2, 
+    Controller::Gamepad_3
+};
 
 constexpr bool isGamepad(Controller aController);
 
@@ -160,6 +171,9 @@ enum class AxisSign
 
 struct GameInputState
 {
+    // Default constructor will initialize the ControllerInputState whit a default constructed state of the right alternative.
+    GameInputState();
+
     void readAll(graphics::ApplicationGlfw & aApplication);
     float asAxis(Controller aController, Command aNegativeButton, Command aPositiveButton, Command aGamepadAxis) const;
     ButtonStatus asButton(Controller aController, Command aButton, Command aGamepadAxis, AxisSign aSign, float aDeadZone) const;
@@ -182,7 +196,7 @@ struct GameInputState
     math::Vec<2, float> getRightDirection(Controller aController, float aDeadZone = 0.2) const
     { return asDirection(aController, RightHorizontalAxis, RightVerticalAxis, aDeadZone); }
 
-    std::array<ControllerInputState, static_cast<std::size_t>(Controller::End)> controllerState;
+    std::array<ControllerInputState, gControllerCount> controllerState;
 };
 
 extern const KeyboardInputConfig gKeyboardConfig;
