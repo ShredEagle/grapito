@@ -77,7 +77,7 @@ aunteater::Entity makePlayer(int aIndex,
         .add<Mass>(player::gMass)
         .add<PlayerData>(aIndex, aColor)
         .add<Position>(Position2{3.f, 3.f}, player::gSize) // The position will be set by pendulum simulation
-        .add<VisualRectangle>(aColor)
+        //.add<VisualRectangle>(aColor)
         .add<VisualSprite>() // handled by animation system
     ;
 

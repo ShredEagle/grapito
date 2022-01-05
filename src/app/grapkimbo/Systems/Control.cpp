@@ -45,13 +45,12 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
             horizontalAxis = direction.x();
         }
 
-        // TODO FP: Something more robust to determine axis sign.
-        float horizontalAxisSign = horizontalAxis == 0 ? 1.f : (horizontalAxis / std::abs(horizontalAxis));
-
-        float groundSpeedAccelFactor = 1.f / player::gGroundNumberOfAccelFrame;
         float groundFriction = 1.f / player::gGroundNumberOfSlowFrame;
         float airSpeedAccelFactor = 1.f / player::gAirNumberOfAccelFrame;
         float airFriction = 1.f / player::gAirNumberOfSlowFrame;
+
+        const float groundMaxFrameAcceleration = player::gGroundSpeed / player::gGroundNumberOfAccelFrame;
+        const float airMaxFrameAcceleration = player::gAirSpeed / player::gAirNumberOfAccelFrame;
 
         if (playerData.state & PlayerCollisionState_Grounded)
         {
@@ -59,8 +58,9 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
             {
                 if (std::abs(aas.speed.x()) <= player::gGroundSpeed)
                 {
-                    aas.speed += horizontalAxisSign * player::gGroundSpeed * groundSpeedAccelFactor * Vec2{1.f, 0.f};
-                    aas.speed.x() = std::max(std::min(player::gGroundSpeed, aas.speed.x()), -player::gGroundSpeed);
+                    float targetSpeed = horizontalAxis * player::gGroundSpeed;
+                    float speedChange = targetSpeed - aas.speed.x();
+                    aas.speed += std::clamp(speedChange, -groundMaxFrameAcceleration, groundMaxFrameAcceleration) * Vec2{1.f, 0.f};
                 }
                 else
                 {
@@ -83,8 +83,9 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
             {
                 if (std::abs(aas.speed.x()) <= player::gAirSpeed)
                 {
-                    aas.speed += horizontalAxisSign * player::gAirSpeed * airSpeedAccelFactor * Vec2{1.f, 0.f};
-                    aas.speed.x() = std::max(std::min(player::gAirSpeed, aas.speed.x()), -player::gAirSpeed);
+                    float targetSpeed = horizontalAxis * player::gAirSpeed;
+                    float speedChange = targetSpeed - aas.speed.x();
+                    aas.speed += std::clamp(speedChange, -airMaxFrameAcceleration, airMaxFrameAcceleration) * Vec2{1.f, 0.f};
                 }
                 else
                 {

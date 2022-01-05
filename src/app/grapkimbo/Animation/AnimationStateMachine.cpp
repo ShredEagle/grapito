@@ -6,7 +6,7 @@ namespace grapito {
 
 
 std::optional<AnimatedSprite> AnimationStateMachine::update(PlayerAnimation & aState,
-                                                            const AnimatedSprite & aAnimation,
+                                                            AnimatedSprite & aAnimation,
                                                             const AccelAndSpeed & aAccelAndSpeed,
                                                             const PlayerData & aPlayerData)
 {
