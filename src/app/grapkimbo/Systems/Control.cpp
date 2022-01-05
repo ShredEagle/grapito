@@ -3,10 +3,13 @@
 #include "Configuration.h"
 #include "Gravity.h"
 
+#include "../commons.h"
 #include "../Entities.h"
 #include "../Utilities.h"
-#include "commons.h"
-#include "math/Constants.h"
+
+#include "../Utils/Player.h"
+
+#include <math/Constants.h>
 
 #include <Components/VisualRectangle.h>
 
@@ -74,7 +77,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
 
             if (inputs[Jump].positiveEdge())
             {
-                aas.speed += Vec2{0.f, + player::gJumpImpulse};
+                aas.speed.y() = player::gJumpImpulse;
             }
         }
         else if (playerData.state & PlayerCollisionState_Jumping)
@@ -136,6 +139,11 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
                     playerData.wallClingFrameCounter = 0;
                 }
             }
+            else if (inputs[Jump].positiveEdge() 
+                     && !isGrappleOut(playerData))
+            {
+                aas.speed.y() = player::gJumpImpulse;
+            }
         }
     }
 
@@ -147,7 +155,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
         auto & [controllable, aas, playerData] = entity;
         const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
 
-        if (inputs[Jump].positiveEdge() && playerData.controlState & (ControlState_Attached | ControlState_Throwing))
+        if (inputs[Jump].positiveEdge() && isGrappleOut(playerData))
         {
             detachPlayerFromGrapple(entity);
             if (playerData.state & PlayerCollisionState_Jumping)
@@ -157,7 +165,6 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
             }
             playerData.controlState &= ~ControlState_Attached;
             playerData.controlState &= ~ControlState_Throwing;
-
         }
     }
 
@@ -186,13 +193,13 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
             }
         }
 
-        if (inputs[Grapple].positiveEdge() && !(playerData.controlState & (ControlState_Attached | ControlState_Throwing)))
+        if (inputs[Grapple].positiveEdge() && !isGrappleOut(playerData))
         {
             throwGrapple(player, mEntityManager);
             playerData.controlState |= ControlState_Throwing;
         }
 
-        if (inputs[Grapple].negativeEdge() && playerData.controlState & ControlState_Throwing)
+        if (inputs[Grapple].negativeEdge() && isThrowing(playerData))
         {
             attachPlayerToGrapple(player, mEntityManager);
             playerData.controlState &= ~ControlState_Throwing;
