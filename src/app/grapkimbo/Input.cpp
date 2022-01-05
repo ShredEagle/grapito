@@ -108,6 +108,8 @@ void readMouse(ControllerInputState & aState, graphics::ApplicationGlfw & aAppli
     float xPos, yPos;
     aApplication.getMousePos(xPos, yPos);
 
+    // Note Ad 2022/01/05 I don't think the mouse is used, and it is not completely implemented
+    // (e.g. missing from configurations)
     aState[MouseXPos].axis() = xPos;
     aState[MouseYPos].axis() = yPos;
 }
@@ -133,6 +135,32 @@ bool isGamepadPresent(Controller aController)
 }
 
 
+GameInputState::GameInputState()
+{
+    for (const Controller controller : gAllControllers)
+    {
+        // Gamepads
+        if(isGamepad(controller))
+        {
+            for (const GamepadInputMapping & mapping : gGamepadConfig)
+            {
+                if (mapping.nature == Axis || mapping.nature == AxisInverted)
+                {
+                    controllerState[(size_t)controller][mapping.command].state = AxisStatus{};
+                }
+            }
+        }
+
+        // Keyboard is all buttons, the default alternative
+        else
+        {
+            controllerState[(size_t)controller][MouseXPos].state = AxisStatus{};
+            controllerState[(size_t)controller][MouseYPos].state = AxisStatus{};
+        }
+    }
+}
+
+
 void GameInputState::readAll(graphics::ApplicationGlfw & aApplication)
 {
     readKeyboard(gKeyboardConfig,
@@ -141,7 +169,7 @@ void GameInputState::readAll(graphics::ApplicationGlfw & aApplication)
     readMouse(controllerState[static_cast<size_t>(Controller::KeyboardMouse)], aApplication);
 
     for (Controller controller = Controller::Gamepad_0;
-         controller != Controller::End;
+         controller != Controller::_End;
          controller = static_cast<Controller>(static_cast<std::underlying_type_t<Controller>>(controller) + 1))
     {
         readJoystick(toGlfwJoystickId(controller),
