@@ -45,13 +45,16 @@ AnimationStateMachine makePlayerAnimationStateMachine(const graphics::sprite::An
     // On the other hand, if the orientation info was present in some logic-state component (e.g. PlayerData for characters),
     // it could be copied from there directly into the VisualSprite, without being kept in AnimatedSprite.
 
+    // Note Ad 2022/01/04: Now, AnimatedSprite can be mutated by the AnimationState::update(), in order to control the animation
+    // playbacke speed.
+
     AnimationStateMachine result;
 
     // The initial state allows to actually assign a non-default AnimatedSprite, thanks to the initial unconditionnal transition.
     // (Otherwise, if the player was already in an Idle state, the AnimatedSprite would not be populated accordingly.)
     result.at(PlayerAnimation::Initial) = {
         {},
-        [](const AnimatedSprite & aAnimation, const AccelAndSpeed & aAccelAndSpeed, const PlayerData & aPlayerData)
+        [](AnimatedSprite & aAnimation, const AccelAndSpeed & aAccelAndSpeed, const PlayerData & aPlayerData)
         {
             return PlayerAnimation::IdleRight;
         }
@@ -60,7 +63,7 @@ AnimationStateMachine makePlayerAnimationStateMachine(const graphics::sprite::An
 
     result.at(PlayerAnimation::IdleLeft) = {
         makeLoopingAnimation(idleSid, aAnimator, Mirroring::Horizontal),
-        [](const AnimatedSprite & aAnimation, const AccelAndSpeed & aAccelAndSpeed, const PlayerData & aPlayerData) 
+        [](AnimatedSprite & aAnimation, const AccelAndSpeed & aAccelAndSpeed, const PlayerData & aPlayerData) 
         -> std::optional<PlayerAnimation>
         {
             if (!isIdle(aPlayerData, aAccelAndSpeed)) 
@@ -81,7 +84,7 @@ AnimationStateMachine makePlayerAnimationStateMachine(const graphics::sprite::An
 
     result.at(PlayerAnimation::IdleRight) = {
         makeLoopingAnimation(idleSid, aAnimator, Mirroring::None),
-        [](const AnimatedSprite & aAnimation, const AccelAndSpeed & aAccelAndSpeed, const PlayerData & aPlayerData) 
+        [](AnimatedSprite & aAnimation, const AccelAndSpeed & aAccelAndSpeed, const PlayerData & aPlayerData) 
         -> std::optional<PlayerAnimation>
         {
             if (!isIdle(aPlayerData, aAccelAndSpeed)) 
@@ -102,7 +105,7 @@ AnimationStateMachine makePlayerAnimationStateMachine(const graphics::sprite::An
 
     result.at(PlayerAnimation::RunLeft) = {
         makeLoopingAnimation(runSid, aAnimator, Mirroring::Horizontal),
-        [](const AnimatedSprite & aAnimation, const AccelAndSpeed & aAccelAndSpeed, const PlayerData & aPlayerData)
+        [](AnimatedSprite & aAnimation, const AccelAndSpeed & aAccelAndSpeed, const PlayerData & aPlayerData)
         -> std::optional<PlayerAnimation>
         {
             if (isIdle(aPlayerData, aAccelAndSpeed)) 
@@ -114,13 +117,14 @@ AnimationStateMachine makePlayerAnimationStateMachine(const graphics::sprite::An
                 return PlayerAnimation::RunRight;
             }
 
+            aAnimation.parameterAdvanceSpeed = std::abs(aAccelAndSpeed.speed.x()) / player::gGroundSpeed;
             return std::nullopt;
         }
     };
 
     result.at(PlayerAnimation::RunRight) = {
         makeLoopingAnimation(runSid, aAnimator, Mirroring::None),
-        [](const AnimatedSprite & aAnimation, const AccelAndSpeed & aAccelAndSpeed, const PlayerData & aPlayerData)
+        [](AnimatedSprite & aAnimation, const AccelAndSpeed & aAccelAndSpeed, const PlayerData & aPlayerData)
         -> std::optional<PlayerAnimation>
         {
             if (isIdle(aPlayerData, aAccelAndSpeed)) 
@@ -132,6 +136,7 @@ AnimationStateMachine makePlayerAnimationStateMachine(const graphics::sprite::An
                 return PlayerAnimation::RunLeft;
             }
 
+            aAnimation.parameterAdvanceSpeed = std::abs(aAccelAndSpeed.speed.x()) / player::gGroundSpeed;
             return std::nullopt;
         }
     };
@@ -171,7 +176,7 @@ void TransitionAnimationState::updateDrawnFrames(const GrapitoTimer aTimer)
     for (auto & [animatedSprite, visualSprite] : mSpriteAnimationFrames)
     {
         visualSprite.sprite = mAnimator.at(animatedSprite.animation,
-                                           animatedSprite.parameter(aTimer.delta()));
+                                           animatedSprite.advance(aTimer.delta()));
         if (animatedSprite.horizontalMirroring)
         {
             visualSprite.mirroring.x() = -1;

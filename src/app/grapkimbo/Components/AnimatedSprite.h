@@ -28,10 +28,17 @@ struct AnimatedSprite : public aunteater::Component<AnimatedSprite>
         horizontalMirroring{aHorizontalMirroring}
     {}
 
+    float advance(float aDelta)
+    {
+        return parameter(aDelta * parameterAdvanceSpeed);
+    }
+
     StringId animation = StringId::Null();  
+    float parameterAdvanceSpeed{1.f};
     // This provides type erasure for the parameter animation
-    std::function<float(float)> parameter;
     bool horizontalMirroring{false};
+private:
+    std::function<float(float)> parameter;
 };
 
 
