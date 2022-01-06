@@ -20,7 +20,6 @@ namespace grapito
 {
 
 typedef aunteater::Archetype<Controllable, Position, AccelAndSpeed, Mass, PlayerData> CartesianControlled;
-typedef aunteater::Archetype<Controllable, AccelAndSpeed, PlayerData> PolarControlled;
 typedef aunteater::Archetype<Controllable, AccelAndSpeed, GrappleControl, Position, PlayerData> Grappler;
 
 class Control : public aunteater::System<GrapitoTimer, GameInputState>
@@ -36,9 +35,7 @@ private:
 
     aunteater::EntityManager & mEntityManager;
     const aunteater::FamilyHelp<CartesianControlled> mCartesianControllables;
-    const aunteater::FamilyHelp<PolarControlled> mPolarControllables;
     const aunteater::FamilyHelp<Grappler> mGrapplers;
-
 };
 
 } // namespace grapito

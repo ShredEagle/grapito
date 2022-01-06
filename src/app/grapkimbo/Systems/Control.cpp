@@ -24,7 +24,6 @@ namespace grapito
 Control::Control(aunteater::EntityManager & aEntityManager) :
     mEntityManager{aEntityManager},
     mCartesianControllables{mEntityManager},
-    mPolarControllables{mEntityManager},
     mGrapplers{mEntityManager}
 {}
 
@@ -37,10 +36,12 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
     const float airMaxFrameAcceleration = player::gAirSpeed / player::gAirNumberOfAccelFrame;
 
     //
-    // General control (happens whether the grapple is out or not)
+    // General control
     //
-    for(auto & [controllable, geometry, aas, mass, playerData] :  mCartesianControllables)
+    for(auto & player : mCartesianControllables)
     {
+        auto & [controllable, geometry, aas, mass, playerData] = player;
+
         const ControllerInputState & inputs = aInputState.get(controllable.controller);
         float horizontalAxis = 
             aInputState.asAxis(controllable.controller, 
@@ -163,26 +164,20 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
                 aas.speed.y() = player::gJumpImpulse;
             }
         }
-    }
 
-    //
-    // Swinging on a grapple
-    //
-    // TODO FP Does it deserve a separate iteration? Maybe it can be merged with the previous loop
-    // (and we get rid of polar controllables, as the player is not necessarily "anchored" here).
-    for(auto & entity : mPolarControllables)
-    {
-        auto & [controllable, aas, playerData] = entity;
-        const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
-
-        if (inputs[Jump].positiveEdge() && isGrappleOut(playerData))
+        // Detach grapple from player if necessary
+        if (isGrappleOut(playerData) && inputs[Jump].positiveEdge())
         {
-            detachPlayerFromGrapple(entity);
-            if (playerData.state & PlayerCollisionState_Jumping)
+            if (// The boosts are only granted if the player was successfully connected (no ABABAB speedrun).
+                isAnchored(playerData) 
+                // Otherwise, would make a super jump when both connected and grounded.
+                && (playerData.state & PlayerCollisionState_Jumping))
             {
-                aas.speed *= 1.5f;
-                aas.speed += Vec2{ 0.f, player::gJumpImpulse };
+                aas.speed *= player::gDetachSpeedBoostFactor;
+                aas.speed.y() += player::gJumpImpulse;
             }
+
+            detachPlayerFromGrapple(player);
             playerData.controlState &= ~ControlState_Attached;
             playerData.controlState &= ~ControlState_Throwing;
         }
