@@ -2,17 +2,21 @@
 
 #include "../Components/SoundPlayer.h"
 
-#include <al.h>
-#include <alc.h>
+#include <handy/StringId_Interning.h>
+
+#include <AL/al.h>
+#include <AL/alc.h>
 #include <spdlog/spdlog.h>
 
 namespace ad {
 namespace grapito
 {
 
-SoundSystem::SoundSystem(aunteater::EntityManager & aEntityManager, SoundManager & aSoundManager) :
+const StringId soundId_MusicSid = handy::internalizeString("ahouais");
+
+SoundSystem::SoundSystem(aunteater::EntityManager & aEntityManager, SoundManager aSoundManager) :
     mSounds{aEntityManager},
-    mSoundManager{aSoundManager}
+    mSoundManager{std::move(aSoundManager)}
 {
     aEntityManager.getFamily<SoundType>().registerObserver(this);
     mOpenALDevice = alcOpenDevice(nullptr);
@@ -76,7 +80,6 @@ void SoundSystem::removedEntity(aunteater::LiveEntity & aEntity)
     }
 }
 
-
 void SoundSystem::update(const GrapitoTimer, const GameInputState &)
 {
     for (auto & [soundPlayer] : mSounds)
@@ -86,8 +89,7 @@ void SoundSystem::update(const GrapitoTimer, const GameInputState &)
             auto & sound = *soundIterator;
             if (!sound.mPlaying)
             {
-                OggSoundData & soundData = mSoundManager.loadFromCacheOrFetch({sound.mFilename, sound.mStreaming});
-                ALuint sourceId = mSoundManager.playSound(soundData);
+                ALuint sourceId = mSoundManager.playSound(sound.mSoundId);
                 sound.sourceId = sourceId;
                 mPlayingSources.emplace_back(PlayingSource{sourceId, soundIterator, soundPlayer});
             }
@@ -116,5 +118,5 @@ void SoundSystem::update(const GrapitoTimer, const GameInputState &)
     alCall(alDeleteSources, sourceToDelete.size(), sourceToDelete.data());
 }
 
-} // namespace grapito
-} // namespace ad
+}
+}

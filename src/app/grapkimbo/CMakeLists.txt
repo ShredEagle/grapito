@@ -175,7 +175,7 @@ find_package(Boost REQUIRED COMPONENTS program_options)
 find_package(glad REQUIRED)
 find_package(imgui REQUIRED)
 find_package(spdlog REQUIRED)
-find_package(OpenAL REQUIRED)
+find_package(OpenAL REQUIRED CONFIG)
 find_package(Vorbis REQUIRED File CONFIG)
 find_package(Ogg REQUIRED CONFIG)
 

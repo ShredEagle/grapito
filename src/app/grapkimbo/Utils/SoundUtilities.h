@@ -3,8 +3,8 @@
 #include <spdlog/spdlog.h>
 
 #include <vorbis/vorbisfile.h>
-#include <al.h>
-#include <alc.h>
+#include <AL/al.h>
+#include <AL/alc.h>
 
 #include <cstdint>
 #include <iostream>

@@ -21,6 +21,7 @@ struct Context
     filesystem::path pathFor(const filesystem::path &aAsset) const;
 
     const arte::AnimationSpriteSheet & loadAnimationSpriteSheet(const filesystem::path &aAsset);
+    const OggSoundData & loadOggSoundData(const filesystem::path &aAsset, bool streamed);
 
     Resources resources;
     Locale locale;
@@ -51,6 +52,11 @@ inline filesystem::path Context::pathFor(const filesystem::path &aAsset) const
 inline const arte::AnimationSpriteSheet & Context::loadAnimationSpriteSheet(const filesystem::path &aAsset)
 {
     return resources.animationSpriteSheets.load(aAsset, resources.locator); 
+}
+
+inline const OggSoundData & Context::loadOggSoundData(const filesystem::path &aAsset, bool streamed)
+{
+    return resources.oggSoundFiles.load(aAsset, resources.locator, streamed);
 }
 
 

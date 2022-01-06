@@ -73,10 +73,17 @@ static ov_callbacks OggVorbisCallbacks{
     tellOggInputStreamCallback
 };
 
-OggSoundData SoundManager::loadOggFile(std::istream & aInputStream, bool streamed)
+OggSoundData loadOggFileFromPath(const filesystem::path & aPath, bool streamed)
+{
+    std::ifstream soundStream{aPath};
+    StringId soundStringId{aPath.stem().string()};
+    return loadOggFile(soundStream, soundStringId, streamed);
+}
+
+OggSoundData loadOggFile(std::istream & aInputStream, StringId aSoundId, bool streamed)
 {
     OggVorbis_File oggFile;
-    OggSoundData resultSoundData;
+    OggSoundData resultSoundData{.soundId = aSoundId};
 
     //Get ogg vorbis file format from the file
     int result = ov_open_callbacks(&aInputStream, &oggFile, nullptr, 0, OggVorbisCallbacks);
@@ -127,11 +134,11 @@ OggSoundData SoundManager::loadOggFile(std::istream & aInputStream, bool streame
         }
         else if (result < 0)
         {
-            spdlog::get("grapito")->error("ERROR: Can read from file");
+            spdlog::get("grapito")->error("ERROR: Can't read from file");
         }
         else
         {
-            spdlog::get("grapito")->warn("WARNING: File is not of the size we thought it was");
+            spdlog::get("grapito")->warn("WARNING: File is not of the size we thought it was (sizeRead: {}, sizeToRead: {})", sizeRead, sizeToRead);
             break;
         }
         //Add to the result dataBuffer the data that was read
@@ -154,18 +161,19 @@ OggSoundData SoundManager::loadOggFile(std::istream & aInputStream, bool streame
     return resultSoundData;
 }
 
-ALuint SoundManager::playSound(OggSoundData & aSoundData)
+ALuint SoundManager::playSound(StringId & aSoundId)
 {
+    const OggSoundData & soundData = mLoadedSoundList.at(aSoundId);
     ALuint source;
     alCall(alGenSources, 1, &source);
     alCall(alSourcef, source, AL_PITCH, 1);
 
-    alCall(alSourcef, source, AL_GAIN, aSoundData.gain);
-    alCall(alSource3f, source, AL_POSITION, aSoundData.position.x(), aSoundData.position.y(), aSoundData.position.z());
-    alCall(alSource3f, source, AL_VELOCITY, aSoundData.velocity.x(), aSoundData.velocity.y(), aSoundData.velocity.z());
+    alCall(alSourcef, source, AL_GAIN, soundData.gain);
+    alCall(alSource3f, source, AL_POSITION, soundData.position.x(), soundData.position.y(), soundData.position.z());
+    alCall(alSource3f, source, AL_VELOCITY, soundData.velocity.x(), soundData.velocity.y(), soundData.velocity.z());
 
-    alCall(alSourcei, source, AL_LOOPING, aSoundData.looping);
-    alCall(alSourcei, source, AL_BUFFER, aSoundData.buffers[0]);
+    alCall(alSourcei, source, AL_LOOPING, soundData.looping);
+    alCall(alSourcei, source, AL_BUFFER, soundData.buffers[0]);
     alCall(alSourcePlay, source);
 
     return source;
@@ -181,30 +189,10 @@ bool SoundManager::pauseSound(ALuint aSource)
     return alCall(alSourcePause, aSource);
 }
 
-OggSoundData & SoundManager::loadFromCacheOrFetch(FetchFile aFileToFetch)
+void SoundManager::storeDataInLoadedSound(const OggSoundData & aSoundData)
 {
-    std::size_t hashId = std::hash<std::string>{}(aFileToFetch.filePath);
-    auto soundIterator = soundCache.find(hashId);
-
-    if (soundIterator == soundCache.end())
-    {
-        filesystem::path absFilePath = mResourceManager->pathFor(aFileToFetch.filePath);
-        std::ifstream inputFileStream{absFilePath.c_str()};
-        OggSoundData loadedData = loadOggFile(inputFileStream, aFileToFetch.streamed);
-
-        auto iteratorPair = soundCache.insert(std::make_pair(hashId, loadedData));
-        soundIterator = iteratorPair.first;
-    }
-
-    return soundIterator->second;
+    mLoadedSoundList.insert({aSoundData.soundId, aSoundData});
 }
 
-void SoundManager::prefetch(std::vector<FetchFile> aFileToFetchList)
-{
-    for (FetchFile file : aFileToFetchList)
-    {
-        loadFromCacheOrFetch(file);
-    }
-}
 }
 }

@@ -1,10 +1,12 @@
+#pragma once
 
 #include "../commons.h"
 
 #include <memory>
 #include <resource/ResourceManager.h>
+#include <platform/Filesystem.h>
 
-#include <al.h>
+#include <AL/al.h>
 #include <vorbis/vorbisfile.h>
 
 #include <cstdint>
@@ -17,6 +19,7 @@ namespace grapito {
 
 struct OggSoundData
 {
+    StringId soundId;
     std::vector<ALuint> buffers;
     int channels;
     long sampleRate;
@@ -30,11 +33,9 @@ struct OggSoundData
     int looping = AL_FALSE;
 };
 
-struct FetchFile
-{
-    std::string filePath;
-    bool streamed;
-};
+//Should always return by value
+OggSoundData loadOggFileFromPath(const filesystem::path & path, bool streamed);
+OggSoundData loadOggFile(std::istream & aInputStream, StringId aSoundId, bool streamed);
 
 //There is three step to play sound
 //First load the file into RAM
@@ -43,16 +44,13 @@ struct FetchFile
 class SoundManager
 {
     public:
-        void prefetch(std::vector<FetchFile> aFileToFetchList);
-        OggSoundData & loadFromCacheOrFetch(FetchFile aFileToFetch);
-        OggSoundData loadOggFile(std::istream & aInputStream, bool streamed);
-        ALuint playSound(OggSoundData & aSoundData);
+        void storeDataInLoadedSound(const OggSoundData & aSoundData);
+        ALuint playSound(StringId & aSoundId);
         bool stopSound(ALuint aSource);
         bool pauseSound(ALuint aSource);
 
     private:
-        std::unordered_map<std::size_t, OggSoundData> soundCache;
-        std::shared_ptr<resource::ResourceManager> mResourceManager;
+        std::unordered_map<StringId, OggSoundData> mLoadedSoundList;
 };
 
 } // namespace grapito

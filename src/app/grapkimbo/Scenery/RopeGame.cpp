@@ -6,6 +6,7 @@
 #include "Systems/GrappleCleanup.h"
 #include "Systems/GrappleJointCreator.h"
 #include "Systems/Debug/DirectControl.h"
+#include "Systems/SoundSystem.h"
 
 #include <Components/AccelAndSpeed.h>
 #include <Components/Body.h>
@@ -82,6 +83,9 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     mSystemManager.add<GrappleCleanup>();
     mSystemManager.add<DelayDeleter>();
 
+    SoundManager soundManager;
+    auto soundSystem = mSystemManager.add<SoundSystem>(std::move(soundManager));
+
     // Done after CameraGuidedControl, to avoid having two camera guides on the frame a player is killed.
     mSystemManager.add<GameRule>(players);
 
@@ -99,6 +103,13 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
         graphics::sprite::Animator animator;
         mRenderSystem->loadSpriteAnimations(spriteSheets.begin(), spriteSheets.end(), animator);
         spriteAnimationSystem->installAnimator(std::move(animator));
+    }
+
+    { // Load sounds
+        auto soundsData = {
+            std::ref(mContext->loadOggSoundData("sounds/ahouais.ogg", false)),
+        };
+        soundSystem->loadSoundData(soundsData.begin(), soundsData.end());
     }
 
     // Camera
