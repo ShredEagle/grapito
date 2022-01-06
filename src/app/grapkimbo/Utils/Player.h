@@ -44,5 +44,17 @@ inline bool isThrowing(const PlayerData & aPlayerData)
     return aPlayerData.controlState & ControlState_Throwing;
 }
 
+
+inline bool isAnchored(const PlayerData & aPlayerData)
+{
+    return aPlayerData.mGrappleWeldJoint != nullptr;
+}
+
+
+inline void resetJumps(PlayerData & aPlayerData)
+{
+    aPlayerData.airborneJumpsLeft = player::gAirborneJumps;
+}
+
 } // namespace grapito
 } // namespace ad

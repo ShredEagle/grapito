@@ -43,6 +43,7 @@ namespace hud
 
 namespace player
 {
+    const int gAirborneJumps = 1;
     const Vec2 gCameraGuideOffset{0.f, 15.f};
     const float gCameraGuideWeight = 1.f;
     const std::array<float, 2> gCameraLimits{7.f, -2.5f};

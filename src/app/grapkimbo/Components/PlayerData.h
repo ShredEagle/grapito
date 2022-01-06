@@ -1,6 +1,7 @@
 #pragma once
 
-#include "commons.h"
+#include "../commons.h"
+#include "../Configuration.h"
 
 #include "../Animation/PlayerAnimation.h"
 
@@ -20,6 +21,7 @@ constexpr PlayerCollisionStateFlag PlayerCollisionState_Walled = 0b10;
 constexpr PlayerCollisionStateFlag PlayerCollisionState_WalledRight = 0b100;
 constexpr PlayerCollisionStateFlag PlayerCollisionState_WalledLeft = 0b1000;
 constexpr PlayerCollisionStateFlag PlayerCollisionState_Jumping = 0b10000;
+// TODO FP These seem not used?
 constexpr PlayerCollisionStateFlag PlayerCollisionState_Grappling = 0b100000;
 constexpr PlayerCollisionStateFlag PlayerCollisionState_OffGrapple = 0b1000000;
 
@@ -51,6 +53,7 @@ struct PlayerData : public aunteater::Component<PlayerData>
     ControlStateFlags controlState = 0;
 
     int wallClingFrameCounter = 0;
+    int airborneJumpsLeft = player::gAirborneJumps;
 
     aunteater::weak_entity grapple = nullptr;
     aunteater::weak_entity grappleAttachment = nullptr;

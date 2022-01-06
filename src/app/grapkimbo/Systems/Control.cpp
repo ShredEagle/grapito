@@ -30,8 +30,14 @@ Control::Control(aunteater::EntityManager & aEntityManager) :
 
 void Control::update(const GrapitoTimer, const GameInputState & aInputState)
 {
+    const float groundFriction = 1.f / player::gGroundNumberOfSlowFrame;
+    const float airFriction = 1.f / player::gAirNumberOfSlowFrame;
+
+    const float groundMaxFrameAcceleration = player::gGroundSpeed / player::gGroundNumberOfAccelFrame;
+    const float airMaxFrameAcceleration = player::gAirSpeed / player::gAirNumberOfAccelFrame;
+
     //
-    // Air
+    // General control (happens whether the grapple is out or not)
     //
     for(auto & [controllable, geometry, aas, mass, playerData] :  mCartesianControllables)
     {
@@ -48,13 +54,20 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
             horizontalAxis = direction.x();
         }
 
-        float groundFriction = 1.f / player::gGroundNumberOfSlowFrame;
-        float airSpeedAccelFactor = 1.f / player::gAirNumberOfAccelFrame;
-        float airFriction = 1.f / player::gAirNumberOfSlowFrame;
+        //
+        // Reset airborn jumps
+        //
+        if (playerData.state & PlayerCollisionState_Grounded || isAnchored(playerData))
+        {
+            // TODO Ad 2022/01/05: This should actually only be done once when the player transition to grounded.
+            // (But currently this transition happens into the physics engine.)
+            // Or when the player actually anchors to the environments.
+            resetJumps(playerData);
+        }
 
-        const float groundMaxFrameAcceleration = player::gGroundSpeed / player::gGroundNumberOfAccelFrame;
-        const float airMaxFrameAcceleration = player::gAirSpeed / player::gAirNumberOfAccelFrame;
-
+        //
+        // Ground control to major Tom
+        //
         if (playerData.state & PlayerCollisionState_Grounded)
         {
             if (std::abs(horizontalAxis) > 0.f)
@@ -80,6 +93,9 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
                 aas.speed.y() = player::gJumpImpulse;
             }
         }
+        //
+        // Air control
+        //
         else if (playerData.state & PlayerCollisionState_Jumping)
         {
             if (std::abs(horizontalAxis) > 0.)
@@ -100,6 +116,9 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
                 aas.speed.x() *= 1.f - airFriction;
             }
 
+            //
+            // Wall control
+            //
             if (playerData.state & PlayerCollisionState_Walled)
             {
                 if (!inputs[Jump])
@@ -139,9 +158,14 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
                     playerData.wallClingFrameCounter = 0;
                 }
             }
+            //
+            // Airborne jumps
+            //
             else if (inputs[Jump].positiveEdge() 
+                     && playerData.airborneJumpsLeft > 0
                      && !isGrappleOut(playerData))
             {
+                --playerData.airborneJumpsLeft;
                 aas.speed.y() = player::gJumpImpulse;
             }
         }
@@ -150,6 +174,8 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
     //
     // Swinging on a grapple
     //
+    // TODO FP Does it deserve a separate iteration? Maybe it can be merged with the previous loop
+    // (and we get rid of polar controllables, as the player is not necessarily "anchored" here).
     for(auto & entity : mPolarControllables)
     {
         auto & [controllable, aas, playerData] = entity;
@@ -174,7 +200,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
     for(auto & player : mGrapplers)
     {
         auto & [controllable, aas, grappleControl, geometry, playerData] = player;
-        const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
+        const ControllerInputState & inputs = aInputState.get(controllable.controller);
 
         if (controllable.controller == Controller::KeyboardMouse)
         {
