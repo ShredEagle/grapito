@@ -3,10 +3,13 @@
 #include "Configuration.h"
 #include "Gravity.h"
 
+#include "../commons.h"
 #include "../Entities.h"
 #include "../Utilities.h"
-#include "commons.h"
-#include "math/Constants.h"
+
+#include "../Utils/Player.h"
+
+#include <math/Constants.h>
 
 #include <Components/VisualRectangle.h>
 
@@ -21,37 +24,44 @@ namespace grapito
 Control::Control(aunteater::EntityManager & aEntityManager) :
     mEntityManager{aEntityManager},
     mCartesianControllables{mEntityManager},
-    mPolarControllables{mEntityManager},
     mGrapplers{mEntityManager}
 {}
 
 void Control::update(const GrapitoTimer, const GameInputState & aInputState)
 {
+    const float groundFriction = 1.f / player::gGroundNumberOfSlowFrame;
+    const float airFriction = 1.f / player::gAirNumberOfSlowFrame;
+
+    const float groundMaxFrameAcceleration = player::gGroundSpeed / player::gGroundNumberOfAccelFrame;
+    const float airMaxFrameAcceleration = player::gAirSpeed / player::gAirNumberOfAccelFrame;
+
     //
-    // Air
+    // General control
     //
-    for(auto & [controllable, geometry, aas, mass, playerData] :  mCartesianControllables)
+    for(auto & player : mCartesianControllables)
     {
-        const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
-        float horizontalAxis;
+        auto & [controllable, geometry, aas, mass, playerData] = player;
 
-        if (controllable.controller == Controller::KeyboardMouse)
+        const ControllerInputState & inputs = aInputState.get(controllable.controller);
+        float horizontalAxis = 
+            aInputState.asAxis(controllable.controller, 
+                               Left, Right, 
+                               LeftHorizontalAxis, controller::gHorizontalDeadZone);
+
+        //
+        // Reset airborn jumps
+        //
+        if (playerData.state & PlayerCollisionState_Grounded || isAnchored(playerData))
         {
-            horizontalAxis = aInputState.asAxis(controllable.controller, Left, Right, LeftHorizontalAxis);
-        }
-        else
-        {
-            Vec2 direction = aInputState.asDirection(controllable.controller, LeftHorizontalAxis, LeftVerticalAxis, controller::gHorizontalDeadZone, 0.f);
-            horizontalAxis = direction.x();
+            // TODO Ad 2022/01/05: This should actually only be done once when the player transition to grounded.
+            // (But currently this transition happens into the physics engine.)
+            // Or when the player actually anchors to the environments.
+            resetJumps(playerData);
         }
 
-        float groundFriction = 1.f / player::gGroundNumberOfSlowFrame;
-        float airSpeedAccelFactor = 1.f / player::gAirNumberOfAccelFrame;
-        float airFriction = 1.f / player::gAirNumberOfSlowFrame;
-
-        const float groundMaxFrameAcceleration = player::gGroundSpeed / player::gGroundNumberOfAccelFrame;
-        const float airMaxFrameAcceleration = player::gAirSpeed / player::gAirNumberOfAccelFrame;
-
+        //
+        // Ground control to major Tom
+        //
         if (playerData.state & PlayerCollisionState_Grounded)
         {
             if (std::abs(horizontalAxis) > 0.f)
@@ -64,6 +74,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
                 }
                 else
                 {
+                    // TODO FP Magic number
                     aas.accel -= aas.speed * 5.f;
                 }
             }
@@ -74,9 +85,12 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
 
             if (inputs[Jump].positiveEdge())
             {
-                aas.speed += Vec2{0.f, + player::gJumpImpulse};
+                aas.speed.y() = player::gJumpImpulse;
             }
         }
+        //
+        // Air control
+        //
         else if (playerData.state & PlayerCollisionState_Jumping)
         {
             if (std::abs(horizontalAxis) > 0.)
@@ -97,6 +111,9 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
                 aas.speed.x() *= 1.f - airFriction;
             }
 
+            //
+            // Wall control
+            //
             if (playerData.state & PlayerCollisionState_Walled)
             {
                 if (!inputs[Jump])
@@ -136,28 +153,33 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
                     playerData.wallClingFrameCounter = 0;
                 }
             }
-        }
-    }
-
-    //
-    // Swinging on a grapple
-    //
-    for(auto & entity : mPolarControllables)
-    {
-        auto & [controllable, aas, playerData] = entity;
-        const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
-
-        if (inputs[Jump].positiveEdge() && playerData.controlState & (ControlState_Attached | ControlState_Throwing))
-        {
-            detachPlayerFromGrapple(entity);
-            if (playerData.state & PlayerCollisionState_Jumping)
+            //
+            // Airborne jumps
+            //
+            else if (inputs[Jump].positiveEdge() 
+                     && playerData.airborneJumpsLeft > 0
+                     && !isGrappleOut(playerData))
             {
-                aas.speed *= 1.5f;
-                aas.speed += Vec2{ 0.f, player::gJumpImpulse };
+                --playerData.airborneJumpsLeft;
+                aas.speed.y() = player::gJumpImpulse;
             }
+        }
+
+        // Detach grapple from player if necessary
+        if (isGrappleOut(playerData) && inputs[Jump].positiveEdge())
+        {
+            if (// The boosts are only granted if the player was successfully connected (no ABABAB speedrun).
+                isAnchored(playerData) 
+                // Otherwise, would make a super jump when both connected and grounded.
+                && (playerData.state & PlayerCollisionState_Jumping))
+            {
+                aas.speed *= player::gDetachSpeedBoostFactor;
+                aas.speed.y() += player::gJumpImpulse;
+            }
+
+            detachPlayerFromGrapple(player);
             playerData.controlState &= ~ControlState_Attached;
             playerData.controlState &= ~ControlState_Throwing;
-
         }
     }
 
@@ -167,7 +189,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
     for(auto & player : mGrapplers)
     {
         auto & [controllable, aas, grappleControl, geometry, playerData] = player;
-        const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
+        const ControllerInputState & inputs = aInputState.get(controllable.controller);
 
         if (controllable.controller == Controller::KeyboardMouse)
         {
@@ -186,13 +208,13 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
             }
         }
 
-        if (inputs[Grapple].positiveEdge() && !(playerData.controlState & (ControlState_Attached | ControlState_Throwing)))
+        if (inputs[Grapple].positiveEdge() && !isGrappleOut(playerData))
         {
             throwGrapple(player, mEntityManager);
             playerData.controlState |= ControlState_Throwing;
         }
 
-        if (inputs[Grapple].negativeEdge() && playerData.controlState & ControlState_Throwing)
+        if (inputs[Grapple].negativeEdge() && isThrowing(playerData))
         {
             attachPlayerToGrapple(player, mEntityManager);
             playerData.controlState &= ~ControlState_Throwing;

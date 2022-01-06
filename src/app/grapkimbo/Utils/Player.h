@@ -13,20 +13,47 @@ namespace grapito {
 
 /// \brief This file is working around the absence of a coherent "Player" class.
 
-bool isIdle(const PlayerData & aPlayerData, const AccelAndSpeed & aAccelSpeed)
+
+inline bool isIdle(const PlayerData & aPlayerData, const AccelAndSpeed & aAccelSpeed)
 {
     return (aPlayerData.state & PlayerCollisionState_Grounded)
         && (std::abs(aAccelSpeed.speed.x()) < player::gIdleSpeedLimit);
 }
 
-bool isGoingLeft(const AccelAndSpeed & aAccelSpeed)
+
+inline bool isGoingLeft(const AccelAndSpeed & aAccelSpeed)
 {
     return aAccelSpeed.speed.x() < -player::gIdleSpeedLimit;
 }
 
-bool isGoingRight(const AccelAndSpeed & aAccelSpeed)
+
+inline bool isGoingRight(const AccelAndSpeed & aAccelSpeed)
 {
     return aAccelSpeed.speed.x() > player::gIdleSpeedLimit;
+}
+
+
+inline bool isGrappleOut(const PlayerData & aPlayerData)
+{
+    return aPlayerData.controlState & (ControlState_Attached | ControlState_Throwing);
+}
+
+
+inline bool isThrowing(const PlayerData & aPlayerData)
+{
+    return aPlayerData.controlState & ControlState_Throwing;
+}
+
+
+inline bool isAnchored(const PlayerData & aPlayerData)
+{
+    return aPlayerData.mGrappleWeldJoint != nullptr;
+}
+
+
+inline void resetJumps(PlayerData & aPlayerData)
+{
+    aPlayerData.airborneJumpsLeft = player::gAirborneJumps;
 }
 
 } // namespace grapito

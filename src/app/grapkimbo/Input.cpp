@@ -182,7 +182,8 @@ void GameInputState::readAll(graphics::ApplicationGlfw & aApplication)
 float GameInputState::asAxis(Controller aController,
                              Command aNegativeButton,
                              Command aPositiveButton,
-                             Command aGamepadAxis) const
+                             Command aGamepadAxis,
+                             float aDeadzone) const
 {
     ControllerInputState input = get(aController);
     float axis = 0.;
@@ -200,6 +201,7 @@ float GameInputState::asAxis(Controller aController,
     else
     {
         axis = input[aGamepadAxis];
+        axis = std::abs(axis) > aDeadzone ? axis : 0.f;
     }
     return axis;
 }
@@ -209,23 +211,23 @@ ButtonStatus GameInputState::asButton(Controller aController,
                                       Command aButton,
                                       Command aGamepadAxis,
                                       AxisSign aSign,
-                                      float aDeadZone) const
+                                      float aDeadzone) const
 {
-    assert(aDeadZone >= 0.f);
+    assert(aDeadzone >= 0.f);
 
     ControllerInputState input = get(aController);
     if (isGamepad(aController))
     {
-        auto isPressed = [aSign, aDeadZone](float aValue) -> bool
+        auto isPressed = [aSign, aDeadzone](float aValue) -> bool
         {
             switch(aSign)
             {
                 case AxisSign::Negative:
-                    return aValue < -aDeadZone;
+                    return aValue < -aDeadzone;
                 // For invalid values, consider it positive case the default
                 case AxisSign::Positive:
                 default:
-                    return aValue > aDeadZone;
+                    return aValue > aDeadzone;
             }
         };
 
@@ -252,7 +254,7 @@ T filterDeadzoneSingleAxis(T aValue, T aDeadzone, T aDefault = 0)
 math::Vec<2, float> GameInputState::asDirection(Controller aController,
                                                 Command aHorizontalAxis,
                                                 Command aVerticalAxis,
-                                                float aDeadZone) const
+                                                float aDeadzone) const
 {
     if (! isGamepad(aController))
     {
@@ -261,14 +263,14 @@ math::Vec<2, float> GameInputState::asDirection(Controller aController,
 
     ControllerInputState input = get(aController);
     math::Vec<2, float> candidate{input[aHorizontalAxis], input[aVerticalAxis]};
-    return candidate.getNorm() > aDeadZone ? candidate : math::Vec<2, float>::Zero();
+    return candidate.getNorm() > aDeadzone ? candidate : math::Vec<2, float>::Zero();
 }
 
 math::Vec<2, float> GameInputState::asDirection(Controller aController,
     Command aHorizontalAxis,
     Command aVerticalAxis,
-    float aHorizontalDeadZone,
-    float aVerticalDeadZone) const
+    float aHorizontalDeadzone,
+    float aVerticalDeadzone) const
 {
     if (!isGamepad(aController))
     {
@@ -277,8 +279,8 @@ math::Vec<2, float> GameInputState::asDirection(Controller aController,
 
     ControllerInputState input = get(aController);
     math::Vec<2, float> candidate{ input[aHorizontalAxis], input[aVerticalAxis] };
-    candidate.x() = std::abs(candidate.x()) > aHorizontalDeadZone ? candidate.x() : 0.f;
-    candidate.y() = std::abs(candidate.y()) > aVerticalDeadZone ? candidate.y() : 0.f;
+    candidate.x() = std::abs(candidate.x()) > aHorizontalDeadzone ? candidate.x() : 0.f;
+    candidate.y() = std::abs(candidate.y()) > aVerticalDeadzone ? candidate.y() : 0.f;
     return candidate;
 }
 
