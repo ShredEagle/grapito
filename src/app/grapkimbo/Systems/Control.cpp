@@ -41,18 +41,11 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
     //
     for(auto & [controllable, geometry, aas, mass, playerData] :  mCartesianControllables)
     {
-        const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
-        float horizontalAxis;
-
-        if (controllable.controller == Controller::KeyboardMouse)
-        {
-            horizontalAxis = aInputState.asAxis(controllable.controller, Left, Right, LeftHorizontalAxis);
-        }
-        else
-        {
-            Vec2 direction = aInputState.asDirection(controllable.controller, LeftHorizontalAxis, LeftVerticalAxis, controller::gHorizontalDeadZone, 0.f);
-            horizontalAxis = direction.x();
-        }
+        const ControllerInputState & inputs = aInputState.get(controllable.controller);
+        float horizontalAxis = 
+            aInputState.asAxis(controllable.controller, 
+                               Left, Right, 
+                               LeftHorizontalAxis, controller::gHorizontalDeadZone);
 
         //
         // Reset airborn jumps
@@ -80,6 +73,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
                 }
                 else
                 {
+                    // TODO FP Magic number
                     aas.accel -= aas.speed * 5.f;
                 }
             }
