@@ -162,7 +162,7 @@ OggSoundData loadOggFile(std::istream & aInputStream, StringId aSoundId, bool st
         }
         else
         {
-            spdlog::get("grapito")->warn("WARNING: File is not of the size we thought it was (sizeRead: {}, sizeToRead: {})", sizeRead, sizeToRead);
+            //We reached the end of the file
             break;
         }
     } while (true);
@@ -183,7 +183,7 @@ OggSoundData loadOggFile(std::istream & aInputStream, StringId aSoundId, bool st
     return resultSoundData;
 }
 
-ALuint SoundManager::playSound(StringId & aSoundId)
+ALuint SoundManager::playSound(StringId & aSoundId, ALboolean looping)
 {
     const OggSoundData & soundData = mLoadedSoundList.at(aSoundId);
     ALuint source;
@@ -194,7 +194,7 @@ ALuint SoundManager::playSound(StringId & aSoundId)
     alCall(alSource3f, source, AL_POSITION, soundData.position.x(), soundData.position.y(), soundData.position.z());
     alCall(alSource3f, source, AL_VELOCITY, soundData.velocity.x(), soundData.velocity.y(), soundData.velocity.z());
 
-    alCall(alSourcei, source, AL_LOOPING, soundData.looping);
+    alCall(alSourcei, source, AL_LOOPING, looping);
     alCall(alSourcei, source, AL_BUFFER, soundData.buffers[0]);
     alCall(alSourcePlay, source);
 

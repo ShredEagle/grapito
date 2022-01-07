@@ -30,7 +30,6 @@ struct OggSoundData
     Position3 position = Position3::Zero();
     Vec3 velocity = Vec3::Zero();
     float gain = 1.f;
-    int looping = AL_FALSE;
 };
 
 //Should always return by value
@@ -45,7 +44,7 @@ class SoundManager
 {
     public:
         void storeDataInLoadedSound(const OggSoundData & aSoundData);
-        ALuint playSound(StringId & aSoundId);
+        ALuint playSound(StringId & aSoundId, ALboolean looping = AL_FALSE);
         bool stopSound(ALuint aSource);
         bool pauseSound(ALuint aSource);
 

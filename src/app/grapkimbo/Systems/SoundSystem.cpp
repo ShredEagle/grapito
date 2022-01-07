@@ -87,7 +87,7 @@ void SoundSystem::update(const GrapitoTimer, const GameInputState &)
             auto & sound = *soundIterator;
             if (!sound.mPlaying)
             {
-                ALuint sourceId = mSoundManager.playSound(sound.mSoundId);
+                ALuint sourceId = mSoundManager.playSound(sound.mSoundId, sound.mLooping);
                 sound.sourceId = sourceId;
                 mPlayingSources.emplace_back(PlayingSource{sourceId, soundIterator, soundPlayer});
                 sound.mPlaying = true;
