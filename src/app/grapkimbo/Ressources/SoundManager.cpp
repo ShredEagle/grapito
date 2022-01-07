@@ -15,7 +15,7 @@ constexpr int StreamingBufferSize = 32768;
 
 static size_t readOggInputStreamCallback(void * destination, size_t elementSize, size_t elementCount, void * aDatasource)
 {
-    ALsizei lengthRead = elementSize * elementCount;
+    std::streamsize lengthRead = elementSize * elementCount;
     std::istream & stream = *static_cast<std::istream*>(aDatasource);
     stream.read(static_cast<char*>(destination), lengthRead);
     const std::streamsize bytesRead = stream.gcount();
@@ -28,12 +28,17 @@ static size_t readOggInputStreamCallback(void * destination, size_t elementSize,
     {
         spdlog::get("grapito")->error("ERROR: Ogg stream has bad bit set");
     }
+    if (stream.fail() && stream.eof())
+    {
+        spdlog::get("grapito")->info("INFO: file read reach EOF");
+    }
 
     return static_cast<size_t>(bytesRead);
 };
 
 static int seekOggInputStreamCallback(void * aDatasource, ogg_int64_t offset, int origin)
 {
+    return -1;
     //Ok so the vorbis is shit honestly
     //From what I've gathered the the origin parameters in the callback tells us
     //from where we should seek into the stream
@@ -75,7 +80,7 @@ static ov_callbacks OggVorbisCallbacks{
 
 OggSoundData loadOggFileFromPath(const filesystem::path & aPath, bool streamed)
 {
-    std::ifstream soundStream{aPath};
+    std::ifstream soundStream{aPath.string(),std::ios::binary};
     StringId soundStringId{aPath.stem().string()};
     return loadOggFile(soundStream, soundStringId, streamed);
 }
@@ -86,8 +91,17 @@ OggSoundData loadOggFile(std::istream & aInputStream, StringId aSoundId, bool st
     OggSoundData resultSoundData{.soundId = aSoundId};
 
     //Get ogg vorbis file format from the file
+    //std::cout << aInputStream.rdbuf();
     int result = ov_open_callbacks(&aInputStream, &oggFile, nullptr, 0, OggVorbisCallbacks);
-    if (result < 0)
+    if (result == OV_EREAD)
+    {
+        spdlog::get("grapito")->error("A read from the media returned an error");
+    }
+    if (result == OV_ENOTVORBIS)
+    {
+        spdlog::get("grapito")->error("File is not a vorbis file");
+    }
+    else if (result < 0)
     {
         spdlog::get("grapito")->error("Error opening ogg file: {}", result);
     }
@@ -109,7 +123,7 @@ OggSoundData loadOggFile(std::istream & aInputStream, StringId aSoundId, bool st
 
     // size = #samples * #channels * 2 (for 16 bit).
     long sizeToRead = ov_pcm_total(&oggFile, -1) * fileInfo->channels * 2;
-    char readBuffer[sizeToRead];
+    char readBuffer[2048];
     int bitStream;
     std::vector<char> dataBuffer;
 
@@ -127,23 +141,31 @@ OggSoundData loadOggFile(std::istream & aInputStream, StringId aSoundId, bool st
     do
     {
         //read from the file a readBuffer size amount of data
-        long result = ov_read(&oggFile, readBuffer, sizeToRead, endian, wordSize, sgned, &bitStream);
+        long result = ov_read(&oggFile, readBuffer, 2048, endian, wordSize, sgned, &bitStream);
         if (result > 0)
         {
             sizeRead += result;
+            //Add to the result dataBuffer the data that was read
+            dataBuffer.insert(dataBuffer.end(), readBuffer, readBuffer + result);
         }
-        else if (result < 0)
+        else if (result == OV_HOLE)
         {
-            spdlog::get("grapito")->error("ERROR: Can't read from file");
+            spdlog::get("grapito")->warn("WARNING: Page corrupted or missing");
+        }
+        else if (result == OV_EBADLINK)
+        {
+            spdlog::get("grapito")->error("ERROR: invalid stream section");
+        }
+        else if (result == OV_EINVAL)
+        {
+            spdlog::get("grapito")->error("ERROR: corrupted file header or can't open file");
         }
         else
         {
             spdlog::get("grapito")->warn("WARNING: File is not of the size we thought it was (sizeRead: {}, sizeToRead: {})", sizeRead, sizeToRead);
             break;
         }
-        //Add to the result dataBuffer the data that was read
-        dataBuffer.insert(dataBuffer.end(), readBuffer, readBuffer + result);
-    } while (sizeRead < sizeToRead);
+    } while (true);
 
     if (sizeRead == 0)
     {

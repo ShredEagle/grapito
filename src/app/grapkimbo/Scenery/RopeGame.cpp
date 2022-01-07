@@ -16,6 +16,7 @@
 #include <Components/Position.h>
 #include <Components/VisualRectangle.h>
 #include <Components/Mass.h>
+#include <Components/SoundPlayer.h>
 
 #include <Systems/AccelSolver.h>
 #include <Systems/CameraGuidedControl.h>
@@ -29,12 +30,15 @@
 #include <Systems/RopeCreation.h>
 #include <Systems/TransitionAnimationState.h>
 
+#include <handy/StringId_Interning.h>
+
 #include <aunteater/Entity.h>
 
 
 namespace ad {
 namespace grapito {
 
+const StringId soundId_MusicSid = handy::internalizeString("ahouais");
 
 std::vector<aunteater::Entity> setupPlayers()
 {
@@ -108,12 +112,17 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     { // Load sounds
         auto soundsData = {
             std::ref(mContext->loadOggSoundData("sounds/ahouais.ogg", false)),
+            std::ref(mContext->loadOggSoundData("sounds/launch.ogg", false)),
+            std::ref(mContext->loadOggSoundData("sounds/weld.ogg", false)),
+            std::ref(mContext->loadOggSoundData("sounds/jump.ogg", false)),
+            std::ref(mContext->loadOggSoundData("sounds/ropejump.ogg", false)),
         };
         soundSystem->loadSoundData(soundsData.begin(), soundsData.end());
     }
 
     // Camera
     aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera());
+    addSoundToEntity(camera, soundId_MusicSid);
 
     constexpr float gLevelHalfWidth = 50.f;
 

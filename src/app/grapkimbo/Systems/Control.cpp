@@ -2,6 +2,7 @@
 
 #include "Configuration.h"
 #include "Gravity.h"
+#include "../Components/SoundPlayer.h"
 
 #include "../Entities.h"
 #include "../Utilities.h"
@@ -10,6 +11,7 @@
 
 #include <Components/VisualRectangle.h>
 
+#include <handy/StringId_Interning.h>
 #include <GLFW/glfw3.h>
 
 
@@ -17,6 +19,8 @@ namespace ad {
 namespace grapito
 {
 
+const StringId soundId_JumpSid = handy::internalizeString("jump");
+const StringId soundId_RopeJumpSid = handy::internalizeString("ropejump");
 
 Control::Control(aunteater::EntityManager & aEntityManager) :
     mEntityManager{aEntityManager},
@@ -30,8 +34,9 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
     //
     // Air
     //
-    for(auto & [controllable, geometry, aas, mass, playerData] :  mCartesianControllables)
+    for(auto & player :  mCartesianControllables)
     {
+        auto & [controllable, geometry, aas, mass, playerData] = player;
         const ControllerInputState & inputs = aInputState.controllerState[(std::size_t)controllable.controller];
         float horizontalAxis;
 
@@ -74,6 +79,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
 
             if (inputs[Jump].positiveEdge())
             {
+                addSoundToEntity(player, soundId_JumpSid);
                 aas.speed += Vec2{0.f, + player::gJumpImpulse};
             }
         }
@@ -148,6 +154,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
 
         if (inputs[Jump].positiveEdge() && playerData.controlState & (ControlState_Attached | ControlState_Throwing))
         {
+            addSoundToEntity(entity, soundId_RopeJumpSid);
             detachPlayerFromGrapple(entity);
             if (playerData.state & PlayerCollisionState_Jumping)
             {

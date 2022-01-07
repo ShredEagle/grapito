@@ -12,8 +12,6 @@ namespace ad {
 namespace grapito
 {
 
-const StringId soundId_MusicSid = handy::internalizeString("ahouais");
-
 SoundSystem::SoundSystem(aunteater::EntityManager & aEntityManager, SoundManager aSoundManager) :
     mSounds{aEntityManager},
     mSoundManager{std::move(aSoundManager)}
@@ -92,6 +90,7 @@ void SoundSystem::update(const GrapitoTimer, const GameInputState &)
                 ALuint sourceId = mSoundManager.playSound(sound.mSoundId);
                 sound.sourceId = sourceId;
                 mPlayingSources.emplace_back(PlayingSource{sourceId, soundIterator, soundPlayer});
+                sound.mPlaying = true;
             }
         }
     }
@@ -106,8 +105,8 @@ void SoundSystem::update(const GrapitoTimer, const GameInputState &)
         if (sourceState == AL_STOPPED)
         {
             sourceToDelete.push_back(playingSource.mSource);
-            sourceIterator = mPlayingSources.erase(sourceIterator);
             playingSource.mSoundPlayerReference.mSounds.erase(playingSource.mSoundDataDeleteIterator);
+            sourceIterator = mPlayingSources.erase(sourceIterator);
         }
         else
         {

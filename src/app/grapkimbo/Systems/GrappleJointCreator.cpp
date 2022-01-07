@@ -10,16 +10,20 @@
 #include "../Components/PlayerData.h"
 #include "../Components/WeldJoint.h"
 #include "../Components/DistanceJoint.h"
+#include "../Components/SoundPlayer.h"
 
 #include "aunteater/Entity.h"
 #include "aunteater/globals.h"
 #include "math/Rectangle.h"
 
 #include <math/Vector.h>
+#include <handy/StringId_Interning.h>
 
 namespace ad {
 namespace grapito
 {
+
+const StringId soundId_WeldSid = handy::internalizeString("weld");
 
 GrappleJointCreator::GrappleJointCreator(aunteater::EntityManager & aEntityManager) :
     mRopeCreator{aEntityManager},
@@ -142,6 +146,7 @@ void GrappleJointCreator::update(const GrapitoTimer, const GameInputState &)
                                         ropeCreatorEntity,
                                         otherEntity
                                     ));
+                            addSoundToEntity(ropeCreatorEntity, soundId_WeldSid);
                             break;
                         }
                     }
