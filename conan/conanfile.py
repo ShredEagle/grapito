@@ -33,7 +33,7 @@ class GrapitoConan(ConanFile):
         ("graphics/72d3510229@adnn/develop"),
         ("math/017e7c42bf@adnn/develop"),
         ("websocket/ef5d5bf4d9@adnn/develop"),
-        ("sounds/4705746da3@adnn/develop"),
+        ("sounds/c80889af36@adnn/develop"),
     )
 
 
