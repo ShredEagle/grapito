@@ -50,8 +50,6 @@ set(${TARGET_NAME}_HEADERS
     Context/Localization.h
     Context/Resources.h
 
-    Ressources/SoundManager.h
-
     Systems/CameraGuidedControl.h
     Systems/Control.h
     Systems/DelayDeleter.h
@@ -98,7 +96,6 @@ set(${TARGET_NAME}_HEADERS
     Utils/RenderEffect.h
     Utils/RopeUtilities.h
     Utils/Shape.h
-    Utils/SoundUtilities.h
     Utils/TimeSystemsUpdater.h
 
     DebugGui/SceneGui.h
@@ -145,8 +142,6 @@ set(${TARGET_NAME}_SOURCES
     TestScenes/Game_pendulum.cpp
     TestScenes/WeldTest.cpp
 
-    Ressources/SoundManager.cpp
-
     Scenery/GameScene.cpp
     Scenery/MenuScene.cpp
     Scenery/RopeGame.cpp
@@ -157,7 +152,6 @@ set(${TARGET_NAME}_SOURCES
     Utils/PhysicsStructs.cpp
     Utils/RenderEffect.cpp
     Utils/RopeUtilities.cpp
-    Utils/SoundUtilities.cpp
     Utils/Shape.cpp
 )
 
@@ -170,6 +164,7 @@ find_package(Aunteater CONFIG REQUIRED COMPONENTS aunteater)
 find_package(Graphics CONFIG REQUIRED COMPONENTS arte graphics resource)
 find_package(Math CONFIG REQUIRED COMPONENTS math)
 find_package(Websocket CONFIG REQUIRED COMPONENTS websocket)
+find_package(Sounds CONFIG REQUIRED COMPONENTS sounds)
 
 find_package(Boost REQUIRED COMPONENTS program_options)
 find_package(glad REQUIRED)
@@ -218,6 +213,7 @@ target_link_libraries(${TARGET_NAME}
         ad::math
         ad::resource
         ad::websocket
+        ad::sounds
 
         Boost::program_options
         glad::glad

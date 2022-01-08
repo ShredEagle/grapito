@@ -12,54 +12,11 @@ namespace ad {
 namespace grapito
 {
 
-SoundSystem::SoundSystem(aunteater::EntityManager & aEntityManager, SoundManager aSoundManager) :
+SoundSystem::SoundSystem(aunteater::EntityManager & aEntityManager, SoundManager & aSoundManager) :
     mSounds{aEntityManager},
-    mSoundManager{std::move(aSoundManager)}
+    mSoundManager{aSoundManager}
 {
     aEntityManager.getFamily<SoundType>().registerObserver(this);
-    mOpenALDevice = alcOpenDevice(nullptr);
-    if(!mOpenALDevice)
-    {
-        /* fail */
-        spdlog::get("grapito")->error("Cannot open OpenAL sound device");
-    }
-    else
-    {
-        if (!alcCall(alcCreateContext, mOpenALContext, mOpenALDevice, mOpenALDevice, nullptr))
-        {
-            spdlog::get("grapito")->error("Cannot create OpenAL context");
-        }
-        else
-        {
-            if (!alcCall(alcMakeContextCurrent, mContextIsCurrent, mOpenALDevice, mOpenALContext))
-            {
-                spdlog::get("grapito")->error("Cannot set OpenAL to current context");
-            }
-        }
-    }
-}
-
-SoundSystem::~SoundSystem()
-{
-    if (mContextIsCurrent)
-    {
-        if (!alcCall(alcMakeContextCurrent, mContextIsCurrent, mOpenALDevice, nullptr))
-        {
-            spdlog::get("grapito")->error("Well we're leaking audio memory now");
-        }
-
-        if (!alcCall(alcDestroyContext, mOpenALDevice, mOpenALContext))
-        {
-            spdlog::get("grapito")->error("Well we're leaking audio memory now");
-        }
-
-        ALCboolean closed;
-        if (!alcCall(alcCloseDevice, closed, mOpenALDevice, mOpenALDevice))
-        {
-            spdlog::get("grapito")->error("Device just disappeared and I don't know why");
-        }
-
-    }
 }
 
 void SoundSystem::addedEntity(aunteater::LiveEntity &)
@@ -99,8 +56,7 @@ void SoundSystem::update(const GrapitoTimer, const GameInputState &)
     for (auto sourceIterator = mPlayingSources.begin(); sourceIterator != mPlayingSources.end();)
     {
         PlayingSource & playingSource = *sourceIterator;
-        ALint sourceState;
-        alCall(alGetSourcei, playingSource.mSource, AL_SOURCE_STATE, &sourceState);
+        ALint sourceState = mSoundManager.getSourceState(playingSource.mSource);
 
         if (sourceState == AL_STOPPED)
         {
@@ -114,7 +70,7 @@ void SoundSystem::update(const GrapitoTimer, const GameInputState &)
         }
     }
 
-    alCall(alDeleteSources, sourceToDelete.size(), sourceToDelete.data());
+    mSoundManager.deleteSources(sourceToDelete);
 }
 
 }

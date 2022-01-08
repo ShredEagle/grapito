@@ -3,6 +3,7 @@
 
 #include "Localization.h"
 #include "Resources.h"
+#include "commons.h"
 
 
 namespace ad {
@@ -25,6 +26,7 @@ struct Context
 
     Resources resources;
     Locale locale;
+    SoundManager mSoundManager;
 };
 
 
@@ -56,7 +58,9 @@ inline const arte::AnimationSpriteSheet & Context::loadAnimationSpriteSheet(cons
 
 inline const OggSoundData & Context::loadOggSoundData(const filesystem::path &aAsset, bool streamed)
 {
-    return resources.oggSoundFiles.load(aAsset, resources.locator, streamed);
+    const OggSoundData & data = resources.oggSoundFiles.load(aAsset, resources.locator, streamed);
+    mSoundManager.storeDataInLoadedSound(data);
+    return data;
 }
 
 

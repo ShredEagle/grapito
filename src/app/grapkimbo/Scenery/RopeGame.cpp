@@ -87,8 +87,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     mSystemManager.add<GrappleCleanup>();
     mSystemManager.add<DelayDeleter>();
 
-    SoundManager soundManager;
-    auto soundSystem = mSystemManager.add<SoundSystem>(std::move(soundManager));
+    auto soundSystem = mSystemManager.add<SoundSystem>(aContext->mSoundManager);
 
     // Done after CameraGuidedControl, to avoid having two camera guides on the frame a player is killed.
     mSystemManager.add<GameRule>(players);
@@ -110,14 +109,11 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     }
 
     { // Load sounds
-        auto soundsData = {
-            std::ref(mContext->loadOggSoundData("sounds/launch.ogg", false)),
-            std::ref(mContext->loadOggSoundData("sounds/weld.ogg", false)),
-            std::ref(mContext->loadOggSoundData("sounds/jump.ogg", false)),
-            std::ref(mContext->loadOggSoundData("sounds/ropejump.ogg", false)),
-            std::ref(mContext->loadOggSoundData("sounds/bgmusic.ogg", false)),
-        };
-        soundSystem->loadSoundData(soundsData.begin(), soundsData.end());
+        mContext->loadOggSoundData("sounds/launch.ogg", false);
+        mContext->loadOggSoundData("sounds/weld.ogg", false);
+        mContext->loadOggSoundData("sounds/jump.ogg", false);
+        mContext->loadOggSoundData("sounds/ropejump.ogg", false);
+        mContext->loadOggSoundData("sounds/bgmusic.ogg", false);
     }
 
     // Camera

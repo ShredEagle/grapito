@@ -4,6 +4,7 @@
 #include <aunteater/Timer.h>
 
 #include <handy/StringId.h>
+#include <sounds/SoundManager.h>
 
 #include <math/Rectangle.h>
 #include <math/Vector.h>
@@ -25,6 +26,8 @@ using GrapitoTimer = aunteater::Timer_base<float>;
 
 
 using StringId = handy::StringId;
+using SoundManager = sounds::SoundManager;
+using OggSoundData = sounds::OggSoundData;
 
 
 } // namespace grapito

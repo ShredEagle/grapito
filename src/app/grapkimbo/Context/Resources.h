@@ -1,8 +1,8 @@
 #pragma once
 
 
-#include "../Ressources/SoundManager.h"
-
+#include "commons.h"
+#include "sounds/SoundManager.h"
 #include <arte/SpriteSheet.h>
 
 #include <resource/ResourceLocator.h>
@@ -19,7 +19,7 @@ struct Resources
     resource::ResourceManager<arte::AnimationSpriteSheet, 
                               &arte::AnimationSpriteSheet::LoadAseFile> animationSpriteSheets;
     resource::ResourceManager<OggSoundData,
-                              loadOggFileFromPath> oggSoundFiles;
+                              sounds::loadOggFileFromPath> oggSoundFiles;
 };
 
 } // namespace grapito
