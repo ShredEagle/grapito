@@ -75,16 +75,16 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     mSystemManager.add<Control>();
     mSystemManager.add<Gravity>();
     mSystemManager.add<RopeCreation>();
-    mSystemManager.add<GrappleJointCreator>();
 
     mSystemManager.add<AccelSolver>();
+    mSystemManager.add<GrappleCleanup>();
     mSystemManager.add<Physics>();
+    mSystemManager.add<GrappleJointCreator>();
 
     std::shared_ptr<TransitionAnimationState> spriteAnimationSystem = 
         mSystemManager.add<TransitionAnimationState>();
 
     mSystemManager.add<CameraGuidedControl>();
-    mSystemManager.add<GrappleCleanup>();
     mSystemManager.add<DelayDeleter>();
 
     auto soundSystem = mSystemManager.add<SoundSystem>(mContext->mSoundManager);

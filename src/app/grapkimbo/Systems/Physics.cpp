@@ -297,29 +297,6 @@ static inline std::vector<ContactFeature> CheckContactValidity(const Shape::Edge
     return result;
 }
 
-// This can only be used if we know lineA and lineB
-// intersect
-// see https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
-// where lineA is P->P+R and lineB is Q->Q+S
-static inline bool findIntersectionPoint(Position2 & result, const Line lineA, const Line lineB)
-{
-    float rCrossS = twoDVectorCross(lineA.direction, lineB.direction);
-
-    Vec2 base = lineB.origin - lineA.origin;
-    float t = twoDVectorCross(base, lineB.direction) / rCrossS;
-    float u = twoDVectorCross(base, lineA.direction) / rCrossS;
-
-    if (t < 0. || t > 1. || u < 0. || u > 1)
-    {
-        return false;
-    }
-
-    result = lineA.origin + t * lineA.direction;
-
-    return true;
-}
-
-
 static inline std::vector<ContactFeature> getContactPoints(
     const uint8_t referenceEdgeIndex,
     const uint8_t incidentEdgeIndex,
@@ -743,6 +720,7 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
     {
         for (auto & constraint : jointConstraints)
         {
+            constraint->debugRender();
             constraint->SolveVelocityConstraint(aTimer);
         }
 

@@ -60,10 +60,10 @@ namespace ad
                 width{aWidth},
                 color{aColor}
             {}
-            math::Position<2, GLfloat> origin;
-            math::Position<2, GLfloat> end;
-            float width;
-            math::sdr::Rgb color;
+            math::Position<2, GLfloat> origin; //< origin
+            math::Position<2, GLfloat> end; //< end
+            float width; //< width
+            math::sdr::Rgb color; //< color
         };
 
         struct Arrow

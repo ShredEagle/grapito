@@ -12,6 +12,7 @@
 #include "../Utils/DrawDebugStuff.h"
 #include "../Utils/PhysicsMathUtilities.h"
 #include "Logging.h"
+#include "math/Color.h"
 
 #include <math/Vector.h>
 #include <iostream>
@@ -365,6 +366,42 @@ bool WeldJointConstraint::SolvePositionConstraint()
     return positionError <= physic::gLinearSlop && angularError <= physic::gAngularSlop;
 }
 
+void WeldJointConstraint::debugRender()
+{
+    Position2 pA = bodyPosA->p;
+    Position2 pB = bodyPosB->p;
+    Position2 cA = bodyPosA->c;
+    Position2 cB = bodyPosB->c;
+    math::Radian<float> aA = bodyPosA->a;
+    math::Radian<float> aB = bodyPosB->a;
+
+    Vec2 rA = transformVector(localAnchorA - (cA - pA).as<math::Position>(), aA);
+    Vec2 rB = transformVector(localAnchorB - (cB - pB).as<math::Position>(), aB);
+
+    debugDrawer->drawLine({
+            cA,
+            cA + rA,
+            2.f,
+            math::sdr::gGreen,
+            });
+    debugDrawer->drawLine({
+            cB,
+            cB + rB,
+            2.f,
+            math::sdr::gGreen,
+            });
+    debugDrawer->drawCross({
+            cA + rA,
+            2.f,
+            math::sdr::gGreen,
+            });
+    debugDrawer->drawCross({
+            cB + rB,
+            2.f,
+            math::sdr::gGreen,
+            });
+}
+
 PivotJointConstraint::PivotJointConstraint(
         const PivotJoint & aPivotJoint,
         ConstructedBody * aBodyA,
@@ -451,6 +488,41 @@ bool PivotJointConstraint::SolvePositionConstraint()
     bodyPosB->a += math::Radian<float>{iB * twoDVectorCross(rB, impulse)};
 
     return positionError <= physic::gLinearSlop;
+}
+void PivotJointConstraint::debugRender()
+{
+    Position2 pA = bodyPosA->p;
+    Position2 pB = bodyPosB->p;
+    Position2 cA = bodyPosA->c;
+    Position2 cB = bodyPosB->c;
+    math::Radian<float> aA = bodyPosA->a;
+    math::Radian<float> aB = bodyPosB->a;
+
+    Vec2 rA = transformVector(localAnchorA - (cA - pA).as<math::Position>(), aA);
+    Vec2 rB = transformVector(localAnchorB - (cB - pB).as<math::Position>(), aB);
+
+    debugDrawer->drawLine({
+            cA,
+            cA + rA,
+            2.f,
+            math::sdr::gRed,
+            });
+    debugDrawer->drawLine({
+            cB,
+            cB + rB,
+            2.f,
+            math::sdr::gGreen,
+            });
+    debugDrawer->drawCross({
+            cA + rA,
+            0.6f,
+            math::sdr::gRed,
+            });
+    debugDrawer->drawCross({
+            cB + rB,
+            0.6f,
+            math::sdr::gGreen,
+            });
 }
 
 DistanceJointConstraint::DistanceJointConstraint(
@@ -683,6 +755,22 @@ bool DistanceJointConstraint::SolvePositionConstraint()
     bodyPosB->a += static_cast<math::Radian<float>>(iB * twoDVectorCross(rB, impulseVec));
 
     return std::abs(C) < physic::gLinearSlop;
+}
+
+void DistanceJointConstraint::debugRender()
+{
+    Position2 cA = bodyPosA->c;
+    math::Radian<float> aA = bodyPosA->a;
+
+    Position2 cB = bodyPosB->c;
+    math::Radian<float> aB = bodyPosB->a;
+
+    rA = transformVector(localAnchorA - (cA - bodyPosA->p).as<math::Position>(), aA);
+    rB = transformVector(localAnchorB - (cB - bodyPosB->p).as<math::Position>(), aB);
+
+    Vec2 distanceVec = (cA + rA - (cB + rB)).normalize() * mBaseLength;
+
+    debugDrawer->drawLine({cB + rB, cB + rB + distanceVec, 2.f, math::sdr::gMagenta});
 }
 
 std::ostream &operator<<(std::ostream & os, const VelocityConstraint & vc)

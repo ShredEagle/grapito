@@ -90,12 +90,6 @@ struct ContactManifold
     friend std::ostream &operator<<(std::ostream & os, const ContactManifold & cm);
 };
 
-struct Line
-{
-    Position2 origin;
-    Vec2 direction;
-};
-
 //The structures that hold the velocity of a body
 //This is stored in a vector in the physics system
 //Its purpose is to make the velocities of the body
@@ -266,6 +260,7 @@ class JointConstraint
     virtual void InitVelocityConstraint(const GrapitoTimer & aTimer) = 0;
     virtual void SolveVelocityConstraint(const GrapitoTimer & aTimer) = 0;
     virtual bool SolvePositionConstraint() = 0;
+    virtual void debugRender() = 0;
 
     ConstructedBody * cbA;
     ConstructedBody * cbB;
@@ -286,6 +281,7 @@ class WeldJointConstraint : public JointConstraint
     void InitVelocityConstraint(const GrapitoTimer & aTimer) override;
     void SolveVelocityConstraint(const GrapitoTimer & aTimer) override;
     bool SolvePositionConstraint() override;
+    void debugRender() override;
 
     protected:
     Velocity * velocityA;
@@ -326,6 +322,7 @@ class PivotJointConstraint : public JointConstraint
     void InitVelocityConstraint(const GrapitoTimer & aTimer) override;
     void SolveVelocityConstraint(const GrapitoTimer & aTimer) override;
     bool SolvePositionConstraint() override;
+    void debugRender() override;
 
     protected:
     Velocity * velocityA;
@@ -364,6 +361,7 @@ class DistanceJointConstraint : public JointConstraint
     void InitVelocityConstraint(const GrapitoTimer & aTimer) override;
     void SolveVelocityConstraint(const GrapitoTimer & aTimer) override;
     bool SolvePositionConstraint() override;
+    void debugRender() override;
 
     protected:
     Velocity * velocityA;
