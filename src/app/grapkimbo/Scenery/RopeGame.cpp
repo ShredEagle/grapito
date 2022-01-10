@@ -87,7 +87,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     mSystemManager.add<GrappleCleanup>();
     mSystemManager.add<DelayDeleter>();
 
-    auto soundSystem = mSystemManager.add<SoundSystem>(aContext->mSoundManager);
+    auto soundSystem = mSystemManager.add<SoundSystem>(mContext->mSoundManager);
 
     // Done after CameraGuidedControl, to avoid having two camera guides on the frame a player is killed.
     mSystemManager.add<GameRule>(players);
