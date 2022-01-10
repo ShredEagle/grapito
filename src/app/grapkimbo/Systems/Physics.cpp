@@ -9,6 +9,7 @@
 
 #include "../Utils/HomogeneousTransformation.h"
 #include "../Utils/PhysicsStructs.h"
+#include "math/Color.h"
 
 #include <aunteater/Timer.h>
 
@@ -510,7 +511,7 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
         {
             auto & bodyB = *bodyBIt;
 
-            if (!bodyA.shouldCollide(bodyB))
+            if (!bodyA.shouldCollide(bodyB) && !bodyA.shouldDetect(bodyB))
             {
                 continue;
             }
@@ -618,6 +619,7 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
                         });
             }
             else if (
+                    bodyRef->shouldCollide(*bodyInc) && 
                     (bodyRef->collisionType == CollisionType_Moving_Env ||
                     bodyInc->collisionType == CollisionType_Moving_Env ) &&
                     !(bodyRef->collisionType == CollisionType_Player || bodyInc->collisionType == CollisionType_Player)

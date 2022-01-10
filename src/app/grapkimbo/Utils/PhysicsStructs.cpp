@@ -31,6 +31,7 @@ ConstructedBody::ConstructedBody(Body & aBody, Position & aPos, AccelAndSpeed & 
     shapeType{aBody.shapeType},
     collisionType{aBody.collisionType},
     acceptedCollision{aBody.acceptedCollision},
+    acceptedDetection{aBody.acceptedDetection},
     bodyRef{aBody},
     posRef{aPos},
     aasRef{aAas},
@@ -73,6 +74,15 @@ bool ConstructedBody::shouldCollide(ConstructedBody & body)
     result = (result && std::find(acceptedCollision.begin(), acceptedCollision.end(), body.collisionType) != acceptedCollision.end()) || acceptedCollision.size() == 0;
     return result;
 }
+
+bool ConstructedBody::shouldDetect(ConstructedBody & body)
+{
+    bool result = true;
+    result = (result && std::find(body.acceptedDetection.begin(), body.acceptedDetection.end(), collisionType) != body.acceptedDetection.end()) || body.acceptedDetection.size() == 0;
+    result = (result && std::find(acceptedDetection.begin(), acceptedDetection.end(), body.collisionType) != acceptedDetection.end()) || acceptedDetection.size() == 0;
+    return result;
+}
+
 
 void ConstructedBody::debugRender()
 {

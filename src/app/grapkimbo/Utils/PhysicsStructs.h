@@ -137,6 +137,8 @@ class ConstructedBody
 
     bool shouldCollide(ConstructedBody & body);
 
+    bool shouldDetect(ConstructedBody & body);
+
     float mass;
     float invMass;
     float moi;
@@ -164,6 +166,7 @@ class ConstructedBody
     ShapeType shapeType;
     CollisionType collisionType;
     std::vector<CollisionType> acceptedCollision;
+    std::vector<CollisionType> acceptedDetection;
 
     Body & bodyRef;
     Position & posRef;

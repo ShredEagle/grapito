@@ -163,7 +163,8 @@ aunteater::Entity createRopeSegment(Position2 origin, Position2 end, AccelAndSpe
                 angle.value(),
                 0.f,
                 0.1f,
-                std::vector<CollisionType>{CollisionType_Static_Env}
+                std::vector<CollisionType>{CollisionType_Static_Env},
+                std::vector<CollisionType>{CollisionType_Static_Env, CollisionType_Moving_Env}
                 )
             .add<VisualRectangle>(math::sdr::gGreen, VisualRectangle::Scope::RopeStructure)
             .add<AccelAndSpeed>(playerAas.speed);
@@ -191,7 +192,8 @@ void throwGrapple(aunteater::weak_entity aPlayer, aunteater::EntityManager & aEn
                 0.f,
                 player::gGrappleFriction,
                 0.3f,
-                std::vector<CollisionType>{CollisionType_Static_Env}
+                std::vector<CollisionType>{CollisionType_Static_Env},
+                std::vector<CollisionType>{CollisionType_Static_Env, CollisionType_Moving_Env}
                 )
             .add<VisualPolygon>(rope::grappleVertices, math::sdr::gYellow)
             .add<AccelAndSpeed>(grappleImpulse, 0.f)

@@ -24,7 +24,8 @@ struct Body : public aunteater::Component<Body>
         float aTheta = 0.f,
         float aFriction = 0.f,
         float gravityScale = 1.f,
-        std::vector<CollisionType> aAcceptedCollision = {}
+        std::vector<CollisionType> aAcceptedCollision = {},
+        std::vector<CollisionType> aAcceptedDetection = {}
     ) :
         mass{aMass},
         moi{0.f},
@@ -35,7 +36,8 @@ struct Body : public aunteater::Component<Body>
         bodyType{aBodyType},
         shapeType{aShapeType},
         collisionType{aCollisionType},
-        acceptedCollision{aAcceptedCollision}
+        acceptedCollision{aAcceptedCollision},
+        acceptedDetection{aAcceptedDetection}
     {
         updateData();
     }
@@ -49,7 +51,8 @@ struct Body : public aunteater::Component<Body>
         float aTheta = 0.f,
         float aFriction = 0.f,
         float gravityScale = 1.f,
-        std::vector<CollisionType> aAcceptedCollision = {}
+        std::vector<CollisionType> aAcceptedCollision = {},
+        std::vector<CollisionType> aAcceptedDetection = {}
     ) :
         mass{aMass},
         moi{0.f},
@@ -60,7 +63,8 @@ struct Body : public aunteater::Component<Body>
         bodyType{aBodyType},
         shapeType{aShapeType},
         collisionType{aCollisionType},
-        acceptedCollision{aAcceptedCollision}
+        acceptedCollision{aAcceptedCollision},
+        acceptedDetection{aAcceptedDetection}
     {
         updateData();
     }
@@ -158,6 +162,7 @@ struct Body : public aunteater::Component<Body>
     ShapeType shapeType;
     CollisionType collisionType;
     std::vector<CollisionType> acceptedCollision;
+    std::vector<CollisionType> acceptedDetection;
 
     std::list<ConstructedBody>::iterator constructedBodyIt;
 };
