@@ -135,7 +135,7 @@ void GrappleJointCreator::update(const GrapitoTimer, const GameInputState &)
 
                         if (collisionPair->manifold.contacts.size() > 0)
                         {
-                            Position2 contactPoint = collisionPair->manifold.contacts[0].contactPoint;
+                            Position2 contactPoint = collisionPair->manifold.contacts[0].contactPoint + collisionPair->manifold.separation * collisionPair->manifold.normal;
                             Position2 localPointGrapple = getWorldPointInLocal(body, pos, contactPoint);
                             Position2 localPointOther = getWorldPointInLocal(otherEntity->get<Body>(), otherEntity->get<Position>(), contactPoint);
                             playerData.mGrappleWeldJoint = mEntityManager.addEntity(
@@ -169,7 +169,9 @@ void GrappleJointCreator::update(const GrapitoTimer, const GameInputState &)
                             0.8f,
                             1.f,
                             0.5f,
-                            length * player::gRopeDistanceJointFactor,
+                            //We need to add the length of the grapple
+                            (rope::grappleVertices[0] - rope::grappleVertices[1]).getNorm()
+                                + length * player::gRopeDistanceJointFactor,
                             player,
                             pivotJoint.bodyB
                         ));
