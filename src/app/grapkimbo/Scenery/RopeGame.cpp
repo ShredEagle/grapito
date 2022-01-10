@@ -38,7 +38,7 @@
 namespace ad {
 namespace grapito {
 
-const StringId soundId_MusicSid = handy::internalizeString("bgmusic");
+StringId soundId_MusicSid = handy::internalizeString("bgmusic");
 
 std::vector<aunteater::Entity> setupPlayers()
 {
@@ -118,7 +118,6 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
 
     // Camera
     aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera());
-    addSoundToEntity(camera, soundId_MusicSid, true);
 
     constexpr float gLevelHalfWidth = 50.f;
 
@@ -211,6 +210,23 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     }
 }
 
+std::pair<TransitionProgress, UpdateStatus> RopeGame::enter(
+            const GrapitoTimer &,
+            const GameInputState &,
+            const StateMachine &)
+{
+    mBgMusicSource = mContext->mSoundManager.playSound(soundId_MusicSid, true);
+    return {TransitionProgress::Complete, UpdateStatus::KeepFrame};
+}
+
+std::pair<TransitionProgress, UpdateStatus> RopeGame::exit(
+            const GrapitoTimer &,
+            const GameInputState &,
+            const StateMachine &)
+{
+    mContext->mSoundManager.stopSound(mBgMusicSource);
+    return {TransitionProgress::Complete, UpdateStatus::KeepFrame};
+}
 
 void RopeGame::render() const
 {

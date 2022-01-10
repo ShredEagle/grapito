@@ -4,6 +4,7 @@
 #include "GameScene.h"
 
 #include "../commons.h"
+#include <utility>
 
 
 namespace ad {
@@ -17,10 +18,20 @@ public:
     RopeGame(std::shared_ptr<Context> aContext,
              std::shared_ptr<graphics::AppInterface> aAppInterface);
 
+    std::pair<TransitionProgress, UpdateStatus> enter(
+            const GrapitoTimer &,
+            const GameInputState &,
+            const StateMachine &) override;
+    std::pair<TransitionProgress, UpdateStatus> exit(
+            const GrapitoTimer &,
+            const GameInputState &,
+            const StateMachine &) override;
+
     void render() const override;
 
 private:
     std::shared_ptr<Render> mRenderSystem;
+    ALuint mBgMusicSource;
 };
 
 
