@@ -6,15 +6,21 @@
 #include "Components/Body.h"
 #include "Components/Position.h"
 #include "Components/RopeCreator.h"
+#include "Components/SoundPlayer.h"
+
 #include "aunteater/Entity.h"
 #include "aunteater/globals.h"
 #include "math/Rectangle.h"
 
 #include <math/Vector.h>
 
+#include <handy/StringId_Interning.h>
+
 namespace ad {
 namespace grapito
 {
+
+const StringId soundId_LaunchSid = handy::internalizeString("launch");
 
 RopeCreation::RopeCreation(aunteater::EntityManager & aEntityManager) :
     mRopeCreator{aEntityManager},
@@ -31,10 +37,12 @@ void RopeCreation::addedEntity(aunteater::LiveEntity & aEntity)
 
     Position2 end = player->get<Position>().position + player->get<Body>().massCenter.as<math::Vec>();
     Position2 origin = pos.position;
+    addSoundToEntity(player, soundId_LaunchSid);
 
     aunteater::weak_entity link = mEntityManager.addEntity(createRopeSegment(
         origin,
-        end
+        end,
+        player->get<AccelAndSpeed>()
     ));
 
     aunteater::weak_entity joint = mEntityManager.addEntity(
@@ -79,7 +87,8 @@ void RopeCreation::handleThrow(RopeCreator & aRopeCreator)
             {
                 aunteater::weak_entity link = mEntityManager.addEntity(createRopeSegment(
                     origin,
-                    end
+                    end,
+                    player->get<AccelAndSpeed>()
                 ));
 
                 aunteater::weak_entity joint = mEntityManager.addEntity(

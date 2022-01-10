@@ -36,6 +36,7 @@ set(${TARGET_NAME}_HEADERS
     Components/Position.h
     Components/RopeCreator.h
     Components/ScreenPosition.h
+    Components/SoundPlayer.h
     Components/Text.h
     Components/VisualOutline.h
     Components/VisualPolygon.h
@@ -63,6 +64,7 @@ set(${TARGET_NAME}_HEADERS
     Systems/AccelSolver.h
     Systems/Physics.h
     Systems/RopeCreation.h
+    Systems/SoundSystem.h
     Systems/TransitionAnimationState.h
 
     Systems/Debug/DirectControl.h
@@ -127,6 +129,7 @@ set(${TARGET_NAME}_SOURCES
     Systems/AccelSolver.cpp
     Systems/Physics.cpp
     Systems/RopeCreation.cpp
+    Systems/SoundSystem.cpp
     Systems/TransitionAnimationState.cpp
 
     Systems/Debug/DirectControl.cpp
@@ -147,10 +150,10 @@ set(${TARGET_NAME}_SOURCES
 
     Utils/CollisionBox.cpp
     Utils/DrawDebugStuff.cpp
+    Utils/PhysicsStructs.cpp
     Utils/RenderEffect.cpp
     Utils/RopeUtilities.cpp
     Utils/Shape.cpp
-    Utils/PhysicsStructs.cpp
 )
 
 source_group(TREE ${CMAKE_CURRENT_LIST_DIR}
@@ -162,11 +165,15 @@ find_package(Aunteater CONFIG REQUIRED COMPONENTS aunteater)
 find_package(Graphics CONFIG REQUIRED COMPONENTS arte graphics resource)
 find_package(Math CONFIG REQUIRED COMPONENTS math)
 find_package(Websocket CONFIG REQUIRED COMPONENTS websocket)
+find_package(Sounds CONFIG REQUIRED COMPONENTS sounds)
 
 find_package(Boost REQUIRED COMPONENTS program_options)
 find_package(glad REQUIRED)
 find_package(imgui REQUIRED)
-find_package(spdlog REQUIRED)
+find_package(spdlog REQUIRED COMPONENTS spdlog)
+find_package(OpenAL REQUIRED CONFIG)
+find_package(Vorbis REQUIRED File CONFIG)
+find_package(Ogg REQUIRED CONFIG)
 
 
 add_executable(${TARGET_NAME}
@@ -207,11 +214,14 @@ target_link_libraries(${TARGET_NAME}
         ad::math
         ad::resource
         ad::websocket
+        ad::sounds
 
         Boost::program_options
         glad::glad
         imgui::imgui
-        spdlog::libspdlog
+        spdlog::spdlog
+        OpenAL::OpenAL
+        Vorbis::vorbisfile
 )
 
 

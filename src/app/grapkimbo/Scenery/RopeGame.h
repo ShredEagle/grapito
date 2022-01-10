@@ -3,6 +3,8 @@
 
 #include "GameScene.h"
 
+#include "../commons.h"
+
 
 namespace ad {
 namespace grapito {

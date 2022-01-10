@@ -6,6 +6,7 @@
 #include "Systems/GrappleCleanup.h"
 #include "Systems/GrappleJointCreator.h"
 #include "Systems/Debug/DirectControl.h"
+#include "Systems/SoundSystem.h"
 
 #include <Components/AccelAndSpeed.h>
 #include <Components/Body.h>
@@ -15,6 +16,7 @@
 #include <Components/Position.h>
 #include <Components/VisualRectangle.h>
 #include <Components/Mass.h>
+#include <Components/SoundPlayer.h>
 
 #include <Systems/AccelSolver.h>
 #include <Systems/CameraGuidedControl.h>
@@ -28,12 +30,15 @@
 #include <Systems/RopeCreation.h>
 #include <Systems/TransitionAnimationState.h>
 
+#include <handy/StringId_Interning.h>
+
 #include <aunteater/Entity.h>
 
 
 namespace ad {
 namespace grapito {
 
+const StringId soundId_MusicSid = handy::internalizeString("bgmusic");
 
 std::vector<aunteater::Entity> setupPlayers()
 {
@@ -82,6 +87,8 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     mSystemManager.add<GrappleCleanup>();
     mSystemManager.add<DelayDeleter>();
 
+    auto soundSystem = mSystemManager.add<SoundSystem>(aContext->mSoundManager);
+
     // Done after CameraGuidedControl, to avoid having two camera guides on the frame a player is killed.
     mSystemManager.add<GameRule>(players);
 
@@ -101,8 +108,17 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
         spriteAnimationSystem->installAnimator(std::move(animator));
     }
 
+    { // Load sounds
+        mContext->loadOggSoundData("sounds/launch.ogg", false);
+        mContext->loadOggSoundData("sounds/weld.ogg", false);
+        mContext->loadOggSoundData("sounds/jump.ogg", false);
+        mContext->loadOggSoundData("sounds/ropejump.ogg", false);
+        mContext->loadOggSoundData("sounds/bgmusic.ogg", false);
+    }
+
     // Camera
     aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera());
+    addSoundToEntity(camera, soundId_MusicSid, true);
 
     constexpr float gLevelHalfWidth = 50.f;
 

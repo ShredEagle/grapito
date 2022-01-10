@@ -1,6 +1,7 @@
 #include "Entities.h"
 
 #include "Components/AnimatedSprite.h"
+#include "Components/AccelAndSpeed.h"
 #include "Components/CameraGuide.h"
 #include "Components/CameraLimits.h"
 #include "Components/CameraTag.h"
@@ -142,7 +143,7 @@ aunteater::Entity makeAnchor(math::Position<2, float> aPosition, math::Size<2, f
     ;
 }
 
-aunteater::Entity createRopeSegment(Position2 origin, Position2 end)
+aunteater::Entity createRopeSegment(Position2 origin, Position2 end, AccelAndSpeed & playerAas)
 {
     Vec2 ropeVector = end - origin;
     float length = ropeVector.getNorm();
@@ -165,7 +166,7 @@ aunteater::Entity createRopeSegment(Position2 origin, Position2 end)
                 std::vector<CollisionType>{CollisionType_Static_Env}
                 )
             .add<VisualRectangle>(math::sdr::gGreen, VisualRectangle::Scope::RopeStructure)
-            .add<AccelAndSpeed>();
+            .add<AccelAndSpeed>(playerAas.speed);
 
     setLocalPointToWorldPos(rope, {0.f, rope::ropeHalfwidth}, origin);
     return rope;
@@ -224,7 +225,8 @@ void attachPlayerToGrapple(aunteater::weak_entity aPlayer, aunteater::EntityMana
 
     aunteater::weak_entity link = aEntityManager.addEntity(createRopeSegment(
         origin,
-        end
+        end,
+        aPlayer->get<AccelAndSpeed>()
     ));
 
     aEntityManager.addEntity(

@@ -2,6 +2,7 @@
 
 #include "Configuration.h"
 #include "Gravity.h"
+#include "../Components/SoundPlayer.h"
 
 #include "../commons.h"
 #include "../Entities.h"
@@ -13,6 +14,7 @@
 
 #include <Components/VisualRectangle.h>
 
+#include <handy/StringId_Interning.h>
 #include <GLFW/glfw3.h>
 
 
@@ -20,6 +22,8 @@ namespace ad {
 namespace grapito
 {
 
+const StringId soundId_JumpSid = handy::internalizeString("jump");
+const StringId soundId_RopeJumpSid = handy::internalizeString("ropejump");
 
 Control::Control(aunteater::EntityManager & aEntityManager) :
     mEntityManager{aEntityManager},
@@ -85,6 +89,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
 
             if (inputs[Jump].positiveEdge())
             {
+                addSoundToEntity(player, soundId_JumpSid);
                 aas.speed.y() = player::gJumpImpulse;
             }
         }
