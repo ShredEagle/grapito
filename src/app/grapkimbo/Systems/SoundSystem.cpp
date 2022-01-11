@@ -1,6 +1,7 @@
 #include "SoundSystem.h"
 
 #include "../Components/SoundPlayer.h"
+#include "../Timer.h"
 
 #include <handy/StringId_Interning.h>
 

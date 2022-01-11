@@ -41,7 +41,7 @@ aunteater::Entity makeAnchor(Position2 aPosition, math::Size<2, float> aSize);
 aunteater::Entity makeAnchor(Position2 aPosition, std::vector<Position2> aVertices);
 
 
-aunteater::Entity createRopeSegment(Position2 origin, Position2 end, AccelAndSpeed & playerAas);
+aunteater::Entity createRopeSegment(Position2 origin, Position2 end, aunteater::weak_entity aPlayer);
 
 void throwGrapple(aunteater::weak_entity aPlayer, aunteater::EntityManager & aEntityManager);
 

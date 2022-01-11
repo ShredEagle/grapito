@@ -2,6 +2,7 @@
 
 #include "../Input.h"
 
+#include "../commons.h"
 #include "../Components/PlayerData.h"
 #include "../Components/Body.h"
 #include "../Components/AccelAndSpeed.h"

@@ -2,6 +2,7 @@
 
 #include "../Configuration.h"
 #include "../Entities.h"
+#include "../Timer.h"
 
 #include "../Components/Body.h"
 #include "../Components/Position.h"
@@ -24,6 +25,20 @@ namespace grapito
 {
 
 const StringId soundId_WeldSid = handy::internalizeString("weld");
+
+
+aunteater::weak_entity getOtherEntity(const Body & aThisBody, const CollisionPair * aCollisionPair)
+{
+    if (&(aCollisionPair->bodyA) == &(*aThisBody.constructedBodyIt))
+    {
+        return aCollisionPair->bodyB.entity;
+    }
+    else
+    {
+        return aCollisionPair->bodyA.entity;
+    }
+}
+
 
 GrappleJointCreator::GrappleJointCreator(aunteater::EntityManager & aEntityManager) :
     mRopeCreator{aEntityManager},
@@ -67,16 +82,7 @@ void GrappleJointCreator::update(const GrapitoTimer, const GameInputState &)
                     {
                         //We found a static env contact with the grapple
                         //We can weld the grapple to it
-                        aunteater::weak_entity otherEntity;
-
-                        if (&collisionPair->bodyA == &ropeConstructedBody)
-                        {
-                            otherEntity = collisionPair->bodyB.entity;
-                        }
-                        else
-                        {
-                            otherEntity = collisionPair->bodyA.entity;
-                        }
+                        aunteater::weak_entity otherEntity = getOtherEntity(ropeBody, collisionPair);
 
                         if (collisionPair->manifold.contacts.size() > 0)
                         {

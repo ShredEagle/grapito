@@ -1,6 +1,8 @@
 #include "TransitionAnimationState.h"
 
 #include "../Configuration.h"
+#include "../Timer.h"
+
 #include "../Utils/Player.h"
 
 #include <handy/StringId_Interning.h>

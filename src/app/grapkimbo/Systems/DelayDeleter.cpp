@@ -1,9 +1,13 @@
 #include "DelayDeleter.h"
+
 #include "../commons.h"
+#include "../Timer.h"
+
 
 namespace ad {
 namespace grapito
 {
+
 
 DelayDeleter::DelayDeleter(aunteater::EntityManager & aEntityManager) :
     mDeletable(aEntityManager)
@@ -25,6 +29,7 @@ void DelayDeleter::update(const GrapitoTimer, const GameInputState &)
         }
     }
 }
+
 
 } // namespace grapito
 } // namespace ad

@@ -1,7 +1,8 @@
 #include "Game_pendulum.h"
-#include "Configuration.h"
-#include "Entities.h"
-#include "Logging.h"
+#include "../Configuration.h"
+#include "../Entities.h"
+#include "../Logging.h"
+#include "../Timer.h"
 
 #include "Systems/DelayDeleter.h"
 #include "Systems/GrappleCleanup.h"

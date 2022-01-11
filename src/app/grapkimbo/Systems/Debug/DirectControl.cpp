@@ -1,6 +1,7 @@
 #include "DirectControl.h"
 
 #include "../../Configuration.h"
+#include "../../Timer.h"
 
 #include "../../Utils/DrawDebugStuff.h"
 

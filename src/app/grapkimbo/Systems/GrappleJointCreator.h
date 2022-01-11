@@ -12,10 +12,9 @@
 
 
 namespace ad {
-namespace grapito
-{
+namespace grapito {
 
-typedef aunteater::Archetype<RopeCreator, Position, Body> RopeCreatorType;
+typedef aunteater::Archetype<Body, Position, RopeCreator> RopeCreatorArchetype;
 
 class GrappleJointCreator : public aunteater::System<GrapitoTimer, GameInputState>
 {
@@ -28,9 +27,13 @@ public:
 private:
     void handleThrow(RopeCreator & aRopeCreator);
 
-    const aunteater::FamilyHelp<RopeCreatorType> mRopeCreator;
+    const aunteater::FamilyHelp<RopeCreatorArchetype> mRopeCreator;
     aunteater::EntityManager & mEntityManager;
 };
+
+
+/// \brief Return the other entity in a collision pair, i.e. the entity which does not have `aThisBody`. 
+aunteater::weak_entity getOtherEntity(const Body & aThisBody, const CollisionPair * aCollisionPair);
 
 
 } // namespace grapito

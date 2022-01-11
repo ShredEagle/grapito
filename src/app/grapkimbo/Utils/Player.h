@@ -56,5 +56,6 @@ inline void resetJumps(PlayerData & aPlayerData)
     aPlayerData.airborneJumpsLeft = player::gAirborneJumps;
 }
 
+
 } // namespace grapito
 } // namespace ad

@@ -6,6 +6,7 @@
 
 #include "../commons.h"
 #include "../Entities.h"
+#include "../Timer.h"
 #include "../Utilities.h"
 
 #include "../Utils/Player.h"
@@ -183,8 +184,6 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
             }
 
             detachPlayerFromGrapple(player);
-            playerData.controlState &= ~ControlState_Attached;
-            playerData.controlState &= ~ControlState_Throwing;
         }
     }
 
