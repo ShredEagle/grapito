@@ -269,7 +269,7 @@ void detachPlayerFromGrapple(aunteater::weak_entity aPlayer)
             // -1, otherwise 0 remains unchanged
             segment.playerId = -segment.playerId - 1;
         },
-        [](auto entity)->RopeSegment &{return entity->get<RopeSegment>();});
+        [](auto entity)->RopeSegment &{return entity->template get<RopeSegment>();});
 
     //Cleanup grapple entity
     playerData.grapple->add<DelayDeletion>(60);
