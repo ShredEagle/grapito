@@ -152,9 +152,9 @@ WeldJointConstraint::WeldJointConstraint(
     invMassB{aBodyB->invMass},
     invMoiB{aBodyB->invMoi},
     localAnchorB{aWeldJoint.localAnchorB},
+    mRefAngle{aBodyB->bodyRef.theta - aBodyA->bodyRef.theta},
     mStiffness{aWeldJoint.mStiffness},
-    mDamping{aWeldJoint.mDamping},
-    mRefAngle{aBodyB->bodyRef.theta - aBodyA->bodyRef.theta}
+    mDamping{aWeldJoint.mDamping}
 {}
 
 void WeldJointConstraint::InitVelocityConstraint(const GrapitoTimer & timer)
