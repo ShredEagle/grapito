@@ -8,11 +8,16 @@
 
 #include "../Components/PlayerData.h"
 #include "../Components/RopeSegment.h"
+#include "../Components/SoundPlayer.h"
 
+#include <handy/StringId_Interning.h>
 
 
 namespace ad {
 namespace grapito {
+
+
+const StringId soundId_CutRopeSid = handy::internalizeString("slash");
 
 
 GrappleInteractions::GrappleInteractions(aunteater::EntityManager & aEntityManager) :
@@ -58,6 +63,7 @@ void GrappleInteractions::update(const GrapitoTimer, const GameInputState &)
         if(playersToDetach.contains(playerData.id))
         {
             detachPlayerFromGrapple(player);
+            addSoundToEntity(player, soundId_CutRopeSid);
         }
     }
 }
