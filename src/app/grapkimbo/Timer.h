@@ -1,7 +1,5 @@
 #pragma once
 
-// TODO move to cpp
-#include "Logging.h"
 
 #include <aunteater/Timer.h>
 
@@ -21,13 +19,7 @@ public:
         mMaxDelta{aMaxDelta}
     {}
 
-    void mark(Value_t aMonotonic)
-    {
-        float delta = std::min(aMonotonic - mWallTime, mMaxDelta);
-        ADLOG(trace)("GrapitoTimer delta: {}(max: {}).", delta, mMaxDelta);
-        mWallTime = aMonotonic;
-        Base_type::mark(simulationTime() + delta); 
-    }
+    void mark(Value_t aMonotonic);
 
 private:
     float mWallTime;

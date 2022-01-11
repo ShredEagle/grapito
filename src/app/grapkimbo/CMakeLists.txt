@@ -108,9 +108,10 @@ set(${TARGET_NAME}_SOURCES
 
     Configuration.cpp
     DebugUI.cpp
+    Entities.cpp
     Input.cpp
     Logging.cpp
-    Entities.cpp
+    Timer.cpp
     TopLevelStates.cpp
 
     Animation/AnimationStateMachine.cpp
