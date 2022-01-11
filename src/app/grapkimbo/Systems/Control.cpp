@@ -6,6 +6,7 @@
 
 #include "../commons.h"
 #include "../Entities.h"
+#include "../Timer.h"
 #include "../Utilities.h"
 
 #include "../Utils/Player.h"

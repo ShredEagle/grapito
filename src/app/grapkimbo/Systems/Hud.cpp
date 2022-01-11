@@ -1,6 +1,7 @@
 #include "Hud.h"
 
 #include "../Configuration.h"
+#include "../Timer.h"
 
 
 namespace ad {

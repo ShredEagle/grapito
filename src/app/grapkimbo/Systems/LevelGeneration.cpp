@@ -1,6 +1,7 @@
 #include "LevelGeneration.h"
 
-#include "Entities.h"
+#include "../Entities.h"
+#include "../Timer.h"
 
 
 namespace ad {

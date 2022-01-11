@@ -1,6 +1,7 @@
 #include "Physics.h"
 
 #include "../Configuration.h"
+#include "../Timer.h"
 
 #include "../Components/Body.h"
 #include "../Components/PivotJoint.h"
@@ -10,8 +11,6 @@
 #include "../Utils/HomogeneousTransformation.h"
 #include "../Utils/PhysicsStructs.h"
 #include "math/Color.h"
-
-#include <aunteater/Timer.h>
 
 #include <math/Angle.h>
 #include <math/Interpolation/Interpolation.h>

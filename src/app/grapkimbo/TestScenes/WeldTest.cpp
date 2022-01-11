@@ -4,6 +4,7 @@
 #include "../commons.h"
 #include "../Configuration.h"
 #include "../Input.h"
+#include "../Timer.h"
 
 #include "../Systems/Render.h"
 #include "../Systems/Control.h"

@@ -3,6 +3,7 @@
 
 #include "StateMachine.h"
 
+#include "../Timer.h"
 #include "../Utils/RenderEffect.h"
 
 #include <graphics/AppInterface.h>

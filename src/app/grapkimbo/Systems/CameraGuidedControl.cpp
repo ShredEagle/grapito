@@ -1,6 +1,7 @@
 #include "CameraGuidedControl.h"
 
 #include "../Configuration.h"
+#include "../Timer.h"
 
 #include "../Utils/Camera.h"
 #include "../Utils/DrawDebugStuff.h"

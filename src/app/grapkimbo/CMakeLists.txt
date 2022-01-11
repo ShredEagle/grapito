@@ -14,6 +14,7 @@ set(${TARGET_NAME}_HEADERS
     Game.h
     Input.h
     Logging.h
+    Timer.h
     TopLevelStates.h
     Utilities.h
 

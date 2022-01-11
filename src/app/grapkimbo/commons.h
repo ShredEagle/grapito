@@ -1,8 +1,6 @@
 #pragma once
 
 
-#include <aunteater/Timer.h>
-
 #include <handy/StringId.h>
 #include <sounds/SoundManager.h>
 
@@ -22,8 +20,7 @@ using Size2 = math::Size<2, float>;
 using Size3 = math::Size<3, float>;
 using Rectangle = math::Rectangle<float>;
 
-using GrapitoTimer = aunteater::Timer_base<float>;
-
+class GrapitoTimer;
 
 using StringId = handy::StringId;
 using SoundManager = sounds::SoundManager;

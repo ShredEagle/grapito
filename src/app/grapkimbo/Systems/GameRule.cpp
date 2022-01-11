@@ -3,6 +3,7 @@
 #include "../Configuration.h"
 #include "../Entities.h"
 #include "../Logging.h"
+#include "../Timer.h"
 
 #include "../Components/ScreenPosition.h"
 

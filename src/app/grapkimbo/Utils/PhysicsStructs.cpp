@@ -1,6 +1,7 @@
 #include "PhysicsStructs.h"
 
 #include "../Configuration.h"
+#include "../Timer.h"
 
 #include "../Components/Body.h"
 #include "../Components/PivotJoint.h"

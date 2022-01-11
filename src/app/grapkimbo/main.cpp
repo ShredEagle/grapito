@@ -3,6 +3,7 @@
 #include "Configuration.h"
 #include "Input.h"
 #include "Logging.h"
+#include "Timer.h"
 #include "TopLevelStates.h"
 
 #include "Context/Context.h"
@@ -96,7 +97,8 @@ int main(int argc, const char ** argv)
                                                      *context));
         }
 
-        GrapitoTimer timer{static_cast<float>(glfwGetTime())};
+        constexpr float gMaxStepDuration = 1.f/60;
+        GrapitoTimer timer{static_cast<float>(glfwGetTime()), gMaxStepDuration};
         GameInputState inputState;
 
         while(application.handleEvents())

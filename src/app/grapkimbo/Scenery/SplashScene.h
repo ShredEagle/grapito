@@ -3,6 +3,8 @@
 
 #include "StateMachine.h"
 
+#include "../Timer.h"
+
 #include <arte/Image.h>
 
 #include <graphics/Spriting.h>
