@@ -55,7 +55,7 @@ struct PlayerData : public aunteater::Component<PlayerData>
     int wallClingFrameCounter = 0;
     int airborneJumpsLeft = player::gAirborneJumps;
 
-    aunteater::weak_entity grapple = nullptr;
+    aunteater::weak_entity grapple = nullptr; // RopeCreator
     aunteater::weak_entity grappleAttachment = nullptr;
     aunteater::weak_entity mGrappleDistanceJoint = nullptr;
     aunteater::weak_entity mGrappleWeldJoint = nullptr;

@@ -4,6 +4,7 @@
 
 #include "Systems/DelayDeleter.h"
 #include "Systems/GrappleCleanup.h"
+#include "Systems/GrappleInteractions.h"
 #include "Systems/GrappleJointCreator.h"
 #include "Systems/Debug/DirectControl.h"
 #include "Systems/SoundSystem.h"
@@ -80,6 +81,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     mSystemManager.add<GrappleCleanup>();
     mSystemManager.add<Physics>();
     mSystemManager.add<GrappleJointCreator>();
+    mSystemManager.add<GrappleInteractions>();
 
     std::shared_ptr<TransitionAnimationState> spriteAnimationSystem = 
         mSystemManager.add<TransitionAnimationState>();

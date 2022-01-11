@@ -1,10 +1,10 @@
 #include "RopeCreation.h"
 
-#include "Components/PivotJoint.h"
 #include "../Entities.h"
 #include "../Timer.h"
 
 #include "Components/Body.h"
+#include "Components/PivotJoint.h"
 #include "Components/Position.h"
 #include "Components/RopeCreator.h"
 #include "Components/SoundPlayer.h"
@@ -40,11 +40,8 @@ void RopeCreation::addedEntity(aunteater::LiveEntity & aEntity)
     Position2 origin = pos.position;
     addSoundToEntity(player, soundId_LaunchSid);
 
-    aunteater::weak_entity link = mEntityManager.addEntity(createRopeSegment(
-        origin,
-        end,
-        player->get<AccelAndSpeed>()
-    ));
+    aunteater::weak_entity link = mEntityManager.addEntity(
+        createRopeSegment(origin, end, player));
 
     aunteater::weak_entity joint = mEntityManager.addEntity(
             aunteater::Entity()
@@ -86,11 +83,8 @@ void RopeCreation::handleThrow(RopeCreator & aRopeCreator)
 
             if (length > .4f)
             {
-                aunteater::weak_entity link = mEntityManager.addEntity(createRopeSegment(
-                    origin,
-                    end,
-                    player->get<AccelAndSpeed>()
-                ));
+                aunteater::weak_entity link = mEntityManager.addEntity(
+                    createRopeSegment(origin, end, player));
 
                 aunteater::weak_entity joint = mEntityManager.addEntity(
                         aunteater::Entity()

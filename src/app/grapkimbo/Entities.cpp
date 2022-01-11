@@ -13,6 +13,7 @@
 #include "Components/PlayerData.h"
 #include "Components/Position.h"
 #include "Components/RopeCreator.h"
+#include "Components/RopeSegment.h"
 #include "Components/ScreenPosition.h"
 #include "Components/Text.h"
 #include "Components/VisualOutline.h"
@@ -143,17 +144,14 @@ aunteater::Entity makeAnchor(math::Position<2, float> aPosition, math::Size<2, f
     ;
 }
 
-aunteater::Entity createRopeSegment(Position2 origin, Position2 end, AccelAndSpeed & playerAas)
+aunteater::Entity createRopeSegment(Position2 origin, Position2 end, aunteater::weak_entity aPlayer)
 {
     Vec2 ropeVector = end - origin;
     float length = ropeVector.getNorm();
     math::Radian<float> angle{atan2(ropeVector.y(), ropeVector.x())};
     math::Size<2, float> size{length, rope::ropeWidth};
     aunteater::Entity rope = aunteater::Entity()
-            .add<Position>(
-                Position2::Zero(),
-                size
-                )
+            .add<AccelAndSpeed>(aPlayer->get<AccelAndSpeed>().speed)
             .add<Body>(
                 math::Rectangle<float>{{0.f, 0.f}, size},
                 BodyType_Dynamic,
@@ -166,8 +164,13 @@ aunteater::Entity createRopeSegment(Position2 origin, Position2 end, AccelAndSpe
                 std::vector<CollisionType>{CollisionType_Static_Env},
                 std::vector<CollisionType>{CollisionType_Static_Env, CollisionType_Moving_Env}
                 )
+            .add<Position>(
+                Position2::Zero(),
+                size
+                )
+            .add<RopeSegment>(aPlayer->get<PlayerData>().id)
             .add<VisualRectangle>(math::sdr::gGreen, VisualRectangle::Scope::RopeStructure)
-            .add<AccelAndSpeed>(playerAas.speed);
+    ;
 
     setLocalPointToWorldPos(rope, {0.f, rope::ropeHalfwidth}, origin);
     return rope;
@@ -228,7 +231,7 @@ void attachPlayerToGrapple(aunteater::weak_entity aPlayer, aunteater::EntityMana
     aunteater::weak_entity link = aEntityManager.addEntity(createRopeSegment(
         origin,
         end,
-        aPlayer->get<AccelAndSpeed>()
+        aPlayer
     ));
 
     aEntityManager.addEntity(
@@ -253,24 +256,42 @@ void attachPlayerToGrapple(aunteater::weak_entity aPlayer, aunteater::EntityMana
 
 void detachPlayerFromGrapple(aunteater::weak_entity aPlayer)
 {
+    PlayerData & playerData = aPlayer->get<PlayerData>();
+
+    // Dissociate each segment from the player
+    // Note Ad 2022/01/11: 
+    // This is bad design, with some very implicit convention that
+    // a negative id is the player it was detached from.
+    std::ranges::for_each(
+        playerData.grapple->get<RopeCreator>().mRopeSegments,
+        [](RopeSegment & segment)
+        {
+            // -1, otherwise 0 remains unchanged
+            segment.playerId = -segment.playerId - 1;
+        },
+        [](auto entity)->RopeSegment &{return entity->get<RopeSegment>();});
+
     //Cleanup grapple entity
-    aPlayer->get<PlayerData>().grapple->add<DelayDeletion>(60);
-    aPlayer->get<PlayerData>().grapple->get<RopeCreator>().mTargetEntity = nullptr;
-    aPlayer->get<PlayerData>().grapple = nullptr;
+    playerData.grapple->add<DelayDeletion>(60);
+    playerData.grapple->get<RopeCreator>().mTargetEntity = nullptr;
+    playerData.grapple = nullptr;
 
     //Cleanup rope pivot joint to player if it exists
-    if (aPlayer->get<PlayerData>().grappleAttachment != nullptr)
+    if (playerData.grappleAttachment != nullptr)
     {
-        aPlayer->get<PlayerData>().grappleAttachment->markToRemove();
-        aPlayer->get<PlayerData>().grappleAttachment = nullptr;
+        playerData.grappleAttachment->markToRemove();
+        playerData.grappleAttachment = nullptr;
     }
 
     //Cleanup grapple attachement to static environment if it exists
-    if (aPlayer->get<PlayerData>().mGrappleWeldJoint != nullptr)
+    if (playerData.mGrappleWeldJoint != nullptr)
     {
-        aPlayer->get<PlayerData>().mGrappleWeldJoint->markToRemove();
-        aPlayer->get<PlayerData>().mGrappleWeldJoint = nullptr;
+        playerData.mGrappleWeldJoint->markToRemove();
+        playerData.mGrappleWeldJoint = nullptr;
     }
+
+    playerData.controlState &= ~ControlState_Attached;
+    playerData.controlState &= ~ControlState_Throwing;
 }
 
 } // namespace grapito

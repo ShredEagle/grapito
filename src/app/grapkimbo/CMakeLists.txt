@@ -36,6 +36,7 @@ set(${TARGET_NAME}_HEADERS
     Components/PlayerData.h
     Components/Position.h
     Components/RopeCreator.h
+    Components/RopeSegment.h
     Components/ScreenPosition.h
     Components/SoundPlayer.h
     Components/Text.h
@@ -57,6 +58,7 @@ set(${TARGET_NAME}_HEADERS
     Systems/GameRule.h
     Systems/Gravity.h
     Systems/GrappleCleanup.h
+    Systems/GrappleInteractions.h
     Systems/GrappleJointCreator.h
     Systems/Gravity.h
     Systems/Hud.h
@@ -90,6 +92,7 @@ set(${TARGET_NAME}_HEADERS
     Utils/CollisionBox.h
     Utils/CompositeTransition.h
     Utils/DrawDebugStuff.h
+    Utils/Grapple.h
     Utils/HomogeneousTransformation.h
     Utils/MenuControls.h
     Utils/PhysicsMathUtilities.h
@@ -124,6 +127,7 @@ set(${TARGET_NAME}_SOURCES
     Systems/GameRule.cpp
     Systems/Gravity.cpp
     Systems/GrappleCleanup.cpp
+    Systems/GrappleInteractions.cpp
     Systems/GrappleJointCreator.cpp
     Systems/Hud.cpp
     Systems/LevelGeneration.cpp

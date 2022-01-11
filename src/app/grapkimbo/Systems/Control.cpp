@@ -184,8 +184,6 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
             }
 
             detachPlayerFromGrapple(player);
-            playerData.controlState &= ~ControlState_Attached;
-            playerData.controlState &= ~ControlState_Throwing;
         }
     }
 
