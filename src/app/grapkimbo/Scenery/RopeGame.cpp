@@ -135,8 +135,11 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
         mEntityManager.addEntity(
             makeAnchor(Position2{ -gLevelHalfWidth - gWallWidth, -gWallWidth }, math::Size<2, float>{(gLevelHalfWidth + gWallWidth) * 2, gWallWidth}));
 
-        createStackTwo(mEntityManager, 0.f);
-        createStackOne(mEntityManager, gStackHeight);
+        createStackFive(mEntityManager, 0.f);
+        createStackThree(mEntityManager, gStackHeight);
+        createStackOne(mEntityManager, gStackHeight * 2);
+        createStackTwo(mEntityManager, gStackHeight * 3);
+        createStackFour(mEntityManager, gStackHeight * 4);
     }
 
     //
