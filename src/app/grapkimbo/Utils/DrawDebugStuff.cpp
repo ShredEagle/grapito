@@ -125,6 +125,9 @@ namespace ad
         void DrawDebugStuff::clear()
         {
             mTrivialLineStrip.clearLines();
+            mLines.clear();
+            mPoints.clear();
+            mArrows.clear();
         }
     }
 }
