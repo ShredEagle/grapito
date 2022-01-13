@@ -13,6 +13,7 @@ set(${TARGET_NAME}_HEADERS
     Entities.h
     Game.h
     Input.h
+    LevelStacks.h
     Logging.h
     Timer.h
     TopLevelStates.h
@@ -113,6 +114,7 @@ set(${TARGET_NAME}_SOURCES
     DebugUI.cpp
     Entities.cpp
     Input.cpp
+    LevelStacks.cpp
     Logging.cpp
     Timer.cpp
     TopLevelStates.cpp
@@ -196,8 +198,8 @@ add_executable(${TARGET_NAME}
 )
 
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    #target_compile_options(${TARGET_NAME}
-    #    PRIVATE "-O3")
+    target_compile_options(${TARGET_NAME}
+        PRIVATE "-O3")
     target_compile_options(${TARGET_NAME}
         PRIVATE "-Wall" "-Wextra" "-fsanitize=address" "-fsanitize=undefined")
     target_link_options(${TARGET_NAME}

@@ -2,6 +2,7 @@
 
 #include "../Entities.h"
 
+#include "LevelStacks.h"
 #include "Systems/DelayDeleter.h"
 #include "Systems/GrappleCleanup.h"
 #include "Systems/GrappleInteractions.h"
@@ -122,78 +123,20 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     // Camera
     aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera());
 
-    constexpr float gLevelHalfWidth = 50.f;
-
     //
     // Level
     //
     {
-        //floors
-        aunteater::weak_entity floor = mEntityManager.addEntity(
-            makeAnchor(Position2{ -gLevelHalfWidth, -4.f }, math::Size<2, float>{gLevelHalfWidth, 2.f}));
-        aunteater::weak_entity floor2 = mEntityManager.addEntity(
-            makeAnchor(Position2{0.f, -2.f}, math::Size<2, float>{gLevelHalfWidth, 2.f} ));    
-
-        // First anchor
-        aunteater::weak_entity polygon = mEntityManager.addEntity(
-            makeAnchor(Position2{ -15.f, 10.f }, std::vector<Position2>{
-            Position2{ 0.f, 0.f }, Position2{ 1.5f, 0.f }, Position2{ 2.5f, 0.5f },
-                Position2{ 2.75f, 2.f }, Position2{ 2.f, 3.f }, Position2{ 0.5f, 2.5f },
-                Position2{ 0.f, 1.f }
-        }));
-
-
-        // 1st square
-        mEntityManager.addEntity(
-                makeAnchor(Position2{ 10.f, 28.f }, math::Size<2, float>{3.f, 3.f}));
-
-        // 1st level platform
-        mEntityManager.addEntity(
-                makeAnchor(Position2{ 23.f, 17.f }, math::Size<2, float>{30.f, 2.f}));
+        constexpr float gLevelHalfWidth = 40.f;
+        constexpr float gWallWidth = 4.f;
+        constexpr float gJumpHeight = 3.6f;
+        constexpr float gStackHeight = gJumpHeight * 15.f;
 
         mEntityManager.addEntity(
-            makeAnchor(Position2{ 35.f, 30.f }, std::vector<Position2>{
-                Position2{ 0.f, 0.f }, Position2{ 11.5f, 0.f }, Position2{ 12.5f, 0.5f },
-                Position2{ 12.75f, 2.f }, Position2{ 12.f, 3.f }, Position2{ 0.5f, 3.f },
-                Position2{ 0.f, 1.f }
-        }));
+            makeAnchor(Position2{ -gLevelHalfWidth - gWallWidth, -gWallWidth }, math::Size<2, float>{(gLevelHalfWidth + gWallWidth) * 2, gWallWidth}));
 
-        // Triangle
-        mEntityManager.addEntity(
-            makeAnchor(Position2{ -30.f, 40.f }, std::vector<Position2>{
-            Position2{ 0.f, 0.f }, Position2{ 7.f, -5.f }, Position2{ 14.f, 0.f },
-        }));
-
-        // 2nd square
-        mEntityManager.addEntity(
-                makeAnchor(Position2{ 0.f, 50.f }, math::Size<2, float>{3.f, 3.f}));
-
-        // 3nd square
-        mEntityManager.addEntity(
-                makeAnchor(Position2{ 22.f, 65.f }, math::Size<2, float>{4.f, 4.f}));
-
-        // 4th square
-        mEntityManager.addEntity(
-                makeAnchor(Position2{ -10.f, 80.f }, math::Size<2, float>{3.f, 3.f}));
-
-        // 5th square
-        mEntityManager.addEntity(
-                makeAnchor(Position2{ -15.f, 100.f }, math::Size<2, float>{3.f, 3.f}));
-
-        // 6th square
-        mEntityManager.addEntity(
-                makeAnchor(Position2{ 25.f, 85.f }, math::Size<2, float>{6.f, 6.f}));
-
-        // 7th square
-        mEntityManager.addEntity(
-                makeAnchor(Position2{ 0.f, 115.f }, math::Size<2, float>{3.f, 3.f}));
-
-        //wall
-        mEntityManager.addEntity(
-            makeAnchor(Position2{-gLevelHalfWidth, -2.f}, math::Size<2, float>{2.f, 100.f} ));
-        //wall2
-        mEntityManager.addEntity(
-            makeAnchor(Position2{ gLevelHalfWidth, -2.f }, math::Size<2, float>{2.f, 100.f}));
+        createStackTwo(mEntityManager, 0.f);
+        createStackOne(mEntityManager, gStackHeight);
     }
 
     //
