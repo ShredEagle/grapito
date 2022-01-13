@@ -25,7 +25,7 @@ UpdateStatus GameScene::update(
     const GameInputState & aInputs,
     StateMachine & aStateMachine)
 {
-    if (isPositiveEdge(aInputs, Start))
+    if (isPositiveEdge(aInputs, Start) != Controller::_End)
     {
         aStateMachine.pushState(setupPauseMenu(mContext, mAppInterface, shared_from_this()));
         // Causes troubles with detection of next press of pause button

@@ -2,6 +2,7 @@
 
 #include "../Entities.h"
 
+#include "Input.h"
 #include "LevelStacks.h"
 #include "Systems/DelayDeleter.h"
 #include "Systems/GrappleCleanup.h"
@@ -44,35 +45,21 @@ namespace grapito {
 
 StringId soundId_MusicSid = handy::internalizeString("bgmusic");
 
-std::vector<aunteater::Entity> setupPlayers()
+std::vector<aunteater::Entity> setupPlayer(const Controller aController)
 {
     std::vector<aunteater::Entity> players;
 
-    // Player 1
-    {
-        Controller controller = isGamepadPresent(Controller::Gamepad_0) ?
-                                Controller::Gamepad_0 : Controller::KeyboardMouse;
-        players.push_back(makePlayer(0, controller, math::sdr::gCyan));
-    }
-
-    // Player 2
-    {
-        Controller controller = Controller::Gamepad_1;
-        if (isGamepadPresent(controller))
-        {
-            players.push_back(makePlayer(1, controller, math::sdr::gMagenta));
-        }
-    }
+    players.push_back(makePlayer(0, aController, math::sdr::gCyan));
 
     return players;
 }
 
 
 RopeGame::RopeGame(std::shared_ptr<Context> aContext,
-                   std::shared_ptr<graphics::AppInterface> aAppInterface) :
+                   std::shared_ptr<graphics::AppInterface> aAppInterface, const Controller aController) :
     GameScene{std::move(aContext), std::move(aAppInterface)}
 {
-    std::vector<aunteater::Entity> players = setupPlayers();
+    std::vector<aunteater::Entity> players = setupPlayer(aController);
 
     mSystemManager.add<debug::DirectControl>();
 
