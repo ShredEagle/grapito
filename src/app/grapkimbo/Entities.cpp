@@ -66,7 +66,7 @@ aunteater::Entity makePlayer(int aIndex,
             BodyType_Dynamic,
             ShapeType_Hull,
             CollisionType_Player,
-            15.f,
+            45.f,
             0.f,
             0.f,
             1.f,
@@ -218,11 +218,6 @@ void attachPlayerToGrapple(aunteater::weak_entity aPlayer, aunteater::EntityMana
     grappleBody.mass = 0.5f;
     grappleBody.updateData();
     grappleBody.updateConstructedBody();
-
-    Body & playerBody = aPlayer->get<Body>();
-    playerBody.mass = 15.f;
-    playerBody.updateData();
-    playerBody.updateConstructedBody();
 
     aunteater::weak_entity lastSegment = ropeCreator.mRopeSegments.back();
     Position2 end = aPlayer->get<Position>().position + aPlayer->get<Body>().massCenter.as<math::Vec>();
