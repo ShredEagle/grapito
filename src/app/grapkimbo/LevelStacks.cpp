@@ -6,10 +6,10 @@ namespace grapito {
 constexpr float gLevelHalfWidth = 40.f;
 constexpr float gWallWidth = 4.f;
 constexpr float gJumpHeight = 3.6f;
-constexpr float gPlatformHeight = 0.8f;
+constexpr float gPlatformHeight = 1.2f;
 constexpr float gStackHeight = gJumpHeight * 15.f;
-constexpr float gSmallAnchorSize = 1.f;
-constexpr float gBigAnchorSize = 1.f;
+constexpr float gSmallAnchorSize = 1.5f;
+constexpr float gBigAnchorSize = 2.f;
 
 aunteater::Entity makeWall(Position2 aPos)
 {

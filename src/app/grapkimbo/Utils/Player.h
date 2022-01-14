@@ -47,7 +47,7 @@ inline bool isThrowing(const PlayerData & aPlayerData)
 
 inline bool isAnchored(const PlayerData & aPlayerData)
 {
-    return aPlayerData.mGrappleWeldJoint != nullptr;
+    return aPlayerData.mGrappleWeldJoint != nullptr || aPlayerData.mGrappleDistanceJoint != nullptr;
 }
 
 

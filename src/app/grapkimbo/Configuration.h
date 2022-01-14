@@ -125,6 +125,8 @@ namespace player
     inline int gAirNumberOfSlowFrame = 10;
     inline float gAirMaxFallSpeed = -50.f; // m/s
     inline float gJumpImpulse = 24.f; // m/s
+    inline float gGrappleReleaseImpulse = 24.f; // m/s
+    inline float gGrappleSwingSpeed = 5.f; // m/s
     inline float gWallFriction = 4.f; // m/s
     inline float gDoubleJumpFactor = 1.3f; // m/s
     inline float gGrappleBaseImpulse = 70.f;
