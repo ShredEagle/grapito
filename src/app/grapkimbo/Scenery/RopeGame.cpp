@@ -133,11 +133,6 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     // Level
     //
     {
-        constexpr float gLevelHalfWidth = 40.f;
-        constexpr float gWallWidth = 4.f;
-        constexpr float gJumpHeight = 3.6f;
-        constexpr float gStackHeight = gJumpHeight * 15.f;
-
         mEntityManager.addEntity(
             makeAnchor(Position2{ -gLevelHalfWidth - gWallWidth, -gWallWidth }, math::Size<2, float>{(gLevelHalfWidth + gWallWidth) * 2, gWallWidth}));
 

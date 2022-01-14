@@ -3,13 +3,13 @@
 namespace ad {
 namespace grapito {
 
-constexpr float gLevelHalfWidth = 40.f;
-constexpr float gWallWidth = 4.f;
-constexpr float gJumpHeight = 3.6f;
-constexpr float gPlatformHeight = 0.8f;
-constexpr float gStackHeight = gJumpHeight * 15.f;
-constexpr float gSmallAnchorSize = 1.f;
-constexpr float gBigAnchorSize = 1.f;
+const float gLevelHalfWidth = 40.f;
+const float gWallWidth = 4.f;
+const float gJumpHeight = 3.6f;
+const float gPlatformHeight = 0.8f;
+const float gStackHeight = gJumpHeight * 15.f;
+const float gSmallAnchorSize = 1.f;
+const float gBigAnchorSize = 1.f;
 
 aunteater::Entity makeWall(Position2 aPos)
 {
