@@ -38,7 +38,7 @@ private:
 };
 
 
-inline Position2 getCameraPosition(const const aunteater::FamilyHelp<Camera> & aCameras)
+inline Position2 getCameraPosition(const aunteater::FamilyHelp<Camera> & aCameras)
 {
     assert(aCameras.size() == 1);
     for(const auto & [cameraTag, geometry] : aCameras)
