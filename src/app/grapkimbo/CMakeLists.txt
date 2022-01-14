@@ -69,6 +69,7 @@ set(${TARGET_NAME}_HEADERS
     Systems/AccelSolver.h
     Systems/Physics.h
     Systems/RopeCreation.h
+    Systems/SegmentStacker.h
     Systems/SoundSystem.h
     Systems/TransitionAnimationState.h
 
@@ -139,6 +140,7 @@ set(${TARGET_NAME}_SOURCES
     Systems/AccelSolver.cpp
     Systems/Physics.cpp
     Systems/RopeCreation.cpp
+    Systems/SegmentStacker.cpp
     Systems/SoundSystem.cpp
     Systems/TransitionAnimationState.cpp
 

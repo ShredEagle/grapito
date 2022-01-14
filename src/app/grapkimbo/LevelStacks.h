@@ -8,14 +8,32 @@
 namespace ad {
 namespace grapito {
 
+extern const float gLevelHalfWidth;
+extern const float gWallWidth;
+extern const float gJumpHeight;
+extern const float gStackHeight;
+
 aunteater::Entity makeWall(Position2 aPos);
 aunteater::Entity makeGrappleAnchor(Position2 aPos);
 
-void createStackOne(aunteater::EntityManager & aEntityManager, float baseHeight);
-void createStackTwo(aunteater::EntityManager & aEntityManager, float baseHeight);
-void createStackThree(aunteater::EntityManager & aEntityManager, float baseHeight);
-void createStackFour(aunteater::EntityManager & aEntityManager, float baseHeight);
-void createStackFive(aunteater::EntityManager & aEntityManager, float baseHeight);
+std::vector<aunteater::weak_entity> 
+createStackOne(aunteater::EntityManager & aEntityManager, float baseHeight);
+std::vector<aunteater::weak_entity> 
+createStackTwo(aunteater::EntityManager & aEntityManager, float baseHeight);
+std::vector<aunteater::weak_entity> 
+createStackThree(aunteater::EntityManager & aEntityManager, float baseHeight);
+std::vector<aunteater::weak_entity> 
+createStackFour(aunteater::EntityManager & aEntityManager, float baseHeight);
+std::vector<aunteater::weak_entity> 
+createStackFive(aunteater::EntityManager & aEntityManager, float baseHeight);
+
+const std::array<std::vector<aunteater::weak_entity>(*)(aunteater::EntityManager & aEntityManager, float baseHeight), 4>
+gStackCandidateFunctions = {
+    &createStackOne,
+    &createStackTwo,
+    &createStackThree,
+    &createStackFour,
+};
 
 }
 }

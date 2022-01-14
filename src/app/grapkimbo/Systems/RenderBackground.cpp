@@ -36,11 +36,7 @@ void RenderBackground::addLayer(const filesystem::path & aImage, float aScrollFa
 
 void RenderBackground::update(const GrapitoTimer, const GameInputState &)
 {
-    for(const auto & [_cameraTag, geometry] : mCameras)
-    {
-        mParallaxScroller.positionCamera(geometry.position);
-    }
-
+    mParallaxScroller.positionCamera(getCameraPosition(mCameras));
     render();
 }
 

@@ -27,10 +27,11 @@
 #include <Systems/Gravity.h>
 #include <Systems/Hud.h>
 #include <Systems/LevelGeneration.h>
+#include <Systems/Physics.h>
 #include <Systems/Render.h>
 #include <Systems/RenderBackground.h>
-#include <Systems/Physics.h>
 #include <Systems/RopeCreation.h>
+#include <Systems/SegmentStacker.h>
 #include <Systems/TransitionAnimationState.h>
 
 #include <handy/StringId_Interning.h>
@@ -89,6 +90,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
         mSystemManager.add<TransitionAnimationState>();
 
     mSystemManager.add<CameraGuidedControl>();
+    mSystemManager.add<SegmentStacker>(0.f); // after the camera is repositioned
     mSystemManager.add<DelayDeleter>();
 
     auto soundSystem = mSystemManager.add<SoundSystem>(mContext->mSoundManager);
@@ -133,19 +135,10 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     // Level
     //
     {
-        constexpr float gLevelHalfWidth = 40.f;
-        constexpr float gWallWidth = 4.f;
-        constexpr float gJumpHeight = 3.6f;
-        constexpr float gStackHeight = gJumpHeight * 15.f;
-
         mEntityManager.addEntity(
             makeAnchor(Position2{ -gLevelHalfWidth - gWallWidth, -gWallWidth }, math::Size<2, float>{(gLevelHalfWidth + gWallWidth) * 2, gWallWidth}));
 
         createStackFive(mEntityManager, 0.f);
-        createStackThree(mEntityManager, gStackHeight);
-        createStackOne(mEntityManager, gStackHeight * 2);
-        createStackTwo(mEntityManager, gStackHeight * 3);
-        createStackFour(mEntityManager, gStackHeight * 4);
     }
 
     //

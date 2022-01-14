@@ -35,8 +35,18 @@ private:
     const aunteater::FamilyHelp<Camera> mCameras;
     const aunteater::FamilyHelp<CameraPoint> mCameraPoints;
     const aunteater::FamilyHelp<CameraLimiter> mCameraLimiters;
-
 };
+
+
+inline Position2 getCameraPosition(const aunteater::FamilyHelp<Camera> & aCameras)
+{
+    assert(aCameras.size() == 1);
+    for(const auto & [cameraTag, geometry] : aCameras)
+    {
+        return geometry.position;
+    }
+    return {0.f, 0.f};
+}
 
 
 struct Influence
@@ -44,6 +54,7 @@ struct Influence
     math::Vec<2, float> accumulatedPosition{math::Vec<2, float>::Zero()};
     float totalWeight;
 };
+
 
 /// \brief Sum all the camera points in `aCameraPoints` into an Influence instance.
 Influence accumulateCameraGuides(const aunteater::FamilyHelp<CameraPoint> & aCameraPoints);
