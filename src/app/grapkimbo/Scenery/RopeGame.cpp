@@ -27,6 +27,7 @@
 #include <Systems/Hud.h>
 #include <Systems/LevelGeneration.h>
 #include <Systems/Render.h>
+#include <Systems/RenderBackground.h>
 #include <Systems/Physics.h>
 #include <Systems/RopeCreation.h>
 #include <Systems/TransitionAnimationState.h>
@@ -93,6 +94,11 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
 
     // Done after CameraGuidedControl, to avoid having two camera guides on the frame a player is killed.
     mSystemManager.add<GameRule>(players);
+
+    mRenderBackgroundSystem = mSystemManager.add<RenderBackground>(mAppInterface); 
+    mRenderBackgroundSystem->addLayer(mContext->pathFor(background::gSpaceImage), background::gSpaceScrollFactor);
+    mRenderBackgroundSystem->addLayer(mContext->pathFor(background::gSmallStarImage), background::gSmallStarScrollFactor);
+    mRenderBackgroundSystem->addLayer(mContext->pathFor(background::gStarImage), background::gStarScrollFactor);
 
     mRenderSystem = mSystemManager.add<Render>(mAppInterface); 
     mSystemManager.add<Hud>(mContext->pathFor(hud::gFont), mAppInterface); 
@@ -233,6 +239,7 @@ std::pair<TransitionProgress, UpdateStatus> RopeGame::exit(
 
 void RopeGame::render() const
 {
+    mRenderBackgroundSystem->render();
     mRenderSystem->render();
 }
 

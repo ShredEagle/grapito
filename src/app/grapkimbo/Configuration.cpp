@@ -9,10 +9,22 @@ namespace grapito {
 constexpr float gGigantismDampeningFactor = 2.f;
 
 
+namespace background
+{
+    const std::string gSpaceImage = "images/backgrounds/Dynamic Space Background FREE/Nebula Aqua-Pink.png";
+    const float gSpaceScrollFactor = 5.f;
+    const std::string gSmallStarImage = "images/backgrounds/Dynamic Space Background FREE/Stars Small_1.png";
+    const float gSmallStarScrollFactor = 7.5f;
+    const std::string gStarImage = "images/backgrounds/Dynamic Space Background FREE/Stars-Big_1_1_PC.png";
+    const float gStarScrollFactor = 10.f;
+} // namespace background
+
+
 namespace camera
 {
     const float gCompetitorGuideFadeOutDuration = 1.5f;
 } // namespace camera
+
 
 namespace debug
 {

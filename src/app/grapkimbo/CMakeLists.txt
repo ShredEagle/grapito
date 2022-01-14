@@ -64,6 +64,7 @@ set(${TARGET_NAME}_HEADERS
     Systems/Hud.h
     Systems/LevelGeneration.h
     Systems/Render.h
+    Systems/RenderBackground.h
     Systems/AccelSolver.h
     Systems/Physics.h
     Systems/RopeCreation.h
@@ -132,6 +133,7 @@ set(${TARGET_NAME}_SOURCES
     Systems/Hud.cpp
     Systems/LevelGeneration.cpp
     Systems/Render.cpp
+    Systems/RenderBackground.cpp
     Systems/AccelSolver.cpp
     Systems/Physics.cpp
     Systems/RopeCreation.cpp
