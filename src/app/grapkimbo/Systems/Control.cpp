@@ -3,6 +3,7 @@
 #include "Configuration.h"
 #include "Gravity.h"
 #include "../Components/SoundPlayer.h"
+#include "../Components/DistanceJoint.h"
 
 #include "../commons.h"
 #include "../Entities.h"
@@ -10,7 +11,9 @@
 #include "../Utilities.h"
 
 #include "../Utils/Player.h"
+#include "math/Color.h"
 
+#include <cmath>
 #include <math/Constants.h>
 
 #include <Components/VisualRectangle.h>
@@ -45,13 +48,16 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
     //
     for(auto & player : mCartesianControllables)
     {
-        auto & [controllable, geometry, aas, mass, playerData] = player;
+        auto & [controllable, geometry, aas, mass, playerData, body] = player;
 
         const ControllerInputState & inputs = aInputState.get(controllable.controller);
         float horizontalAxis = 
             aInputState.asAxis(controllable.controller, 
                                Left, Right, 
                                LeftHorizontalAxis, controller::gHorizontalDeadZone);
+        Vec2 controllerDirection = 
+            aInputState.asDirection(controllable.controller, 
+                               LeftHorizontalAxis, LeftVerticalAxis, controller::gVerticalDeadZone, controller::gHorizontalDeadZone);
 
         //
         // Reset airborn jumps
@@ -99,7 +105,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
         //
         else if (playerData.state & PlayerCollisionState_Jumping)
         {
-            if (std::abs(horizontalAxis) > 0.)
+            if (std::abs(horizontalAxis) > 0.f && !isAnchored(playerData))
             {
                 if (std::abs(aas.speed.x()) <= player::gAirSpeed)
                 {
@@ -111,6 +117,19 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
                 {
                     aas.accel.x() -= aas.speed.x();
                 }
+            }
+            else if (controllerDirection.getNormSquared() > 0.f && isAnchored(playerData))
+            {
+                Position2 playerPos = body.massCenter + geometry.position.as<math::Vec>();
+                DistanceJoint joint = playerData.mGrappleDistanceJoint->get<DistanceJoint>();
+                Position2 attachPoint = getLocalPointInWorld(joint.bodyB->get<Body>(), joint.bodyB->get<Position>(), joint.localAnchorB);
+
+                Vec2 jointDirection = (attachPoint - playerPos).normalize();
+                Vec2 possibleDirection = {-jointDirection.y(), jointDirection.x()};
+
+                aas.speed += possibleDirection.dot(controllerDirection.normalize()) * 2.f * (player::gGrappleSwingSpeed / pow(possibleDirection.getNorm() + 1.f, 2)) * possibleDirection * controllerDirection.getNorm();
+
+                debugDrawer->drawLine({playerPos, playerPos + possibleDirection * 4.f, 2.f, math::sdr::gGreen});
             }
             else
             {
@@ -147,16 +166,33 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
                     playerData.wallClingFrameCounter = 0;
                 }
 
-                if (inputs[Jump].positiveEdge() && !(playerData.state & PlayerCollisionState_Grounded))
+                if (
+                        inputs[Jump].positiveEdge()
+                        && !(playerData.state & PlayerCollisionState_Grounded)
+                   )
                 {
-                    float wallJumpHorizontalImpulse = player::gJumpImpulse * player::gDoubleJumpFactor * cos(math::pi<float> / 4.);
-                    float wallJumpVerticalImpulse = player::gJumpImpulse * player::gDoubleJumpFactor * sin(math::pi<float> / 4.);
+                    if (
+                        ((horizontalAxis < 0.f && playerData.state & PlayerCollisionState_WalledLeft)
+                        || (horizontalAxis > 0.f && playerData.state & PlayerCollisionState_WalledRight))
+                        && playerData.airborneJumpsLeft > 0 && !isGrappleOut(playerData))
+                    {
+                        //
+                        // Airborne jumps while walled
+                        //
+                        --playerData.airborneJumpsLeft;
+                        aas.speed.y() = player::gJumpImpulse;
+                    }
+                    else
+                    {
+                        float wallJumpHorizontalImpulse = player::gJumpImpulse * player::gDoubleJumpFactor * cos(math::pi<float> / 4.);
+                        float wallJumpVerticalImpulse = player::gJumpImpulse * player::gDoubleJumpFactor * sin(math::pi<float> / 4.);
 
-                    aas.speed = playerData.state & PlayerCollisionState_WalledLeft ?
-                        Vec2{wallJumpHorizontalImpulse, wallJumpVerticalImpulse} :
-                        Vec2{-wallJumpHorizontalImpulse, wallJumpVerticalImpulse};
+                        aas.speed = playerData.state & PlayerCollisionState_WalledLeft ?
+                            Vec2{wallJumpHorizontalImpulse, wallJumpVerticalImpulse} :
+                            Vec2{-wallJumpHorizontalImpulse, wallJumpVerticalImpulse};
 
-                    playerData.wallClingFrameCounter = 0;
+                        playerData.wallClingFrameCounter = 0;
+                    }
                 }
             }
             //
@@ -179,7 +215,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
                 // Otherwise, would make a super jump when both connected and grounded.
                 && (playerData.state & PlayerCollisionState_Jumping))
             {
-                aas.speed *= player::gDetachSpeedBoostFactor;
+                aas.speed += aas.speed.normalize() * player::gGrappleReleaseImpulse;
                 aas.speed.y() += player::gJumpImpulse;
             }
 
@@ -227,7 +263,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
     }
 
 
-    for (auto& [controllable, geometry, aas, mass, playerData] : mCartesianControllables)
+    for (auto& [controllable, geometry, aas, mass, playerData, body] : mCartesianControllables)
     {
         playerData.state &= ~PlayerCollisionState_Walled;
         playerData.state &= ~PlayerCollisionState_WalledLeft;

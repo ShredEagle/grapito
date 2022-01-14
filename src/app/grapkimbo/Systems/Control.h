@@ -19,7 +19,7 @@ namespace ad {
 namespace grapito
 {
 
-typedef aunteater::Archetype<Controllable, Position, AccelAndSpeed, Mass, PlayerData> CartesianControlled;
+typedef aunteater::Archetype<Controllable, Position, AccelAndSpeed, Mass, PlayerData, Body> CartesianControlled;
 typedef aunteater::Archetype<Controllable, AccelAndSpeed, GrappleControl, Position, PlayerData> Grappler;
 
 class Control : public aunteater::System<GrapitoTimer, GameInputState>
