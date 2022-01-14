@@ -138,17 +138,20 @@ void Render::update(const GrapitoTimer aTimer, const GameInputState &)
         mSpriting.updateInstances(sprites);
     }
 
-    for(const auto & [cameraTag, geometry] : mCameras)
+    // Position camera
     {
+        auto position = getCameraPosition(mCameras);
         math::Rectangle<GLfloat> viewed = 
-            getViewedRectangle(geometry.position,
+            getViewedRectangle(position,
                                math::getRatio<GLfloat>(mAppInterface->getWindowSize()));
         setViewedRectangle(mTrivialShaping, viewed);
         setViewedRectangle(mTrivialLineStrip, viewed);
         setViewedRectangle(mTrivialPolygon, viewed);
         setOrthographicView(mCurving,
-                            {geometry.position, 0.f},
-                            graphics::getViewVolume(mAppInterface->getWindowSize(), render::gViewedHeight, 1.f, 2.f));
+                            {position, 0.f},
+                            graphics::getViewVolume(mAppInterface->getWindowSize(),
+                                                    render::gViewedHeight,
+                                                    1.f, 2.f));
         setViewedRectangle(mSpriting, viewed);
         debugDrawer->setViewedRectangle(viewed);
     }
