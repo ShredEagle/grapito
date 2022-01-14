@@ -20,6 +20,7 @@ namespace grapito
 Render::Render(aunteater::EntityManager & aEntityManager,
                std::shared_ptr<graphics::AppInterface> aAppInterface) :
     mEntityManager{aEntityManager},
+    mAppInterface{aAppInterface},
     mRectangles{mEntityManager},
     mPolygons{mEntityManager},
     mBodyRectangles{mEntityManager},
@@ -29,7 +30,6 @@ Render::Render(aunteater::EntityManager & aEntityManager,
     mCrosshairs{mEntityManager},
     mSprites{mEntityManager},
     mCameras{mEntityManager},
-    mAppInterface{aAppInterface},
     mTrivialShaping{aAppInterface->getWindowSize()},
     mTrivialLineStrip{aAppInterface->getWindowSize()},
     mTrivialPolygon{aAppInterface->getWindowSize()},
@@ -41,7 +41,6 @@ void Render::update(const GrapitoTimer aTimer, const GameInputState &)
 {
     mTrivialLineStrip.clearLines();
     mTrivialPolygon.clearPolygons();
-    mAppInterface->clear();
 
     for (auto & [geometry, body, visualRectangle] : mBodyRectangles)
     {

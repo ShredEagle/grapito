@@ -19,6 +19,17 @@ namespace anchor
 } // namespace anchor
 
 
+namespace background
+{
+    extern const std::string gSpaceImage;
+    extern const float gSpaceScrollFactor;
+    extern const std::string gSmallStarImage;
+    extern const float gSmallStarScrollFactor;
+    extern const std::string gStarImage;
+    extern const float gStarScrollFactor;
+} // namespace background
+
+
 namespace camera
 {
     constexpr float gAnchorGuideFadeIn = 2.f;

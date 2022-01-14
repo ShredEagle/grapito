@@ -10,6 +10,7 @@
 namespace ad {
 namespace grapito {
 
+class RenderBackground;
 class Render;
 
 class RopeGame : public GameScene
@@ -30,6 +31,7 @@ public:
     void render() const override;
 
 private:
+    std::shared_ptr<RenderBackground> mRenderBackgroundSystem;
     std::shared_ptr<Render> mRenderSystem;
     ALuint mBgMusicSource;
 };

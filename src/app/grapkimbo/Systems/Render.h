@@ -60,6 +60,8 @@ public:
 
 private:
     aunteater::EntityManager & mEntityManager;
+    std::shared_ptr<graphics::AppInterface> mAppInterface;
+
     const aunteater::FamilyHelp<RenderedRectangle> mRectangles;
     const aunteater::FamilyHelp<RenderedPolygon> mPolygons;
     const aunteater::FamilyHelp<RenderedBodyRectangle> mBodyRectangles;
@@ -70,7 +72,6 @@ private:
     const aunteater::FamilyHelp<RenderedSprite> mSprites;
     const aunteater::FamilyHelp<Camera> mCameras;
 
-    std::shared_ptr<graphics::AppInterface> mAppInterface;
     graphics::TrivialShaping mTrivialShaping;
     graphics::TrivialLineStrip mTrivialLineStrip;
     graphics::TrivialPolygon mTrivialPolygon;

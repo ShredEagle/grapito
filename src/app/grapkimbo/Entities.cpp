@@ -1,5 +1,7 @@
 #include "Entities.h"
 
+#include "commons.h"
+
 #include "Components/AnimatedSprite.h"
 #include "Components/AccelAndSpeed.h"
 #include "Components/CameraGuide.h"
@@ -24,8 +26,8 @@
 #include "Components/Debug/DirectControlTag.h"
 
 #include "Utils/PhysicsStructs.h"
-#include "aunteater/EntityManager.h"
-#include "commons.h"
+
+#include <aunteater/EntityManager.h>
 
 #include <math/VectorUtilities.h>
 
@@ -33,6 +35,7 @@
 namespace ad {
 namespace grapito
 {
+
 
 aunteater::Entity makeDirectControllable(Controller aController, Position2 aInitialPosition)
 {
