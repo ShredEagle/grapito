@@ -27,5 +27,13 @@ createStackFour(aunteater::EntityManager & aEntityManager, float baseHeight);
 std::vector<aunteater::weak_entity> 
 createStackFive(aunteater::EntityManager & aEntityManager, float baseHeight);
 
+const std::array<std::vector<aunteater::weak_entity>(*)(aunteater::EntityManager & aEntityManager, float baseHeight), 4>
+gStackCandidateFunctions = {
+    &createStackOne,
+    &createStackTwo,
+    &createStackThree,
+    &createStackFour,
+};
+
 }
 }

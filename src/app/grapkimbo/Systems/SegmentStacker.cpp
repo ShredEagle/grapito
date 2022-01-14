@@ -33,7 +33,8 @@ auto listConnected(SegmentStacker::SegmentIndex aIndex, int aSpan)
 SegmentStacker::SegmentStacker(aunteater::EntityManager & aEntityManager, float aStartingHeight) :
     mEntityManager{aEntityManager},
     mCameras{aEntityManager},
-    mStartingIndex{(SegmentIndex)std::floor(aStartingHeight / gStackHeight) + 1}
+    mStartingIndex{(SegmentIndex)std::floor(aStartingHeight / gStackHeight) + 1},
+    mRandomFunctionIndex{0, gStackCandidateFunctions.size() - 1}
 {
     updateAvailableSegments(mCurrentIndex);
 }
@@ -84,7 +85,9 @@ void SegmentStacker::updateAvailableSegments(SegmentIndex aIndex)
 
 void SegmentStacker::generateSegment(SegmentIndex aIndex)
 {
-    mSegments.emplace(aIndex, createStackOne(mEntityManager, aIndex * gStackHeight));
+    mSegments.emplace(
+        aIndex,
+        gStackCandidateFunctions[mRandomFunctionIndex()](mEntityManager, aIndex * gStackHeight));
 }
 
 

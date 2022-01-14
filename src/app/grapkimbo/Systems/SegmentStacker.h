@@ -13,6 +13,8 @@
 #include <aunteater/FamilyHelp.h>
 #include <aunteater/System.h>
 
+#include <handy/random.h>
+
 #include <math/Vector.h>
 
 #include <functional>
@@ -44,6 +46,7 @@ private:
     SegmentIndex mCurrentIndex{0};
     SegmentIndex mStartingIndex; // The index at which generation should start.
     std::map<SegmentIndex, std::vector<aunteater::weak_entity>> mSegments;
+    Randomizer<> mRandomFunctionIndex;
 };
 
 } // namespace grapito
