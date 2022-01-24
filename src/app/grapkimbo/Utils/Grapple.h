@@ -12,6 +12,11 @@ namespace ad {
 namespace grapito {
 
 
+inline bool isDetached(const RopeCreator & aRopeCreator)
+{
+    return aRopeCreator.mTargetEntity == nullptr;
+}
+
 inline bool isBeingThrown(const RopeCreator & aRopeCreator)
 {
     return aRopeCreator.mTargetEntity != nullptr 
