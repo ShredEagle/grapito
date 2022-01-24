@@ -25,6 +25,7 @@
 
 #include "Components/Debug/DirectControlTag.h"
 
+#include "Utils/Grapple.h"
 #include "Utils/PhysicsStructs.h"
 
 #include <aunteater/EntityManager.h>
@@ -257,15 +258,11 @@ void detachPlayerFromGrapple(aunteater::weak_entity aPlayer)
     PlayerData & playerData = aPlayer->get<PlayerData>();
 
     // Dissociate each segment from the player
-    // Note Ad 2022/01/11: 
-    // This is bad design, with some very implicit convention that
-    // a negative id is the player it was detached from.
     std::ranges::for_each(
         playerData.grapple->get<RopeCreator>().mRopeSegments,
         [](RopeSegment & segment)
         {
-            // -1, otherwise 0 remains unchanged
-            segment.playerId = -segment.playerId - 1;
+            segment.playerId = playerIdToDetachedId(segment.playerId);
         },
         [](auto entity)->RopeSegment &{return entity->template get<RopeSegment>();});
 

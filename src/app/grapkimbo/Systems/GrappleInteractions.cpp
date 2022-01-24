@@ -38,7 +38,7 @@ std::optional<int> getPlayerIdIfGrappleCanCut(const RopeCreator & aRopeCreator)
         else if(isDetached(aRopeCreator))
         {
             assert(aRopeCreator.mRopeSegments.size() > 0);
-            return aRopeCreator.mRopeSegments.front()->get<RopeSegment>().playerId;
+            return detachedIdToPlayerId(aRopeCreator.mRopeSegments.front()->get<RopeSegment>().playerId);
         }
         return std::nullopt;
 }
@@ -52,13 +52,16 @@ void GrappleInteractions::update(const GrapitoTimer, const GameInputState &)
         // If the grapple is still connected to a player, but not to the environment
         if(auto grapplePlayerId = getPlayerIdIfGrappleCanCut(ropeCreator))
         {
+            assert(grapplePlayerId >= 0); // We do not get a "detached id"
             for (const auto & collisionPair : body.constructedBodyIt->contactList)
             {
                 if (collisionPair->bodyA.collisionType == CollisionType_Moving_Env
                     && collisionPair->bodyB.collisionType == CollisionType_Moving_Env)
                 {
                     aunteater::weak_entity collidedEntity = getOtherEntity(body, collisionPair);
-                    if (collidedEntity->has<RopeSegment>() 
+                    if (collidedEntity->has<RopeSegment>()
+                        && collidedEntity->get<RopeSegment>().playerId >= 0 // No need to collide detached ropes
+                                                                            // Which has no effect anyway (we loop on players to cut ropes)
                         && collidedEntity->get<RopeSegment>().playerId != *grapplePlayerId)
                     {
                         int segmentPlayerId = collidedEntity->get<RopeSegment>().playerId;
