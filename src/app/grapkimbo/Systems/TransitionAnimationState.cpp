@@ -153,11 +153,10 @@ TransitionAnimationState::TransitionAnimationState(aunteater::EntityManager & aE
 {}
 
 
-void TransitionAnimationState::installAnimators(AnimatorMap aAnimators)
+void TransitionAnimationState::installAnimator(graphics::sprite::Animator aAnimator)
 {
-    mAnimators = std::move(aAnimators);
-    // All animations variants have exactly the same duration, so use the first.
-    mPlayerAnimationStateMachine = makePlayerAnimationStateMachine(mAnimators.begin()->second);
+    mAnimator = std::move(aAnimator);
+    mPlayerAnimationStateMachine = makePlayerAnimationStateMachine(mAnimator);
 }
 
 
@@ -178,9 +177,8 @@ void TransitionAnimationState::updateDrawnFrames(const GrapitoTimer aTimer)
 {
     for (auto & [animatedSprite, visualSprite] : mSpriteAnimationFrames)
     {
-        visualSprite.sprite = mAnimators.at(animatedSprite.variant)
-                                            .at(animatedSprite.animation,
-                                                animatedSprite.advance(aTimer.delta()));
+        visualSprite.sprite = mAnimator.at(animatedSprite.animation,
+                                           animatedSprite.advance(aTimer.delta()));
         if (animatedSprite.horizontalMirroring)
         {
             visualSprite.mirroring.x() = -1;

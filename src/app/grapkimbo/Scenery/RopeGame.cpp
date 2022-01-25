@@ -107,21 +107,16 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     mSystemManager.add<Hud>(mContext->pathFor(hud::gFont), mAppInterface); 
 
     { // Load sprite animations
-        AnimatorMap animatorVariants;
-        for (AnimationVariant variant : gAllColorVariants)
-        {
-            // Note: It is not obvious whether it is better to maintain a permanent instance of the sprite sheet
-            // (trading RAM for better load times), but this is a good pretext to use the ResourceManager.
-            auto spriteSheets = {
-                std::ref(mContext->loadAnimationSpriteSheet("sprite_sheet/idle_" + toString(variant) + ".json")),
-                std::ref(mContext->loadAnimationSpriteSheet("sprite_sheet/run_" + toString(variant) + ".json")),
-            };
+        // Note: It is not obvious whether it is better to maintain a permanent instance of the sprite sheet
+        // (trading RAM for better load times), but this is a good pretext to use the ResourceManager.
+        auto spriteSheets = {
+            std::ref(mContext->loadAnimationSpriteSheet("sprite_sheet/idle.json")),
+            std::ref(mContext->loadAnimationSpriteSheet("sprite_sheet/run.json")),
+        };
 
-            graphics::sprite::Animator animator;
-            mRenderSystem->loadSpriteAnimations(spriteSheets.begin(), spriteSheets.end(), animator);
-            animatorVariants.emplace(variant, std::move(animator));
-        }
-        spriteAnimationSystem->installAnimators(std::move(animatorVariants));
+        graphics::sprite::Animator animator;
+        mRenderSystem->loadSpriteAnimations(spriteSheets.begin(), spriteSheets.end(), animator);
+        spriteAnimationSystem->installAnimator(std::move(animator));
     }
 
     { // Load sounds

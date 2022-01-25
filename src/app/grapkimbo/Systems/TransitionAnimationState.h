@@ -24,15 +24,12 @@ using AnimatedPlayer = aunteater::Archetype<AccelAndSpeed, AnimatedSprite, Playe
 using SpriteAnimationFrame = aunteater::Archetype<AnimatedSprite, VisualSprite>;
 
 
-using AnimatorMap = std::map<AnimationVariant, graphics::sprite::Animator>;
-
-
 class TransitionAnimationState : public aunteater::System<GrapitoTimer, GameInputState>
 {
 public:
     TransitionAnimationState(aunteater::EntityManager & aEntityManager);
 
-    void installAnimators(AnimatorMap aAnimators);
+    void installAnimator(graphics::sprite::Animator aAnimator);
 
     void update(const GrapitoTimer aTimer, const GameInputState & aInput) override;
 
@@ -44,7 +41,7 @@ private:
     const aunteater::FamilyHelp<AnimatedPlayer> mAnimatedPlayers;
     const aunteater::FamilyHelp<SpriteAnimationFrame> mSpriteAnimationFrames;
 
-    AnimatorMap mAnimators;
+    graphics::sprite::Animator mAnimator;
     AnimationStateMachine mPlayerAnimationStateMachine;
 };
 
