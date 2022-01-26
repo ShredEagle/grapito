@@ -51,12 +51,7 @@ public:
 
     void update(const GrapitoTimer aTimer, const GameInputState &) override;
 
-    /// \brief Load all animations from the sprite sheet range into the animator.
-    /// Those animations will then ben drawable by the Renderer.
-    template <class T_iterator>
-    void loadSpriteAnimations(T_iterator aSpriteSheetBegin, T_iterator aSpriteSheetEnd,
-                              graphics::sprite::Animator & aAnimator);
-                             
+    AtlasIndex installAtlas(graphics::sprite::LoadedAtlas aAtlas);
 
 private:
     aunteater::EntityManager & mEntityManager;
@@ -79,19 +74,9 @@ private:
     graphics::Spriting mSpriting;
 
     Spline mBeziers;
+
+    std::vector<graphics::sprite::LoadedAtlas> mAtlases;
 };
-
-
-//
-// Implementations
-//
-template <class T_iterator>
-void Render::loadSpriteAnimations(T_iterator aSpriteSheetBegin, T_iterator aSpriteSheetEnd,
-                                  graphics::sprite::Animator & aAnimator)
-{
-    aAnimator.load(aSpriteSheetBegin, aSpriteSheetEnd, mSpriting);
-}
-
 
 
 } // namespace grapito

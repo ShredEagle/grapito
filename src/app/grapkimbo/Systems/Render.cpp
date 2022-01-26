@@ -37,6 +37,14 @@ Render::Render(aunteater::EntityManager & aEntityManager,
     mSpriting{render::gSpritePixelWorldSize}
 {}
 
+
+AtlasIndex Render::installAtlas(graphics::sprite::LoadedAtlas aAtlas)
+{
+    mAtlases.push_back(std::move(aAtlas)); 
+    return mAtlases.size() - 1;
+}
+
+
 void Render::update(const GrapitoTimer aTimer, const GameInputState &)
 {
     mTrivialLineStrip.clearLines();
@@ -167,7 +175,8 @@ void Render::render() const
     mTrivialShaping.render();
     mTrivialPolygon.render();
     mCurving.render(mBeziers);
-    mSpriting.render();
+    // TODO pick the correct atlas for sprites
+    mSpriting.render(mAtlases.front());
 }
 
 

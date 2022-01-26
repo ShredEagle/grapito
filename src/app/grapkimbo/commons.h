@@ -26,6 +26,8 @@ using StringId = handy::StringId;
 using SoundManager = sounds::SoundManager;
 using OggSoundData = sounds::OggSoundData;
 
+using AtlasIndex = std::size_t;
+
 
 } // namespace grapito
 } // namespace ad 

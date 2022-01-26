@@ -115,7 +115,10 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
         };
 
         graphics::sprite::Animator animator;
-        mRenderSystem->loadSpriteAnimations(spriteSheets.begin(), spriteSheets.end(), animator);
+        // TODO cache via resource system
+        // TODO load different atlases for different player colors
+        mRenderSystem->installAtlas(
+            animator.load(spriteSheets.begin(), spriteSheets.end()));
         spriteAnimationSystem->installAnimator(std::move(animator));
     }
 
