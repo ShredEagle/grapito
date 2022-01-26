@@ -76,6 +76,8 @@ private:
     // complicates things too much. A big atlas with all color variations, and some better logic in
     // animation system to offset to the expected variations, could simplify the code a lot
     // (no more mapping between atlases and their sprites, etc).
+    // Alternatively, we could "externalize" the VAO (out of Spriting renderer), and feed it on ::render().
+    // (see Tiling)
     // But for the moment, Spriting is mutable, so ::render() can update instances per atlas...
     mutable graphics::Spriting mSpriting;
 
