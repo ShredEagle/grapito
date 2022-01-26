@@ -71,11 +71,19 @@ private:
     graphics::TrivialLineStrip mTrivialLineStrip;
     graphics::TrivialPolygon mTrivialPolygon;
     graphics::Curving mCurving;
-    graphics::Spriting mSpriting;
+    // TODO Ad 2022/01/26: Awfull SMELL
+    // I now think that having several atlases (textures) to render on a single Spriting renderer
+    // complicates things too much. A big atlas with all color variations, and some better logic in
+    // animation system to offset to the expected variations, could simplify the code a lot
+    // (no more mapping between atlases and their sprites, etc).
+    // But for the moment, Spriting is mutable, so ::render() can update instances per atlas...
+    mutable graphics::Spriting mSpriting;
 
     Spline mBeziers;
 
     std::vector<graphics::sprite::LoadedAtlas> mAtlases;
+    // An (implicit) mapping between an AtlasIndex and a vector of Sprites for this atlas.
+    std::vector<std::vector<graphics::Spriting::Instance>> mAtlasToSprites;
 };
 
 

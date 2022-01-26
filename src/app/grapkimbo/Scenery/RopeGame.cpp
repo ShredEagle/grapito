@@ -116,10 +116,21 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
 
         graphics::sprite::Animator animator;
         // TODO cache via resource system
-        // TODO load different atlases for different player colors
-        mRenderSystem->installAtlas(
-            animator.load(spriteSheets.begin(), spriteSheets.end()));
+        // Install the blue (default) variant
+        mRenderSystem->installAtlas(animator.load(spriteSheets.begin(), spriteSheets.end()));
         spriteAnimationSystem->installAnimator(std::move(animator));
+
+        using namespace std::string_literals;
+        // The blue variant is already installed above.
+        for (const auto & color : {"green"s, "red"s})
+        {
+            arte::Image<math::sdr::Rgba> colorVariation = arte::stackVertical<math::sdr::Rgba>(
+                std::vector<arte::ImageRgba>{
+                    arte::ImageRgba{mContext->pathFor("sprite_sheet/idle_" + color + ".png")},
+                    arte::ImageRgba{mContext->pathFor("sprite_sheet/run_" + color + ".png")},
+                });
+            mRenderSystem->installAtlas(graphics::sprite::loadAtlas(colorVariation));
+        }
     }
 
     { // Load sounds
