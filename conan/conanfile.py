@@ -30,7 +30,7 @@ class GrapitoConan(ConanFile):
         ("vorbis/1.3.7"),
 
         ("aunteater/9cd7bd9340@adnn/develop"),
-        ("graphics/6a28e25cfc@adnn/develop"),
+        ("graphics/7d5b1c3cea@adnn/develop"),
         ("math/017e7c42bf@adnn/develop"),
         ("websocket/ef5d5bf4d9@adnn/develop"),
         ("sounds/c80889af36@adnn/develop"),
