@@ -24,12 +24,12 @@ RenderBackground::RenderBackground(aunteater::EntityManager & aEntityManager,
 void RenderBackground::addLayer(const filesystem::path & aImage, float aScrollFactor)
 {
     arte::Image<math::sdr::Rgba> image{aImage, arte::ImageOrientation::InvertVerticalAxis};
-    auto [atlas, loadedTiles] = graphics::sprites::load(image);
+    auto [atlas, loadedTile] = graphics::sprite::load(image);
 
     mParallaxScroller.addLayer(
         atlas, 
         image.dimensions(),
-        [tiles = std::move(loadedTiles)](auto){return tiles.at(0);},
+        [tile = std::move(loadedTile)](auto){return tile;},
         aScrollFactor);
 }
 

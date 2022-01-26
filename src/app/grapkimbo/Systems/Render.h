@@ -51,12 +51,7 @@ public:
 
     void update(const GrapitoTimer aTimer, const GameInputState &) override;
 
-    /// \brief Load all animations from the sprite sheet range into the animator.
-    /// Those animations will then ben drawable by the Renderer.
-    template <class T_iterator>
-    void loadSpriteAnimations(T_iterator aSpriteSheetBegin, T_iterator aSpriteSheetEnd,
-                              graphics::sprite::Animator & aAnimator);
-                             
+    AtlasIndex installAtlas(graphics::sprite::LoadedAtlas aAtlas);
 
 private:
     aunteater::EntityManager & mEntityManager;
@@ -76,22 +71,22 @@ private:
     graphics::TrivialLineStrip mTrivialLineStrip;
     graphics::TrivialPolygon mTrivialPolygon;
     graphics::Curving mCurving;
-    graphics::Spriting mSpriting;
+    // TODO Ad 2022/01/26: Awfull SMELL
+    // I now think that having several atlases (textures) to render on a single Spriting renderer
+    // complicates things too much. A big atlas with all color variations, and some better logic in
+    // animation system to offset to the expected variations, could simplify the code a lot
+    // (no more mapping between atlases and their sprites, etc).
+    // Alternatively, we could "externalize" the VAO (out of Spriting renderer), and feed it on ::render().
+    // (see Tiling)
+    // But for the moment, Spriting is mutable, so ::render() can update instances per atlas...
+    mutable graphics::Spriting mSpriting;
 
     Spline mBeziers;
+
+    std::vector<graphics::sprite::LoadedAtlas> mAtlases;
+    // An (implicit) mapping between an AtlasIndex and a vector of Sprites for this atlas.
+    std::vector<std::vector<graphics::Spriting::Instance>> mAtlasToSprites;
 };
-
-
-//
-// Implementations
-//
-template <class T_iterator>
-void Render::loadSpriteAnimations(T_iterator aSpriteSheetBegin, T_iterator aSpriteSheetEnd,
-                                  graphics::sprite::Animator & aAnimator)
-{
-    aAnimator.load(aSpriteSheetBegin, aSpriteSheetEnd, mSpriting);
-}
-
 
 
 } // namespace grapito

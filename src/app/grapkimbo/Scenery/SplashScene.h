@@ -7,6 +7,7 @@
 
 #include <arte/Image.h>
 
+#include <graphics/SpriteLoading.h>
 #include <graphics/Spriting.h>
 
 #include <vector>
@@ -51,6 +52,7 @@ private:
     std::vector<Splash>::size_type mCurrentSplashId{0};
     GrapitoTimer::Value_t mTimeAccumlated{0};
     graphics::Spriting mSpriting;
+    graphics::sprite::LoadedAtlas mAtlas;
     std::optional<graphics::LoadedSprite> mLoadedSprite;
 };
 

@@ -84,7 +84,8 @@ aunteater::Entity makePlayer(int aIndex,
         .add<PlayerData>(aIndex, aColor)
         .add<Position>(Position2{3.f, 3.f}, player::gSize) // The position will be set by pendulum simulation
         //.add<VisualRectangle>(aColor)
-        .add<VisualSprite>() // handled by animation system
+        .add<VisualSprite>((AtlasIndex)aIndex) // the sprite itself is handled by animation system
+                                               // SMELL: we hardcode the fact that we use the player id as atlas index
     ;
 
     //aPendular.connected->add<CameraGuide>(math::makeInterpolation<math::ease::SmoothStep>(0., 1., 0.3));

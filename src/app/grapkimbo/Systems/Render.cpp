@@ -37,6 +37,15 @@ Render::Render(aunteater::EntityManager & aEntityManager,
     mSpriting{render::gSpritePixelWorldSize}
 {}
 
+
+AtlasIndex Render::installAtlas(graphics::sprite::LoadedAtlas aAtlas)
+{
+    mAtlases.push_back(std::move(aAtlas)); 
+    mAtlasToSprites.emplace_back();
+    return mAtlases.size() - 1;
+}
+
+
 void Render::update(const GrapitoTimer aTimer, const GameInputState &)
 {
     mTrivialLineStrip.clearLines();
@@ -127,15 +136,16 @@ void Render::update(const GrapitoTimer aTimer, const GameInputState &)
     }
 
     { // Sprites
-        std::vector<graphics::Spriting::Instance> sprites;
+        std::ranges::for_each(mAtlasToSprites, [](auto & aSprites){aSprites.clear();});
         for(const auto & [position, visualSprite] : mSprites)
         {
-            sprites.emplace_back(position.position,
-                                 visualSprite.sprite,
-                                 render::gSpriteOpacity,
-                                 visualSprite.mirroring);
+            mAtlasToSprites
+                .at(visualSprite.atlas)
+                    .emplace_back(position.position,
+                                  visualSprite.sprite,
+                                  render::gSpriteOpacity,
+                                  visualSprite.mirroring);
         }
-        mSpriting.updateInstances(sprites);
     }
 
     // Position camera
@@ -167,7 +177,13 @@ void Render::render() const
     mTrivialShaping.render();
     mTrivialPolygon.render();
     mCurving.render(mBeziers);
-    mSpriting.render();
+
+    // Render all sprites for each atlas (batch rendering).
+    for (AtlasIndex atlas = 0; atlas != mAtlases.size(); ++atlas)
+    {
+        mSpriting.updateInstances(mAtlasToSprites.at(atlas));
+        mSpriting.render(mAtlases.at(atlas));
+    }
 }
 
 
