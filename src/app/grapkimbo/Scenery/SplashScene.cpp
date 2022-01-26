@@ -57,7 +57,7 @@ UpdateStatus SplashScene::update(
 
     if (! mLoadedSprite)
     {
-        mLoadedSprite = mSpriting.load(current().mImage);
+        std::tie(mAtlas, mLoadedSprite) = graphics::sprite::load(current().mImage);
         mSpritePlacement_w = ((mScreenSize_w - current().mImage.dimensions()) / 2).as<math::Position>();
     }
 
@@ -70,7 +70,7 @@ UpdateStatus SplashScene::update(
                 *mLoadedSprite,
                 current().mSpriteOpacity(aTimer.delta())} 
         });
-    mSpriting.render();
+    mSpriting.render(mAtlas);
     return UpdateStatus::SwapBuffers;
 }
 
