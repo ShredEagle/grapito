@@ -88,6 +88,9 @@ aunteater::Entity makePlayer(int aIndex,
                                                // SMELL: we hardcode the fact that we use the player id as atlas index
     ;
 
+    //Player should not be rotated by any constraints
+    player.get<Body>().invMoi = 0.f;
+
     //aPendular.connected->add<CameraGuide>(math::makeInterpolation<math::ease::SmoothStep>(0., 1., 0.3));
 
     return player;
