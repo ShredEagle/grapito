@@ -75,6 +75,7 @@ namespace hud
     extern const float gViewedHeight;
     extern const char * const gFont;
     extern const GLfloat gTextHeight;
+    extern const Position2 gModeTextPosition;
 }
 
 

@@ -1,6 +1,7 @@
 #include "GameRule.h"
 
 #include "../Configuration.h"
+#include "../Context/Context.h"
 #include "../Entities.h"
 #include "../Logging.h"
 #include "../Timer.h"
@@ -10,15 +11,22 @@
 #include "../Utils/Camera.h"
 #include "../Utils/CompositeTransition.h"
 
+#include <handy/StringId_Interning.h>
+
 
 namespace ad {
 namespace grapito {
 
 
+const StringId hud_victory_sid  = handy::internalizeString("hud_victory");
+const StringId hud_solomode_sid = handy::internalizeString("hud_solomode");
+
+
 class PhaseBase : public State
 {
 public:
-    PhaseBase(GameRule & aGameRule) :
+    PhaseBase(std::shared_ptr<Context> aContext, GameRule & aGameRule) :
+        mContext{std::move(aContext)},
         mGameRule{aGameRule}
     {}
 
@@ -33,6 +41,7 @@ protected:
         return mGameRule.mEntityManager;
     }
 
+    std::shared_ptr<Context> mContext;
     GameRule & mGameRule;
 };
 
@@ -41,8 +50,8 @@ class CongratulationPhase : public PhaseBase
     static constexpr Position2 gOutside = {-2000.f, -100.f};
 
 public:
-    CongratulationPhase(GameRule & aGameRule) :
-        PhaseBase{aGameRule},
+    CongratulationPhase(std::shared_ptr<Context> aContext, GameRule & aGameRule) :
+        PhaseBase{std::move(aContext), aGameRule},
         mHudPositionInterpolation{gOutside}
     {
         mHudPositionInterpolation
@@ -55,7 +64,7 @@ private:
     void beforeEnter() override
     {
         mHudPositionInterpolation.reset();
-        mHudText = getEntityManager().addEntity(makeHudText("Winning", gOutside));
+        mHudText = getEntityManager().addEntity(makeHudText(mContext->translate(hud_victory_sid), gOutside));
     }
 
 
@@ -135,7 +144,8 @@ class FreeSoloPhase : public PhaseBase
 
     void beforeEnter() override
     {
-        mHudText = getEntityManager().addEntity(makeHudText("Free Solo", {-500.f, 300.f}));
+        mHudText = getEntityManager().addEntity(
+            makeHudText(mContext->translate(hud_solomode_sid), hud::gModeTextPosition));
     }
 
 
@@ -165,23 +175,23 @@ class FreeSoloPhase : public PhaseBase
 };
 
 
-GameRule::PhasesArray setupGamePhases(GameRule & aGameRule)
+GameRule::PhasesArray setupGamePhases(std::shared_ptr<Context> aContext, GameRule & aGameRule)
 {
     GameRule::PhasesArray result;
-    result[GameRule::FreeSolo] = std::make_shared<FreeSoloPhase>(aGameRule);
-    result[GameRule::Competition] = std::make_shared<CompetitionPhase>(aGameRule);
-    result[GameRule::Congratulation] = std::make_shared<CongratulationPhase>(aGameRule);
+    result[GameRule::FreeSolo] = std::make_shared<FreeSoloPhase>(aContext, aGameRule);
+    result[GameRule::Competition] = std::make_shared<CompetitionPhase>(aContext, aGameRule);
+    result[GameRule::Congratulation] = std::make_shared<CongratulationPhase>(aContext, aGameRule);
     return result;
 }
 
 
-GameRule::GameRule(aunteater::EntityManager & aEntityManager, std::vector<aunteater::Entity> aPlayers) :
+GameRule::GameRule(aunteater::EntityManager & aEntityManager, std::shared_ptr<Context> aContext, std::vector<aunteater::Entity> aPlayers) :
     mEntityManager{aEntityManager},
     mCompetitors{aEntityManager},
     mCameras{aEntityManager},
     mCameraPoints{aEntityManager},
     mPlayers{std::move(aPlayers)},
-    mPhases{setupGamePhases(*this)},
+    mPhases{setupGamePhases(aContext, *this)},
     mPhaseMachine{mPhases[FreeSolo]}
 {}
 
@@ -275,5 +285,5 @@ void GameRule::killAllCompetitors()
 }
 
 
-} // namespace grapitor
+} // namespace grapito
 } // namespace ad
