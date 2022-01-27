@@ -42,14 +42,16 @@ namespace game
     const float gCompetitorEliminationDistance = 15.f + (render::gViewedHeight / 2.f);
     const float gCongratulationPhaseDuration = 3.f;
     const Position2 gCongratulationScreenPosition{-200.f, -100.f};
+    const std::string gFallbackLanguage{"en"};
 } // namespace game
 
 
 namespace hud
 {
-    extern const float gViewedHeight = menu::gViewedHeight;
-    extern const char * const gFont = menu::gFont;
-    extern const GLfloat gTextHeight = menu::gTextHeight  * 2.5 ;
+    const float gViewedHeight = menu::gViewedHeight;
+    const char * const gFont = menu::gFont;
+    const GLfloat gTextHeight = menu::gTextHeight  * 2.5 ;
+    const Position2 gModeTextPosition{-500.f, 300.f};
 }
 
 

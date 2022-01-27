@@ -66,6 +66,7 @@ namespace game
     extern const float gCompetitorEliminationDistance;
     extern const float gCongratulationPhaseDuration;
     extern const Position2 gCongratulationScreenPosition;
+    extern const std::string gFallbackLanguage;
 } // namespace game
 
 
@@ -74,6 +75,7 @@ namespace hud
     extern const float gViewedHeight;
     extern const char * const gFont;
     extern const GLfloat gTextHeight;
+    extern const Position2 gModeTextPosition;
 }
 
 

@@ -20,6 +20,8 @@ using Size2 = math::Size<2, float>;
 using Size3 = math::Size<3, float>;
 using Rectangle = math::Rectangle<float>;
 
+struct Context;
+
 class GrapitoTimer;
 
 using StringId = handy::StringId;

@@ -34,7 +34,7 @@ class GameRule : public aunteater::System<GrapitoTimer, GameInputState>
 
     using PhasesArray = std::array<std::shared_ptr<State>, _End>;
 
-    friend PhasesArray setupGamePhases(GameRule &);
+    friend PhasesArray setupGamePhases(std::shared_ptr<Context>, GameRule &);
 
     friend class PhaseBase;
     friend class FreeSoloPhase;
@@ -42,7 +42,7 @@ class GameRule : public aunteater::System<GrapitoTimer, GameInputState>
     friend class CongratulationPhase;
 
 public:
-    GameRule(aunteater::EntityManager & aEntityManager, std::vector<aunteater::Entity> aPlayers);
+    GameRule(aunteater::EntityManager & aEntityManager, std::shared_ptr<Context> aContext, std::vector<aunteater::Entity> aPlayers);
 
     void update(const GrapitoTimer aTimer, const GameInputState & aInput) override;
 
