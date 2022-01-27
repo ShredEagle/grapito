@@ -34,6 +34,9 @@ class Locale
 public:
     Locale(filesystem::path aTranslationDatabase);
 
+    /// \brief Indicate whether the provided language is available in the translation database.
+    bool isSupported(const std::string & aLanguageName);
+
     /// \brief Set the active language. Default is "zero" (i.e. first language in the Json).
     void setLanguage(const std::string & aLanguageName);
 

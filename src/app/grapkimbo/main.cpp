@@ -19,6 +19,8 @@
 
 #include <graphics/ApplicationGlfw.h>
 
+#include <platform/Locale.h>
+
 #include <boost/program_options.hpp>
 
 #include <iostream>
@@ -36,7 +38,9 @@ po::variables_map handleCommandLine(int argc, const char ** argv)
     po::options_description desc("Allowed options");
     desc.add_options()
         ("help", "Produce help message.")
-        ("skip_splash", po::bool_switch(), "Skip splash screens.");
+        ("skip_splash", po::bool_switch(), "Skip splash screens.")
+        ("language", po::value<std::string>(), "Override auto-detected language.")
+    ;
 
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -49,6 +53,30 @@ po::variables_map handleCommandLine(int argc, const char ** argv)
 
     return vm;
 }      
+
+
+std::shared_ptr<Context> initializeContext(const po::variables_map & aArguments)
+{
+    std::shared_ptr<Context> context = 
+#if defined(EN_MODE_LAFF)
+            std::make_shared<Context>(filesystem::path{"assets/"});
+#else
+            std::make_shared<Context>(gRepositoryRoot / filesystem::path{"../grapito_media/assets/"});
+#endif
+        // language
+        std::string language;
+        if (aArguments.count("language")) 
+        {
+            language = aArguments["language"].as<std::string>();
+        }
+        else
+        {
+            language = platform::getSystemLanguage();
+        }
+        context->locale.setLanguage(context->locale.isSupported(language) ? language : game::gFallbackLanguage);
+
+    return context;
+}
 
 
 int main(int argc, const char ** argv)
@@ -75,13 +103,7 @@ int main(int argc, const char ** argv)
         ad::grapito::ImguiState imguiState;
         DebugUI debugUI;
 
-        std::shared_ptr<Context> context = 
-#if defined(EN_MODE_LAFF)
-            std::make_shared<Context>(filesystem::path{"assets/"});
-#else
-            std::make_shared<Context>(gRepositoryRoot / filesystem::path{"../grapito_media/assets/"});
-#endif
-        context->locale.setLanguage("es");
+        std::shared_ptr<Context> context = initializeContext(arguments);
 
         StateMachine topLevelFlow;
         

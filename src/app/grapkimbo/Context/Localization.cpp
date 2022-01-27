@@ -43,6 +43,13 @@ Locale::Locale(filesystem::path aTranslationDatabase)
 }
 
 
+bool Locale::isSupported(const std::string & aLanguageName)
+{
+    return std::find(mAvailableLanguages.begin(), mAvailableLanguages.end(), aLanguageName)
+            != mAvailableLanguages.end();
+}
+
+
 void Locale::setLanguage(const std::string & aLanguageName)
 {
     if (auto foundIt = std::find(mAvailableLanguages.begin(),
