@@ -80,7 +80,7 @@ createStackTwo(aunteater::EntityManager & aEntityManager, float baseHeight)
     segment.push_back(aEntityManager.addEntity(makeAnchor({-gLevelHalfWidth, gJumpHeight * 15 - gPlatformHeight + baseHeight}, {22.f, gPlatformHeight})));
     segment.push_back(aEntityManager.addEntity(makeAnchor({gLevelHalfWidth - 22.f - gPlatformHeight, gJumpHeight * 15 - gPlatformHeight + baseHeight}, {22.f + gPlatformHeight, gPlatformHeight})));
 
-    segment.push_back(aEntityManager.addEntity(makeGrappleAnchor({0.f, gJumpHeight * 12.f + baseHeight}, 1.f)));
+    segment.push_back(aEntityManager.addEntity(makeGrappleAnchor({0.f, gJumpHeight * 12.f + baseHeight}, gBigAnchorSize)));
 
     return segment;
 }
@@ -104,9 +104,6 @@ createStackThree(aunteater::EntityManager & aEntityManager, float baseHeight)
 
     segment.push_back(aEntityManager.addEntity(makeGrappleAnchor({-17.f, gJumpHeight * 13 + baseHeight}, gSmallAnchorSize)));
     segment.push_back(aEntityManager.addEntity(makeGrappleAnchor({17.f, gJumpHeight * 13 + baseHeight}, gSmallAnchorSize)));
-
-    segment.push_back(aEntityManager.addEntity(makeAnchor({-gLevelHalfWidth, gJumpHeight * 15 - gPlatformHeight + baseHeight}, {5.f, gPlatformHeight})));
-    segment.push_back(aEntityManager.addEntity(makeAnchor({gLevelHalfWidth - 5.f, gJumpHeight * 15 - gPlatformHeight + baseHeight}, {5.f, gPlatformHeight})));
 
     segment.push_back(aEntityManager.addEntity(makeAnchor({-gLevelHalfWidth + 10.f, gJumpHeight * 15 - gPlatformHeight + baseHeight}, {gLevelHalfWidth * 2 - 20.f, gPlatformHeight})));
 
@@ -167,8 +164,6 @@ createStackFive(aunteater::EntityManager & aEntityManager, float baseHeight)
     segment.push_back(aEntityManager.addEntity(makeGrappleAnchor({gLevelHalfWidth - 14 - gSmallAnchorSize / 2, gJumpHeight * 10.f + baseHeight}, gSmallAnchorSize)));
 
     segment.push_back(aEntityManager.addEntity(makeAnchor({-gLevelHalfWidth + 10.f, gJumpHeight * 15 - gPlatformHeight + baseHeight}, {gLevelHalfWidth * 2 - 20.f, gPlatformHeight})));
-    segment.push_back(aEntityManager.addEntity(makeAnchor({-gLevelHalfWidth, gJumpHeight * 15 - gPlatformHeight + baseHeight}, {5.f, gPlatformHeight})));
-    segment.push_back(aEntityManager.addEntity(makeAnchor({gLevelHalfWidth - 5.f, gJumpHeight * 15 - gPlatformHeight + baseHeight}, {5.f, gPlatformHeight})));
 
     return segment;
 }
