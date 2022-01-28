@@ -139,7 +139,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
             //
             // Wall control
             //
-            if (playerData.state & PlayerCollisionState_Walled)
+            if (playerData.state & PlayerCollisionState_Walled && !isAnchored(playerData))
             {
                 if (!inputs[Jump])
                 {
