@@ -131,7 +131,8 @@ namespace player
     inline float gDoubleJumpFactor = 1.3f; // m/s
     inline float gGrappleBaseImpulse = 70.f;
     extern const float gGrappleFriction;
-    inline float gRopeDistanceJointFactor = 1.1f;
+    extern float gRopeDistanceJointFactor;
+    extern float gGrappleDistanceJointFactor;
     //static constexpr double gAirControlAcceleration = 12.; // m/s
     //constexpr double gAcceleration = 10.;
     //constexpr double gPlayerJumpImpulse = 10.; // m/s

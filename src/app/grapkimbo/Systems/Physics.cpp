@@ -10,11 +10,14 @@
 
 #include "../Utils/HomogeneousTransformation.h"
 #include "../Utils/PhysicsStructs.h"
+#include "Entities.h"
 #include "math/Color.h"
 
 #include <math/Angle.h>
 #include <math/Interpolation/Interpolation.h>
 #include <math/Matrix.h>
+
+#include <spdlog/spdlog.h>
 
 #include <iostream>
 #include <ostream>
@@ -459,7 +462,8 @@ Physics::Physics(aunteater::EntityManager & aEntityManager) :
     bodyObserver{this},
     pivotObserver{this},
     weldObserver{this},
-    distanceObserver{this}
+    distanceObserver{this},
+    mEntityManager{aEntityManager}
 {
     aEntityManager.getFamily<PhysicalBody>().registerObserver(&bodyObserver);
     aEntityManager.getFamily<Pivotable>().registerObserver(&pivotObserver);
@@ -505,6 +509,8 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
 
         auto bodyBIt = bodyAIt;
         bodyBIt++;
+
+        bodyA.box->shape.debugRender();
 
         for (; bodyBIt != constructedBodies.end(); ++bodyBIt)
         {
@@ -569,6 +575,19 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
             Shape::Edge refEdge = bodyRef->box->shape.getEdge(manifold.referenceEdgeIndex);
 
             manifold.incidentEdgeIndex = findIncidentEdge(refEdge.direction, bodyInc->box->shape);
+
+            if (manifold.incidentEdgeIndex == -1)
+            {
+                std::stringstream bodyRefString;
+                bodyRefString << *bodyRef;
+                std::stringstream bodyIncString;
+                bodyIncString << *bodyInc;
+                spdlog::get("grapito")->error("IncidentEdge not found");
+                spdlog::get("grapito")->error("bodyRef: {} ", bodyRefString.str());
+                spdlog::get("grapito")->error("bodyInc: {} ", bodyIncString.str());
+                mEntityManager.addEntity(makeHudText("STOP#### There was a incidentEdge crash Please look at the log!!!!!!!!!!", {-300.f, 300.f}));
+                continue;
+            }
 
             manifold.contacts = getContactPoints(
                 manifold.referenceEdgeIndex,
@@ -724,7 +743,10 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
             constraint->debugRender();
             constraint->SolveVelocityConstraint(aTimer);
         }
+    }
 
+    for (int i = 0; i < physic::gMaxVelocityConstraintIteration; i++)
+    {
         for (VelocityConstraint & constraint : velocityConstraints)
         {
             solveContactVelocityConstraint(constraint);

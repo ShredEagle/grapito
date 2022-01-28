@@ -27,6 +27,12 @@ void GrappleCleanup::update(const GrapitoTimer, const GameInputState &)
 {
     for (auto & [playerData] : mCleanable)
     {
+        if (playerData.mRopeContactDistanceJoint != nullptr)
+        {
+            playerData.mRopeContactDistanceJoint->markToRemove();
+            playerData.mRopeContactDistanceJoint = nullptr;
+        }
+
         if (playerData.mGrappleDistanceJoint != nullptr)
         {
             playerData.mGrappleDistanceJoint->markToRemove();

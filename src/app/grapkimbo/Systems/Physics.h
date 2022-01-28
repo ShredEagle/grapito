@@ -98,6 +98,8 @@ private:
     std::vector<VelocityConstraint> velocityConstraints;
     std::vector<PlayerEnvironmentConstraint> playerConstraints;
 
+    aunteater::EntityManager & mEntityManager;
+
     //Think of putting in place a pool_allocator from foonathan/memory of from boost
 };
 

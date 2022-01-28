@@ -274,6 +274,7 @@ void detachPlayerFromGrapple(aunteater::weak_entity aPlayer)
     playerData.grapple->add<DelayDeletion>(60);
     playerData.grapple->get<RopeCreator>().mTargetEntity = nullptr;
     playerData.grapple = nullptr;
+    playerData.throwGrappleFrameCounter = 0;
 
     //Cleanup rope pivot joint to player if it exists
     if (playerData.grappleAttachment != nullptr)
