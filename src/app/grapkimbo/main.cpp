@@ -40,6 +40,7 @@ po::variables_map handleCommandLine(int argc, const char ** argv)
         ("help", "Produce help message.")
         ("skip_splash", po::bool_switch(), "Skip splash screens.")
         ("language", po::value<std::string>(), "Override auto-detected language.")
+        ("windowed", po::bool_switch(), "Launch application windowed instead of fullscreen.")
     ;
 
     po::variables_map vm;
@@ -90,9 +91,16 @@ int main(int argc, const char ** argv)
             std::exit(EXIT_SUCCESS);
         }
 
+        auto applicationFlags = ad::graphics::ApplicationFlag::Window_Keep_Ratio;
+        if (!arguments["windowed"].as<bool>())
+        {
+            applicationFlags |= ad::graphics::ApplicationFlag::Fullscreen;
+        }
+
         ad::graphics::ApplicationGlfw application(
-            "grapkimbo", game::gAppResolution.width(), game::gAppResolution.height(),
-            ad::graphics::ApplicationGlfw::Window_Keep_Ratio);
+            "grapkimbo", 
+            game::gAppResolution.width(), game::gAppResolution.height(),
+            applicationFlags);
         // Need to wait for the graphics logger initialized by ApplicationGlfw constructor.
         initializeLogging();
 
