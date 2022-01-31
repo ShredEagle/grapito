@@ -10,11 +10,14 @@
 
 #include "../Utils/HomogeneousTransformation.h"
 #include "../Utils/PhysicsStructs.h"
+#include "Entities.h"
 #include "math/Color.h"
 
 #include <math/Angle.h>
 #include <math/Interpolation/Interpolation.h>
 #include <math/Matrix.h>
+
+#include <spdlog/spdlog.h>
 
 #include <iostream>
 #include <ostream>
@@ -459,7 +462,8 @@ Physics::Physics(aunteater::EntityManager & aEntityManager) :
     bodyObserver{this},
     pivotObserver{this},
     weldObserver{this},
-    distanceObserver{this}
+    distanceObserver{this},
+    mEntityManager{aEntityManager}
 {
     aEntityManager.getFamily<PhysicalBody>().registerObserver(&bodyObserver);
     aEntityManager.getFamily<Pivotable>().registerObserver(&pivotObserver);
@@ -505,6 +509,8 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
 
         auto bodyBIt = bodyAIt;
         bodyBIt++;
+
+        bodyA.box->shape.debugRender();
 
         for (; bodyBIt != constructedBodies.end(); ++bodyBIt)
         {
@@ -569,6 +575,19 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
             Shape::Edge refEdge = bodyRef->box->shape.getEdge(manifold.referenceEdgeIndex);
 
             manifold.incidentEdgeIndex = findIncidentEdge(refEdge.direction, bodyInc->box->shape);
+
+            if (manifold.incidentEdgeIndex == -1)
+            {
+                std::stringstream bodyRefString;
+                bodyRefString << *bodyRef;
+                std::stringstream bodyIncString;
+                bodyIncString << *bodyInc;
+                spdlog::get("grapito")->error("IncidentEdge not found");
+                spdlog::get("grapito")->error("bodyRef: {} ", bodyRefString.str());
+                spdlog::get("grapito")->error("bodyInc: {} ", bodyIncString.str());
+                mEntityManager.addEntity(makeHudText("STOP#### There was a incidentEdge crash Please look at the log!!!!!!!!!!", {-300.f, 300.f}));
+                continue;
+            }
 
             manifold.contacts = getContactPoints(
                 manifold.referenceEdgeIndex,
@@ -724,7 +743,10 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
             constraint->debugRender();
             constraint->SolveVelocityConstraint(aTimer);
         }
+    }
 
+    for (int i = 0; i < physic::gMaxVelocityConstraintIteration; i++)
+    {
         for (VelocityConstraint & constraint : velocityConstraints)
         {
             solveContactVelocityConstraint(constraint);
@@ -771,6 +793,39 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
         constraint.angleBaseB = constraint.bodyPosB->a;
     }
 
+    for (auto & constraint : playerConstraints)
+    {
+        constraint.cPlayer->bodyPos->p += constraint.separation * constraint.normal;
+        Vec2 tangent = {-constraint.normal.y(), constraint.normal.x()};
+        constraint.cPlayer->velocity->v = constraint.cPlayer->velocity->v.dot(tangent) * tangent;
+
+        if (-constraint.normal.dot(PlayerGroundedNormal) > PlayerGroundedSlopeDotValue)
+        {
+            //Set player as grounded
+            constraint.cPlayer->entity->get<PlayerData>().state |= PlayerCollisionState_Grounded;
+            constraint.cPlayer->entity->get<PlayerData>().state &= ~PlayerCollisionState_Jumping;
+        }
+        else if (constraint.normal.dot(PlayerWalledNormal) < -PlayerWallSlopeDotValue ||
+            constraint.normal.dot(PlayerWalledNormal) > PlayerWallSlopeDotValue)
+        {
+            constraint.cPlayer->entity->get<PlayerData>().state |= PlayerCollisionState_Walled;
+            if (constraint.normal.x() > 0.)
+            {
+                constraint.cPlayer->entity->get<PlayerData>().state |= PlayerCollisionState_WalledRight;
+            }
+            else
+            {
+                constraint.cPlayer->entity->get<PlayerData>().state |= PlayerCollisionState_WalledLeft;
+            }
+        }
+        else
+        {
+            constraint.cPlayer->entity->get<PlayerData>().wallClingFrameCounter = 0;
+        }
+        constraint.cPlayer->box->shape.debugRender();
+    }
+
+
     for (int i = 0; i < physic::gMaxPositionConstraintIteration; i++)
     {
         bool jointOkay = true;
@@ -812,37 +867,6 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
         if (jointOkay)
         {
             break;
-        }
-    }
-
-    for (auto & constraint : playerConstraints)
-    {
-        constraint.cPlayer->bodyPos->p += constraint.separation * constraint.normal;
-        Vec2 tangent = {-constraint.normal.y(), constraint.normal.x()};
-        constraint.cPlayer->velocity->v = constraint.cPlayer->velocity->v.dot(tangent) * tangent;
-
-        if (-constraint.normal.dot(PlayerGroundedNormal) > PlayerGroundedSlopeDotValue)
-        {
-            //Set player as grounded
-            constraint.cPlayer->entity->get<PlayerData>().state |= PlayerCollisionState_Grounded;
-            constraint.cPlayer->entity->get<PlayerData>().state &= ~PlayerCollisionState_Jumping;
-        }
-        else if (constraint.normal.dot(PlayerWalledNormal) < -PlayerWallSlopeDotValue ||
-            constraint.normal.dot(PlayerWalledNormal) > PlayerWallSlopeDotValue)
-        {
-            constraint.cPlayer->entity->get<PlayerData>().state |= PlayerCollisionState_Walled;
-            if (constraint.normal.x() > 0.)
-            {
-                constraint.cPlayer->entity->get<PlayerData>().state |= PlayerCollisionState_WalledRight;
-            }
-            else
-            {
-                constraint.cPlayer->entity->get<PlayerData>().state |= PlayerCollisionState_WalledLeft;
-            }
-        }
-        else
-        {
-            constraint.cPlayer->entity->get<PlayerData>().wallClingFrameCounter = 0;
         }
     }
 

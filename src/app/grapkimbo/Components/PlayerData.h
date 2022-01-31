@@ -53,12 +53,14 @@ struct PlayerData : public aunteater::Component<PlayerData>
     ControlStateFlags controlState = 0;
 
     int wallClingFrameCounter = 0;
+    int throwGrappleFrameCounter = 0;
     int airborneJumpsLeft = player::gAirborneJumps;
 
     aunteater::weak_entity grapple = nullptr; // RopeCreator
     aunteater::weak_entity grappleAttachment = nullptr;
-    aunteater::weak_entity mGrappleDistanceJoint = nullptr;
+    aunteater::weak_entity mRopeContactDistanceJoint = nullptr;
     aunteater::weak_entity mGrappleWeldJoint = nullptr;
+    aunteater::weak_entity mGrappleDistanceJoint = nullptr;
 
     Vec2 mAimVector = Vec2::Zero();
 

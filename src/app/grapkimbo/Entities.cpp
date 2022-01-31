@@ -88,6 +88,9 @@ aunteater::Entity makePlayer(int aIndex,
                                                // SMELL: we hardcode the fact that we use the player id as atlas index
     ;
 
+    //Player should not be rotated by any constraints
+    player.get<Body>().invMoi = 0.f;
+
     //aPendular.connected->add<CameraGuide>(math::makeInterpolation<math::ease::SmoothStep>(0., 1., 0.3));
 
     return player;
@@ -271,6 +274,7 @@ void detachPlayerFromGrapple(aunteater::weak_entity aPlayer)
     playerData.grapple->add<DelayDeletion>(60);
     playerData.grapple->get<RopeCreator>().mTargetEntity = nullptr;
     playerData.grapple = nullptr;
+    playerData.throwGrappleFrameCounter = 0;
 
     //Cleanup rope pivot joint to player if it exists
     if (playerData.grappleAttachment != nullptr)

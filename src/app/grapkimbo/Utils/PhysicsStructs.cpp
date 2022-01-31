@@ -655,27 +655,6 @@ void DistanceJointConstraint::SolveVelocityConstraint(const GrapitoTimer & aTime
             wB += iB * twoDVectorCross(rB, impulseVec);
         }
 
-        //Lower than min length
-        {
-            //Scope is just because the computation are really similar
-            float C = mCurrentLength - mMinBaseLength;
-            float bias = std::max(0.f, C) / aTimer.delta();
-
-            Vec2 pointSpeedA = vA + wA * angVecA;
-            Vec2 pointSpeedB = vB + wB * angVecB;
-            float Cdot = mCurrentDirection.dot(pointSpeedB - pointSpeedA);
-
-            float impulse = -mMass * (Cdot + bias);
-            float oldImpulse = mLowerImpulse;
-            mLowerImpulse = std::max(0.f, mLowerImpulse + impulse);
-            impulse = mLowerImpulse - oldImpulse;
-
-            Vec2 impulseVec = impulse * mCurrentDirection;
-            vA -= mA * impulseVec;
-            wA -= iA * twoDVectorCross(rA, impulseVec);
-            vB += mB * impulseVec;
-            wB += iB * twoDVectorCross(rB, impulseVec);
-        }
         //Greater than default length
         {
             //Scope is just because the computation are really similar
@@ -722,50 +701,55 @@ void DistanceJointConstraint::SolveVelocityConstraint(const GrapitoTimer & aTime
 
 bool DistanceJointConstraint::SolvePositionConstraint()
 {
-    float iA = invMoiA;
-    Position2 cA = bodyPosA->c;
-    math::Radian<float> aA = bodyPosA->a;
-
-    float iB = invMoiB;
-    Position2 cB = bodyPosB->c;
-    math::Radian<float> aB = bodyPosB->a;
-
-    rA = transformVector(localAnchorA - (cA - bodyPosA->p).as<math::Position>(), aA);
-    rB = transformVector(localAnchorB - (cB - bodyPosB->p).as<math::Position>(), aB);
-
-    mCurrentDirection = (cB + rB) - (cA + rA);
-    float length = mCurrentDirection.getNorm();
-    mCurrentDirection /= length;
-    float C;
-
-    if (mMaxBaseLength == mMinBaseLength)
+    if (mCurrentLength > mBaseLength)
     {
-        C = length - mMinBaseLength;
-    }
-    else if (length < mMinBaseLength)
-    {
-        C = length - mMinBaseLength;
-    }
-    else if (length > mMaxBaseLength)
-    {
-        C = length - mMaxBaseLength;
-    }
-    else
-    {
-        //Distance is correct, no need to adjust
-        return true;
+        float iA = invMoiA;
+        Position2 cA = bodyPosA->c;
+        math::Radian<float> aA = bodyPosA->a;
+
+        float iB = invMoiB;
+        Position2 cB = bodyPosB->c;
+        math::Radian<float> aB = bodyPosB->a;
+
+        rA = transformVector(localAnchorA - (cA - bodyPosA->p).as<math::Position>(), aA);
+        rB = transformVector(localAnchorB - (cB - bodyPosB->p).as<math::Position>(), aB);
+
+        mCurrentDirection = (cB + rB) - (cA + rA);
+        float length = mCurrentDirection.getNorm();
+        mCurrentDirection /= length;
+        float C;
+
+        if (mMaxBaseLength == mMinBaseLength)
+        {
+            C = length - mMinBaseLength;
+        }
+        else if (length < mMinBaseLength)
+        {
+            C = length - mMinBaseLength;
+        }
+        else if (length > mMaxBaseLength)
+        {
+            C = length - mMaxBaseLength;
+        }
+        else
+        {
+            //Distance is correct, no need to adjust
+            return true;
+        }
+
+        float impulse = -mMass * C;
+        Vec2 impulseVec = impulse * mCurrentDirection;
+        bodyPosA->c -= impulseVec * invMassA;
+        bodyPosA->p -= impulseVec * invMassA;
+        bodyPosA->a -= static_cast<math::Radian<float>>(iA * twoDVectorCross(rA, impulseVec));
+        bodyPosB->c += impulseVec * invMassB;
+        bodyPosB->p += impulseVec * invMassB;
+        bodyPosB->a += static_cast<math::Radian<float>>(iB * twoDVectorCross(rB, impulseVec));
+
+        return std::abs(C) < physic::gLinearSlop;
     }
 
-    float impulse = -mMass * C;
-    Vec2 impulseVec = impulse * mCurrentDirection;
-    bodyPosA->c -= impulseVec * invMassA;
-    bodyPosA->p -= impulseVec * invMassA;
-    bodyPosA->a -= static_cast<math::Radian<float>>(iA * twoDVectorCross(rA, impulseVec));
-    bodyPosB->c += impulseVec * invMassB;
-    bodyPosB->p += impulseVec * invMassB;
-    bodyPosB->a += static_cast<math::Radian<float>>(iB * twoDVectorCross(rB, impulseVec));
-
-    return std::abs(C) < physic::gLinearSlop;
+    return true;
 }
 
 void DistanceJointConstraint::debugRender()
@@ -825,6 +809,7 @@ std::ostream &operator<<(std::ostream & os, const ConstructedBody & cb)
     os << "    speed : " << cb.velocity->v << "\n";
     os << "    w : " << cb.velocity->w << "\n";
     os << "    bodyType : " << cb.bodyType << "\n";
+    os << "    box: " << cb.box << "\n";
     os << "}\n";
     return os;
 }

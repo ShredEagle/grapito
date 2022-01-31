@@ -121,7 +121,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
             else if (controllerDirection.getNormSquared() > 0.f && isAnchored(playerData))
             {
                 Position2 playerPos = body.massCenter + geometry.position.as<math::Vec>();
-                DistanceJoint joint = playerData.mGrappleDistanceJoint->get<DistanceJoint>();
+                DistanceJoint joint = playerData.mRopeContactDistanceJoint->get<DistanceJoint>();
                 Position2 attachPoint = getLocalPointInWorld(joint.bodyB->get<Body>(), joint.bodyB->get<Position>(), joint.localAnchorB);
 
                 Vec2 jointDirection = (attachPoint - playerPos).normalize();
@@ -139,7 +139,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
             //
             // Wall control
             //
-            if (playerData.state & PlayerCollisionState_Walled)
+            if (playerData.state & PlayerCollisionState_Walled && !isAnchored(playerData))
             {
                 if (!inputs[Jump])
                 {
