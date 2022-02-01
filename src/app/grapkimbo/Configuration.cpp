@@ -40,6 +40,7 @@ namespace game
 {
     const math::Size<2, int> gAppResolution{1600, 900};
     const float gCompetitorEliminationDistance = 15.f + (render::gViewedHeight / 2.f);
+    const math::hdr::Rgb gClearColor{0.1, 0.2, 0.3};
     const float gCongratulationPhaseDuration = 3.f;
     const Position2 gCongratulationScreenPosition{0.f, -50.f};
     const float gCountdownStepPeriod = 0.8f;
@@ -60,8 +61,15 @@ namespace hud
 
 namespace menu
 {
+    const int gBlurringPasses = 6;
+    const float gViewedHeight = 1000.f;
+    const const char * gFont = "fonts/Titillium_Web/TitilliumWeb-Bold.ttf";
     const math::sdr::Rgba gTextColor = math::sdr::gWhite;
     const GLfloat gTextHeight = 0.65f * gButtonSize.height();
+    const float gButtonSpacing = 100.f;
+    const math::sdr::Rgb gButtonColor{ 120, 100, 110 };
+    const math::sdr::Rgb gSelectedColor{ 190, 190, 80 };
+    const float gTransitionDuration = 0.275f;
 } // namespace menu
 
 
