@@ -87,7 +87,8 @@ namespace menu
     constexpr float gViewedHeight = 1000.f;
     constexpr math::Size<2, GLfloat> gButtonSize{400.f, 80.f};
     constexpr const char * gFont = "fonts/dejavu-fonts-ttf-2.37/ttf/DejaVuSans.ttf";
-    constexpr GLfloat gTextHeight = 0.65f * gButtonSize.height();
+    extern const math::sdr::Rgba gTextColor;
+    extern const GLfloat gTextHeight;
     constexpr float gButtonSpacing = 100.f;
     constexpr math::sdr::Rgb gButtonColor{ 120, 100, 110 };
     constexpr math::sdr::Rgb gSelectedColor{ 190, 190, 80 };

@@ -25,7 +25,7 @@ void Hud::update(const GrapitoTimer aTimer, const GameInputState &)
         switch(screenPosition.origin)
         {
         case ScreenPosition::BottomLeft:
-            mTexting.prepareString(text.message, screenPosition.position, strings);
+            mTexting.prepareString(text.message, screenPosition.position, text.color, strings);
             break;
         case ScreenPosition::Center:
             math::Rectangle<GLfloat> messageBounds = 
@@ -33,6 +33,7 @@ void Hud::update(const GrapitoTimer aTimer, const GameInputState &)
             math::Position<2, GLfloat> messageCenter = messageBounds.origin() + messageBounds.center().as<math::Vec>();
             mTexting.prepareString(text.message, 
                                    -messageCenter + screenPosition.position.as<math::Vec>(),
+                                   text.color,
                                    strings);
             break;
         }

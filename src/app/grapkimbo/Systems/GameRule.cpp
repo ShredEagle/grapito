@@ -134,10 +134,18 @@ class WarmupPhase : public PhaseBase
         const GameInputState & aInputs,
         StateMachine & aStateMachine) override
     {
-        mCountdownParam.advance(aTimer.delta());
+        updateImpl(aTimer.delta(), aStateMachine);
+        // Note: Has no effect, nested state machines update status is not checked.
+        return UpdateStatus::SwapBuffers;
+    }
+
+    void updateImpl(double aDelta, StateMachine & aStateMachine)
+    {
+        auto param = mCountdownParam.advance(aDelta);
         if(mCountdownParam.isCompleted())
         {
             ++mCurrentStep;
+            auto overshoot = mCountdownParam.getOvershoot();
             mCountdownParam.reset();
 
             if(mCurrentStep == mSteps.size())
@@ -149,13 +157,14 @@ class WarmupPhase : public PhaseBase
             else
             {
                 mHudText->get<Text>().message = mSteps.at(mCurrentStep);
+                updateImpl(overshoot, aStateMachine);
             }
         }
-
-        // Note: Has no effect, nested state machines update status is not checked.
-        return UpdateStatus::SwapBuffers;
+        else
+        {
+            mHudText->get<Text>().color.a() = param * 255;
+        }
     }
-
 
     void beforeExit() override
     {

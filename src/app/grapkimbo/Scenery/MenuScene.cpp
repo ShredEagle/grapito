@@ -123,7 +123,7 @@ void MenuScene::updateMenuBuffers()
             mTexting.getStringBounds(mMenu[buttonId].mText, { 0.f, 0.f });
         // The offset from the center of the bounding box to the initial pen position (origin)
         math::Vec<2, GLfloat> centeringPenOffset = -textBoundingBox.center().as<math::Vec>();
-        mTexting.prepareString(mMenu[buttonId].mText, buttonCenter + centeringPenOffset, strings);
+        mTexting.prepareString(mMenu[buttonId].mText, buttonCenter + centeringPenOffset, menu::gTextColor, strings);
         debugDrawer->drawOutline(
             mTexting.getStringBounds(mMenu[buttonId].mText, buttonCenter + centeringPenOffset));
 

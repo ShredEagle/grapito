@@ -57,6 +57,13 @@ namespace hud
 }
 
 
+namespace menu
+{
+    const math::sdr::Rgba gTextColor = math::sdr::gWhite;
+    const GLfloat gTextHeight = 0.65f * gButtonSize.height();
+} // namespace menu
+
+
 namespace player
 {
     const int gAirborneJumps = 1;
