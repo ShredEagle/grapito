@@ -248,7 +248,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
             }
         }
 
-        if (inputs[Grapple].positiveEdge() && !isGrappleOut(playerData))
+        if (mGrapplingEnabled && inputs[Grapple].positiveEdge() && !isGrappleOut(playerData))
         {
             throwGrapple(player, mEntityManager);
             playerData.controlState |= ControlState_Throwing;

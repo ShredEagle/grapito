@@ -66,6 +66,7 @@ namespace game
     extern const float gCompetitorEliminationDistance;
     extern const float gCongratulationPhaseDuration;
     extern const Position2 gCongratulationScreenPosition;
+    extern const float gCountdownStepPeriod;
     extern const std::string gFallbackLanguage;
 } // namespace game
 

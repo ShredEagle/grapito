@@ -1,5 +1,7 @@
 #include "GameRule.h"
 
+#include "Control.h"
+
 #include "../Configuration.h"
 #include "../Context/Context.h"
 #include "../Entities.h"
@@ -7,6 +9,7 @@
 #include "../Timer.h"
 
 #include "../Components/ScreenPosition.h"
+#include "../Components/Text.h"
 
 #include "../Utils/Camera.h"
 #include "../Utils/CompositeTransition.h"
@@ -77,7 +80,7 @@ private:
             mHudPositionInterpolation.advance(aTimer.delta());
         if(mHudPositionInterpolation.isCompleted())
         {
-            aStateMachine.putNext(getPhase(GameRule::Competition));
+            aStateMachine.putNext(getPhase(GameRule::Warmup));
             aStateMachine.popState();
         }
 
@@ -98,24 +101,75 @@ private:
 };
 
 
-class CompetitionPhase : public PhaseBase
+/// \brief Countdown during which grapples cannot be used.
+class WarmupPhase : public PhaseBase
 {
     using PhaseBase::PhaseBase;
 
     void beforeEnter() override
     {
         mGameRule.resetCompetitors();
+        mGameRule.disableGrapples();
+        mHudText = getEntityManager().addEntity(makeHudText(mSteps.front(), hud::gModeTextPosition));
     }
 
-    std::pair<TransitionProgress, UpdateStatus> enter(
-        const GrapitoTimer &,
-        const GameInputState &,
-        const StateMachine &) override
+    UpdateStatus update(
+        const GrapitoTimer & aTimer,
+        const GameInputState & aInputs,
+        StateMachine & aStateMachine) override
     {
-        // Ensure update() does not execute on the same step as beforeEnter()
-        // Otherwise, there is a risk the newly placed players are eliminated in the same step.
-        return {TransitionProgress::Complete, UpdateStatus::SwapBuffers};
+        mCountdownParam.advance(aTimer.delta());
+        if(mCountdownParam.isCompleted())
+        {
+            ++mCurrentStep;
+            mCountdownParam.reset();
+
+            if(mCurrentStep == mSteps.size())
+            {
+                mCurrentStep = 0;
+                aStateMachine.putNext(getPhase(GameRule::Competition));
+                aStateMachine.popState();
+            }
+            else
+            {
+                mHudText->get<Text>().message = mSteps.at(mCurrentStep);
+            }
+        }
+
+        // Note: Has no effect, nested state machines update status is not checked.
+        return UpdateStatus::SwapBuffers;
     }
+
+
+    void beforeExit() override
+    {
+        mHudText->markToRemove();
+        mGameRule.enableGrapples();
+    }
+
+
+    math::ParameterAnimation<float, math::Clamp> mCountdownParam = 
+        math::makeParameterAnimation<math::Clamp>(game::gCountdownStepPeriod);
+    std::vector<std::string> mSteps{"3", "2", "1"};
+    std::size_t mCurrentStep{0};
+    aunteater::weak_entity mHudText{nullptr};
+};
+
+
+
+class CompetitionPhase : public PhaseBase
+{
+    using PhaseBase::PhaseBase;
+
+    //std::pair<TransitionProgress, UpdateStatus> enter(
+    //    const GrapitoTimer &,
+    //    const GameInputState &,
+    //    const StateMachine &) override
+    //{
+    //    // Ensure update() does not execute on the same step as beforeEnter()
+    //    // Otherwise, there is a risk the newly placed players are eliminated in the same step.
+    //    return {TransitionProgress::Complete, UpdateStatus::SwapBuffers};
+    //}
 
     UpdateStatus update(
         const GrapitoTimer &,
@@ -157,7 +211,7 @@ class FreeSoloPhase : public PhaseBase
         // TODO This should be handled for all active controllers, there might not even be a gamepad.
         if (aInputs.get(Controller::Gamepad_0)[Back].positiveEdge() && (mGameRule.mPlayers.size() > 1))
         {
-            aStateMachine.putNext(getPhase(GameRule::Competition));
+            aStateMachine.putNext(getPhase(GameRule::Warmup));
             aStateMachine.popState();
         }
         // Note: This will have absolutely no impact, nested state machines
@@ -179,20 +233,22 @@ GameRule::PhasesArray setupGamePhases(std::shared_ptr<Context> aContext, GameRul
 {
     GameRule::PhasesArray result;
     result[GameRule::FreeSolo] = std::make_shared<FreeSoloPhase>(aContext, aGameRule);
+    result[GameRule::Warmup] = std::make_shared<WarmupPhase>(aContext, aGameRule);
     result[GameRule::Competition] = std::make_shared<CompetitionPhase>(aContext, aGameRule);
     result[GameRule::Congratulation] = std::make_shared<CongratulationPhase>(aContext, aGameRule);
     return result;
 }
 
 
-GameRule::GameRule(aunteater::EntityManager & aEntityManager, std::shared_ptr<Context> aContext, std::vector<aunteater::Entity> aPlayers) :
+GameRule::GameRule(aunteater::EntityManager & aEntityManager, std::shared_ptr<Context> aContext, std::vector<aunteater::Entity> aPlayers, std::shared_ptr<Control> aControlSystem) :
     mEntityManager{aEntityManager},
     mCompetitors{aEntityManager},
     mCameras{aEntityManager},
     mCameraPoints{aEntityManager},
     mPlayers{std::move(aPlayers)},
     mPhases{setupGamePhases(aContext, *this)},
-    mPhaseMachine{mPhases[FreeSolo]}
+    mPhaseMachine{mPhases[FreeSolo]},
+    mControlSystem{std::move(aControlSystem)}
 {}
 
 
@@ -282,6 +338,18 @@ void GameRule::killAllCompetitors()
     {
         kill(competitor);
     }
+}
+
+
+void GameRule::enableGrapples()
+{
+    mControlSystem->switchGrappling(true);
+}
+
+
+void GameRule::disableGrapples()
+{
+    mControlSystem->switchGrappling(false);
 }
 
 

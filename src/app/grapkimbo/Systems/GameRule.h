@@ -21,11 +21,15 @@ namespace grapito {
 using Competitor = aunteater::Archetype<CameraGuide, PlayerData, Position>;
 
 
+class Control;
+
+
 class GameRule : public aunteater::System<GrapitoTimer, GameInputState>
 {
     enum Phase
     {
         FreeSolo,
+        Warmup,
         Competition, 
         Congratulation,
 
@@ -38,11 +42,12 @@ class GameRule : public aunteater::System<GrapitoTimer, GameInputState>
 
     friend class PhaseBase;
     friend class FreeSoloPhase;
+    friend class WarmupPhase;
     friend class CompetitionPhase;
     friend class CongratulationPhase;
 
 public:
-    GameRule(aunteater::EntityManager & aEntityManager, std::shared_ptr<Context> aContext, std::vector<aunteater::Entity> aPlayers);
+    GameRule(aunteater::EntityManager & aEntityManager, std::shared_ptr<Context> aContext, std::vector<aunteater::Entity> aPlayers, std::shared_ptr<Control> aControlSystem);
 
     void update(const GrapitoTimer aTimer, const GameInputState & aInput) override;
 
@@ -59,10 +64,15 @@ private:
 
     void prepareCameraFadeOut(Position2 aCameraPosition, const Position & aGeometry, CameraGuide & aCameraGuide);
 
+    void enableGrapples();
+    void disableGrapples();
+
     aunteater::EntityManager & mEntityManager;
     const aunteater::FamilyHelp<Competitor> mCompetitors;
     const aunteater::FamilyHelp<Camera> mCameras;
     const aunteater::FamilyHelp<CameraPoint> mCameraPoints;
+
+    std::shared_ptr<Control> mControlSystem;
 
     std::vector<aunteater::Entity> mPlayers;
 

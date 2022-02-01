@@ -76,7 +76,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
 
     mSystemManager.add<debug::DirectControl>();
 
-    mSystemManager.add<Control>();
+    std::shared_ptr<Control> controlSystem = mSystemManager.add<Control>();
     mSystemManager.add<Gravity>();
     mSystemManager.add<RopeCreation>();
 
@@ -96,7 +96,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     auto soundSystem = mSystemManager.add<SoundSystem>(mContext->mSoundManager);
 
     // Done after CameraGuidedControl, to avoid having two camera guides on the frame a player is killed.
-    mSystemManager.add<GameRule>(mContext, players);
+    mSystemManager.add<GameRule>(mContext, players, controlSystem);
 
     mRenderBackgroundSystem = mSystemManager.add<RenderBackground>(mAppInterface); 
     mRenderBackgroundSystem->addLayer(mContext->pathFor(background::gSpaceImage), background::gSpaceScrollFactor);
