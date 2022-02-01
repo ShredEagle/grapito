@@ -52,6 +52,7 @@ set(${TARGET_NAME}_HEADERS
     Context/Context.h
     Context/Localization.h
     Context/Resources.h
+    Context/PlayerList.h
 
     Systems/CameraGuidedControl.h
     Systems/Control.h
@@ -68,6 +69,7 @@ set(${TARGET_NAME}_HEADERS
     Systems/RenderBackground.h
     Systems/AccelSolver.h
     Systems/Physics.h
+    Systems/PlayerJoin.h
     Systems/RopeCreation.h
     Systems/SegmentStacker.h
     Systems/SoundSystem.h
@@ -124,6 +126,7 @@ set(${TARGET_NAME}_SOURCES
     Animation/AnimationStateMachine.cpp
 
     Context/Localization.cpp
+    Context/PlayerList.cpp
 
     Systems/CameraGuidedControl.cpp
     Systems/Control.cpp
@@ -139,6 +142,7 @@ set(${TARGET_NAME}_SOURCES
     Systems/RenderBackground.cpp
     Systems/AccelSolver.cpp
     Systems/Physics.cpp
+    Systems/PlayerJoin.cpp
     Systems/RopeCreation.cpp
     Systems/SegmentStacker.cpp
     Systems/SoundSystem.cpp

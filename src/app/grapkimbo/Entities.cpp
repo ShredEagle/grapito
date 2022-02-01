@@ -55,8 +55,39 @@ aunteater::Entity makeHudText(std::string aMessage, Position2 aScreenPosition)
         .add<Text>(std::move(aMessage));
 }
 
+aunteater::Entity makeChoosingColorPlayer(int aIndex, Controller aController, math::sdr::Rgb aColor)
+{
+    aunteater::Entity player = aunteater::Entity()
+        .add<Controllable>(aController)
+        .add<PlayerData>(aIndex, aColor);
+}
 
-aunteater::Entity makePlayer(int aIndex,
+void makeChoosingColorPlayerPlaying(aunteater::weak_entity player)
+{
+    player->add<AccelAndSpeed>()
+        .add<AnimatedSprite>()
+        .add<Body>(
+            math::Rectangle<float>{{0.f, 0.f}, player::gSize},
+            BodyType_Dynamic,
+            ShapeType_Hull,
+            CollisionType_Player,
+            45.f,
+            0.f,
+            0.f,
+            1.f,
+            std::vector<CollisionType>{CollisionType_Static_Env}
+            )
+        .add<CameraGuide>(player::gCameraGuideWeight, player::gCameraGuideOffset)
+        .add<CameraLimits>(player::gCameraLimits[0], player::gCameraLimits[1])
+        .add<Mass>(player::gMass)
+        .add<Position>(Position2{3.f, 3.f}, player::gSize) // The position will be set by pendulum simulation
+        //.add<VisualRectangle>(aColor)
+        .add<VisualSprite>((AtlasIndex)player->get<PlayerData>().id); // the sprite itself is handled by animation system
+                                                                      // SMELL: we hardcode the fact that we use the player id as atlas index
+}
+
+
+aunteater::Entity makePlayingPlayer(int aIndex,
                              Controller aController,
                              math::sdr::Rgb aColor,
                              GrappleMode aGrappleMode)

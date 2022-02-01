@@ -9,6 +9,7 @@
 #include "Systems/GrappleInteractions.h"
 #include "Systems/GrappleJointCreator.h"
 #include "Systems/Debug/DirectControl.h"
+#include "Systems/PlayerJoin.h"
 #include "Systems/SoundSystem.h"
 
 #include <Components/AccelAndSpeed.h>
@@ -45,13 +46,10 @@ namespace grapito {
 
 StringId soundId_MusicSid = handy::internalizeString("bgmusic");
 
-std::vector<aunteater::Entity> setupPlayer(const Controller aController)
+aunteater::Entity setupPlayer(const Controller aController)
 {
-    std::vector<aunteater::Entity> players;
+    return makePlayingPlayer(0, aController, math::sdr::gCyan);
 
-    players.push_back(makePlayer(0, aController, math::sdr::gCyan));
-
-    return players;
 }
 
 
@@ -59,10 +57,13 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
                    std::shared_ptr<graphics::AppInterface> aAppInterface, const Controller aController) :
     GameScene{std::move(aContext), std::move(aAppInterface)}
 {
-    std::vector<aunteater::Entity> players = setupPlayer(aController);
+    mContext->mPlayerList.addPlayer(aController, PlayerJoinState_Playing);
+
+    auto player = setupPlayer(aController);
 
     mSystemManager.add<debug::DirectControl>();
 
+    mSystemManager.add<PlayerJoin>(mContext);
     mSystemManager.add<Control>();
     mSystemManager.add<Gravity>();
     mSystemManager.add<RopeCreation>();
@@ -83,7 +84,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     auto soundSystem = mSystemManager.add<SoundSystem>(mContext->mSoundManager);
 
     // Done after CameraGuidedControl, to avoid having two camera guides on the frame a player is killed.
-    mSystemManager.add<GameRule>(mContext, players);
+    mSystemManager.add<GameRule>(mContext, std::vector<aunteater::Entity>{player});
 
     mRenderBackgroundSystem = mSystemManager.add<RenderBackground>(mAppInterface); 
     mRenderBackgroundSystem->addLayer(mContext->pathFor(background::gSpaceImage), background::gSpaceScrollFactor);
@@ -146,14 +147,11 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     // Players
     //
     {
-        for (const auto & player : players)
-        {
-            mEntityManager.addEntity(player);
-        }
+        mEntityManager.addEntity(player);
 
         // Debug direct control (for camera influence)
         mEntityManager.addEntity(
-            makeDirectControllable(players[0].get<Controllable>().controller)
+            makeDirectControllable(player.get<Controllable>().controller)
         );
 
     }

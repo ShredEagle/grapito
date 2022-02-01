@@ -30,7 +30,7 @@ aunteater::Entity makeDirectControllable(Controller aController,
 
 aunteater::Entity makeHudText(std::string aMessage, Position2 aScreenPosition);
 
-aunteater::Entity makePlayer(int aIndex,
+aunteater::Entity makePlayingPlayer(int aIndex,
                              Controller aController,
                              math::sdr::Rgb aColor,
                              GrappleMode aGrappleMode = GrappleMode::Closest);
