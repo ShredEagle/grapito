@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Game.h"
-#include "Game_pendulum.h"
 #include "CollisionTest.h"
 #include "DistanceTest.h"
 #include "FrictionTest.h"
@@ -23,7 +22,6 @@ enum GameList
 {
     CollisionTest,
     DistanceTest,
-    GamePendulum,
     FrictionTest,
     SimpleCollisionTest,
     PivotTest,
@@ -51,9 +49,6 @@ static void ChangeScene(GameList aGameType, graphics::ApplicationGlfw & aApplica
         break;
     case GameList::DistanceTest:
         currentGame = std::make_unique<class DistanceTest>(aApplication, aUI);
-        break;
-    case GameList::GamePendulum:
-        currentGame = std::make_unique<Game_pendulum>(aApplication, aUI);
         break;
     case GameList::FrictionTest:
         currentGame = std::make_unique<class FrictionTest>(aApplication, aUI);

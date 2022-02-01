@@ -9,7 +9,6 @@
 #include <Components/Mass.h>
 #include <Components/Position.h>
 #include <Components/AccelAndSpeed.h>
-#include <Components/GrappleControl.h>
 #include <Components/PlayerData.h>
 
 #include <aunteater/Entity.h>
@@ -32,8 +31,7 @@ aunteater::Entity makeHudText(std::string aMessage, Position2 aScreenPosition);
 
 aunteater::Entity makePlayingPlayer(int aIndex,
                              Controller aController,
-                             math::sdr::Rgb aColor,
-                             GrappleMode aGrappleMode = GrappleMode::Closest);
+                             math::sdr::Rgb aColor);
 
 void kill(aunteater::weak_entity aPlayer);
 
@@ -48,11 +46,6 @@ void throwGrapple(aunteater::weak_entity aPlayer, aunteater::EntityManager & aEn
 void attachPlayerToGrapple(aunteater::weak_entity aPlayer, aunteater::EntityManager & aEntityManager);
 
 void detachPlayerFromGrapple(aunteater::weak_entity aPlayer);
-
-aunteater::weak_entity setGrappleMode(aunteater::weak_entity aEntity,
-                                      const PlayerData & aPlayerData,
-                                      GrappleMode aMode,
-                                      aunteater::EntityManager & aEntityManager);
 
 inline void setLocalPointToWorldPos(Body & body, Position & pos, Position2 localPos, Position2 worldPos)
 {

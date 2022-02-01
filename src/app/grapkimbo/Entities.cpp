@@ -9,7 +9,6 @@
 #include "Components/CameraTag.h"
 #include "Components/Controllable.h"
 #include "Components/DelayDeletion.h"
-#include "Components/GrappleControl.h"
 #include "Components/Mass.h"
 #include "Components/PivotJoint.h"
 #include "Components/PlayerData.h"
@@ -89,8 +88,7 @@ void makeChoosingColorPlayerPlaying(aunteater::weak_entity player)
 
 aunteater::Entity makePlayingPlayer(int aIndex,
                              Controller aController,
-                             math::sdr::Rgb aColor,
-                             GrappleMode aGrappleMode)
+                             math::sdr::Rgb aColor)
 {
     aunteater::Entity player = aunteater::Entity()
         // The component will be populated by AnimationState system.
@@ -110,7 +108,6 @@ aunteater::Entity makePlayingPlayer(int aIndex,
         .add<CameraGuide>(player::gCameraGuideWeight, player::gCameraGuideOffset)
         .add<CameraLimits>(player::gCameraLimits[0], player::gCameraLimits[1])
         .add<Controllable>(aController)
-        .add<GrappleControl>(aGrappleMode)
         .add<Mass>(player::gMass)
         .add<PlayerData>(aIndex, aColor)
         .add<Position>(Position2{3.f, 3.f}, player::gSize) // The position will be set by pendulum simulation

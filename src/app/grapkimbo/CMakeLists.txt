@@ -31,7 +31,6 @@ set(${TARGET_NAME}_HEADERS
     Components/Controllable.h
     Components/DelayDeletion.h
     Components/DistanceJoint.h
-    Components/GrappleControl.h
     Components/Mass.h
     Components/PivotJoint.h
     Components/PlayerData.h
@@ -83,7 +82,6 @@ set(${TARGET_NAME}_HEADERS
     TestScenes/PivotTest.h
     TestScenes/SimpleCollisionTest.h
     TestScenes/SetPositionTest.h
-    TestScenes/Game_pendulum.h
     TestScenes/SceneChanger.h
     TestScenes/WeldTest.h
 
@@ -156,7 +154,6 @@ set(${TARGET_NAME}_SOURCES
     TestScenes/SimpleCollisionTest.cpp
     TestScenes/SetPositionTest.cpp
     TestScenes/PivotTest.cpp
-    TestScenes/Game_pendulum.cpp
     TestScenes/WeldTest.cpp
 
     Scenery/GameScene.cpp

@@ -16,7 +16,6 @@
 #include <Components/Body.h>
 #include <Components/CameraGuide.h>
 #include <Components/Controllable.h>
-#include <Components/GrappleControl.h>
 #include <Components/Position.h>
 #include <Components/VisualRectangle.h>
 #include <Components/Mass.h>
