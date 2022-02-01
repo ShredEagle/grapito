@@ -23,6 +23,10 @@ namespace grapito {
 
 const StringId hud_victory_sid  = handy::internalizeString("hud_victory");
 const StringId hud_solomode_sid = handy::internalizeString("hud_solomode");
+const StringId hud_1_sid = handy::internalizeString("hud_1");
+const StringId hud_2_sid = handy::internalizeString("hud_2");
+const StringId hud_3_sid = handy::internalizeString("hud_3");
+const StringId hud_climb_sid = handy::internalizeString("hud_climb");
 
 
 class PhaseBase : public State
@@ -124,8 +128,8 @@ class WarmupPhase : public PhaseBase
     {
         mGameRule.resetCompetitors();
         mGameRule.disableGrapples();
-        mHudText = getEntityManager().addEntity(makeHudText(mSteps.front(),
-                                                            {0.f, 0.f},
+        mHudText = getEntityManager().addEntity(makeHudText(mContext->translate(mSteps.front()),
+                                                            hud::gCountdownPosition,
                                                             ScreenPosition::Center));
     }
 
@@ -139,7 +143,7 @@ class WarmupPhase : public PhaseBase
         return UpdateStatus::SwapBuffers;
     }
 
-    void updateImpl(double aDelta, StateMachine & aStateMachine)
+    void updateImpl(float aDelta, StateMachine & aStateMachine)
     {
         auto param = mCountdownParam.advance(aDelta);
         if(mCountdownParam.isCompleted())
@@ -156,7 +160,7 @@ class WarmupPhase : public PhaseBase
             }
             else
             {
-                mHudText->get<Text>().message = mSteps.at(mCurrentStep);
+                mHudText->get<Text>().message = mContext->translate(mSteps.at(mCurrentStep));
                 updateImpl(overshoot, aStateMachine);
             }
         }
@@ -175,7 +179,7 @@ class WarmupPhase : public PhaseBase
 
     math::ParameterAnimation<float, math::Clamp> mCountdownParam = 
         math::makeParameterAnimation<math::Clamp>(game::gCountdownStepPeriod);
-    std::vector<std::string> mSteps{"3", "2", "1"};
+    std::array<StringId, 3> mSteps{hud_3_sid, hud_2_sid, hud_1_sid};
     std::size_t mCurrentStep{0};
     aunteater::weak_entity mHudText{nullptr};
 };
@@ -186,21 +190,30 @@ class CompetitionPhase : public PhaseBase
 {
     using PhaseBase::PhaseBase;
 
-    //std::pair<TransitionProgress, UpdateStatus> enter(
-    //    const GrapitoTimer &,
-    //    const GameInputState &,
-    //    const StateMachine &) override
-    //{
-    //    // Ensure update() does not execute on the same step as beforeEnter()
-    //    // Otherwise, there is a risk the newly placed players are eliminated in the same step.
-    //    return {TransitionProgress::Complete, UpdateStatus::SwapBuffers};
-    //}
+    // Should be a beforeEnter, but needs the timer
+    std::pair<TransitionProgress, UpdateStatus> enter(
+        const GrapitoTimer & aTimer,
+        const GameInputState &,
+        const StateMachine &) override
+    {
+        mEnterTime = aTimer.simulationTime();
+        mHudText = getEntityManager().addEntity(makeHudText(mContext->translate(hud_climb_sid),
+                                                            hud::gCountdownPosition,
+                                                            ScreenPosition::Center));
+        return {TransitionProgress::Complete, UpdateStatus::SwapBuffers};
+    }
 
     UpdateStatus update(
-        const GrapitoTimer &,
+        const GrapitoTimer & aTimer,
         const GameInputState & aInputs,
         StateMachine & aStateMachine) override
     {
+        if (mHudText && aTimer.simulationTime() > (mEnterTime + hud::gClimbMessageDuration))
+        {
+            (*mHudText)->markToRemove();
+            mHudText = std::nullopt;
+        }
+
         if (mGameRule.eliminateCompetitors() == 1)
         {
             // There is a winner
@@ -213,6 +226,18 @@ class CompetitionPhase : public PhaseBase
         // update status is not checked.
         return UpdateStatus::SwapBuffers;
     }
+
+    void beforeExit() override
+    {
+        // Just in case the removal condition was not already met before exiting
+        if (mHudText)
+        {
+            (*mHudText)->markToRemove();
+        }
+    }
+
+    std::optional<aunteater::weak_entity> mHudText;
+    float mEnterTime;
 };
 
 
