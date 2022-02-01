@@ -84,12 +84,13 @@ public:
         return mCompleted;
     }
 
-    void reset()
-    {
-        mCurrent = 0;
-        mLocalTime = 0;
-        mCompleted = false;
-    }
+    // TODO Ad 2022/02/01: This is not enough, we would need to also reset each evaluator.
+    //void reset()
+    //{
+    //    mCurrent = 0;
+    //    mLocalTime = 0;
+    //    mCompleted = false;
+    //}
 
 private:
     T_parameter getLastEndTime()

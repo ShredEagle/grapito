@@ -50,23 +50,34 @@ protected:
 
 class CongratulationPhase : public PhaseBase
 {
-    static constexpr Position2 gOutside = {-2000.f, -100.f};
+    static constexpr Position2 gOutside = {0.f, -1000.f};
+
+    static auto PrepareInterpolation()
+    {
+        CompositeTransition<Position2, float> result{gOutside};
+        result
+            .pushInterpolation<math::None>(game::gCongratulationScreenPosition,
+                                           game::gCongratulationPhaseDuration * (1./3.))
+            .pushConstant(game::gCongratulationPhaseDuration * (2./3.));
+        return result;
+    }
 
 public:
     CongratulationPhase(std::shared_ptr<Context> aContext, GameRule & aGameRule) :
         PhaseBase{std::move(aContext), aGameRule},
-        mHudPositionInterpolation{gOutside}
-    {
-        mHudPositionInterpolation
-            .pushInterpolation<math::None>(game::gCongratulationScreenPosition,
-                                           game::gCongratulationPhaseDuration * (1./3.))
-            .pushConstant(game::gCongratulationPhaseDuration * (2./3.));
-    }
+        mHudPositionInterpolationReference{PrepareInterpolation()},
+        mHudPositionInterpolation{mHudPositionInterpolationReference}
+    {}
 
 private:
+    void resetInterpolation()
+    {
+        mHudPositionInterpolation = mHudPositionInterpolationReference;
+    }
+
     void beforeEnter() override
     {
-        mHudPositionInterpolation.reset();
+        resetInterpolation();
         mHudText = getEntityManager().addEntity(makeHudText(mContext->translate(hud_victory_sid), 
                                                             gOutside,
                                                             ScreenPosition::Center));
@@ -98,6 +109,7 @@ private:
     }
 
 
+    const CompositeTransition<Position2, float> mHudPositionInterpolationReference;
     CompositeTransition<Position2, float> mHudPositionInterpolation;
     aunteater::weak_entity mHudText{nullptr};
 };

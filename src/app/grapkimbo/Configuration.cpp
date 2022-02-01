@@ -41,8 +41,8 @@ namespace game
     const math::Size<2, int> gAppResolution{1600, 900};
     const float gCompetitorEliminationDistance = 15.f + (render::gViewedHeight / 2.f);
     const float gCongratulationPhaseDuration = 3.f;
-    const Position2 gCongratulationScreenPosition{-200.f, -100.f};
-    const float gCountdownStepPeriod = 1.f;
+    const Position2 gCongratulationScreenPosition{0.f, -50.f};
+    const float gCountdownStepPeriod = 0.8f;
     const std::string gFallbackLanguage{"en"};
 } // namespace game
 
