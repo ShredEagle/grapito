@@ -67,7 +67,9 @@ private:
     void beforeEnter() override
     {
         mHudPositionInterpolation.reset();
-        mHudText = getEntityManager().addEntity(makeHudText(mContext->translate(hud_victory_sid), gOutside));
+        mHudText = getEntityManager().addEntity(makeHudText(mContext->translate(hud_victory_sid), 
+                                                            gOutside,
+                                                            ScreenPosition::Center));
     }
 
 
@@ -110,7 +112,9 @@ class WarmupPhase : public PhaseBase
     {
         mGameRule.resetCompetitors();
         mGameRule.disableGrapples();
-        mHudText = getEntityManager().addEntity(makeHudText(mSteps.front(), hud::gModeTextPosition));
+        mHudText = getEntityManager().addEntity(makeHudText(mSteps.front(),
+                                                            {0.f, 0.f},
+                                                            ScreenPosition::Center));
     }
 
     UpdateStatus update(
@@ -199,7 +203,9 @@ class FreeSoloPhase : public PhaseBase
     void beforeEnter() override
     {
         mHudText = getEntityManager().addEntity(
-            makeHudText(mContext->translate(hud_solomode_sid), hud::gModeTextPosition));
+            makeHudText(mContext->translate(hud_solomode_sid),
+                        hud::gModeTextPosition,
+                        ScreenPosition::BottomLeft));
     }
 
 

@@ -585,7 +585,7 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
                 spdlog::get("grapito")->error("IncidentEdge not found");
                 spdlog::get("grapito")->error("bodyRef: {} ", bodyRefString.str());
                 spdlog::get("grapito")->error("bodyInc: {} ", bodyIncString.str());
-                mEntityManager.addEntity(makeHudText("STOP#### There was a incidentEdge crash Please look at the log!!!!!!!!!!", {-300.f, 300.f}));
+                mEntityManager.addEntity(makeHudText("STOP#### There was a incidentEdge crash Please look at the log!!!!!!!!!!", {-300.f, 300.f}, ScreenPosition::BottomLeft));
                 continue;
             }
 

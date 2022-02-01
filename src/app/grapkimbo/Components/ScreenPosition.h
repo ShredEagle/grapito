@@ -11,11 +11,19 @@ namespace grapito {
 
 struct ScreenPosition : public aunteater::Component<ScreenPosition>
 {
-    ScreenPosition(Position2 aPosition) :
-        position{aPosition}
+    enum Origin
+    {
+        BottomLeft,
+        Center,
+    };
+
+    ScreenPosition(Position2 aPosition, Origin aEntityOrigin) :
+        position{aPosition},
+        origin{aEntityOrigin}
     {}
 
     Position2 position;
+    Origin origin; // The origin of the positioned entity
 };
 
 
