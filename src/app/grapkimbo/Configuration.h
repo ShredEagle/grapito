@@ -67,6 +67,7 @@ namespace game
     extern const float gCongratulationPhaseDuration;
     extern const Position2 gCongratulationScreenPosition;
     extern const std::string gFallbackLanguage;
+    constexpr int gMaxPlayerSlots = 5;
 } // namespace game
 
 

@@ -5,7 +5,6 @@
 #include <Components/AccelAndSpeed.h>
 #include <Components/Body.h>
 #include <Components/Controllable.h>
-#include <Components/GrappleControl.h>
 #include <Components/Mass.h>
 #include <Components/PlayerData.h>
 #include <Components/Position.h>
@@ -20,7 +19,7 @@ namespace grapito
 {
 
 typedef aunteater::Archetype<Controllable, Position, AccelAndSpeed, Mass, PlayerData, Body> CartesianControlled;
-typedef aunteater::Archetype<Controllable, AccelAndSpeed, GrappleControl, Position, PlayerData> Grappler;
+typedef aunteater::Archetype<Controllable, AccelAndSpeed, Position, PlayerData> Grappler;
 
 class Control : public aunteater::System<GrapitoTimer, GameInputState>
 {

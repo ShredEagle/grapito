@@ -70,7 +70,7 @@ private:
 
     UpdateStatus update(
             const GrapitoTimer & aTimer,
-            const GameInputState & aInputs,
+            const GameInputState & /*aInputs*/,
             StateMachine & aStateMachine) override
     {
         mHudText->get<ScreenPosition>().position =
@@ -119,7 +119,7 @@ class CompetitionPhase : public PhaseBase
 
     UpdateStatus update(
         const GrapitoTimer &,
-        const GameInputState & aInputs,
+        const GameInputState & /*aInputs*/,
         StateMachine & aStateMachine) override
     {
         if (mGameRule.eliminateCompetitors() == 1)

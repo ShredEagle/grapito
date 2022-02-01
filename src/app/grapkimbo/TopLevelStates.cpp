@@ -81,13 +81,13 @@ std::shared_ptr<MenuScene> setupMainMenu(const std::shared_ptr<Context> & aConte
         Menu {
             std::vector<UiButton>{
                 { aContext->translate(menu_start_sid),
-                  [aContext](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface)
+                [aContext](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface, const Controller aController)
                     {
-                        aMachine.emplaceState<RopeGame>(aContext, aAppInterface);
+                        aMachine.emplaceState<RopeGame>(aContext, aAppInterface, aController);
                     }
                 },
                 { aContext->translate(menu_exit_sid),
-                  [](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface)
+                  [](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface, const Controller)
                     {
                         aAppInterface->requestCloseApplication();
                     }
@@ -108,21 +108,21 @@ std::shared_ptr<MenuScene> setupPauseMenu(
         Menu {
             std::vector<UiButton>{
                 { aContext->translate(menu_resume_sid),
-                  [](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> &)
+                  [](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> &, const Controller)
                     {
                         aMachine.popState(); // this
                     }
                 },
                 { aContext->translate(menu_restart_sid),
-                  [aContext](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface)
+                  [aContext](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface, const Controller aController)
                     {
                         aMachine.popState(); // this
                         aMachine.popState(); // running game
-                        aMachine.emplaceState<RopeGame>(aContext, aAppInterface); // new game
+                        aMachine.emplaceState<RopeGame>(aContext, aAppInterface, aController); // new game
                     }
                 },
                 { aContext->translate(menu_main_sid),
-                  [](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface)
+                  [](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> &, const Controller)
                     {
                         aMachine.popState(); // this
                         aMachine.popState(); // running game
