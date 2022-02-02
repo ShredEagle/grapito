@@ -1,6 +1,7 @@
 #include "GameRule.h"
 
 #include "Control.h"
+#include "RenderToScreen.h"
 
 #include "../Configuration.h"
 #include "../Context/Context.h"
@@ -77,6 +78,7 @@ private:
     void resetInterpolation()
     {
         mHudPositionInterpolation = mHudPositionInterpolationReference;
+        mFadeOpacity.reset();
     }
 
     void beforeEnter() override
@@ -97,8 +99,15 @@ private:
             mHudPositionInterpolation.advance(aTimer.delta());
         if(mHudPositionInterpolation.isCompleted())
         {
-            aStateMachine.putNext(getPhase(GameRule::Warmup));
-            aStateMachine.popState();
+            // This is advancing both the fade opacity and the position interpolation
+            // during the transition frame (ideally, it should only advance opacity with the overshoot)
+            // but that is acceptable
+            mGameRule.setFadeOpacity(mFadeOpacity.advance(aTimer.delta()));
+            if(mFadeOpacity.isCompleted())
+            {
+                aStateMachine.putNext(getPhase(GameRule::Warmup));
+                aStateMachine.popState();
+            }
         }
 
         // Note: This will have absolutely no impact, nested state machines
@@ -115,6 +124,9 @@ private:
 
     const CompositeTransition<Position2, float> mHudPositionInterpolationReference;
     CompositeTransition<Position2, float> mHudPositionInterpolation;
+
+    math::Interpolation<float, float> mFadeOpacity = 
+        math::makeInterpolation(0.f, 1.f, game::gFadeDuration);
     aunteater::weak_entity mHudText{nullptr};
 };
 
@@ -131,6 +143,7 @@ class WarmupPhase : public PhaseBase
         mHudText = getEntityManager().addEntity(makeHudText(mContext->translate(mSteps.front()),
                                                             hud::gCountdownPosition,
                                                             ScreenPosition::Center));
+        mFadeOpacity.reset();
     }
 
     UpdateStatus update(
@@ -145,6 +158,7 @@ class WarmupPhase : public PhaseBase
 
     void updateImpl(float aDelta, StateMachine & aStateMachine)
     {
+        mGameRule.setFadeOpacity(mFadeOpacity.advance(aDelta));
         auto param = mCountdownParam.advance(aDelta);
         if(mCountdownParam.isCompleted())
         {
@@ -174,11 +188,14 @@ class WarmupPhase : public PhaseBase
     {
         mHudText->markToRemove();
         mGameRule.enableGrapples();
+        mGameRule.disableFade();
     }
 
 
     math::ParameterAnimation<float, math::Clamp> mCountdownParam = 
         math::makeParameterAnimation<math::Clamp>(game::gCountdownStepPeriod);
+    math::Interpolation<float, float> mFadeOpacity = 
+        math::makeInterpolation(1.f, 0.f, game::gFadeDuration);
     std::array<StringId, 3> mSteps{hud_3_sid, hud_2_sid, hud_1_sid};
     std::size_t mCurrentStep{0};
     aunteater::weak_entity mHudText{nullptr};
@@ -292,7 +309,11 @@ GameRule::PhasesArray setupGamePhases(std::shared_ptr<Context> aContext, GameRul
 }
 
 
-GameRule::GameRule(aunteater::EntityManager & aEntityManager, std::shared_ptr<Context> aContext, std::vector<aunteater::Entity> aPlayers, std::shared_ptr<Control> aControlSystem) :
+GameRule::GameRule(aunteater::EntityManager & aEntityManager,
+                   std::shared_ptr<Context> aContext,
+                   std::vector<aunteater::Entity> aPlayers,
+                   std::shared_ptr<Control> aControlSystem,
+                   std::shared_ptr<RenderToScreen> aRenderToScreenSystem) :
     mEntityManager{aEntityManager},
     mCompetitors{aEntityManager},
     mCameras{aEntityManager},
@@ -300,7 +321,8 @@ GameRule::GameRule(aunteater::EntityManager & aEntityManager, std::shared_ptr<Co
     mPlayers{std::move(aPlayers)},
     mPhases{setupGamePhases(aContext, *this)},
     mPhaseMachine{mPhases[FreeSolo]},
-    mControlSystem{std::move(aControlSystem)}
+    mControlSystem{std::move(aControlSystem)},
+    mRenderToScreenSystem{std::move(aRenderToScreenSystem)}
 {}
 
 
@@ -402,6 +424,18 @@ void GameRule::enableGrapples()
 void GameRule::disableGrapples()
 {
     mControlSystem->switchGrappling(false);
+}
+
+
+void GameRule::setFadeOpacity(float aOpacity)
+{
+    mRenderToScreenSystem->setFade({game::gFadeColor, (std::uint8_t)(aOpacity * 255)});
+}
+
+
+void GameRule::disableFade()
+{
+    mRenderToScreenSystem->disableFade();
 }
 
 

@@ -96,8 +96,9 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
 
     auto soundSystem = mSystemManager.add<SoundSystem>(mContext->mSoundManager);
 
+    auto renderToScreen = std::make_shared<RenderToScreen>(mEntityManager, mAppInterface, *this); 
     // Done after CameraGuidedControl, to avoid having two camera guides on the frame a player is killed.
-    mSystemManager.add<GameRule>(mContext, players, controlSystem);
+    mSystemManager.add<GameRule>(mContext, players, controlSystem, renderToScreen);
 
     mRenderBackgroundSystem = mSystemManager.add<RenderBackground>(mAppInterface); 
     mRenderBackgroundSystem->addLayer(mContext->pathFor(background::gSpaceImage), background::gSpaceScrollFactor);
@@ -108,7 +109,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     mRenderHudSystem = mSystemManager.add<RenderHud>(mContext->pathFor(hud::gFont), mAppInterface); 
     
     // Will actually render everything to screen.
-    mSystemManager.add<RenderToScreen>(mAppInterface, *this); 
+    mSystemManager.add(std::move(renderToScreen)); 
 
     { // Load sprite animations
         // Note: It is not obvious whether it is better to maintain a permanent instance of the sprite sheet

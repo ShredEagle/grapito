@@ -67,7 +67,9 @@ namespace game
     extern const float gCongratulationPhaseDuration;
     extern const Position2 gCongratulationScreenPosition;
     extern const float gCountdownStepPeriod;
+    extern const float gFadeDuration;
     extern const std::string gFallbackLanguage;
+    extern const math::sdr::Rgb gFadeColor;
 } // namespace game
 
 

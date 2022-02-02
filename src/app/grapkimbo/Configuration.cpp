@@ -44,7 +44,9 @@ namespace game
     const float gCongratulationPhaseDuration = 3.f;
     const Position2 gCongratulationScreenPosition{0.f, -50.f};
     const float gCountdownStepPeriod = 0.8f;
+    const float gFadeDuration = 0.75f;
     const std::string gFallbackLanguage{"en"};
+    const math::sdr::Rgb gFadeColor = math::sdr::gBlack;
 } // namespace game
 
 
