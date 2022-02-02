@@ -87,7 +87,7 @@ namespace menu
     constexpr math::Size<2, GLfloat> gButtonSize{400.f, 80.f}; // kept in .h to avoid SIOF
     extern const int gBlurringPasses;
     extern const float gViewedHeight;
-    extern const const char * gFont;
+    extern const char * gFont;
     extern const math::sdr::Rgba gTextColor;
     extern const GLfloat gTextHeight;
     extern const float gButtonSpacing;

@@ -63,7 +63,7 @@ namespace menu
 {
     const int gBlurringPasses = 6;
     const float gViewedHeight = 1000.f;
-    const const char * gFont = "fonts/Titillium_Web/TitilliumWeb-Bold.ttf";
+    const char * gFont = "fonts/Titillium_Web/TitilliumWeb-Bold.ttf";
     const math::sdr::Rgba gTextColor = math::sdr::gWhite;
     const GLfloat gTextHeight = 0.65f * gButtonSize.height();
     const float gButtonSpacing = 100.f;
