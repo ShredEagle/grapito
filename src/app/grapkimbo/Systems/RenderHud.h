@@ -29,6 +29,8 @@ public:
 
     void update(const GrapitoTimer, const GameInputState &) override;
 
+    void render() const;
+
 private:
     const aunteater::FamilyHelp<HudText> mHudTexts;
 

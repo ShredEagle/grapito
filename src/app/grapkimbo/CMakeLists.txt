@@ -65,6 +65,7 @@ set(${TARGET_NAME}_HEADERS
     Systems/LevelGeneration.h
     Systems/RenderBackground.h
     Systems/RenderHud.h
+    Systems/RenderToScreen.h
     Systems/RenderWorld.h
     Systems/AccelSolver.h
     Systems/Physics.h
@@ -135,6 +136,7 @@ set(${TARGET_NAME}_SOURCES
     Systems/LevelGeneration.cpp
     Systems/RenderBackground.cpp
     Systems/RenderHud.cpp
+    Systems/RenderToScreen.cpp
     Systems/RenderWorld.cpp
     Systems/AccelSolver.cpp
     Systems/Physics.cpp

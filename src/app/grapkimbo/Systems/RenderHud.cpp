@@ -39,6 +39,11 @@ void RenderHud::update(const GrapitoTimer aTimer, const GameInputState &)
         }
     }
     mTexting.updateInstances(strings);
+}
+
+
+void RenderHud::render() const
+{
     mTexting.render();
 }
 

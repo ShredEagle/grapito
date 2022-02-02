@@ -167,7 +167,6 @@ void RenderWorld::update(const GrapitoTimer aTimer, const GameInputState &)
     }
 
     mTrivialShaping.updateInstances(shapes);
-    render();
 }
 
 
