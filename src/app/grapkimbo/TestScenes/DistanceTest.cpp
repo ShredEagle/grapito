@@ -6,7 +6,7 @@
 #include "../Input.h"
 #include "../Timer.h"
 
-#include "../Systems/Render.h"
+#include "../Systems/RenderWorld.h"
 #include "../Systems/Control.h"
 #include "../Systems/Gravity.h"
 #include "../Systems/Physics.h"
@@ -96,7 +96,7 @@ DistanceTest::DistanceTest(graphics::ApplicationGlfw & aApplication, DebugUI & a
     mSystemManager.add<Control>();
     mSystemManager.add<AccelSolver>();
     mSystemManager.add<Physics>();
-    mSystemManager.add<Render>(aApplication.getAppInterface()); 
+    mSystemManager.add<RenderWorld>(aApplication.getAppInterface()); 
 
     mEntityManager.addEntity(makeCamera({10.f, 2.f}));
 

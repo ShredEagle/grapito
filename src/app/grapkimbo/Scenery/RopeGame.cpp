@@ -28,8 +28,8 @@
 #include <Systems/Hud.h>
 #include <Systems/LevelGeneration.h>
 #include <Systems/Physics.h>
-#include <Systems/Render.h>
 #include <Systems/RenderBackground.h>
+#include <Systems/RenderWorld.h>
 #include <Systems/RopeCreation.h>
 #include <Systems/SegmentStacker.h>
 #include <Systems/TransitionAnimationState.h>
@@ -103,7 +103,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     mRenderBackgroundSystem->addLayer(mContext->pathFor(background::gSmallStarImage), background::gSmallStarScrollFactor);
     mRenderBackgroundSystem->addLayer(mContext->pathFor(background::gStarImage), background::gStarScrollFactor);
 
-    mRenderSystem = mSystemManager.add<Render>(mAppInterface); 
+    mRenderWorldSystem = mSystemManager.add<RenderWorld>(mAppInterface); 
     mSystemManager.add<Hud>(mContext->pathFor(hud::gFont), mAppInterface); 
 
     { // Load sprite animations
@@ -117,7 +117,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
         graphics::sprite::Animator animator;
         // TODO cache via resource system
         // Install the blue (default) variant
-        mRenderSystem->installAtlas(animator.load(spriteSheets.begin(), spriteSheets.end()));
+        mRenderWorldSystem->installAtlas(animator.load(spriteSheets.begin(), spriteSheets.end()));
         spriteAnimationSystem->installAnimator(std::move(animator));
 
         using namespace std::string_literals;
@@ -129,7 +129,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
                     arte::ImageRgba{mContext->pathFor("sprite_sheet/idle_" + color + ".png")},
                     arte::ImageRgba{mContext->pathFor("sprite_sheet/run_" + color + ".png")},
                 });
-            mRenderSystem->installAtlas(graphics::sprite::loadAtlas(colorVariation));
+            mRenderWorldSystem->installAtlas(graphics::sprite::loadAtlas(colorVariation));
         }
     }
 
@@ -193,7 +193,7 @@ std::pair<TransitionProgress, UpdateStatus> RopeGame::exit(
 void RopeGame::render() const
 {
     mRenderBackgroundSystem->render();
-    mRenderSystem->render();
+    mRenderWorldSystem->render();
 }
 
 

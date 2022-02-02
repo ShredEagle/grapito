@@ -64,8 +64,8 @@ set(${TARGET_NAME}_HEADERS
     Systems/Gravity.h
     Systems/Hud.h
     Systems/LevelGeneration.h
-    Systems/Render.h
     Systems/RenderBackground.h
+    Systems/RenderWorld.h
     Systems/AccelSolver.h
     Systems/Physics.h
     Systems/RopeCreation.h
@@ -81,7 +81,6 @@ set(${TARGET_NAME}_HEADERS
     TestScenes/PivotTest.h
     TestScenes/SimpleCollisionTest.h
     TestScenes/SetPositionTest.h
-    TestScenes/Game_pendulum.h
     TestScenes/SceneChanger.h
     TestScenes/WeldTest.h
 
@@ -135,8 +134,8 @@ set(${TARGET_NAME}_SOURCES
     Systems/GrappleJointCreator.cpp
     Systems/Hud.cpp
     Systems/LevelGeneration.cpp
-    Systems/Render.cpp
     Systems/RenderBackground.cpp
+    Systems/RenderWorld.cpp
     Systems/AccelSolver.cpp
     Systems/Physics.cpp
     Systems/RopeCreation.cpp
@@ -152,7 +151,6 @@ set(${TARGET_NAME}_SOURCES
     TestScenes/SimpleCollisionTest.cpp
     TestScenes/SetPositionTest.cpp
     TestScenes/PivotTest.cpp
-    TestScenes/Game_pendulum.cpp
     TestScenes/WeldTest.cpp
 
     Scenery/GameScene.cpp
