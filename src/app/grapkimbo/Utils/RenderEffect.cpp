@@ -20,15 +20,29 @@ RenderEffect::RenderEffect(std::shared_ptr<graphics::AppInterface> aAppInterface
 
 void RenderEffect::blurTo(const GameScene & aScene, graphics::FrameBuffer & aDestination, int aPassCount)
 {
-    {
-        // Render the scene to a texture
-        auto renderTexture = mFrameBuffers.bindTargetFrameBuffer();
-        auto viewport = mFrameBuffers.scopeViewport();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        aScene.render();
-        mFrameBuffers.swap();
-    }
+    renderGameScene(aScene);
     mGaussianBlur.apply(aPassCount, mFrameBuffers, &aDestination);
+}
+
+
+void RenderEffect::fadeTo(const GameScene & aScene,
+                          graphics::FrameBuffer & aDestination,
+                          math::sdr::Rgba aFadeToColor)
+{
+    renderGameScene(aScene);
+    mFade.apply(aFadeToColor, mFrameBuffers.getTexture(graphics::Role::Source), aDestination);
+}
+
+
+void RenderEffect::renderGameScene(const GameScene & aScene)
+{
+    // Render the game scene to the target texture in ping pong FBs.
+    auto renderTexture = mFrameBuffers.bindTargetFrameBuffer();
+    auto viewport = mFrameBuffers.scopeViewport();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    aScene.render();
+    // The target texture becomes the source.
+    mFrameBuffers.swap();
 }
 
 

@@ -14,13 +14,23 @@ RenderToScreen::RenderToScreen(aunteater::EntityManager & aEntityManager,
                                const GameScene & aGameScene) :
     mEntityManager{aEntityManager},
     mAppInterface{aAppInterface},
-    mRenderedScene{aGameScene}
+    mRenderedScene{aGameScene},
+    mEffects{mAppInterface}
 {}
 
 
 void RenderToScreen::update(const GrapitoTimer, const GameInputState &)
 {
-    mRenderedScene.render();
+    if(mFadeToColor)
+    {
+        mEffects.fadeTo(mRenderedScene,         
+                        graphics::FrameBuffer::Default(),
+                        *mFadeToColor);
+    }
+    else
+    {
+        mRenderedScene.render();
+    }
 }
 
 
