@@ -1,4 +1,4 @@
-#include "Hud.h"
+#include "RenderHud.h"
 
 #include "../Configuration.h"
 #include "../Timer.h"
@@ -8,15 +8,15 @@ namespace ad {
 namespace grapito {
 
 
-Hud::Hud(aunteater::EntityManager & aEntityManager,
-         const filesystem::path & aFontPath,
-         std::shared_ptr<graphics::AppInterface> aAppInterface) :
+RenderHud::RenderHud(aunteater::EntityManager & aEntityManager,
+                     const filesystem::path & aFontPath,
+                     std::shared_ptr<graphics::AppInterface> aAppInterface) :
     mHudTexts{aEntityManager},
     mTexting{aFontPath, hud::gTextHeight, hud::gViewedHeight, std::move(aAppInterface)}
 {}
 
 
-void Hud::update(const GrapitoTimer aTimer, const GameInputState &)
+void RenderHud::update(const GrapitoTimer aTimer, const GameInputState &)
 {
     graphics::Texting::Mapping strings;
 

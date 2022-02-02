@@ -25,7 +25,7 @@
 #include <Systems/Control.h>
 #include <Systems/GameRule.h>
 #include <Systems/Gravity.h>
-#include <Systems/Hud.h>
+#include <Systems/RenderHud.h>
 #include <Systems/LevelGeneration.h>
 #include <Systems/Physics.h>
 #include <Systems/RenderBackground.h>
@@ -104,7 +104,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     mRenderBackgroundSystem->addLayer(mContext->pathFor(background::gStarImage), background::gStarScrollFactor);
 
     mRenderWorldSystem = mSystemManager.add<RenderWorld>(mAppInterface); 
-    mSystemManager.add<Hud>(mContext->pathFor(hud::gFont), mAppInterface); 
+    mSystemManager.add<RenderHud>(mContext->pathFor(hud::gFont), mAppInterface); 
 
     { // Load sprite animations
         // Note: It is not obvious whether it is better to maintain a permanent instance of the sprite sheet

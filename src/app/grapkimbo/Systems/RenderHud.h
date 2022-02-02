@@ -20,12 +20,12 @@ namespace grapito {
 using HudText = aunteater::Archetype<ScreenPosition, Text>;
 
 
-class Hud : public aunteater::System<GrapitoTimer, GameInputState>
+class RenderHud : public aunteater::System<GrapitoTimer, GameInputState>
 {
 public:
-    Hud(aunteater::EntityManager & aEntityManager,
-        const filesystem::path & aFontPath,
-        std::shared_ptr<graphics::AppInterface> aAppInterface);
+    RenderHud(aunteater::EntityManager & aEntityManager,
+              const filesystem::path & aFontPath,
+              std::shared_ptr<graphics::AppInterface> aAppInterface);
 
     void update(const GrapitoTimer, const GameInputState &) override;
 
