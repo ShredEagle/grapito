@@ -61,12 +61,15 @@ namespace debug
 namespace game
 {
     extern const math::Size<2, int> gAppResolution;
-    constexpr math::hdr::Rgb gClearColor{0.1, 0.2, 0.3};
+    extern const math::hdr::Rgb gClearColor;
     // If a competitor fall below this vertical limit, it is eliminated.
     extern const float gCompetitorEliminationDistance;
     extern const float gCongratulationPhaseDuration;
     extern const Position2 gCongratulationScreenPosition;
+    extern const float gCountdownStepPeriod;
+    extern const float gFadeDuration;
     extern const std::string gFallbackLanguage;
+    extern const math::sdr::Rgb gFadeColor;
     constexpr int gMaxPlayerSlots = 5;
 } // namespace game
 
@@ -77,20 +80,23 @@ namespace hud
     extern const char * const gFont;
     extern const GLfloat gTextHeight;
     extern const Position2 gModeTextPosition;
+    extern const Position2 gCountdownPosition;
+    extern const float gClimbMessageDuration;
 }
 
 
 namespace menu
 {
-    constexpr int gBlurringPasses = 6;
-    constexpr float gViewedHeight = 1000.f;
-    constexpr math::Size<2, GLfloat> gButtonSize{400.f, 80.f};
-    constexpr const char * gFont = "fonts/dejavu-fonts-ttf-2.37/ttf/DejaVuSans.ttf";
-    constexpr GLfloat gTextHeight = 0.65f * gButtonSize.height();
-    constexpr float gButtonSpacing = 100.f;
-    constexpr math::sdr::Rgb gButtonColor{ 120, 100, 110 };
-    constexpr math::sdr::Rgb gSelectedColor{ 190, 190, 80 };
-    constexpr float gTransitionDuration = 0.275f;
+    constexpr math::Size<2, GLfloat> gButtonSize{400.f, 80.f}; // kept in .h to avoid SIOF
+    extern const int gBlurringPasses;
+    extern const float gViewedHeight;
+    extern const char * gFont;
+    extern const math::sdr::Rgba gTextColor;
+    extern const GLfloat gTextHeight;
+    extern const float gButtonSpacing;
+    extern const math::sdr::Rgb gButtonColor;
+    extern const math::sdr::Rgb gSelectedColor;
+    extern const float gTransitionDuration;
 }
 
 

@@ -10,11 +10,13 @@ namespace grapito {
 
 struct Text : public aunteater::Component<Text>
 {
-    Text(std::string aMessage) :
-        message{std::move(aMessage)}
+    Text(std::string aMessage, math::sdr::Rgba aColor = math::sdr::gWhite) :
+        message{std::move(aMessage)},
+        color{aColor}
     {}
 
     std::string message;
+    math::sdr::Rgba color;
 };
 
 

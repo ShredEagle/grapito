@@ -81,6 +81,7 @@ public:
     { return {TransitionProgress::None, UpdateStatus::KeepFrame}; }
 
     // Provided to allow setup of the transition phases
+    // TODO Ad 2022/02/01: could actually make use of the timer, for example to mark "phase enter time".
     virtual void beforeEnter()
     {}
 

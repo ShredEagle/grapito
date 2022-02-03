@@ -20,9 +20,9 @@ public:
     RenderBackground(aunteater::EntityManager & aEntityManager,
                      std::shared_ptr<graphics::AppInterface> aAppInterface);
 
-    void render() const;
-
     void update(const GrapitoTimer aTimer, const GameInputState &) override;
+
+    void render() const;
 
     void addLayer(const filesystem::path & aImage, float aScrollFactor);
 

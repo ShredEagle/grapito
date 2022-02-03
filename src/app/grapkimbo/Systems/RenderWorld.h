@@ -40,12 +40,12 @@ typedef aunteater::Archetype<Position, VisualOutline> RenderedOutline;
 typedef aunteater::Archetype<Position, Body, PlayerData> AimVector;
 typedef aunteater::Archetype<Position, VisualSprite> RenderedSprite;
 
-class Render : public aunteater::System<GrapitoTimer, GameInputState>
+class RenderWorld : public aunteater::System<GrapitoTimer, GameInputState>
 {
 
 public:
-    Render(aunteater::EntityManager & aEntityManager,
-           std::shared_ptr<graphics::AppInterface> aAppInterface);
+    RenderWorld(aunteater::EntityManager & aEntityManager,
+                std::shared_ptr<graphics::AppInterface> aAppInterface);
 
     void render() const;
 

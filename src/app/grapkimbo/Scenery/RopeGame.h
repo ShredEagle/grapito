@@ -11,7 +11,8 @@ namespace ad {
 namespace grapito {
 
 class RenderBackground;
-class Render;
+class RenderHud;
+class RenderWorld;
 
 class RopeGame : public GameScene
 {
@@ -32,7 +33,8 @@ public:
 
 private:
     std::shared_ptr<RenderBackground> mRenderBackgroundSystem;
-    std::shared_ptr<Render> mRenderSystem;
+    std::shared_ptr<RenderHud> mRenderHudSystem;
+    std::shared_ptr<RenderWorld> mRenderWorldSystem;
     ALuint mBgMusicSource;
 };
 

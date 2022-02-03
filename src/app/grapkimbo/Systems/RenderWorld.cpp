@@ -1,4 +1,4 @@
-#include "Render.h"
+#include "RenderWorld.h"
 
 #include "../Configuration.h"
 #include "../Timer.h"
@@ -17,8 +17,8 @@ namespace ad {
 namespace grapito
 {
 
-Render::Render(aunteater::EntityManager & aEntityManager,
-               std::shared_ptr<graphics::AppInterface> aAppInterface) :
+RenderWorld::RenderWorld(aunteater::EntityManager & aEntityManager,
+                         std::shared_ptr<graphics::AppInterface> aAppInterface) :
     mEntityManager{aEntityManager},
     mAppInterface{aAppInterface},
     mRectangles{mEntityManager},
@@ -38,7 +38,7 @@ Render::Render(aunteater::EntityManager & aEntityManager,
 {}
 
 
-AtlasIndex Render::installAtlas(graphics::sprite::LoadedAtlas aAtlas)
+AtlasIndex RenderWorld::installAtlas(graphics::sprite::LoadedAtlas aAtlas)
 {
     mAtlases.push_back(std::move(aAtlas)); 
     mAtlasToSprites.emplace_back();
@@ -46,7 +46,7 @@ AtlasIndex Render::installAtlas(graphics::sprite::LoadedAtlas aAtlas)
 }
 
 
-void Render::update(const GrapitoTimer aTimer, const GameInputState &)
+void RenderWorld::update(const GrapitoTimer aTimer, const GameInputState &)
 {
     mTrivialLineStrip.clearLines();
     mTrivialPolygon.clearPolygons();
@@ -167,11 +167,10 @@ void Render::update(const GrapitoTimer aTimer, const GameInputState &)
     }
 
     mTrivialShaping.updateInstances(shapes);
-    render();
 }
 
 
-void Render::render() const
+void RenderWorld::render() const
 {
     mTrivialLineStrip.render();
     mTrivialShaping.render();

@@ -1,5 +1,8 @@
 #include "GameRule.h"
 
+#include "Control.h"
+#include "RenderToScreen.h"
+
 #include "../Configuration.h"
 #include "../Context/Context.h"
 #include "../Entities.h"
@@ -7,6 +10,7 @@
 #include "../Timer.h"
 
 #include "../Components/ScreenPosition.h"
+#include "../Components/Text.h"
 
 #include "../Utils/Camera.h"
 #include "../Utils/CompositeTransition.h"
@@ -20,6 +24,10 @@ namespace grapito {
 
 const StringId hud_victory_sid  = handy::internalizeString("hud_victory");
 const StringId hud_solomode_sid = handy::internalizeString("hud_solomode");
+const StringId hud_1_sid = handy::internalizeString("hud_1");
+const StringId hud_2_sid = handy::internalizeString("hud_2");
+const StringId hud_3_sid = handy::internalizeString("hud_3");
+const StringId hud_climb_sid = handy::internalizeString("hud_climb");
 
 
 class PhaseBase : public State
@@ -47,24 +55,38 @@ protected:
 
 class CongratulationPhase : public PhaseBase
 {
-    static constexpr Position2 gOutside = {-2000.f, -100.f};
+    static constexpr Position2 gOutside = {0.f, -1000.f};
+
+    static auto PrepareInterpolation()
+    {
+        CompositeTransition<Position2, float> result{gOutside};
+        result
+            .pushInterpolation<math::None>(game::gCongratulationScreenPosition,
+                                           game::gCongratulationPhaseDuration * (1./3.))
+            .pushConstant(game::gCongratulationPhaseDuration * (2./3.));
+        return result;
+    }
 
 public:
     CongratulationPhase(std::shared_ptr<Context> aContext, GameRule & aGameRule) :
         PhaseBase{std::move(aContext), aGameRule},
-        mHudPositionInterpolation{gOutside}
-    {
-        mHudPositionInterpolation
-            .pushInterpolation<math::None>(game::gCongratulationScreenPosition,
-                                           game::gCongratulationPhaseDuration * (1./3.))
-            .pushConstant(game::gCongratulationPhaseDuration * (2./3.));
-    }
+        mHudPositionInterpolationReference{PrepareInterpolation()},
+        mHudPositionInterpolation{mHudPositionInterpolationReference}
+    {}
 
 private:
+    void resetInterpolation()
+    {
+        mHudPositionInterpolation = mHudPositionInterpolationReference;
+        mFadeOpacity.reset();
+    }
+
     void beforeEnter() override
     {
-        mHudPositionInterpolation.reset();
-        mHudText = getEntityManager().addEntity(makeHudText(mContext->translate(hud_victory_sid), gOutside));
+        resetInterpolation();
+        mHudText = getEntityManager().addEntity(makeHudText(mContext->translate(hud_victory_sid), 
+                                                            gOutside,
+                                                            ScreenPosition::Center));
     }
 
 
@@ -77,8 +99,15 @@ private:
             mHudPositionInterpolation.advance(aTimer.delta());
         if(mHudPositionInterpolation.isCompleted())
         {
-            aStateMachine.putNext(getPhase(GameRule::Competition));
-            aStateMachine.popState();
+            // This is advancing both the fade opacity and the position interpolation
+            // during the transition frame (ideally, it should only advance opacity with the overshoot)
+            // but that is acceptable
+            mGameRule.setFadeOpacity(mFadeOpacity.advance(aTimer.delta()));
+            if(mFadeOpacity.isCompleted())
+            {
+                aStateMachine.putNext(getPhase(GameRule::Warmup));
+                aStateMachine.popState();
+            }
         }
 
         // Note: This will have absolutely no impact, nested state machines
@@ -93,35 +122,115 @@ private:
     }
 
 
+    const CompositeTransition<Position2, float> mHudPositionInterpolationReference;
     CompositeTransition<Position2, float> mHudPositionInterpolation;
+
+    math::Interpolation<float, float> mFadeOpacity = 
+        math::makeInterpolation(0.f, 1.f, game::gFadeDuration);
     aunteater::weak_entity mHudText{nullptr};
 };
 
 
-class CompetitionPhase : public PhaseBase
+/// \brief Countdown during which grapples cannot be used.
+class WarmupPhase : public PhaseBase
 {
     using PhaseBase::PhaseBase;
 
     void beforeEnter() override
     {
         mGameRule.resetCompetitors();
+        mGameRule.disableGrapples();
+        mHudText = getEntityManager().addEntity(makeHudText(mContext->translate(mSteps.front()),
+                                                            hud::gCountdownPosition,
+                                                            ScreenPosition::Center));
+        mFadeOpacity.reset();
     }
 
+    UpdateStatus update(
+        const GrapitoTimer & aTimer,
+        const GameInputState & aInputs,
+        StateMachine & aStateMachine) override
+    {
+        updateImpl(aTimer.delta(), aStateMachine);
+        // Note: Has no effect, nested state machines update status is not checked.
+        return UpdateStatus::SwapBuffers;
+    }
+
+    void updateImpl(float aDelta, StateMachine & aStateMachine)
+    {
+        mGameRule.setFadeOpacity(mFadeOpacity.advance(aDelta));
+        auto param = mCountdownParam.advance(aDelta);
+        if(mCountdownParam.isCompleted())
+        {
+            ++mCurrentStep;
+            auto overshoot = mCountdownParam.getOvershoot();
+            mCountdownParam.reset();
+
+            if(mCurrentStep == mSteps.size())
+            {
+                mCurrentStep = 0;
+                aStateMachine.putNext(getPhase(GameRule::Competition));
+                aStateMachine.popState();
+            }
+            else
+            {
+                mHudText->get<Text>().message = mContext->translate(mSteps.at(mCurrentStep));
+                updateImpl(overshoot, aStateMachine);
+            }
+        }
+        else
+        {
+            mHudText->get<Text>().color.a() = param * 255;
+        }
+    }
+
+    void beforeExit() override
+    {
+        mHudText->markToRemove();
+        mGameRule.enableGrapples();
+        mGameRule.disableFade();
+    }
+
+
+    math::ParameterAnimation<float, math::Clamp> mCountdownParam = 
+        math::makeParameterAnimation<math::Clamp>(game::gCountdownStepPeriod);
+    math::Interpolation<float, float> mFadeOpacity = 
+        math::makeInterpolation(1.f, 0.f, game::gFadeDuration);
+    std::array<StringId, 3> mSteps{hud_3_sid, hud_2_sid, hud_1_sid};
+    std::size_t mCurrentStep{0};
+    aunteater::weak_entity mHudText{nullptr};
+};
+
+
+
+class CompetitionPhase : public PhaseBase
+{
+    using PhaseBase::PhaseBase;
+
+    // Should be a beforeEnter, but needs the timer
     std::pair<TransitionProgress, UpdateStatus> enter(
-        const GrapitoTimer &,
+        const GrapitoTimer & aTimer,
         const GameInputState &,
         const StateMachine &) override
     {
-        // Ensure update() does not execute on the same step as beforeEnter()
-        // Otherwise, there is a risk the newly placed players are eliminated in the same step.
+        mEnterTime = aTimer.simulationTime();
+        mHudText = getEntityManager().addEntity(makeHudText(mContext->translate(hud_climb_sid),
+                                                            hud::gCountdownPosition,
+                                                            ScreenPosition::Center));
         return {TransitionProgress::Complete, UpdateStatus::SwapBuffers};
     }
 
     UpdateStatus update(
-        const GrapitoTimer &,
+        const GrapitoTimer & aTimer,
         const GameInputState & /*aInputs*/,
         StateMachine & aStateMachine) override
     {
+        if (mHudText && aTimer.simulationTime() > (mEnterTime + hud::gClimbMessageDuration))
+        {
+            (*mHudText)->markToRemove();
+            mHudText = std::nullopt;
+        }
+
         if (mGameRule.eliminateCompetitors() == 1)
         {
             // There is a winner
@@ -134,6 +243,18 @@ class CompetitionPhase : public PhaseBase
         // update status is not checked.
         return UpdateStatus::SwapBuffers;
     }
+
+    void beforeExit() override
+    {
+        // Just in case the removal condition was not already met before exiting
+        if (mHudText)
+        {
+            (*mHudText)->markToRemove();
+        }
+    }
+
+    std::optional<aunteater::weak_entity> mHudText;
+    float mEnterTime;
 };
 
 
@@ -145,7 +266,9 @@ class FreeSoloPhase : public PhaseBase
     void beforeEnter() override
     {
         mHudText = getEntityManager().addEntity(
-            makeHudText(mContext->translate(hud_solomode_sid), hud::gModeTextPosition));
+            makeHudText(mContext->translate(hud_solomode_sid),
+                        hud::gModeTextPosition,
+                        ScreenPosition::BottomLeft));
     }
 
 
@@ -157,7 +280,7 @@ class FreeSoloPhase : public PhaseBase
         // TODO This should be handled for all active controllers, there might not even be a gamepad.
         if (aInputs.get(Controller::Gamepad_0)[Back].positiveEdge() && (mGameRule.mPlayers.size() > 1))
         {
-            aStateMachine.putNext(getPhase(GameRule::Competition));
+            aStateMachine.putNext(getPhase(GameRule::Warmup));
             aStateMachine.popState();
         }
         // Note: This will have absolutely no impact, nested state machines
@@ -179,20 +302,27 @@ GameRule::PhasesArray setupGamePhases(std::shared_ptr<Context> aContext, GameRul
 {
     GameRule::PhasesArray result;
     result[GameRule::FreeSolo] = std::make_shared<FreeSoloPhase>(aContext, aGameRule);
+    result[GameRule::Warmup] = std::make_shared<WarmupPhase>(aContext, aGameRule);
     result[GameRule::Competition] = std::make_shared<CompetitionPhase>(aContext, aGameRule);
     result[GameRule::Congratulation] = std::make_shared<CongratulationPhase>(aContext, aGameRule);
     return result;
 }
 
 
-GameRule::GameRule(aunteater::EntityManager & aEntityManager, std::shared_ptr<Context> aContext, std::vector<aunteater::Entity> aPlayers) :
+GameRule::GameRule(aunteater::EntityManager & aEntityManager,
+                   std::shared_ptr<Context> aContext,
+                   std::vector<aunteater::Entity> aPlayers,
+                   std::shared_ptr<Control> aControlSystem,
+                   std::shared_ptr<RenderToScreen> aRenderToScreenSystem) :
     mEntityManager{aEntityManager},
     mCompetitors{aEntityManager},
     mCameras{aEntityManager},
     mCameraPoints{aEntityManager},
     mPlayers{std::move(aPlayers)},
     mPhases{setupGamePhases(aContext, *this)},
-    mPhaseMachine{mPhases[FreeSolo]}
+    mPhaseMachine{mPhases[FreeSolo]},
+    mControlSystem{std::move(aControlSystem)},
+    mRenderToScreenSystem{std::move(aRenderToScreenSystem)}
 {}
 
 
@@ -282,6 +412,30 @@ void GameRule::killAllCompetitors()
     {
         kill(competitor);
     }
+}
+
+
+void GameRule::enableGrapples()
+{
+    mControlSystem->switchGrappling(true);
+}
+
+
+void GameRule::disableGrapples()
+{
+    mControlSystem->switchGrappling(false);
+}
+
+
+void GameRule::setFadeOpacity(float aOpacity)
+{
+    mRenderToScreenSystem->setFade({game::gFadeColor, (std::uint8_t)(aOpacity * 255)});
+}
+
+
+void GameRule::disableFade()
+{
+    mRenderToScreenSystem->disableFade();
 }
 
 

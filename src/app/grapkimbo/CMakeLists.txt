@@ -62,10 +62,11 @@ set(${TARGET_NAME}_HEADERS
     Systems/GrappleInteractions.h
     Systems/GrappleJointCreator.h
     Systems/Gravity.h
-    Systems/Hud.h
     Systems/LevelGeneration.h
-    Systems/Render.h
     Systems/RenderBackground.h
+    Systems/RenderHud.h
+    Systems/RenderToScreen.h
+    Systems/RenderWorld.h
     Systems/AccelSolver.h
     Systems/Physics.h
     Systems/PlayerJoin.h
@@ -134,10 +135,11 @@ set(${TARGET_NAME}_SOURCES
     Systems/GrappleCleanup.cpp
     Systems/GrappleInteractions.cpp
     Systems/GrappleJointCreator.cpp
-    Systems/Hud.cpp
     Systems/LevelGeneration.cpp
-    Systems/Render.cpp
     Systems/RenderBackground.cpp
+    Systems/RenderHud.cpp
+    Systems/RenderToScreen.cpp
+    Systems/RenderWorld.cpp
     Systems/AccelSolver.cpp
     Systems/Physics.cpp
     Systems/PlayerJoin.cpp

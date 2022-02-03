@@ -47,10 +47,10 @@ aunteater::Entity makeDirectControllable(Controller aController, Position2 aInit
 }
 
 
-aunteater::Entity makeHudText(std::string aMessage, Position2 aScreenPosition)
+aunteater::Entity makeHudText(std::string aMessage, Position2 aScreenPosition, ScreenPosition::Origin aMessageOrigin)
 {
     return aunteater::Entity{}
-        .add<ScreenPosition>(aScreenPosition)
+        .add<ScreenPosition>(aScreenPosition, aMessageOrigin)
         .add<Text>(std::move(aMessage));
 }
 
@@ -59,6 +59,7 @@ aunteater::Entity makeChoosingColorPlayer(int aIndex, Controller aController, ma
     aunteater::Entity player = aunteater::Entity()
         .add<Controllable>(aController)
         .add<PlayerData>(aIndex, aColor);
+    return player;
 }
 
 void makeChoosingColorPlayerPlaying(aunteater::weak_entity player)

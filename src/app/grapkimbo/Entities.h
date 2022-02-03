@@ -10,6 +10,7 @@
 #include <Components/Position.h>
 #include <Components/AccelAndSpeed.h>
 #include <Components/PlayerData.h>
+#include <Components/ScreenPosition.h>
 
 #include <aunteater/Entity.h>
 #include <aunteater/EntityManager.h>
@@ -27,7 +28,7 @@ aunteater::Entity makeDirectControllable(Controller aController,
                                          Position2 aInitialPosition = {0.f, 0.f});
                              
 
-aunteater::Entity makeHudText(std::string aMessage, Position2 aScreenPosition);
+aunteater::Entity makeHudText(std::string aMessage, Position2 aScreenPosition, ScreenPosition::Origin aMessageOrigin);
 
 aunteater::Entity makePlayingPlayer(int aIndex,
                              Controller aController,

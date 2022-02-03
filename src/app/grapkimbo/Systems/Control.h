@@ -29,12 +29,17 @@ public:
 
     void update(const GrapitoTimer, const GameInputState & aInputState) override;
 
+    void switchGrappling(bool aEnabled)
+    { mGrapplingEnabled = aEnabled; }
+
 private:
     std::pair<Position2, double> anchor(const Position2 aPosition);
 
     aunteater::EntityManager & mEntityManager;
     const aunteater::FamilyHelp<CartesianControlled> mCartesianControllables;
     const aunteater::FamilyHelp<Grappler> mGrapplers;
+
+    bool mGrapplingEnabled{true};
 };
 
 } // namespace grapito

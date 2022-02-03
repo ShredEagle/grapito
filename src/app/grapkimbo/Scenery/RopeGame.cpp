@@ -26,11 +26,12 @@
 #include <Systems/Control.h>
 #include <Systems/GameRule.h>
 #include <Systems/Gravity.h>
-#include <Systems/Hud.h>
 #include <Systems/LevelGeneration.h>
 #include <Systems/Physics.h>
-#include <Systems/Render.h>
 #include <Systems/RenderBackground.h>
+#include <Systems/RenderHud.h>
+#include <Systems/RenderToScreen.h>
+#include <Systems/RenderWorld.h>
 #include <Systems/RopeCreation.h>
 #include <Systems/SegmentStacker.h>
 #include <Systems/TransitionAnimationState.h>
@@ -63,7 +64,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     mSystemManager.add<debug::DirectControl>();
 
     mSystemManager.add<PlayerJoin>(mContext);
-    mSystemManager.add<Control>();
+    std::shared_ptr<Control> controlSystem = mSystemManager.add<Control>();
     mSystemManager.add<Gravity>();
     mSystemManager.add<RopeCreation>();
 
@@ -82,16 +83,20 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
 
     auto soundSystem = mSystemManager.add<SoundSystem>(mContext->mSoundManager);
 
+    auto renderToScreen = std::make_shared<RenderToScreen>(mEntityManager, mAppInterface, *this); 
     // Done after CameraGuidedControl, to avoid having two camera guides on the frame a player is killed.
-    mSystemManager.add<GameRule>(mContext, std::vector<aunteater::Entity>{player});
+    mSystemManager.add<GameRule>(mContext, std::vector<aunteater::Entity>{player}, controlSystem, renderToScreen);
 
     mRenderBackgroundSystem = mSystemManager.add<RenderBackground>(mAppInterface); 
     mRenderBackgroundSystem->addLayer(mContext->pathFor(background::gSpaceImage), background::gSpaceScrollFactor);
     mRenderBackgroundSystem->addLayer(mContext->pathFor(background::gSmallStarImage), background::gSmallStarScrollFactor);
     mRenderBackgroundSystem->addLayer(mContext->pathFor(background::gStarImage), background::gStarScrollFactor);
 
-    mRenderSystem = mSystemManager.add<Render>(mAppInterface); 
-    mSystemManager.add<Hud>(mContext->pathFor(hud::gFont), mAppInterface); 
+    mRenderWorldSystem = mSystemManager.add<RenderWorld>(mAppInterface); 
+    mRenderHudSystem = mSystemManager.add<RenderHud>(mContext->pathFor(hud::gFont), mAppInterface); 
+    
+    // Will actually render everything to screen.
+    mSystemManager.add(std::move(renderToScreen)); 
 
     { // Load sprite animations
         // Note: It is not obvious whether it is better to maintain a permanent instance of the sprite sheet
@@ -104,7 +109,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
         graphics::sprite::Animator animator;
         // TODO cache via resource system
         // Install the blue (default) variant
-        mRenderSystem->installAtlas(animator.load(spriteSheets.begin(), spriteSheets.end()));
+        mRenderWorldSystem->installAtlas(animator.load(spriteSheets.begin(), spriteSheets.end()));
         spriteAnimationSystem->installAnimator(std::move(animator));
 
         using namespace std::string_literals;
@@ -116,7 +121,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
                     arte::ImageRgba{mContext->pathFor("sprite_sheet/idle_" + color + ".png")},
                     arte::ImageRgba{mContext->pathFor("sprite_sheet/run_" + color + ".png")},
                 });
-            mRenderSystem->installAtlas(graphics::sprite::loadAtlas(colorVariation));
+            mRenderWorldSystem->installAtlas(graphics::sprite::loadAtlas(colorVariation));
         }
     }
 
@@ -177,7 +182,8 @@ std::pair<TransitionProgress, UpdateStatus> RopeGame::exit(
 void RopeGame::render() const
 {
     mRenderBackgroundSystem->render();
-    mRenderSystem->render();
+    mRenderWorldSystem->render();
+    mRenderHudSystem->render();
 }
 
 
