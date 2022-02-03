@@ -59,6 +59,7 @@ aunteater::Entity makeChoosingColorPlayer(int aIndex, Controller aController, ma
     aunteater::Entity player = aunteater::Entity()
         .add<Controllable>(aController)
         .add<PlayerData>(aIndex, aColor);
+    return player;
 }
 
 void makeChoosingColorPlayerPlaying(aunteater::weak_entity player)
