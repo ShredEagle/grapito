@@ -1,5 +1,6 @@
 #include "GameScene.h"
 
+#include "Input.h"
 #include "MenuScene.h"
 
 #include "../Configuration.h"
@@ -25,13 +26,17 @@ UpdateStatus GameScene::update(
     const GameInputState & aInputs,
     StateMachine & aStateMachine)
 {
-    if (isPositiveEdge(aInputs, Start))
+    Controller pressingStartController = isPositiveEdge(aInputs, Start);
+    if (pressingStartController != Controller::_End)
     {
-        aStateMachine.pushState(setupPauseMenu(mContext, mAppInterface, shared_from_this()));
-        // Causes troubles with detection of next press of pause button
-        // it would still be the same edge!
-        //return aStateMachine.update(aTimer, aInputs);
-        return UpdateStatus::KeepFrame;
+        if (mContext->mPlayerList.getPlayerState(pressingStartController) != PlayerJoinState_NotActive)
+        {
+            aStateMachine.pushState(setupPauseMenu(mContext, mAppInterface, shared_from_this()));
+            // Causes troubles with detection of next press of pause button
+            // it would still be the same edge!
+            //return aStateMachine.update(aTimer, aInputs);
+            return UpdateStatus::KeepFrame;
+        }
     }
 
     InputState debugPause = aInputs.get(Controller::KeyboardMouse)[Command::Pause];

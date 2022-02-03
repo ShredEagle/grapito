@@ -31,7 +31,6 @@ set(${TARGET_NAME}_HEADERS
     Components/Controllable.h
     Components/DelayDeletion.h
     Components/DistanceJoint.h
-    Components/GrappleControl.h
     Components/Mass.h
     Components/PivotJoint.h
     Components/PlayerData.h
@@ -52,6 +51,7 @@ set(${TARGET_NAME}_HEADERS
     Context/Context.h
     Context/Localization.h
     Context/Resources.h
+    Context/PlayerList.h
 
     Systems/CameraGuidedControl.h
     Systems/Control.h
@@ -69,6 +69,7 @@ set(${TARGET_NAME}_HEADERS
     Systems/RenderWorld.h
     Systems/AccelSolver.h
     Systems/Physics.h
+    Systems/PlayerJoin.h
     Systems/RopeCreation.h
     Systems/SegmentStacker.h
     Systems/SoundSystem.h
@@ -124,6 +125,7 @@ set(${TARGET_NAME}_SOURCES
     Animation/AnimationStateMachine.cpp
 
     Context/Localization.cpp
+    Context/PlayerList.cpp
 
     Systems/CameraGuidedControl.cpp
     Systems/Control.cpp
@@ -140,6 +142,7 @@ set(${TARGET_NAME}_SOURCES
     Systems/RenderWorld.cpp
     Systems/AccelSolver.cpp
     Systems/Physics.cpp
+    Systems/PlayerJoin.cpp
     Systems/RopeCreation.cpp
     Systems/SegmentStacker.cpp
     Systems/SoundSystem.cpp

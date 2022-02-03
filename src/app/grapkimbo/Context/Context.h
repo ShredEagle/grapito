@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include "PlayerList.h"
 #include "Localization.h"
 #include "Resources.h"
 #include "commons.h"
@@ -27,6 +28,8 @@ struct Context
     Resources resources;
     Locale locale;
     SoundManager mSoundManager;
+
+    PlayerList mPlayerList;
 };
 
 

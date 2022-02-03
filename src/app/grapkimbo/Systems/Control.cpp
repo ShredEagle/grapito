@@ -228,7 +228,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
     //
     for(auto & player : mGrapplers)
     {
-        auto & [controllable, aas, grappleControl, geometry, playerData] = player;
+        auto & [controllable, aas, geometry, playerData] = player;
         const ControllerInputState & inputs = aInputState.get(controllable.controller);
 
         if (controllable.controller == Controller::KeyboardMouse)

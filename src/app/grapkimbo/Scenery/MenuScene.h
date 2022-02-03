@@ -26,8 +26,8 @@ class GameScene;
 struct UiButton
 {
     const std::string mText;
-    std::function<void(StateMachine &, std::shared_ptr<graphics::AppInterface> &)> mCallback =
-        [](StateMachine &, std::shared_ptr<graphics::AppInterface> &){};
+    std::function<void(StateMachine &, std::shared_ptr<graphics::AppInterface> &, const Controller)> mCallback =
+        [](StateMachine &, std::shared_ptr<graphics::AppInterface> &, const Controller){};
 };
 
 

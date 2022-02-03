@@ -22,7 +22,6 @@ enum GameList
 {
     CollisionTest,
     DistanceTest,
-    GamePendulum,
     FrictionTest,
     SimpleCollisionTest,
     PivotTest,

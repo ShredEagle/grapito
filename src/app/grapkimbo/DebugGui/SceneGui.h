@@ -91,11 +91,6 @@ static void drawImGui(graphics::ApplicationGlfw & aApplication, DebugUI & aUI, I
         ImGui::EndMenuBar();
     }
 
-    if(ImGui::Button("Game_pendulum"))
-    {
-        ChangeScene(GameList::GamePendulum, aApplication, aUI);
-    }
-
     ImGui::Checkbox("Debug draw", &debugDrawer->mShown);
 
     ImGui::Checkbox("Show rope structure (not implemented)", &aState.showRopeStructure);
