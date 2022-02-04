@@ -33,6 +33,8 @@ class GameRule : public aunteater::System<GrapitoTimer, GameInputState>
         Competition, 
         Congratulation,
         ExpectPlayers,
+        FadeOut,
+        FadeIn,
 
         _End,
     };
@@ -46,6 +48,8 @@ class GameRule : public aunteater::System<GrapitoTimer, GameInputState>
     friend class WarmupPhase;
     friend class CompetitionPhase;
     friend class CongratulationPhase;
+    friend class FadeOutPhase;
+    friend class FadeInPhase;
 
 public:
     GameRule(aunteater::EntityManager & aEntityManager,
@@ -59,7 +63,7 @@ private:
     /// \brief Reset all competitors to their initial state.
     void resetCompetitors();
 
-    void addNewCompetitors();
+    void addNewCompetitors(bool aPreserveCameraPosition = false);
 
     /// \brief Remove all competitors from the game.
     void killAllCompetitors(); // Can you tell I watched squid game recently?

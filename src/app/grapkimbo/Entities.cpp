@@ -89,7 +89,8 @@ void makeChoosingColorPlayerPlaying(aunteater::weak_entity player)
 
 aunteater::Entity makePlayingPlayer(int aIndex,
                              Controller aController,
-                             math::sdr::Rgb aColor)
+                             math::sdr::Rgb aColor,
+                             Position2 aPosition)
 {
     aunteater::Entity player = aunteater::Entity()
         // The component will be populated by AnimationState system.
@@ -111,7 +112,7 @@ aunteater::Entity makePlayingPlayer(int aIndex,
         .add<Controllable>(aController)
         .add<Mass>(player::gMass)
         .add<PlayerData>(aIndex, aColor)
-        .add<Position>(Position2{3.f, 3.f}, player::gSize) // The position will be set by pendulum simulation
+        .add<Position>(aPosition, player::gSize) // The position will be set by pendulum simulation
         //.add<VisualRectangle>(aColor)
         .add<VisualSprite>((AtlasIndex)aIndex) // the sprite itself is handled by animation system
                                                // SMELL: we hardcode the fact that we use the player id as atlas index

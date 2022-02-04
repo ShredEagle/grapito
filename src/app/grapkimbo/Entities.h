@@ -18,8 +18,7 @@
 
 
 namespace ad {
-namespace grapito
-{
+namespace grapito {
 
 
 aunteater::Entity makeCamera(Position2 pos = {0.f, 0.f});
@@ -34,8 +33,9 @@ aunteater::Entity makeHudText(std::string aMessage, Position2 aScreenPosition, S
 // TODO Ad 2022/02/04: Replace sdr::Rgb by a color index, and use it instead of the player index.
 // Will be required to implement choosing color.
 aunteater::Entity makePlayingPlayer(int aIndex,
-                             Controller aController,
-                             math::sdr::Rgb aColor);
+                                    Controller aController,
+                                    math::sdr::Rgb aColor,
+                                    Position2 aPosition = {0.f, 3.f});
 
 void kill(aunteater::weak_entity aPlayer);
 
