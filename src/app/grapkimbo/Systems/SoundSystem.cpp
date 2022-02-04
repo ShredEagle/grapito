@@ -33,46 +33,52 @@ void SoundSystem::removedEntity(aunteater::LiveEntity & aEntity)
         {
             mSoundManager.stopSound(sound.sourceId);
         }
+        else
+        {
+            mOrphanPlayingSounds.push_back(std::move(sound));
+        }
     }
 }
 
 void SoundSystem::update(const GrapitoTimer, const GameInputState &)
 {
+    std::vector<ALuint> sourceToDelete;
     for (auto & [soundPlayer] : mSounds)
     {
-        for (auto soundIterator = soundPlayer.mSounds.begin(); soundIterator != soundPlayer.mSounds.end(); ++soundIterator)
+        for (auto & sound : soundPlayer.mSounds)
         {
-            auto & sound = *soundIterator;
             if (!sound.mPlaying)
             {
                 ALuint sourceId = mSoundManager.playSound(sound.mSoundId, sound.mLooping);
                 sound.sourceId = sourceId;
-                mPlayingSources.emplace_back(PlayingSource{sourceId, soundIterator, soundPlayer});
                 sound.mPlaying = true;
             }
         }
+        checkAndPrepareSourceDeletion(sourceToDelete, soundPlayer.mSounds);
     }
-    std::vector<ALuint> sourceToDelete;
 
-    for (auto sourceIterator = mPlayingSources.begin(); sourceIterator != mPlayingSources.end();)
-    {
-        PlayingSource & playingSource = *sourceIterator;
-        ALint sourceState = mSoundManager.getSourceState(playingSource.mSource);
-
-        if (sourceState == AL_STOPPED)
-        {
-            sourceToDelete.push_back(playingSource.mSource);
-            playingSource.mSoundPlayerReference.mSounds.erase(playingSource.mSoundDataDeleteIterator);
-            sourceIterator = mPlayingSources.erase(sourceIterator);
-        }
-        else
-        {
-            ++sourceIterator;
-        }
-    }
+    checkAndPrepareSourceDeletion(sourceToDelete, mOrphanPlayingSounds);
 
     mSoundManager.deleteSources(sourceToDelete);
 }
 
+void SoundSystem::checkAndPrepareSourceDeletion(std::vector<ALuint> & outSourceToDelete, std::list<Sound> & aSoundList)
+{
+    for (auto soundIterator = aSoundList.begin(); soundIterator != aSoundList.end();)
+    {
+        Sound sound = *soundIterator;
+        ALint sourceState = mSoundManager.getSourceState(sound.sourceId);
+
+        if (sourceState == AL_STOPPED)
+        {
+            outSourceToDelete.push_back(sound.sourceId);
+            soundIterator = aSoundList.erase(soundIterator);
+        }
+        else
+        {
+            ++soundIterator;
+        }
+    }
+}
 }
 }
