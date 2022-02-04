@@ -309,50 +309,9 @@ class CompetitionPhase : public PhaseBase
 };
 
 
-class FreeSoloPhase : public PhaseBase
-{
-    using PhaseBase::PhaseBase;
-
-
-    void beforeEnter() override
-    {
-        mHudText = getEntityManager().addEntity(
-            makeHudText(mContext->translate(hud_solomode_sid),
-                        hud::gModeTextPosition,
-                        ScreenPosition::BottomLeft));
-    }
-
-
-    UpdateStatus update(
-        const GrapitoTimer &,
-        const GameInputState & aInputs,
-        StateMachine & aStateMachine) override
-    {
-        // TODO This should be handled for all active controllers, there might not even be a gamepad.
-        if (aInputs.get(Controller::Gamepad_0)[Back].positiveEdge() && (mGameRule.mPlayers.size() > 1))
-        {
-            aStateMachine.putNext(getPhase(GameRule::Warmup));
-            aStateMachine.popState();
-        }
-        // Note: This will have absolutely no impact, nested state machines
-        // update status is not checked.
-        return UpdateStatus::SwapBuffers;
-    }
-
-
-    void beforeExit() override
-    {
-        mHudText->markToRemove();
-    }
-
-    aunteater::weak_entity mHudText;
-};
-
-
 GameRule::PhasesArray setupGamePhases(std::shared_ptr<Context> aContext, GameRule & aGameRule)
 {
     GameRule::PhasesArray result;
-    result[GameRule::FreeSolo] = std::make_shared<FreeSoloPhase>(aContext, aGameRule);
     result[GameRule::Warmup] = std::make_shared<WarmupPhase>(aContext, aGameRule);
     result[GameRule::Competition] = std::make_shared<CompetitionPhase>(aContext, aGameRule);
     result[GameRule::Congratulation] = std::make_shared<CongratulationPhase>(aContext, aGameRule);
@@ -363,14 +322,12 @@ GameRule::PhasesArray setupGamePhases(std::shared_ptr<Context> aContext, GameRul
 
 GameRule::GameRule(aunteater::EntityManager & aEntityManager,
                    std::shared_ptr<Context> aContext,
-                   std::vector<aunteater::Entity> aPlayers,
                    std::shared_ptr<Control> aControlSystem,
                    std::shared_ptr<RenderToScreen> aRenderToScreenSystem) :
     mEntityManager{aEntityManager},
     mCompetitors{aEntityManager},
     mCameras{aEntityManager},
     mCameraPoints{aEntityManager},
-    mPlayers{std::move(aPlayers)},
     mContext{std::move(aContext)},
     mPhases{setupGamePhases(mContext, *this)},
     mPhaseMachine{mPhases[ExpectPlayers]},

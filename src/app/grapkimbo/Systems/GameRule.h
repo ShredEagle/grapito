@@ -29,7 +29,6 @@ class GameRule : public aunteater::System<GrapitoTimer, GameInputState>
 {
     enum Phase
     {
-        FreeSolo,
         Warmup,
         Competition, 
         Congratulation,
@@ -43,7 +42,6 @@ class GameRule : public aunteater::System<GrapitoTimer, GameInputState>
     friend PhasesArray setupGamePhases(std::shared_ptr<Context>, GameRule &);
 
     friend class PhaseBase;
-    friend class FreeSoloPhase;
     friend class ExpectPlayersPhase;
     friend class WarmupPhase;
     friend class CompetitionPhase;
@@ -52,7 +50,6 @@ class GameRule : public aunteater::System<GrapitoTimer, GameInputState>
 public:
     GameRule(aunteater::EntityManager & aEntityManager,
              std::shared_ptr<Context> aContext,
-             std::vector<aunteater::Entity> aPlayers,
              std::shared_ptr<Control> aControlSystem,
              std::shared_ptr<RenderToScreen> aRenderToScreenSystem);
 
@@ -85,10 +82,9 @@ private:
     std::shared_ptr<Control> mControlSystem;
     std::shared_ptr<RenderToScreen> mRenderToScreenSystem;
 
-    // TODO remove
-    std::vector<aunteater::Entity> mPlayers;
-
     std::shared_ptr<Context> mContext;
+
+    std::vector<int> mAddedPlayerSlots;
 
     PhasesArray mPhases;
     StateMachine mPhaseMachine;
