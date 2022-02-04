@@ -17,13 +17,6 @@ namespace ad {
 namespace grapito
 {
 
-struct PlayingSource
-{
-    ALuint mSource;
-    std::list<Sound>::iterator mSoundDataDeleteIterator;
-    SoundPlayer & mSoundPlayerReference;
-};
-
 typedef aunteater::Archetype<SoundPlayer> SoundType;
 
 class SoundSystem : public aunteater::System<GrapitoTimer, GameInputState>, public aunteater::FamilyObserver
@@ -43,12 +36,13 @@ public:
 
 
 private:
+    void checkAndPrepareSourceDeletion(std::vector<ALuint> & outSourceToDelete, std::list<Sound>& aSoundList);
     const aunteater::FamilyHelp<SoundType> mSounds;
     SoundManager & mSoundManager;
     //Right now this is here but this should be stored in the scenes
     //later once I understand it better to allow pause and relaunch on scene change
     //TODO(franz): store this in the scenes
-    std::list<PlayingSource> mPlayingSources;
+    std::list<Sound> mOrphanPlayingSounds;
 };
 
 } // namespace grapito
