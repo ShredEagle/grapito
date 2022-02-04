@@ -57,12 +57,17 @@ int PlayerList::addPlayer(Controller aControllerId, PlayerJoinState aJoinState)
 {
     int availableSlot = getNextSlot();
 
-    if (availableSlot != -1)
+    if (availableSlot != -1
+        && std::ranges::find_if(mPlayerList, [&](const auto & state)
+            {
+                return state.mControllerId == aControllerId;
+            }) == mPlayerList.end())
     {
         mPlayerList.emplace_back(PlayerControllerState{availableSlot, aControllerId, aJoinState});
+        return availableSlot;
     }
 
-    return availableSlot;
+    return -1;
 }
 
 void PlayerList::removePlayer(Controller aControllerId)
