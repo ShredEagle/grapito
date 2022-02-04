@@ -22,6 +22,7 @@ namespace ad {
 namespace grapito {
 
 
+const StringId hud_waitplayers_sid  = handy::internalizeString("hud_waitplayers");
 const StringId hud_victory_sid  = handy::internalizeString("hud_victory");
 const StringId hud_solomode_sid = handy::internalizeString("hud_solomode");
 const StringId hud_1_sid = handy::internalizeString("hud_1");
@@ -52,6 +53,7 @@ protected:
     std::shared_ptr<Context> mContext;
     GameRule & mGameRule;
 };
+
 
 class CongratulationPhase : public PhaseBase
 {
@@ -130,6 +132,55 @@ private:
     aunteater::weak_entity mHudText{nullptr};
 };
 
+
+class ExpectPlayersPhase : public PhaseBase
+{
+    using PhaseBase::PhaseBase;
+
+    void beforeEnter() override
+    {
+        mFadeOpacity.reset();
+        mGameRule.disableGrapples();
+        mHudText = getEntityManager().addEntity(makeHudText(mContext->translate(hud_waitplayers_sid), 
+                                                            hud::gCountdownPosition,
+                                                            ScreenPosition::Center));
+    }
+
+
+    UpdateStatus update(
+            const GrapitoTimer & aTimer,
+            const GameInputState &,
+            StateMachine & aStateMachine) override
+    {
+        mHudText->get<Text>().color.a() = mFlashing.advance(aTimer.delta()) * 255;
+
+        if(mContext->mPlayerList.countActivePlayers() > 1)
+        {
+            mGameRule.setFadeOpacity(mFadeOpacity.advance(aTimer.delta()));
+            if(mFadeOpacity.isCompleted())
+            {
+                aStateMachine.putNext(getPhase(GameRule::Warmup));
+                aStateMachine.popState();
+            }
+        }
+
+        // Note: This will have absolutely no impact, nested state machines
+        // update status is not checked.
+        return UpdateStatus::SwapBuffers;
+    }
+
+
+    void beforeExit() override
+    {
+        mHudText->markToRemove();
+        mGameRule.enableGrapples();
+    }
+    aunteater::weak_entity mHudText{nullptr};
+    math::Interpolation<float, float, math::periodic::PingPong> mFlashing =
+        math::makeInterpolation<math::periodic::PingPong>(0.f, 1.f, game::gFadeDuration);
+    math::Interpolation<float, float> mFadeOpacity =
+        math::makeInterpolation(0.f, 1.f, game::gFadeDuration);
+};
 
 /// \brief Countdown during which grapples cannot be used.
 class WarmupPhase : public PhaseBase
@@ -305,6 +356,7 @@ GameRule::PhasesArray setupGamePhases(std::shared_ptr<Context> aContext, GameRul
     result[GameRule::Warmup] = std::make_shared<WarmupPhase>(aContext, aGameRule);
     result[GameRule::Competition] = std::make_shared<CompetitionPhase>(aContext, aGameRule);
     result[GameRule::Congratulation] = std::make_shared<CongratulationPhase>(aContext, aGameRule);
+    result[GameRule::ExpectPlayers] = std::make_shared<ExpectPlayersPhase>(aContext, aGameRule);
     return result;
 }
 
@@ -319,8 +371,9 @@ GameRule::GameRule(aunteater::EntityManager & aEntityManager,
     mCameras{aEntityManager},
     mCameraPoints{aEntityManager},
     mPlayers{std::move(aPlayers)},
-    mPhases{setupGamePhases(aContext, *this)},
-    mPhaseMachine{mPhases[FreeSolo]},
+    mContext{std::move(aContext)},
+    mPhases{setupGamePhases(mContext, *this)},
+    mPhaseMachine{mPhases[ExpectPlayers]},
     mControlSystem{std::move(aControlSystem)},
     mRenderToScreenSystem{std::move(aRenderToScreenSystem)}
 {}
@@ -399,9 +452,13 @@ void GameRule::resetCompetitors()
 {
     killAllCompetitors();
 
-    for (const auto & player : mPlayers)
+    for (const PlayerControllerState & player : mContext->mPlayerList)
     {
-        mEntityManager.addEntity(player);
+        if (player.mJoinState == PlayerJoinState_Playing)
+        {
+            mEntityManager.addEntity(
+                makePlayingPlayer(player.mPlayerSlot, player.mControllerId, player.mColor));
+        }
     }
 }
 

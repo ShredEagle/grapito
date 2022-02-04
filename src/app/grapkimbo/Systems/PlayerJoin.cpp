@@ -25,14 +25,6 @@ void PlayerJoin::update(const GrapitoTimer aTimer, const GameInputState & aInput
         {
             //Change player to Choosing color state
             int slot = mContext->mPlayerList.addPlayer(controller, PlayerJoinState_Playing);
-            if (slot != -1)
-            {
-                //Add Color choice Menu entity
-                auto player = makePlayingPlayer(slot, controller, math::sdr::gCyan);
-
-                mEntityManager.addEntity(player);
-            }
-
         }
     }
 

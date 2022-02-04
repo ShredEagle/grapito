@@ -30,6 +30,9 @@ aunteater::Entity makeDirectControllable(Controller aController,
 
 aunteater::Entity makeHudText(std::string aMessage, Position2 aScreenPosition, ScreenPosition::Origin aMessageOrigin);
 
+
+// TODO Ad 2022/02/04: Replace sdr::Rgb by a color index, and use it instead of the player index.
+// Will be required to implement choosing color.
 aunteater::Entity makePlayingPlayer(int aIndex,
                              Controller aController,
                              math::sdr::Rgb aColor);

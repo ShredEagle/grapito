@@ -33,6 +33,7 @@ class GameRule : public aunteater::System<GrapitoTimer, GameInputState>
         Warmup,
         Competition, 
         Congratulation,
+        ExpectPlayers,
 
         _End,
     };
@@ -43,6 +44,7 @@ class GameRule : public aunteater::System<GrapitoTimer, GameInputState>
 
     friend class PhaseBase;
     friend class FreeSoloPhase;
+    friend class ExpectPlayersPhase;
     friend class WarmupPhase;
     friend class CompetitionPhase;
     friend class CongratulationPhase;
@@ -83,7 +85,10 @@ private:
     std::shared_ptr<Control> mControlSystem;
     std::shared_ptr<RenderToScreen> mRenderToScreenSystem;
 
+    // TODO remove
     std::vector<aunteater::Entity> mPlayers;
+
+    std::shared_ptr<Context> mContext;
 
     PhasesArray mPhases;
     StateMachine mPhaseMachine;

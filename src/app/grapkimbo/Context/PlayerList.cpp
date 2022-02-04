@@ -107,5 +107,12 @@ std::vector<Controller> PlayerList::getUnactiveControllers()
     return unactiveControllers;
 }
 
+
+std::size_t PlayerList::countActivePlayers() const
+{
+    return mPlayerList.size();
+}
+
+
 }
 }
