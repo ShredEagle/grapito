@@ -145,19 +145,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
         createStackFive(mEntityManager, 0.f);
     }
 
-    //
-    // Players
-    //
-    {
-        auto player = setupPlayer(aController);
-        mEntityManager.addEntity(player);
-
-        // Debug direct control (for camera influence)
-        mEntityManager.addEntity(
-            makeDirectControllable(player.get<Controllable>().controller)
-        );
-
-    }
+    // Players are added by GameRule system.
 }
 
 std::pair<TransitionProgress, UpdateStatus> RopeGame::enter(

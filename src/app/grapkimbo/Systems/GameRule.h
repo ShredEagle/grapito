@@ -59,6 +59,8 @@ private:
     /// \brief Reset all competitors to their initial state.
     void resetCompetitors();
 
+    void addNewCompetitors();
+
     /// \brief Remove all competitors from the game.
     void killAllCompetitors(); // Can you tell I watched squid game recently?
 
@@ -84,7 +86,8 @@ private:
 
     std::shared_ptr<Context> mContext;
 
-    std::vector<int> mAddedPlayerSlots;
+    // Values from PlayerControllerState.mPlayerSlot
+    std::set<int> mAddedCompetitors;
 
     PhasesArray mPhases;
     StateMachine mPhaseMachine;

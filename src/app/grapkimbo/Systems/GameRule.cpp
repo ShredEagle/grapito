@@ -140,6 +140,7 @@ class ExpectPlayersPhase : public PhaseBase
     void beforeEnter() override
     {
         mFadeOpacity.reset();
+        mGameRule.resetCompetitors(); // in order to add at least the player that entered the game
         mGameRule.disableGrapples();
         mHudText = getEntityManager().addEntity(makeHudText(mContext->translate(hud_waitplayers_sid), 
                                                             hud::gCountdownPosition,
@@ -209,6 +210,7 @@ class WarmupPhase : public PhaseBase
 
     void updateImpl(float aDelta, StateMachine & aStateMachine)
     {
+        mGameRule.addNewCompetitors();
         mGameRule.setFadeOpacity(mFadeOpacity.advance(aDelta));
         auto param = mCountdownParam.advance(aDelta);
         if(mCountdownParam.isCompleted())
@@ -408,13 +410,21 @@ void GameRule::prepareCameraFadeOut(Position2 aCameraPosition,
 void GameRule::resetCompetitors()
 {
     killAllCompetitors();
+    mAddedCompetitors.clear();
+    addNewCompetitors();
+}
 
+
+void GameRule::addNewCompetitors()
+{
     for (const PlayerControllerState & player : mContext->mPlayerList)
     {
-        if (player.mJoinState == PlayerJoinState_Playing)
+        if (!mAddedCompetitors.contains(player.mPlayerSlot)
+            && player.mJoinState == PlayerJoinState_Playing)
         {
             mEntityManager.addEntity(
                 makePlayingPlayer(player.mPlayerSlot, player.mControllerId, player.mColor));
+            mAddedCompetitors.insert(player.mPlayerSlot);
         }
     }
 }
