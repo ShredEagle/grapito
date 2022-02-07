@@ -11,6 +11,8 @@
 #include <aunteater/FamilyHelp.h>
 #include <aunteater/System.h>
 
+#include <handy/random.h>
+
 #include <array>
 
 
@@ -25,14 +27,50 @@ class Control;
 class RenderToScreen;
 
 
+// This is a very naive implementation.
+// There are many better options with a single container.
+class PositionsBucket
+{
+public:
+    PositionsBucket(std::initializer_list<Position2> aOptions) :
+        mAvailable{std::move(aOptions)},
+        mIndexer{0, std::numeric_limits<int>::max()}
+    {}
+
+    Position2 getRandom()
+    {
+        assert (mAvailable.size() > 0);
+
+        auto candidate = mAvailable.begin() + (mIndexer() % mAvailable.size());
+        Position2 result = *candidate;
+        mAvailable.erase(candidate);
+        mInUse.push_back(result);
+        return result;
+    }
+
+    void reset()
+    {
+        std::ranges::copy(mInUse, std::back_inserter(mAvailable));
+        mInUse.clear();
+    }
+
+private:
+    std::vector<Position2> mAvailable;
+    std::vector<Position2> mInUse;
+    Randomizer<> mIndexer;
+};
+
+
 class GameRule : public aunteater::System<GrapitoTimer, GameInputState>
 {
     enum Phase
     {
-        FreeSolo,
         Warmup,
         Competition, 
         Congratulation,
+        ExpectPlayers,
+        FadeOut,
+        FadeIn,
 
         _End,
     };
@@ -42,15 +80,16 @@ class GameRule : public aunteater::System<GrapitoTimer, GameInputState>
     friend PhasesArray setupGamePhases(std::shared_ptr<Context>, GameRule &);
 
     friend class PhaseBase;
-    friend class FreeSoloPhase;
+    friend class ExpectPlayersPhase;
     friend class WarmupPhase;
     friend class CompetitionPhase;
     friend class CongratulationPhase;
+    friend class FadeOutPhase;
+    friend class FadeInPhase;
 
 public:
     GameRule(aunteater::EntityManager & aEntityManager,
              std::shared_ptr<Context> aContext,
-             std::vector<aunteater::Entity> aPlayers,
              std::shared_ptr<Control> aControlSystem,
              std::shared_ptr<RenderToScreen> aRenderToScreenSystem);
 
@@ -60,6 +99,8 @@ private:
     /// \brief Reset all competitors to their initial state.
     void resetCompetitors();
 
+    void addNewCompetitors(bool aPreserveCameraPosition = false);
+
     /// \brief Remove all competitors from the game.
     void killAllCompetitors(); // Can you tell I watched squid game recently?
 
@@ -67,7 +108,9 @@ private:
     /// \return The number of competitors remaining in the game after this step of eliminations.
     std::size_t eliminateCompetitors();
 
-    void prepareCameraFadeOut(Position2 aCameraPosition, const Position & aGeometry, CameraGuide & aCameraGuide);
+    aunteater::Entity prepareCameraFadeOut(Position2 aCameraPosition,
+                                           const Position & aGeometry,
+                                           CameraGuide & aCameraGuide);
 
     void enableGrapples();
     void disableGrapples();
@@ -83,7 +126,21 @@ private:
     std::shared_ptr<Control> mControlSystem;
     std::shared_ptr<RenderToScreen> mRenderToScreenSystem;
 
-    std::vector<aunteater::Entity> mPlayers;
+    std::shared_ptr<Context> mContext;
+
+    // Values from PlayerControllerState.mPlayerSlot
+    std::set<int> mAddedCompetitors;
+
+    PositionsBucket mCandidatePositions{ 
+        {-15.f, 3.f}, 
+        {-11.f, 3.f}, 
+        { -7.f, 3.f}, 
+        { -3.f, 3.f}, 
+        {  3.f, 3.f}, 
+        {  7.f, 3.f}, 
+        { 11.f, 3.f}, 
+        { 15.f, 3.f}, 
+    };
 
     PhasesArray mPhases;
     StateMachine mPhaseMachine;

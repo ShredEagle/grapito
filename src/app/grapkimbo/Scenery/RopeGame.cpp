@@ -59,8 +59,6 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
 {
     mContext->mPlayerList.addPlayer(aController, PlayerJoinState_Playing);
 
-    auto player = setupPlayer(aController);
-
     mSystemManager.add<debug::DirectControl>();
 
     mSystemManager.add<PlayerJoin>(mContext);
@@ -85,7 +83,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
 
     auto renderToScreen = std::make_shared<RenderToScreen>(mEntityManager, mAppInterface, *this); 
     // Done after CameraGuidedControl, to avoid having two camera guides on the frame a player is killed.
-    mSystemManager.add<GameRule>(mContext, std::vector<aunteater::Entity>{player}, controlSystem, renderToScreen);
+    mSystemManager.add<GameRule>(mContext, controlSystem, renderToScreen);
 
     mRenderBackgroundSystem = mSystemManager.add<RenderBackground>(mAppInterface); 
     mRenderBackgroundSystem->addLayer(mContext->pathFor(background::gSpaceImage), background::gSpaceScrollFactor);
@@ -147,18 +145,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
         createStackFive(mEntityManager, 0.f);
     }
 
-    //
-    // Players
-    //
-    {
-        mEntityManager.addEntity(player);
-
-        // Debug direct control (for camera influence)
-        mEntityManager.addEntity(
-            makeDirectControllable(player.get<Controllable>().controller)
-        );
-
-    }
+    // Players are added by GameRule system.
 }
 
 std::pair<TransitionProgress, UpdateStatus> RopeGame::enter(

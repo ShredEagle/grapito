@@ -22,6 +22,7 @@ namespace ad {
 namespace grapito {
 
 
+const StringId hud_waitplayers_sid  = handy::internalizeString("hud_waitplayers");
 const StringId hud_victory_sid  = handy::internalizeString("hud_victory");
 const StringId hud_solomode_sid = handy::internalizeString("hud_solomode");
 const StringId hud_1_sid = handy::internalizeString("hud_1");
@@ -53,6 +54,7 @@ protected:
     GameRule & mGameRule;
 };
 
+
 class CongratulationPhase : public PhaseBase
 {
     static constexpr Position2 gOutside = {0.f, -1000.f};
@@ -78,7 +80,6 @@ private:
     void resetInterpolation()
     {
         mHudPositionInterpolation = mHudPositionInterpolationReference;
-        mFadeOpacity.reset();
     }
 
     void beforeEnter() override
@@ -99,15 +100,54 @@ private:
             mHudPositionInterpolation.advance(aTimer.delta());
         if(mHudPositionInterpolation.isCompleted())
         {
-            // This is advancing both the fade opacity and the position interpolation
-            // during the transition frame (ideally, it should only advance opacity with the overshoot)
-            // but that is acceptable
-            mGameRule.setFadeOpacity(mFadeOpacity.advance(aTimer.delta()));
-            if(mFadeOpacity.isCompleted())
-            {
-                aStateMachine.putNext(getPhase(GameRule::Warmup));
-                aStateMachine.popState();
-            }
+            aStateMachine.putNext(getPhase(GameRule::FadeOut));
+            aStateMachine.popState();
+        }
+
+        // Note: This will have absolutely no impact, nested state machines
+        // update status is not checked.
+        return UpdateStatus::SwapBuffers;
+    }
+
+
+    void beforeExit() override
+    {
+        // TODO delay delete ?
+        mHudText->markToRemove();
+    }
+
+
+    const CompositeTransition<Position2, float> mHudPositionInterpolationReference;
+    CompositeTransition<Position2, float> mHudPositionInterpolation;
+    aunteater::weak_entity mHudText{nullptr};
+};
+
+
+class ExpectPlayersPhase : public PhaseBase
+{
+    using PhaseBase::PhaseBase;
+
+    void beforeEnter() override
+    {
+        mGameRule.resetCompetitors(); // in order to add at least the player that entered the game
+        mGameRule.disableGrapples();
+        mHudText = getEntityManager().addEntity(makeHudText(mContext->translate(hud_waitplayers_sid), 
+                                                            hud::gCountdownPosition,
+                                                            ScreenPosition::Center));
+    }
+
+
+    UpdateStatus update(
+            const GrapitoTimer & aTimer,
+            const GameInputState &,
+            StateMachine & aStateMachine) override
+    {
+        mHudText->get<Text>().color.a() = mFlashing.advance(aTimer.delta()) * 255;
+
+        if(mContext->mPlayerList.countActivePlayers() > 1)
+        {
+            aStateMachine.putNext(getPhase(GameRule::Warmup));
+            aStateMachine.popState();
         }
 
         // Note: This will have absolutely no impact, nested state machines
@@ -121,13 +161,88 @@ private:
         mHudText->markToRemove();
     }
 
-
-    const CompositeTransition<Position2, float> mHudPositionInterpolationReference;
-    CompositeTransition<Position2, float> mHudPositionInterpolation;
-
-    math::Interpolation<float, float> mFadeOpacity = 
-        math::makeInterpolation(0.f, 1.f, game::gFadeDuration);
     aunteater::weak_entity mHudText{nullptr};
+    math::Interpolation<float, float, math::periodic::PingPong> mFlashing =
+        math::makeInterpolation<math::periodic::PingPong>(0.f, 1.f, game::gFadeDuration);
+};
+
+
+class FadeOutPhase : public PhaseBase
+{
+    using PhaseBase::PhaseBase;
+
+    void beforeEnter() override
+    {
+        mFadeOpacity.reset();
+    }
+
+
+    UpdateStatus update(
+            const GrapitoTimer & aTimer,
+            const GameInputState &,
+            StateMachine & aStateMachine) override
+    {
+        mGameRule.setFadeOpacity(mFadeOpacity.advance(aTimer.delta()));
+        if(mFadeOpacity.isCompleted())
+        {
+            aStateMachine.putNext(getPhase(GameRule::FadeIn));
+            aStateMachine.popState();
+        }
+
+        // Note: This will have absolutely no impact, nested state machines
+        // update status is not checked.
+        return UpdateStatus::SwapBuffers;
+    }
+
+
+    void beforeExit() override
+    {
+        mGameRule.disableFade();
+    }
+
+    math::Interpolation<float, float> mFadeOpacity =
+        math::makeInterpolation(0.f, 1.f, game::gFadeDuration);
+};
+
+
+/// \brief Reset players and fade in (i.e. show game world)
+class FadeInPhase : public PhaseBase
+{
+    using PhaseBase::PhaseBase;
+
+    void beforeEnter() override
+    {
+        mFadeOpacity.reset();
+        mGameRule.resetCompetitors();
+        mGameRule.disableGrapples();
+    }
+
+
+    UpdateStatus update(
+            const GrapitoTimer & aTimer,
+            const GameInputState &,
+            StateMachine & aStateMachine) override
+    {
+        mGameRule.setFadeOpacity(mFadeOpacity.advance(aTimer.delta()));
+        if(mFadeOpacity.isCompleted())
+        {
+            aStateMachine.putNext(getPhase(GameRule::Warmup));
+            aStateMachine.popState();
+        }
+
+        // Note: This will have absolutely no impact, nested state machines
+        // update status is not checked.
+        return UpdateStatus::SwapBuffers;
+    }
+
+
+    void beforeExit() override
+    {
+        mGameRule.disableFade();
+    }
+
+    math::Interpolation<float, float> mFadeOpacity =
+        math::makeInterpolation(1.f, 0.f, game::gFadeDuration);
 };
 
 
@@ -138,12 +253,9 @@ class WarmupPhase : public PhaseBase
 
     void beforeEnter() override
     {
-        mGameRule.resetCompetitors();
-        mGameRule.disableGrapples();
         mHudText = getEntityManager().addEntity(makeHudText(mContext->translate(mSteps.front()),
                                                             hud::gCountdownPosition,
                                                             ScreenPosition::Center));
-        mFadeOpacity.reset();
     }
 
     UpdateStatus update(
@@ -158,7 +270,7 @@ class WarmupPhase : public PhaseBase
 
     void updateImpl(float aDelta, StateMachine & aStateMachine)
     {
-        mGameRule.setFadeOpacity(mFadeOpacity.advance(aDelta));
+        mGameRule.addNewCompetitors(true);
         auto param = mCountdownParam.advance(aDelta);
         if(mCountdownParam.isCompleted())
         {
@@ -188,14 +300,11 @@ class WarmupPhase : public PhaseBase
     {
         mHudText->markToRemove();
         mGameRule.enableGrapples();
-        mGameRule.disableFade();
     }
 
 
     math::ParameterAnimation<float, math::Clamp> mCountdownParam = 
         math::makeParameterAnimation<math::Clamp>(game::gCountdownStepPeriod);
-    math::Interpolation<float, float> mFadeOpacity = 
-        math::makeInterpolation(1.f, 0.f, game::gFadeDuration);
     std::array<StringId, 3> mSteps{hud_3_sid, hud_2_sid, hud_1_sid};
     std::size_t mCurrentStep{0};
     aunteater::weak_entity mHudText{nullptr};
@@ -258,69 +367,31 @@ class CompetitionPhase : public PhaseBase
 };
 
 
-class FreeSoloPhase : public PhaseBase
-{
-    using PhaseBase::PhaseBase;
-
-
-    void beforeEnter() override
-    {
-        mHudText = getEntityManager().addEntity(
-            makeHudText(mContext->translate(hud_solomode_sid),
-                        hud::gModeTextPosition,
-                        ScreenPosition::BottomLeft));
-    }
-
-
-    UpdateStatus update(
-        const GrapitoTimer &,
-        const GameInputState & aInputs,
-        StateMachine & aStateMachine) override
-    {
-        // TODO This should be handled for all active controllers, there might not even be a gamepad.
-        if (aInputs.get(Controller::Gamepad_0)[Back].positiveEdge() && (mGameRule.mPlayers.size() > 1))
-        {
-            aStateMachine.putNext(getPhase(GameRule::Warmup));
-            aStateMachine.popState();
-        }
-        // Note: This will have absolutely no impact, nested state machines
-        // update status is not checked.
-        return UpdateStatus::SwapBuffers;
-    }
-
-
-    void beforeExit() override
-    {
-        mHudText->markToRemove();
-    }
-
-    aunteater::weak_entity mHudText;
-};
-
-
 GameRule::PhasesArray setupGamePhases(std::shared_ptr<Context> aContext, GameRule & aGameRule)
 {
     GameRule::PhasesArray result;
-    result[GameRule::FreeSolo] = std::make_shared<FreeSoloPhase>(aContext, aGameRule);
     result[GameRule::Warmup] = std::make_shared<WarmupPhase>(aContext, aGameRule);
     result[GameRule::Competition] = std::make_shared<CompetitionPhase>(aContext, aGameRule);
     result[GameRule::Congratulation] = std::make_shared<CongratulationPhase>(aContext, aGameRule);
+    result[GameRule::ExpectPlayers] = std::make_shared<ExpectPlayersPhase>(aContext, aGameRule);
+    result[GameRule::FadeOut] = std::make_shared<FadeOutPhase>(aContext, aGameRule);
+    result[GameRule::FadeIn] = std::make_shared<FadeInPhase>(aContext, aGameRule);
     return result;
 }
 
 
 GameRule::GameRule(aunteater::EntityManager & aEntityManager,
                    std::shared_ptr<Context> aContext,
-                   std::vector<aunteater::Entity> aPlayers,
                    std::shared_ptr<Control> aControlSystem,
                    std::shared_ptr<RenderToScreen> aRenderToScreenSystem) :
     mEntityManager{aEntityManager},
     mCompetitors{aEntityManager},
     mCameras{aEntityManager},
     mCameraPoints{aEntityManager},
-    mPlayers{std::move(aPlayers)},
-    mPhases{setupGamePhases(aContext, *this)},
-    mPhaseMachine{mPhases[FreeSolo]},
+    mContext{std::move(aContext)},
+    mPhases{setupGamePhases(mContext, *this)},
+    // ATTENTION the state machine is entering the first state directly, before GameRule is done cting.
+    mPhaseMachine{mPhases[ExpectPlayers]},
     mControlSystem{std::move(aControlSystem)},
     mRenderToScreenSystem{std::move(aRenderToScreenSystem)}
 {}
@@ -338,6 +409,7 @@ std::size_t GameRule::eliminateCompetitors()
     Position2 cameraPosition = mCameras.begin()->get<Position>().position;
 
     std::size_t remainingCompetitors = 0;
+    std::vector<aunteater::Entity> fadeOutGuides;
     for (auto competitor : mCompetitors)
     {
         auto & [cameraGuide, playerData, geometry] = competitor;            
@@ -345,7 +417,7 @@ std::size_t GameRule::eliminateCompetitors()
         {
             ADLOG(info)("Player {} eliminated!", playerData.id);
 
-            prepareCameraFadeOut(cameraPosition, geometry, cameraGuide);
+            fadeOutGuides.push_back(prepareCameraFadeOut(cameraPosition, geometry, cameraGuide));
 
             // Remove the player from the game, and 
             // TODO This is a good example of circumventing the type system with entities:
@@ -357,13 +429,22 @@ std::size_t GameRule::eliminateCompetitors()
             ++remainingCompetitors;
         }
     }
+
+    // NOTE Ad 2022/02/07: The fade out guides are added to the simulation only once they are all calculated :
+    // If they were added when they are computed, they would influence the computation of the next guide,
+    // resulting in glitchy camera.
+    for(const auto & guide : fadeOutGuides)
+    {
+        mEntityManager.addEntity(guide);
+    }
+
     return remainingCompetitors;
 }
 
 
-void GameRule::prepareCameraFadeOut(Position2 aCameraPosition,
-                                    const Position & aGeometry,
-                                    CameraGuide & aCameraGuide)
+aunteater::Entity GameRule::prepareCameraFadeOut(Position2 aCameraPosition,
+                                                 const Position & aGeometry,
+                                                 CameraGuide & aCameraGuide)
 {
     // Patch the camera guide:
     // A player has a CameraGuide, but also CameraLimits, and the limits override the position computed from the guide.
@@ -387,21 +468,58 @@ void GameRule::prepareCameraFadeOut(Position2 aCameraPosition,
                                    (smoothOut.influence, 0.f, camera::gCompetitorGuideFadeOutDuration);
         smoothOut.completionBehaviour = CameraGuide::OnCompletion::RemoveEntity;
 
-        mEntityManager.addEntity(aunteater::Entity{}
+        return aunteater::Entity{}
             .add<CameraGuide>(smoothOut)
             .add<Position>(aGeometry)
-        );
+        ;
     }
 }
 
 
 void GameRule::resetCompetitors()
 {
+    mCandidatePositions.reset();
     killAllCompetitors();
+    mAddedCompetitors.clear();
+    addNewCompetitors();
+}
 
-    for (const auto & player : mPlayers)
+
+void GameRule::addNewCompetitors(bool aPreserveCameraPosition)
+{
+    for (PlayerControllerState & player : mContext->mPlayerList)
     {
-        mEntityManager.addEntity(player);
+        // Advance queued players to playing state.
+        if (player.mJoinState == PlayerJoinState_Queued) 
+        {
+            player.mJoinState = PlayerJoinState_Playing;
+        }
+
+        if (!mAddedCompetitors.contains(player.mPlayerSlot)
+            && player.mJoinState == PlayerJoinState_Playing)
+        {
+            // TODO random starting positions when not preserving camera
+            Position2 aSpawnPos = [&]()
+            {
+                if (aPreserveCameraPosition)
+                {
+                    auto cameraGuides = accumulateCameraGuides(mCameraPoints);
+                    auto result = 
+                        cameraGuides.accumulatedPosition.as<math::Position>() / cameraGuides.totalWeight
+                        - player::gCameraGuideOffset;
+                    result.y() = 3.f; // So it spawns at a known height (not traversing environment)
+                    return result;
+                }
+                else
+                {
+                    return mCandidatePositions.getRandom();
+                }
+            }();
+
+            mEntityManager.addEntity(
+                makePlayingPlayer(player.mPlayerSlot, player.mControllerId, player.mColor, aSpawnPos));
+            mAddedCompetitors.insert(player.mPlayerSlot);
+        }
     }
 }
 
