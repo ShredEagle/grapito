@@ -61,7 +61,7 @@ private:
 };
 
 
-class GameRule : public aunteater::System<GrapitoTimer, GameInputState>
+class CompetitionRule : public aunteater::System<GrapitoTimer, GameInputState>
 {
     enum Phase
     {
@@ -77,7 +77,7 @@ class GameRule : public aunteater::System<GrapitoTimer, GameInputState>
 
     using PhasesArray = std::array<std::shared_ptr<State>, _End>;
 
-    friend PhasesArray setupGamePhases(std::shared_ptr<Context>, GameRule &);
+    friend PhasesArray setupGamePhases(std::shared_ptr<Context>, CompetitionRule &);
 
     friend class PhaseBase;
     friend class ExpectPlayersPhase;
@@ -88,7 +88,7 @@ class GameRule : public aunteater::System<GrapitoTimer, GameInputState>
     friend class FadeInPhase;
 
 public:
-    GameRule(aunteater::EntityManager & aEntityManager,
+    CompetitionRule(aunteater::EntityManager & aEntityManager,
              std::shared_ptr<Context> aContext,
              std::shared_ptr<Control> aControlSystem,
              std::shared_ptr<RenderToScreen> aRenderToScreenSystem);

@@ -1,4 +1,4 @@
-#include "GameRule.h"
+#include "CompetitionRule.h"
 
 #include "Control.h"
 #include "RenderToScreen.h"
@@ -34,24 +34,24 @@ const StringId hud_climb_sid = handy::internalizeString("hud_climb");
 class PhaseBase : public State
 {
 public:
-    PhaseBase(std::shared_ptr<Context> aContext, GameRule & aGameRule) :
+    PhaseBase(std::shared_ptr<Context> aContext, CompetitionRule & aCompetitionRule) :
         mContext{std::move(aContext)},
-        mGameRule{aGameRule}
+        mCompetitionRule{aCompetitionRule}
     {}
 
 protected:
-    std::shared_ptr<State> getPhase(GameRule::Phase aPhase)
+    std::shared_ptr<State> getPhase(CompetitionRule::Phase aPhase)
     {
-        return mGameRule.mPhases[aPhase];
+        return mCompetitionRule.mPhases[aPhase];
     }
 
     aunteater::EntityManager & getEntityManager()
     {
-        return mGameRule.mEntityManager;
+        return mCompetitionRule.mEntityManager;
     }
 
     std::shared_ptr<Context> mContext;
-    GameRule & mGameRule;
+    CompetitionRule & mCompetitionRule;
 };
 
 
@@ -70,8 +70,8 @@ class CongratulationPhase : public PhaseBase
     }
 
 public:
-    CongratulationPhase(std::shared_ptr<Context> aContext, GameRule & aGameRule) :
-        PhaseBase{std::move(aContext), aGameRule},
+    CongratulationPhase(std::shared_ptr<Context> aContext, CompetitionRule & aCompetitionRule) :
+        PhaseBase{std::move(aContext), aCompetitionRule},
         mHudPositionInterpolationReference{PrepareInterpolation()},
         mHudPositionInterpolation{mHudPositionInterpolationReference}
     {}
@@ -100,7 +100,7 @@ private:
             mHudPositionInterpolation.advance(aTimer.delta());
         if(mHudPositionInterpolation.isCompleted())
         {
-            aStateMachine.putNext(getPhase(GameRule::FadeOut));
+            aStateMachine.putNext(getPhase(CompetitionRule::FadeOut));
             aStateMachine.popState();
         }
 
@@ -129,8 +129,8 @@ class ExpectPlayersPhase : public PhaseBase
 
     void beforeEnter() override
     {
-        mGameRule.resetCompetitors(); // in order to add at least the player that entered the game
-        mGameRule.disableGrapples();
+        mCompetitionRule.resetCompetitors(); // in order to add at least the player that entered the game
+        mCompetitionRule.disableGrapples();
         mHudText = getEntityManager().addEntity(makeHudText(mContext->translate(hud_waitplayers_sid), 
                                                             hud::gCountdownPosition,
                                                             ScreenPosition::Center));
@@ -146,7 +146,7 @@ class ExpectPlayersPhase : public PhaseBase
 
         if(mContext->mPlayerList.countActivePlayers() > 1)
         {
-            aStateMachine.putNext(getPhase(GameRule::Warmup));
+            aStateMachine.putNext(getPhase(CompetitionRule::Warmup));
             aStateMachine.popState();
         }
 
@@ -182,10 +182,10 @@ class FadeOutPhase : public PhaseBase
             const GameInputState &,
             StateMachine & aStateMachine) override
     {
-        mGameRule.setFadeOpacity(mFadeOpacity.advance(aTimer.delta()));
+        mCompetitionRule.setFadeOpacity(mFadeOpacity.advance(aTimer.delta()));
         if(mFadeOpacity.isCompleted())
         {
-            aStateMachine.putNext(getPhase(GameRule::FadeIn));
+            aStateMachine.putNext(getPhase(CompetitionRule::FadeIn));
             aStateMachine.popState();
         }
 
@@ -197,7 +197,7 @@ class FadeOutPhase : public PhaseBase
 
     void beforeExit() override
     {
-        mGameRule.disableFade();
+        mCompetitionRule.disableFade();
     }
 
     math::Interpolation<float, float> mFadeOpacity =
@@ -213,8 +213,8 @@ class FadeInPhase : public PhaseBase
     void beforeEnter() override
     {
         mFadeOpacity.reset();
-        mGameRule.resetCompetitors();
-        mGameRule.disableGrapples();
+        mCompetitionRule.resetCompetitors();
+        mCompetitionRule.disableGrapples();
     }
 
 
@@ -223,10 +223,10 @@ class FadeInPhase : public PhaseBase
             const GameInputState &,
             StateMachine & aStateMachine) override
     {
-        mGameRule.setFadeOpacity(mFadeOpacity.advance(aTimer.delta()));
+        mCompetitionRule.setFadeOpacity(mFadeOpacity.advance(aTimer.delta()));
         if(mFadeOpacity.isCompleted())
         {
-            aStateMachine.putNext(getPhase(GameRule::Warmup));
+            aStateMachine.putNext(getPhase(CompetitionRule::Warmup));
             aStateMachine.popState();
         }
 
@@ -238,7 +238,7 @@ class FadeInPhase : public PhaseBase
 
     void beforeExit() override
     {
-        mGameRule.disableFade();
+        mCompetitionRule.disableFade();
     }
 
     math::Interpolation<float, float> mFadeOpacity =
@@ -270,7 +270,7 @@ class WarmupPhase : public PhaseBase
 
     void updateImpl(float aDelta, StateMachine & aStateMachine)
     {
-        mGameRule.addNewCompetitors(true);
+        mCompetitionRule.addNewCompetitors(true);
         auto param = mCountdownParam.advance(aDelta);
         if(mCountdownParam.isCompleted())
         {
@@ -281,7 +281,7 @@ class WarmupPhase : public PhaseBase
             if(mCurrentStep == mSteps.size())
             {
                 mCurrentStep = 0;
-                aStateMachine.putNext(getPhase(GameRule::Competition));
+                aStateMachine.putNext(getPhase(CompetitionRule::Competition));
                 aStateMachine.popState();
             }
             else
@@ -299,7 +299,7 @@ class WarmupPhase : public PhaseBase
     void beforeExit() override
     {
         mHudText->markToRemove();
-        mGameRule.enableGrapples();
+        mCompetitionRule.enableGrapples();
     }
 
 
@@ -340,11 +340,11 @@ class CompetitionPhase : public PhaseBase
             mHudText = std::nullopt;
         }
 
-        if (mGameRule.eliminateCompetitors() == 1)
+        if (mCompetitionRule.eliminateCompetitors() == 1)
         {
             // There is a winner
             ADLOG(info)("Climb over.");
-            aStateMachine.putNext(getPhase(GameRule::Congratulation));
+            aStateMachine.putNext(getPhase(CompetitionRule::Congratulation));
             aStateMachine.popState();
         }
 
@@ -367,20 +367,20 @@ class CompetitionPhase : public PhaseBase
 };
 
 
-GameRule::PhasesArray setupGamePhases(std::shared_ptr<Context> aContext, GameRule & aGameRule)
+CompetitionRule::PhasesArray setupGamePhases(std::shared_ptr<Context> aContext, CompetitionRule & aCompetitionRule)
 {
-    GameRule::PhasesArray result;
-    result[GameRule::Warmup] = std::make_shared<WarmupPhase>(aContext, aGameRule);
-    result[GameRule::Competition] = std::make_shared<CompetitionPhase>(aContext, aGameRule);
-    result[GameRule::Congratulation] = std::make_shared<CongratulationPhase>(aContext, aGameRule);
-    result[GameRule::ExpectPlayers] = std::make_shared<ExpectPlayersPhase>(aContext, aGameRule);
-    result[GameRule::FadeOut] = std::make_shared<FadeOutPhase>(aContext, aGameRule);
-    result[GameRule::FadeIn] = std::make_shared<FadeInPhase>(aContext, aGameRule);
+    CompetitionRule::PhasesArray result;
+    result[CompetitionRule::Warmup] = std::make_shared<WarmupPhase>(aContext, aCompetitionRule);
+    result[CompetitionRule::Competition] = std::make_shared<CompetitionPhase>(aContext, aCompetitionRule);
+    result[CompetitionRule::Congratulation] = std::make_shared<CongratulationPhase>(aContext, aCompetitionRule);
+    result[CompetitionRule::ExpectPlayers] = std::make_shared<ExpectPlayersPhase>(aContext, aCompetitionRule);
+    result[CompetitionRule::FadeOut] = std::make_shared<FadeOutPhase>(aContext, aCompetitionRule);
+    result[CompetitionRule::FadeIn] = std::make_shared<FadeInPhase>(aContext, aCompetitionRule);
     return result;
 }
 
 
-GameRule::GameRule(aunteater::EntityManager & aEntityManager,
+CompetitionRule::CompetitionRule(aunteater::EntityManager & aEntityManager,
                    std::shared_ptr<Context> aContext,
                    std::shared_ptr<Control> aControlSystem,
                    std::shared_ptr<RenderToScreen> aRenderToScreenSystem) :
@@ -390,20 +390,20 @@ GameRule::GameRule(aunteater::EntityManager & aEntityManager,
     mCameraPoints{aEntityManager},
     mContext{std::move(aContext)},
     mPhases{setupGamePhases(mContext, *this)},
-    // ATTENTION the state machine is entering the first state directly, before GameRule is done cting.
+    // ATTENTION the state machine is entering the first state directly, before CompetitionRule is done cting.
     mPhaseMachine{mPhases[ExpectPlayers]},
     mControlSystem{std::move(aControlSystem)},
     mRenderToScreenSystem{std::move(aRenderToScreenSystem)}
 {}
 
 
-void GameRule::update(const GrapitoTimer aTimer, const GameInputState & aInput)
+void CompetitionRule::update(const GrapitoTimer aTimer, const GameInputState & aInput)
 {
     mPhaseMachine.update(aTimer, aInput);
 }
 
 
-std::size_t GameRule::eliminateCompetitors()
+std::size_t CompetitionRule::eliminateCompetitors()
 {
     // There is the one camera
     Position2 cameraPosition = mCameras.begin()->get<Position>().position;
@@ -442,7 +442,7 @@ std::size_t GameRule::eliminateCompetitors()
 }
 
 
-aunteater::Entity GameRule::prepareCameraFadeOut(Position2 aCameraPosition,
+aunteater::Entity CompetitionRule::prepareCameraFadeOut(Position2 aCameraPosition,
                                                  const Position & aGeometry,
                                                  CameraGuide & aCameraGuide)
 {
@@ -476,7 +476,7 @@ aunteater::Entity GameRule::prepareCameraFadeOut(Position2 aCameraPosition,
 }
 
 
-void GameRule::resetCompetitors()
+void CompetitionRule::resetCompetitors()
 {
     mCandidatePositions.reset();
     killAllCompetitors();
@@ -485,7 +485,7 @@ void GameRule::resetCompetitors()
 }
 
 
-void GameRule::addNewCompetitors(bool aPreserveCameraPosition)
+void CompetitionRule::addNewCompetitors(bool aPreserveCameraPosition)
 {
     for (PlayerControllerState & player : mContext->mPlayerList)
     {
@@ -524,7 +524,7 @@ void GameRule::addNewCompetitors(bool aPreserveCameraPosition)
 }
 
 
-void GameRule::killAllCompetitors()
+void CompetitionRule::killAllCompetitors()
 {
     for (auto competitor : mCompetitors)
     {
@@ -533,25 +533,25 @@ void GameRule::killAllCompetitors()
 }
 
 
-void GameRule::enableGrapples()
+void CompetitionRule::enableGrapples()
 {
     mControlSystem->switchGrappling(true);
 }
 
 
-void GameRule::disableGrapples()
+void CompetitionRule::disableGrapples()
 {
     mControlSystem->switchGrappling(false);
 }
 
 
-void GameRule::setFadeOpacity(float aOpacity)
+void CompetitionRule::setFadeOpacity(float aOpacity)
 {
     mRenderToScreenSystem->setFade({game::gFadeColor, (std::uint8_t)(aOpacity * 255)});
 }
 
 
-void GameRule::disableFade()
+void CompetitionRule::disableFade()
 {
     mRenderToScreenSystem->disableFade();
 }

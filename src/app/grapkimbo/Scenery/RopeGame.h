@@ -18,7 +18,8 @@ class RopeGame : public GameScene
 {
 public:
     RopeGame(std::shared_ptr<Context> aContext,
-             std::shared_ptr<graphics::AppInterface> aAppInterface, const Controller aController);
+             std::shared_ptr<graphics::AppInterface> aAppInterface,
+             const Controller aController);
 
     std::pair<TransitionProgress, UpdateStatus> enter(
             const GrapitoTimer &,

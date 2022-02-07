@@ -24,7 +24,7 @@
 #include <Systems/AccelSolver.h>
 #include <Systems/CameraGuidedControl.h>
 #include <Systems/Control.h>
-#include <Systems/GameRule.h>
+#include <Systems/CompetitionRule.h>
 #include <Systems/Gravity.h>
 #include <Systems/LevelGeneration.h>
 #include <Systems/Physics.h>
@@ -83,7 +83,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
 
     auto renderToScreen = std::make_shared<RenderToScreen>(mEntityManager, mAppInterface, *this); 
     // Done after CameraGuidedControl, to avoid having two camera guides on the frame a player is killed.
-    mSystemManager.add<GameRule>(mContext, controlSystem, renderToScreen);
+    mSystemManager.add<CompetitionRule>(mContext, controlSystem, renderToScreen);
 
     mRenderBackgroundSystem = mSystemManager.add<RenderBackground>(mAppInterface); 
     mRenderBackgroundSystem->addLayer(mContext->pathFor(background::gSpaceImage), background::gSpaceScrollFactor);
