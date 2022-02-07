@@ -390,6 +390,7 @@ GameRule::GameRule(aunteater::EntityManager & aEntityManager,
     mCameraPoints{aEntityManager},
     mContext{std::move(aContext)},
     mPhases{setupGamePhases(mContext, *this)},
+    // ATTENTION the state machine is entering the first state directly, before GameRule is done cting.
     mPhaseMachine{mPhases[ExpectPlayers]},
     mControlSystem{std::move(aControlSystem)},
     mRenderToScreenSystem{std::move(aRenderToScreenSystem)}
@@ -477,6 +478,7 @@ aunteater::Entity GameRule::prepareCameraFadeOut(Position2 aCameraPosition,
 
 void GameRule::resetCompetitors()
 {
+    mCandidatePositions.reset();
     killAllCompetitors();
     mAddedCompetitors.clear();
     addNewCompetitors();
@@ -497,15 +499,23 @@ void GameRule::addNewCompetitors(bool aPreserveCameraPosition)
             && player.mJoinState == PlayerJoinState_Playing)
         {
             // TODO random starting positions when not preserving camera
-            Position2 aSpawnPos{0.f, 3.f};
-            if (aPreserveCameraPosition)
+            Position2 aSpawnPos = [&]()
             {
-                auto cameraGuides = accumulateCameraGuides(mCameraPoints);
-                aSpawnPos = 
-                    cameraGuides.accumulatedPosition.as<math::Position>() / cameraGuides.totalWeight
-                    - player::gCameraGuideOffset;
-                aSpawnPos.y() = 3.f; // So it spawns at a known height (not traversing environment)
-            }
+                if (aPreserveCameraPosition)
+                {
+                    auto cameraGuides = accumulateCameraGuides(mCameraPoints);
+                    auto result = 
+                        cameraGuides.accumulatedPosition.as<math::Position>() / cameraGuides.totalWeight
+                        - player::gCameraGuideOffset;
+                    result.y() = 3.f; // So it spawns at a known height (not traversing environment)
+                    return result;
+                }
+                else
+                {
+                    return mCandidatePositions.getRandom();
+                }
+            }();
+
             mEntityManager.addEntity(
                 makePlayingPlayer(player.mPlayerSlot, player.mControllerId, player.mColor, aSpawnPos));
             mAddedCompetitors.insert(player.mPlayerSlot);

@@ -11,6 +11,8 @@
 #include <aunteater/FamilyHelp.h>
 #include <aunteater/System.h>
 
+#include <handy/random.h>
+
 #include <array>
 
 
@@ -23,6 +25,40 @@ using Competitor = aunteater::Archetype<CameraGuide, PlayerData, Position>;
 
 class Control;
 class RenderToScreen;
+
+
+// This is a very naive implementation.
+// There are many better options with a single container.
+class PositionsBucket
+{
+public:
+    PositionsBucket(std::initializer_list<Position2> aOptions) :
+        mAvailable{std::move(aOptions)},
+        mIndexer{0, std::numeric_limits<int>::max()}
+    {}
+
+    Position2 getRandom()
+    {
+        assert (mAvailable.size() > 0);
+
+        auto candidate = mAvailable.begin() + (mIndexer() % mAvailable.size());
+        Position2 result = *candidate;
+        mAvailable.erase(candidate);
+        mInUse.push_back(result);
+        return result;
+    }
+
+    void reset()
+    {
+        std::ranges::copy(mInUse, std::back_inserter(mAvailable));
+        mInUse.clear();
+    }
+
+private:
+    std::vector<Position2> mAvailable;
+    std::vector<Position2> mInUse;
+    Randomizer<> mIndexer;
+};
 
 
 class GameRule : public aunteater::System<GrapitoTimer, GameInputState>
@@ -94,6 +130,17 @@ private:
 
     // Values from PlayerControllerState.mPlayerSlot
     std::set<int> mAddedCompetitors;
+
+    PositionsBucket mCandidatePositions{ 
+        {-15.f, 3.f}, 
+        {-11.f, 3.f}, 
+        { -7.f, 3.f}, 
+        { -3.f, 3.f}, 
+        {  3.f, 3.f}, 
+        {  7.f, 3.f}, 
+        { 11.f, 3.f}, 
+        { 15.f, 3.f}, 
+    };
 
     PhasesArray mPhases;
     StateMachine mPhaseMachine;
