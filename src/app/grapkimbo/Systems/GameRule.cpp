@@ -408,6 +408,7 @@ std::size_t GameRule::eliminateCompetitors()
     Position2 cameraPosition = mCameras.begin()->get<Position>().position;
 
     std::size_t remainingCompetitors = 0;
+    std::vector<aunteater::Entity> fadeOutGuides;
     for (auto competitor : mCompetitors)
     {
         auto & [cameraGuide, playerData, geometry] = competitor;            
@@ -415,7 +416,7 @@ std::size_t GameRule::eliminateCompetitors()
         {
             ADLOG(info)("Player {} eliminated!", playerData.id);
 
-            prepareCameraFadeOut(cameraPosition, geometry, cameraGuide);
+            fadeOutGuides.push_back(prepareCameraFadeOut(cameraPosition, geometry, cameraGuide));
 
             // Remove the player from the game, and 
             // TODO This is a good example of circumventing the type system with entities:
@@ -427,13 +428,22 @@ std::size_t GameRule::eliminateCompetitors()
             ++remainingCompetitors;
         }
     }
+
+    // NOTE Ad 2022/02/07: The fade out guides are added to the simulation only once they are all calculated :
+    // If they were added when they are computed, they would influence the computation of the next guide,
+    // resulting in glitchy camera.
+    for(const auto & guide : fadeOutGuides)
+    {
+        mEntityManager.addEntity(guide);
+    }
+
     return remainingCompetitors;
 }
 
 
-void GameRule::prepareCameraFadeOut(Position2 aCameraPosition,
-                                    const Position & aGeometry,
-                                    CameraGuide & aCameraGuide)
+aunteater::Entity GameRule::prepareCameraFadeOut(Position2 aCameraPosition,
+                                                 const Position & aGeometry,
+                                                 CameraGuide & aCameraGuide)
 {
     // Patch the camera guide:
     // A player has a CameraGuide, but also CameraLimits, and the limits override the position computed from the guide.
@@ -457,10 +467,10 @@ void GameRule::prepareCameraFadeOut(Position2 aCameraPosition,
                                    (smoothOut.influence, 0.f, camera::gCompetitorGuideFadeOutDuration);
         smoothOut.completionBehaviour = CameraGuide::OnCompletion::RemoveEntity;
 
-        mEntityManager.addEntity(aunteater::Entity{}
+        return aunteater::Entity{}
             .add<CameraGuide>(smoothOut)
             .add<Position>(aGeometry)
-        );
+        ;
     }
 }
 

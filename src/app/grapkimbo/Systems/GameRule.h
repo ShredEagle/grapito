@@ -72,7 +72,9 @@ private:
     /// \return The number of competitors remaining in the game after this step of eliminations.
     std::size_t eliminateCompetitors();
 
-    void prepareCameraFadeOut(Position2 aCameraPosition, const Position & aGeometry, CameraGuide & aCameraGuide);
+    aunteater::Entity prepareCameraFadeOut(Position2 aCameraPosition,
+                                           const Position & aGeometry,
+                                           CameraGuide & aCameraGuide);
 
     void enableGrapples();
     void disableGrapples();
