@@ -8,6 +8,7 @@ namespace grapito {
 enum PlayerJoinState
 {
     PlayerJoinState_ChoosingColor,
+    PlayerJoinState_Queued, // Waiting to enter the next game
     PlayerJoinState_Playing,
 
     //Enum last member
@@ -37,6 +38,12 @@ class PlayerList
         std::vector<Controller> getUnactiveControllers();
 
         std::size_t countActivePlayers() const;
+
+        auto begin()
+        { return mPlayerList.begin(); }
+
+        auto end()
+        { return mPlayerList.end(); }
 
         auto begin() const
         { return mPlayerList.cbegin(); }

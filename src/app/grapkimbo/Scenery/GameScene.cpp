@@ -29,7 +29,7 @@ UpdateStatus GameScene::update(
     Controller pressingStartController = isPositiveEdge(aInputs, Start);
     if (pressingStartController != Controller::_End)
     {
-        if (mContext->mPlayerList.getPlayerState(pressingStartController) != PlayerJoinState_NotActive)
+        if (mContext->mPlayerList.getPlayerState(pressingStartController) == PlayerJoinState_Playing)
         {
             aStateMachine.pushState(setupPauseMenu(mContext, mAppInterface, shared_from_this()));
             // Causes troubles with detection of next press of pause button

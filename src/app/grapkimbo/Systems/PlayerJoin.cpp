@@ -24,7 +24,7 @@ void PlayerJoin::update(const GrapitoTimer aTimer, const GameInputState & aInput
         if (aInputs.get(controller)[Command::Start].positiveEdge())
         {
             //Change player to Choosing color state
-            int slot = mContext->mPlayerList.addPlayer(controller, PlayerJoinState_Playing);
+            int slot = mContext->mPlayerList.addPlayer(controller, PlayerJoinState_Queued);
         }
     }
 

@@ -475,8 +475,14 @@ void GameRule::resetCompetitors()
 
 void GameRule::addNewCompetitors(bool aPreserveCameraPosition)
 {
-    for (const PlayerControllerState & player : mContext->mPlayerList)
+    for (PlayerControllerState & player : mContext->mPlayerList)
     {
+        // Advance queued players to playing state.
+        if (player.mJoinState == PlayerJoinState_Queued) 
+        {
+            player.mJoinState = PlayerJoinState_Playing;
+        }
+
         if (!mAddedCompetitors.contains(player.mPlayerSlot)
             && player.mJoinState == PlayerJoinState_Playing)
         {
