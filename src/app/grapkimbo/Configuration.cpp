@@ -54,7 +54,8 @@ namespace hud
 {
     const float gViewedHeight = menu::gViewedHeight;
     const char * const gFont = menu::gFont;
-    const GLfloat gTextHeight = menu::gTextHeight  * 4 ;
+    const GLfloat gSmallTextHeight = menu::gTextHeight * 1.5f;
+    const GLfloat gLargeTextHeight = menu::gTextHeight  * 4;
     const Position2 gAltimeterPosition{0.f, -420.f};
     const Position2 gCountdownPosition{0.f, 20.f};
     const Position2 gModeTextPosition{-500.f, 300.f};
