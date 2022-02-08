@@ -30,7 +30,7 @@ auto makeInterpolation(std::shared_ptr<graphics::AppInterface> aAppInterface, GL
 MenuScene::MenuScene(Menu aMenu,
                      const filesystem::path & aFontPath,
                      std::shared_ptr<graphics::AppInterface> aAppInterface,
-                     std::shared_ptr<GameScene> aGameScene) :
+                     std::shared_ptr<const GameScene> aGameScene) :
     mMenu{std::move(aMenu)},
     mAppInterface{std::move(aAppInterface)},
     mOptionalGameScene{aGameScene},

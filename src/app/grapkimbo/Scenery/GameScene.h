@@ -15,6 +15,9 @@ namespace ad {
 namespace grapito {
 
 
+class MenuScene;
+
+
 class GameScene : public State, public std::enable_shared_from_this<GameScene>
 {
 public:
@@ -33,6 +36,8 @@ public:
     virtual void render() const = 0;
 
 protected:
+    virtual std::shared_ptr<MenuScene> getPauseMenu() = 0;
+
     aunteater::EntityManager mEntityManager;
     aunteater::SystemManager<GrapitoTimer, GameInputState> mSystemManager{mEntityManager};
     std::shared_ptr<graphics::AppInterface> mAppInterface;

@@ -1,6 +1,7 @@
 #include "RopeGame.h"
 
 #include "../Entities.h"
+#include "../TopLevelStates.h"
 
 #include "Input.h"
 #include "LevelStacks.h"
@@ -25,6 +26,7 @@
 #include <Systems/CameraGuidedControl.h>
 #include <Systems/Control.h>
 #include <Systems/CompetitionRule.h>
+#include <Systems/FreesoloRule.h>
 #include <Systems/Gravity.h>
 #include <Systems/LevelGeneration.h>
 #include <Systems/Physics.h>
@@ -54,8 +56,11 @@ aunteater::Entity setupPlayer(const Controller aController)
 
 
 RopeGame::RopeGame(std::shared_ptr<Context> aContext,
-                   std::shared_ptr<graphics::AppInterface> aAppInterface, const Controller aController) :
-    GameScene{std::move(aContext), std::move(aAppInterface)}
+                   std::shared_ptr<graphics::AppInterface> aAppInterface,
+                   GameMode aGameMode,
+                   const Controller aController) :
+    GameScene{std::move(aContext), std::move(aAppInterface)},
+    mGameMode{aGameMode}
 {
     mContext->mPlayerList.addPlayer(aController, PlayerJoinState_Playing);
 
@@ -83,7 +88,16 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
 
     auto renderToScreen = std::make_shared<RenderToScreen>(mEntityManager, mAppInterface, *this); 
     // Done after CameraGuidedControl, to avoid having two camera guides on the frame a player is killed.
-    mSystemManager.add<CompetitionRule>(mContext, controlSystem, renderToScreen);
+
+    switch (mGameMode)
+    {
+    case GameMode::Multiplayer:
+        mSystemManager.add<CompetitionRule>(mContext, controlSystem, renderToScreen);
+        break;
+    case GameMode::Freesolo:
+        mSystemManager.add<FreesoloRule>(mContext, controlSystem, renderToScreen);
+        break;
+    }
 
     mRenderBackgroundSystem = mSystemManager.add<RenderBackground>(mAppInterface); 
     mRenderBackgroundSystem->addLayer(mContext->pathFor(background::gSpaceImage), background::gSpaceScrollFactor);
@@ -133,7 +147,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     }
 
     // Camera
-    aunteater::weak_entity camera = mEntityManager.addEntity(makeCamera());
+    mEntityManager.addEntity(makeCamera());
 
     //
     // Level
@@ -171,6 +185,11 @@ void RopeGame::render() const
     mRenderBackgroundSystem->render();
     mRenderWorldSystem->render();
     mRenderHudSystem->render();
+}
+
+std::shared_ptr<MenuScene> RopeGame::getPauseMenu()
+{
+    return setupPauseMenu(mContext, mAppInterface, shared_from_this(), mGameMode);
 }
 
 

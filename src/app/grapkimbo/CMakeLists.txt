@@ -57,6 +57,7 @@ set(${TARGET_NAME}_HEADERS
     Systems/CompetitionRule.h
     Systems/Control.h
     Systems/DelayDeleter.h
+    Systems/FreesoloRule.h
     Systems/Gravity.h
     Systems/GrappleCleanup.h
     Systems/GrappleInteractions.h
@@ -131,6 +132,7 @@ set(${TARGET_NAME}_SOURCES
     Systems/CompetitionRule.cpp
     Systems/Control.cpp
     Systems/DelayDeleter.cpp
+    Systems/FreesoloRule.cpp
     Systems/Gravity.cpp
     Systems/GrappleCleanup.cpp
     Systems/GrappleInteractions.cpp

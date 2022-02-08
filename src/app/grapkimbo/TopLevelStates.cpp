@@ -20,11 +20,12 @@ namespace grapito {
 
 using handy::StringId;
 // Interning the strings allow to find them from the hash, if needed (debug).
-const StringId menu_start_sid   = handy::internalizeString("menu_start");
-const StringId menu_exit_sid    = handy::internalizeString("menu_exit");
-const StringId menu_resume_sid  = handy::internalizeString("menu_resume");
-const StringId menu_restart_sid = handy::internalizeString("menu_restart");
-const StringId menu_main_sid    = handy::internalizeString("menu_main");
+const StringId menu_multiplayer_sid = handy::internalizeString("menu_multiplayer");
+const StringId menu_freesolo_sid    = handy::internalizeString("menu_freesolo");
+const StringId menu_exit_sid        = handy::internalizeString("menu_exit");
+const StringId menu_resume_sid      = handy::internalizeString("menu_resume");
+const StringId menu_restart_sid     = handy::internalizeString("menu_restart");
+const StringId menu_main_sid        = handy::internalizeString("menu_main");
 
 
 std::shared_ptr<SplashScene> setupSplashScreen(math::Size<2, int> aResolution,
@@ -80,10 +81,16 @@ std::shared_ptr<MenuScene> setupMainMenu(const std::shared_ptr<Context> & aConte
     return std::make_shared<MenuScene>(
         Menu {
             std::vector<UiButton>{
-                { aContext->translate(menu_start_sid),
+                { aContext->translate(menu_multiplayer_sid),
                 [aContext](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface, const Controller aController)
                     {
-                        aMachine.emplaceState<RopeGame>(aContext, aAppInterface, aController);
+                        aMachine.emplaceState<RopeGame>(aContext, aAppInterface, GameMode::Multiplayer, aController);
+                    }
+                },
+                { aContext->translate(menu_freesolo_sid),
+                [aContext](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface, const Controller aController)
+                    {
+                        aMachine.emplaceState<RopeGame>(aContext, aAppInterface, GameMode::Freesolo, aController);
                     }
                 },
                 { aContext->translate(menu_exit_sid),
@@ -102,7 +109,8 @@ std::shared_ptr<MenuScene> setupMainMenu(const std::shared_ptr<Context> & aConte
 std::shared_ptr<MenuScene> setupPauseMenu(
     const std::shared_ptr<Context> & aContext,
     std::shared_ptr<graphics::AppInterface> & aAppInterface,
-    std::shared_ptr<GameScene> aGameScene)
+    std::shared_ptr<const GameScene> aGameScene,
+    GameMode aGameMode)
 {
     return std::make_shared<MenuScene>(
         Menu {
@@ -114,11 +122,11 @@ std::shared_ptr<MenuScene> setupPauseMenu(
                     }
                 },
                 { aContext->translate(menu_restart_sid),
-                  [aContext](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface, const Controller aController)
+                  [aContext, aGameMode](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface, const Controller aController)
                     {
                         aMachine.popState(); // this
                         aMachine.popState(); // running game
-                        aMachine.emplaceState<RopeGame>(aContext, aAppInterface, aController); // new game
+                        aMachine.emplaceState<RopeGame>(aContext, aAppInterface, aGameMode, aController); // new game
                     }
                 },
                 { aContext->translate(menu_main_sid),

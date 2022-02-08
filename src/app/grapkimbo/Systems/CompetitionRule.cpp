@@ -498,7 +498,6 @@ void CompetitionRule::addNewCompetitors(bool aPreserveCameraPosition)
         if (!mAddedCompetitors.contains(player.mPlayerSlot)
             && player.mJoinState == PlayerJoinState_Playing)
         {
-            // TODO random starting positions when not preserving camera
             Position2 aSpawnPos = [&]()
             {
                 if (aPreserveCameraPosition)
