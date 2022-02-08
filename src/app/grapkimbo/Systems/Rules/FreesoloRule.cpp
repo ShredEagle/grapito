@@ -1,13 +1,13 @@
 #include "FreesoloRule.h"
 
-#include "../Entities.h"
-#include "../Timer.h"
+#include "../../Entities.h"
+#include "../../Timer.h"
 
-#include "../Components/Position.h"
-#include "../Components/Text.h"
+#include "../../Components/Position.h"
+#include "../../Components/Text.h"
 
-#include "../Context/Context.h"
-#include "../Context/PlayerList.h"
+#include "../../Context/Context.h"
+#include "../../Context/PlayerList.h"
 
 #include <numeric>
 
@@ -20,12 +20,9 @@ FreesoloRule::FreesoloRule(aunteater::EntityManager & aEntityManager,
                    std::shared_ptr<Context> aContext,
                    std::shared_ptr<Control> aControlSystem,
                    std::shared_ptr<RenderToScreen> aRenderToScreenSystem) :
-    mEntityManager{aEntityManager},
-    mContext{std::move(aContext)},
+    RuleBase{aEntityManager, std::move(aContext), std::move(aControlSystem), std::move(aRenderToScreenSystem)},
     mHudText{mEntityManager.addEntity(
-        makeHudText("", hud::gAltimeterPosition, ScreenPosition::Center))},
-    mControlSystem{std::move(aControlSystem)},
-    mRenderToScreenSystem{std::move(aRenderToScreenSystem)}
+        makeHudText("", hud::gAltimeterPosition, ScreenPosition::Center))}
 {
     mHudText->get<Text>().size = Text::Small;
 

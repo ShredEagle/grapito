@@ -1,7 +1,8 @@
 #pragma once
 
+#include "RuleBase.h"
 
-#include "../Scenery/StateMachine.h"
+#include "../../Scenery/StateMachine.h"
 
 #include <aunteater/EntityManager.h>
 #include <aunteater/System.h>
@@ -17,7 +18,7 @@ class Control;
 class RenderToScreen;
 
 
-class FreesoloRule : public aunteater::System<GrapitoTimer, GameInputState>
+class FreesoloRule : public RuleBase
 {
 
 public:
@@ -29,12 +30,6 @@ public:
     void update(const GrapitoTimer aTimer, const GameInputState & aInput) override;
 
 private:
-    aunteater::EntityManager & mEntityManager;
-    std::shared_ptr<Context> mContext;
-
-    std::shared_ptr<Control> mControlSystem;
-    std::shared_ptr<RenderToScreen> mRenderToScreenSystem;
-
     aunteater::weak_entity mPlayer{nullptr};
     aunteater::weak_entity mHudText{nullptr};
 

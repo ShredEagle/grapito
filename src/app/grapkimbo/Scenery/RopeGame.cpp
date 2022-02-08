@@ -25,8 +25,8 @@
 #include <Systems/AccelSolver.h>
 #include <Systems/CameraGuidedControl.h>
 #include <Systems/Control.h>
-#include <Systems/CompetitionRule.h>
-#include <Systems/FreesoloRule.h>
+#include <Systems/Rules/CompetitionRule.h>
+#include <Systems/Rules/FreesoloRule.h>
 #include <Systems/Gravity.h>
 #include <Systems/LevelGeneration.h>
 #include <Systems/Physics.h>
