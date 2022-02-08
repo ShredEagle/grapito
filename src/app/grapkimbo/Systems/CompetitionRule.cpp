@@ -388,11 +388,11 @@ CompetitionRule::CompetitionRule(aunteater::EntityManager & aEntityManager,
     mCompetitors{aEntityManager},
     mCameras{aEntityManager},
     mCameraPoints{aEntityManager},
+    mControlSystem{std::move(aControlSystem)},
     mContext{std::move(aContext)},
     mPhases{setupGamePhases(mContext, *this)},
     // ATTENTION the state machine is entering the first state directly, before CompetitionRule is done cting.
     mPhaseMachine{mPhases[ExpectPlayers]},
-    mControlSystem{std::move(aControlSystem)},
     mRenderToScreenSystem{std::move(aRenderToScreenSystem)}
 {}
 
