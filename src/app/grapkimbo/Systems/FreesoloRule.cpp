@@ -3,8 +3,13 @@
 #include "../Entities.h"
 #include "../Timer.h"
 
+#include "../Components/Position.h"
+#include "../Components/Text.h"
+
 #include "../Context/Context.h"
 #include "../Context/PlayerList.h"
+
+#include <numeric>
 
 
 namespace ad {
@@ -17,18 +22,24 @@ FreesoloRule::FreesoloRule(aunteater::EntityManager & aEntityManager,
                    std::shared_ptr<RenderToScreen> aRenderToScreenSystem) :
     mEntityManager{aEntityManager},
     mContext{std::move(aContext)},
+    mHudText{mEntityManager.addEntity(
+        makeHudText("", hud::gAltimeterPosition, ScreenPosition::Center))},
     mControlSystem{std::move(aControlSystem)},
     mRenderToScreenSystem{std::move(aRenderToScreenSystem)}
 {
     PlayerControllerState player = *mContext->mPlayerList.begin();
-    mEntityManager.addEntity(
+    mPlayer = mEntityManager.addEntity(
         makePlayingPlayer(player.mPlayerSlot, player.mControllerId, player.mColor, {0.f, 3.f}));
 }
 
 
 void FreesoloRule::update(const GrapitoTimer aTimer, const GameInputState & aInput)
 {
-    // No specific rules at the moment, just execution of all the systems.
+    mHeights.pop_front();
+    mHeights.push_back(std::max(0.f, std::floor(mPlayer->get<Position>().position.y())));
+
+    int average = std::accumulate(mHeights.begin(), mHeights.end(), 0) / mHeights.size();
+    mHudText->get<Text>().message = std::to_string(average);
 } 
 
 

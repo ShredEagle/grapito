@@ -6,6 +6,8 @@
 #include <aunteater/EntityManager.h>
 #include <aunteater/System.h>
 
+#include <deque>
+
 
 namespace ad {
 namespace grapito {
@@ -28,11 +30,16 @@ public:
 
 private:
     aunteater::EntityManager & mEntityManager;
+    std::shared_ptr<Context> mContext;
 
     std::shared_ptr<Control> mControlSystem;
     std::shared_ptr<RenderToScreen> mRenderToScreenSystem;
 
-    std::shared_ptr<Context> mContext;
+    aunteater::weak_entity mPlayer{nullptr};
+    aunteater::weak_entity mHudText{nullptr};
+
+    // We want size, not list init of the deque
+    std::deque<int> mHeights = std::deque<int>(8, 0);
 };
 
 
