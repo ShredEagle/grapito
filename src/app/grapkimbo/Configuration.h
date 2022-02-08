@@ -82,10 +82,16 @@ namespace hud
     extern const char * const gFont;
     extern const GLfloat gSmallTextHeight;
     extern const GLfloat gLargeTextHeight;
+
     extern const Position2 gAltimeterPosition;
+    extern const Position2 gBestScorePosition;
     extern const Position2 gCountdownPosition;
     extern const Position2 gModeTextPosition;
+
     extern const float gClimbMessageDuration;
+    extern const float gInstructionMessageDuration;
+
+    extern const math::sdr::Rgb gTextColor;
 }
 
 

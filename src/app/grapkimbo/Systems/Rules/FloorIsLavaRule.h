@@ -52,10 +52,16 @@ private:
     void addPlayer();
     void resetPlayer();
 
+    void setHeight(int aHeight);
+
     aunteater::weak_entity mPlayer{nullptr};
+    aunteater::weak_entity mHudHeightText{nullptr};
+    aunteater::weak_entity mHudBestScoreText{nullptr};
 
     PhasesArray mPhases;
     StateMachine mPhaseMachine;
+
+    int mBestHeight{0};
 };
 
 

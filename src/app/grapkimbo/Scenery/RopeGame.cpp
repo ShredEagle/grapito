@@ -142,6 +142,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     }
 
     { // Load sounds
+        mContext->loadOggSoundData("sounds/burn.ogg", false);
         mContext->loadOggSoundData("sounds/launch.ogg", false);
         mContext->loadOggSoundData("sounds/weld.ogg", false);
         mContext->loadOggSoundData("sounds/jump.ogg", false);

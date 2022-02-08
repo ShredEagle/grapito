@@ -41,7 +41,7 @@ namespace game
     const math::Size<2, int> gAppResolution{1600, 900};
     const float gCompetitorEliminationDistance = 15.f + (render::gViewedHeight / 2.f);
     const math::hdr::Rgb gClearColor{0.1, 0.2, 0.3};
-    const float gCongratulationPhaseDuration = 3.f;
+    const float gCongratulationPhaseDuration = 2.5f;
     const Position2 gCongratulationScreenPosition{0.f, -50.f};
     const float gCountdownStepPeriod = 0.8f;
     const float gFadeDuration = 0.75f;
@@ -57,10 +57,16 @@ namespace hud
     const char * const gFont = menu::gFont;
     const GLfloat gSmallTextHeight = menu::gTextHeight * 1.5f;
     const GLfloat gLargeTextHeight = menu::gTextHeight  * 4;
+
     const Position2 gAltimeterPosition{0.f, -420.f};
+    const Position2 gBestScorePosition{-600.f, -420.f};
     const Position2 gCountdownPosition{0.f, 20.f};
     const Position2 gModeTextPosition{-500.f, 300.f};
+
     const float gClimbMessageDuration = 1.5f;
+    const float gInstructionMessageDuration = 2.f;
+
+    const math::sdr::Rgb gTextColor = math::sdr::gWhite;
 }
 
 

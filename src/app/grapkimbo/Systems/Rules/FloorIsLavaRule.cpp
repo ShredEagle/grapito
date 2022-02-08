@@ -9,6 +9,7 @@
 #include "../../Timer.h"
 
 #include "../../Components/ScreenPosition.h"
+#include "../../Components/SoundPlayer.h"
 #include "../../Components/Text.h"
 
 #include "../../Utils/Player.h"
@@ -20,7 +21,11 @@ namespace ad {
 namespace grapito {
 
 
-const StringId hud_lavadeath_sid = handy::internalizeString("hud_lavadeath");
+const StringId hud_lavadeath_sid        = handy::internalizeString("hud_lavadeath");
+const StringId hud_lavainstruction_sid  = handy::internalizeString("hud_lavainstruction");
+const StringId hud_record_sid           = handy::internalizeString("hud_record");
+
+const StringId soundId_BurnSid = handy::internalizeString("burn");
 
 
 using PhaseParent = PhaseBase<FloorIsLavaRule>;
@@ -74,6 +79,7 @@ class LavaFadeInPhase : public PhaseParent
 
     void beforeEnter() override
     {
+        mRule.setHeight(0);
         mFadeOpacity.reset();
         mRule.resetPlayer();
     }
@@ -113,7 +119,9 @@ class InitialInviciblePhase : public PhaseParent
     using PhaseParent::PhaseParent;
 
     void beforeEnter() override
-    {}
+    {
+        mRule.enableGrapples();
+    }
 
     UpdateStatus update(
         const GrapitoTimer & aTimer,
@@ -122,7 +130,6 @@ class InitialInviciblePhase : public PhaseParent
     {
         if (mRule.player()->get<Position>().position.y() > game::FloorBecomesLavaHeight)
         {
-            // TODO message
             aStateMachine.putNext(getPhase(FloorIsLavaRule::FloorIsLava));
             aStateMachine.popState();
         }
@@ -135,19 +142,73 @@ class InitialInviciblePhase : public PhaseParent
 };
 
 
+struct OpacityInterpolation
+{
+    static auto makeInterpolation(float aDuration)
+    {
+        CompositeTransition<float, float> result{0.f};
+        result
+            .pushInterpolation<math::None>(1.f, aDuration * (1./3.))
+            .pushConstant(aDuration * (1./3.))
+            .pushInterpolation<math::None>(0.f, aDuration * (1./3.))
+        ;
+        return result;
+    }
+
+    OpacityInterpolation(float aDuration) :
+        mInterpolationReference{makeInterpolation(aDuration)},
+        mInterpolation{mInterpolationReference}
+    {}
+
+    void reset()
+    {
+        mInterpolation = mInterpolationReference;
+    }
+
+    const CompositeTransition<float, float> mInterpolationReference;
+    CompositeTransition<float, float> mInterpolation;
+};
+
 
 class FloorIsLavaPhase : public PhaseParent
 {
     using PhaseParent::PhaseParent;
+
+    // Should be a beforeEnter, but needs the timer
+    void beforeEnter() override
+    {
+        mOpacity.reset();
+        mMaxHeight = 0;
+        mHudInstructionText = 
+            getEntityManager().addEntity(makeHudText(mContext->translate(hud_lavainstruction_sid),
+                                                     hud::gCountdownPosition,
+                                                     ScreenPosition::Center));
+    }
 
     UpdateStatus update(
         const GrapitoTimer & aTimer,
         const GameInputState & /*aInputs*/,
         StateMachine & aStateMachine) override
     {
+        if (mHudInstructionText)
+        {
+            (*mHudInstructionText)->get<Text>().color = 
+                math::sdr::Rgba{hud::gTextColor, (std::uint8_t)(255 * mOpacity.mInterpolation.advance(aTimer.delta()))};
+            if (mOpacity.mInterpolation.isCompleted())
+            {
+                (*mHudInstructionText)->markToRemove();
+                mHudInstructionText = std::nullopt;
+            }
+        }
+
+        mMaxHeight = std::max((int)std::floor(mRule.player()->get<Position>().position.y()), mMaxHeight);
+        mRule.setHeight(mMaxHeight);
+
         if (isGrounded(mRule.player()->get<PlayerData>()))
         {
             // TODO check for highscore
+            mRule.disableGrapples();
+            addSoundToEntity(mRule.player(), soundId_BurnSid);
             aStateMachine.putNext(getPhase(FloorIsLavaRule::Death));
             aStateMachine.popState();
         }
@@ -156,6 +217,19 @@ class FloorIsLavaPhase : public PhaseParent
         // update status is not checked.
         return UpdateStatus::SwapBuffers;
     }
+
+    void beforeExit() override
+    {
+        // Just in case the removal condition was not already met before exiting
+        if (mHudInstructionText)
+        {
+            (*mHudInstructionText)->markToRemove();
+        }
+    }
+
+    std::optional<aunteater::weak_entity> mHudInstructionText;
+    int mMaxHeight;
+    OpacityInterpolation mOpacity{hud::gInstructionMessageDuration}; 
 };
 
 
@@ -178,11 +252,19 @@ FloorIsLavaRule::FloorIsLavaRule(aunteater::EntityManager & aEntityManager,
                    std::shared_ptr<Control> aControlSystem,
                    std::shared_ptr<RenderToScreen> aRenderToScreenSystem) :
     RuleBase{aEntityManager, std::move(aContext), std::move(aControlSystem), std::move(aRenderToScreenSystem)},
+    mHudHeightText{mEntityManager.addEntity(makeHudText("",
+                                                        hud::gAltimeterPosition,
+                                                        ScreenPosition::Center))},
+    mHudBestScoreText{mEntityManager.addEntity(makeHudText("",
+                                                           hud::gBestScorePosition,
+                                                           ScreenPosition::Center))},
     mPhases{setupGamePhases(mContext, *this)},
     // ATTENTION the state machine is entering the first state directly, before FloorIsLavaRule is done cting.
     mPhaseMachine{mPhases[InitialInvicible]}
 {
     addPlayer();
+    mHudHeightText->get<Text>().size = Text::Small;
+    mHudBestScoreText->get<Text>().size = Text::Small;
 }
 
 
@@ -206,6 +288,15 @@ void FloorIsLavaRule::resetPlayer()
     addPlayer();
 }
 
+
+void FloorIsLavaRule::setHeight(int aHeight)
+{
+    mHudHeightText->get<Text>().message = std::to_string(aHeight);
+
+    mBestHeight = std::max(aHeight, mBestHeight);
+    mHudBestScoreText->get<Text>().message = 
+        mContext->translate(hud_record_sid) + std::to_string(mBestHeight);
+}
 
 
 } // namespace grapito
