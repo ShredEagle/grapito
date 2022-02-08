@@ -2,6 +2,7 @@
 
 
 #include "../../Configuration.h"
+#include "../../Entities.h"
 #include "../../Timer.h"
 
 #include "../../Components/ScreenPosition.h"
