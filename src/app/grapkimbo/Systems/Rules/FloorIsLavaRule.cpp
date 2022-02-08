@@ -80,6 +80,7 @@ class LavaFadeInPhase : public PhaseParent
     void beforeEnter() override
     {
         mRule.setHeight(0);
+        mRule.enableGrapples();
         mFadeOpacity.reset();
         mRule.resetPlayer();
     }
@@ -119,9 +120,7 @@ class InitialInviciblePhase : public PhaseParent
     using PhaseParent::PhaseParent;
 
     void beforeEnter() override
-    {
-        mRule.enableGrapples();
-    }
+    {}
 
     UpdateStatus update(
         const GrapitoTimer & aTimer,
