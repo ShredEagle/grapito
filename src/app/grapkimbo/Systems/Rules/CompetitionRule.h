@@ -76,10 +76,11 @@ class CompetitionRule : public RuleBase
 
     template <class>
     friend class PhaseBase;
+    template <class>
+    friend class MessagePhase;
     friend class ExpectPlayersPhase;
     friend class WarmupPhase;
     friend class CompetitionPhase;
-    friend class CongratulationPhase;
     friend class FadeOutPhase;
     friend class FadeInPhase;
 

@@ -15,32 +15,6 @@ class Control;
 class RenderToScreen;
 
 
-template <class T_rule>
-class PhaseBase : public State
-{
-public:
-    PhaseBase(std::shared_ptr<Context> aContext, T_rule & aRule) :
-        mContext{std::move(aContext)},
-        mRule{aRule}
-    {}
-
-protected:
-    std::shared_ptr<State> getPhase(T_rule::Phase aPhase)
-    {
-        return mRule.mPhases[aPhase];
-    }
-
-    aunteater::EntityManager & getEntityManager()
-    {
-        return mRule.mEntityManager;
-    }
-
-    std::shared_ptr<Context> mContext;
-    T_rule & mRule;
-};
-
-
-
 class RuleBase : public aunteater::System<GrapitoTimer, GameInputState>
 {
 public:

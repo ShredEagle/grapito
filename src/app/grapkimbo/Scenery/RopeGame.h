@@ -19,6 +19,7 @@ enum class GameMode
 {
     Multiplayer,
     Freesolo,
+    FloorIsLava,
 };
 
 

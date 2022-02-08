@@ -47,6 +47,7 @@ namespace game
     const float gFadeDuration = 0.75f;
     const std::string gFallbackLanguage{"en"};
     const math::sdr::Rgb gFadeColor = math::sdr::gBlack;
+    extern const float FloorBecomesLavaHeight = 8.f;
 } // namespace game
 
 

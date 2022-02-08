@@ -77,7 +77,9 @@ set(${TARGET_NAME}_HEADERS
     Systems/Debug/DirectControl.h
 
     Systems/Rules/CompetitionRule.h
+    Systems/Rules/FloorIsLavaRule.h
     Systems/Rules/FreesoloRule.h
+    Systems/Rules/Phases.h
     Systems/Rules/RuleBase.h
 
     TestScenes/CollisionTest.h
@@ -153,6 +155,7 @@ set(${TARGET_NAME}_SOURCES
     Systems/Debug/DirectControl.cpp
 
     Systems/Rules/CompetitionRule.cpp
+    Systems/Rules/FloorIsLavaRule.cpp
     Systems/Rules/FreesoloRule.cpp
     Systems/Rules/RuleBase.cpp
 

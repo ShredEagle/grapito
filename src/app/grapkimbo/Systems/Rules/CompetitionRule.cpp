@@ -1,5 +1,7 @@
 #include "CompetitionRule.h"
 
+#include "Phases.h"
+
 #include "../../Configuration.h"
 #include "../../Context/Context.h"
 #include "../../Entities.h"
@@ -10,7 +12,6 @@
 #include "../../Components/Text.h"
 
 #include "../../Utils/Camera.h"
-#include "../../Utils/CompositeTransition.h"
 
 #include <handy/StringId_Interning.h>
 
@@ -30,73 +31,7 @@ const StringId hud_climb_sid = handy::internalizeString("hud_climb");
 
 using PhaseParent = PhaseBase<CompetitionRule>;
 
-class CongratulationPhase : public PhaseParent
-{
-    static constexpr Position2 gOutside = {0.f, -1000.f};
-
-    static auto PrepareInterpolation()
-    {
-        CompositeTransition<Position2, float> result{gOutside};
-        result
-            .pushInterpolation<math::None>(game::gCongratulationScreenPosition,
-                                           game::gCongratulationPhaseDuration * (1./3.))
-            .pushConstant(game::gCongratulationPhaseDuration * (2./3.));
-        return result;
-    }
-
-public:
-    CongratulationPhase(std::shared_ptr<Context> aContext, CompetitionRule & aCompetitionRule) :
-        PhaseParent{std::move(aContext), aCompetitionRule},
-        mHudPositionInterpolationReference{PrepareInterpolation()},
-        mHudPositionInterpolation{mHudPositionInterpolationReference}
-    {}
-
-private:
-    void resetInterpolation()
-    {
-        mHudPositionInterpolation = mHudPositionInterpolationReference;
-    }
-
-    void beforeEnter() override
-    {
-        resetInterpolation();
-        mHudText = getEntityManager().addEntity(makeHudText(mContext->translate(hud_victory_sid),
-                                                            gOutside,
-                                                            ScreenPosition::Center));
-    }
-
-
-    UpdateStatus update(
-            const GrapitoTimer & aTimer,
-            const GameInputState & /*aInputs*/,
-            StateMachine & aStateMachine) override
-    {
-        mHudText->get<ScreenPosition>().position =
-            mHudPositionInterpolation.advance(aTimer.delta());
-        if(mHudPositionInterpolation.isCompleted())
-        {
-            aStateMachine.putNext(getPhase(CompetitionRule::FadeOut));
-            aStateMachine.popState();
-        }
-
-        // Note: This will have absolutely no impact, nested state machines
-        // update status is not checked.
-        return UpdateStatus::SwapBuffers;
-    }
-
-
-    void beforeExit() override
-    {
-        // TODO delay delete ?
-        mHudText->markToRemove();
-    }
-
-
-    const CompositeTransition<Position2, float> mHudPositionInterpolationReference;
-    CompositeTransition<Position2, float> mHudPositionInterpolation;
-    aunteater::weak_entity mHudText{nullptr};
-};
-
+using CongratulationPhase = MessagePhase<CompetitionRule>;
 
 class ExpectPlayersPhase : public PhaseParent
 {
@@ -347,7 +282,9 @@ CompetitionRule::PhasesArray setupGamePhases(std::shared_ptr<Context> aContext, 
     CompetitionRule::PhasesArray result;
     result[CompetitionRule::Warmup] = std::make_shared<WarmupPhase>(aContext, aCompetitionRule);
     result[CompetitionRule::Competition] = std::make_shared<CompetitionPhase>(aContext, aCompetitionRule);
-    result[CompetitionRule::Congratulation] = std::make_shared<CongratulationPhase>(aContext, aCompetitionRule);
+    result[CompetitionRule::Congratulation] = 
+        std::make_shared<CongratulationPhase>(aContext, aCompetitionRule,
+                                              aContext->translate(hud_victory_sid), CompetitionRule::FadeOut);
     result[CompetitionRule::ExpectPlayers] = std::make_shared<ExpectPlayersPhase>(aContext, aCompetitionRule);
     result[CompetitionRule::FadeOut] = std::make_shared<FadeOutPhase>(aContext, aCompetitionRule);
     result[CompetitionRule::FadeIn] = std::make_shared<FadeInPhase>(aContext, aCompetitionRule);

@@ -70,7 +70,9 @@ namespace game
     extern const float gFadeDuration;
     extern const std::string gFallbackLanguage;
     extern const math::sdr::Rgb gFadeColor;
+    // TODO FP why 5 ?
     constexpr int gMaxPlayerSlots = 5;
+    extern const float FloorBecomesLavaHeight;
 } // namespace game
 
 

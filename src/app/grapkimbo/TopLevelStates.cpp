@@ -22,6 +22,7 @@ using handy::StringId;
 // Interning the strings allow to find them from the hash, if needed (debug).
 const StringId menu_multiplayer_sid = handy::internalizeString("menu_multiplayer");
 const StringId menu_freesolo_sid    = handy::internalizeString("menu_freesolo");
+const StringId menu_floorislava_sid = handy::internalizeString("menu_floorislava");
 const StringId menu_exit_sid        = handy::internalizeString("menu_exit");
 const StringId menu_resume_sid      = handy::internalizeString("menu_resume");
 const StringId menu_restart_sid     = handy::internalizeString("menu_restart");
@@ -91,6 +92,12 @@ std::shared_ptr<MenuScene> setupMainMenu(const std::shared_ptr<Context> & aConte
                 [aContext](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface, const Controller aController)
                     {
                         aMachine.emplaceState<RopeGame>(aContext, aAppInterface, GameMode::Freesolo, aController);
+                    }
+                },
+                { aContext->translate(menu_floorislava_sid),
+                [aContext](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface, const Controller aController)
+                    {
+                        aMachine.emplaceState<RopeGame>(aContext, aAppInterface, GameMode::FloorIsLava, aController);
                     }
                 },
                 { aContext->translate(menu_exit_sid),

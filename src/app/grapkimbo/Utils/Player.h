@@ -33,6 +33,12 @@ inline bool isGoingRight(const AccelAndSpeed & aAccelSpeed)
 }
 
 
+inline bool isGrounded(const PlayerData & aPlayerData)
+{
+    return aPlayerData.state & PlayerCollisionState_Grounded;
+}
+
+
 inline bool isGrappleOut(const PlayerData & aPlayerData)
 {
     return aPlayerData.controlState & (ControlState_Attached | ControlState_Throwing);

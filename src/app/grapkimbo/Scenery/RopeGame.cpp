@@ -26,6 +26,7 @@
 #include <Systems/CameraGuidedControl.h>
 #include <Systems/Control.h>
 #include <Systems/Rules/CompetitionRule.h>
+#include <Systems/Rules/FloorIsLavaRule.h>
 #include <Systems/Rules/FreesoloRule.h>
 #include <Systems/Gravity.h>
 #include <Systems/LevelGeneration.h>
@@ -96,6 +97,9 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
         break;
     case GameMode::Freesolo:
         mSystemManager.add<FreesoloRule>(mContext, controlSystem, renderToScreen);
+        break;
+    case GameMode::FloorIsLava:
+        mSystemManager.add<FloorIsLavaRule>(mContext, controlSystem, renderToScreen);
         break;
     }
 
