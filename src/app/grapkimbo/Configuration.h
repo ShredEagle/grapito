@@ -160,6 +160,10 @@ namespace player
 
     extern const float gIdleSpeedLimit;
 
+    extern const math::sdr::Rgb gBlueColor;
+    extern const math::sdr::Rgb gGreenColor;
+    extern const math::sdr::Rgb gRedColor;
+
 } // namespace player
 
 

@@ -79,14 +79,9 @@ struct PlayerStatus
 
 struct PlayerHud
 {
-    //PlayerHud(math::sdr::Rgb aColor, aunteater::EntityManager & aEntityManager) :
-    //    mHudText{aEntityManager.addEntity(
-    //        makeHudText("", hud::gAltimeterPosition, ScreenPosition::Center))},
-    //{
-    //    mHudText->get<Text>().color = aColor;
-    //}
-
     PlayerHud(PlayerStatus & aStatus, aunteater::EntityManager & aEntityManager);
+
+    void setColor(math::sdr::Rgb aColor);
 
     void update();
 
@@ -103,6 +98,8 @@ public:
     {}
 
     void add(PlayerStatus & aStatus);
+
+    void setColor(PlayerStatus & aStatus, math::sdr::Rgb aColor);
 
     void update()
     {

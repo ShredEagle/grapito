@@ -22,7 +22,7 @@ struct PlayerControllerState
     Controller mControllerId;
     PlayerJoinState mJoinState;
     // TODO ability to pick a color
-    math::sdr::Rgb mColor{math::sdr::gCyan};
+    math::sdr::Rgb mColor;
 };
 
 class PlayerList

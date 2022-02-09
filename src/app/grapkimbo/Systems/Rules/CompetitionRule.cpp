@@ -462,6 +462,8 @@ void CompetitionRule::instantiateQueuedCompetitors(bool aPreserveCameraPosition)
 {
     for (PlayerControllerState & player : mContext->mPlayerList)
     {
+        auto & playerStatus = mControllerToPlayerStatus.at(player.mControllerId);
+
         // Note we do not keep the context player state in sync with the local player status
         // In particular, we do not move the context back to queued, ever.
         if (player.mJoinState == PlayerJoinState_Queued)
@@ -469,9 +471,9 @@ void CompetitionRule::instantiateQueuedCompetitors(bool aPreserveCameraPosition)
             // Advance queued context players to playing state, which is used to control pause menu for e.g.
             // This is feedback from downstream to the context, which is maybe not good architecture.
             player.mJoinState = PlayerJoinState_Playing;
+            mHudLine.setColor(playerStatus, player.mColor);
         }
 
-        auto & playerStatus = mControllerToPlayerStatus.at(player.mControllerId);
         if (playerStatus.status == PlayerStatus::Queued || playerStatus.status == PlayerStatus::Eliminated)
         {
             playerStatus.status = PlayerStatus::Playing;
@@ -543,6 +545,10 @@ PlayerHud::PlayerHud(PlayerStatus & aStatus, aunteater::EntityManager & aEntityM
     hudText->get<Text>().size = Text::Small;
 }
 
+void PlayerHud::setColor(math::sdr::Rgb aColor)
+{
+    hudText->get<Text>().color = aColor;
+}
 
 void PlayerHud::update()
 {
@@ -556,6 +562,17 @@ void HudLine::add(PlayerStatus & aStatus)
     reflow();
 }
 
+void HudLine::setColor(PlayerStatus & aStatus, math::sdr::Rgb aColor)
+{
+    for (auto & hud : mHuds)
+    {
+        if(&hud.status == &aStatus)
+        {
+            hud.setColor(aColor);
+            break;
+        }
+    }
+}
 
 void HudLine::reflow()
 {
