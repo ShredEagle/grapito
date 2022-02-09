@@ -135,6 +135,20 @@ bool isGamepadPresent(Controller aController)
 }
 
 
+std::vector<Controller> listPresentGamepads()
+{
+    std::vector<Controller> present;
+    for (const Controller controller : gAllControllers)
+    {
+        if(isGamepad(controller) && isGamepadPresent(controller))
+        {
+            present.push_back(controller);
+        }
+    }
+    return present;
+}
+
+
 GameInputState::GameInputState()
 {
     for (const Controller controller : gAllControllers)

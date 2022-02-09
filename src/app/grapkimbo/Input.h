@@ -163,6 +163,8 @@ constexpr bool isGamepad(Controller aController);
 
 bool isGamepadPresent(Controller aController);
 
+std::vector<Controller> listPresentGamepads();
+
 enum class AxisSign
 {
     Positive,

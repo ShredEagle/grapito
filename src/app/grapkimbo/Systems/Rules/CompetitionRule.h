@@ -7,6 +7,8 @@
 #include "../../Components/Position.h"
 #include "../../Components/PlayerData.h"
 
+#include "../../Context/PlayerList.h"
+
 #include "../../Scenery/StateMachine.h"
 
 #include <aunteater/FamilyHelp.h>
@@ -56,6 +58,66 @@ private:
 };
 
 
+struct PlayerStatus
+{
+    enum Status
+    {
+        Connected,
+
+        Queued,
+        Eliminated,
+        Playing,
+    };
+
+    std::string text();
+
+    std::shared_ptr<Context> mContext;
+    Status status{Connected};
+    int score{0};
+};
+
+
+struct PlayerHud
+{
+    //PlayerHud(math::sdr::Rgb aColor, aunteater::EntityManager & aEntityManager) :
+    //    mHudText{aEntityManager.addEntity(
+    //        makeHudText("", hud::gAltimeterPosition, ScreenPosition::Center))},
+    //{
+    //    mHudText->get<Text>().color = aColor;
+    //}
+
+    PlayerHud(PlayerStatus & aStatus, aunteater::EntityManager & aEntityManager);
+
+    void update();
+
+    PlayerStatus & status;
+    aunteater::weak_entity hudText{nullptr};
+};
+
+
+class HudLine
+{
+public:
+    HudLine(aunteater::EntityManager & aEntityManager) :
+        mEntityManager{aEntityManager}
+    {}
+
+    void add(PlayerStatus & aStatus);
+
+    void update()
+    {
+        std::ranges::for_each(mHuds, &PlayerHud::update);
+    }
+
+private:
+    void reflow();
+
+    aunteater::EntityManager & mEntityManager;
+    std::vector<PlayerHud> mHuds;
+};
+
+
+
 class CompetitionRule : public RuleBase
 {
     enum Phase
@@ -93,10 +155,17 @@ public:
     void update(const GrapitoTimer aTimer, const GameInputState & aInput) override;
 
 private:
+    void updateConnectedControllers();
+
+    void updatePlayerQueue(PlayerJoinState aStateToQueueFrom = PlayerJoinState_Queued);
+
     /// \brief Reset all competitors to their initial state.
     void resetCompetitors();
 
-    void addNewCompetitors(bool aPreserveCameraPosition = false);
+    void instantiateQueuedCompetitors(bool aPreserveCameraPosition = false);
+
+    /// \rief Remove a single competitor from the game
+    void killAndQueue(aunteater::weak_entity aCompetitor);
 
     /// \brief Remove all competitors from the game.
     void killAllCompetitors(); // Can you tell I watched squid game recently?
@@ -113,9 +182,6 @@ private:
     const aunteater::FamilyHelp<Camera> mCameras;
     const aunteater::FamilyHelp<CameraPoint> mCameraPoints;
 
-    // Values from PlayerControllerState.mPlayerSlot
-    std::set<int> mAddedCompetitors;
-
     PositionsBucket mCandidatePositions{
         {-15.f, 3.f},
         {-11.f, 3.f},
@@ -126,6 +192,10 @@ private:
         { 11.f, 3.f},
         { 15.f, 3.f},
     };
+
+    std::map<Controller, PlayerStatus> mControllerToPlayerStatus;
+
+    HudLine mHudLine;
 
     PhasesArray mPhases;
     StateMachine mPhaseMachine;

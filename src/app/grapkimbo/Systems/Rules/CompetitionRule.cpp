@@ -8,6 +8,7 @@
 #include "../../Logging.h"
 #include "../../Timer.h"
 
+#include "../../Components/Controllable.h"
 #include "../../Components/ScreenPosition.h"
 #include "../../Components/Text.h"
 
@@ -28,6 +29,10 @@ const StringId hud_2_sid = handy::internalizeString("hud_2");
 const StringId hud_3_sid = handy::internalizeString("hud_3");
 const StringId hud_climb_sid = handy::internalizeString("hud_climb");
 
+const StringId hud_pressstart_sid = handy::internalizeString("hud_pressstart");
+const StringId hud_joining_sid = handy::internalizeString("hud_joining");
+
+
 
 using PhaseParent = PhaseBase<CompetitionRule>;
 
@@ -37,13 +42,20 @@ class ExpectPlayersPhase : public PhaseParent
 {
     using PhaseParent::PhaseParent;
 
-    void beforeEnter() override
+    // Semantically is a `beforeEnter()`, but we do not want this to be
+    // called before the CompetitionRule construction is complete
+    // (this is the initial machine state).
+    std::pair<TransitionProgress, UpdateStatus> enter(
+        const GrapitoTimer &,
+        const GameInputState &,
+        const StateMachine &) override
     {
         mRule.resetCompetitors(); // in order to add at least the player that entered the game
         mRule.disableGrapples();
         mHudText = getEntityManager().addEntity(makeHudText(mContext->translate(hud_waitplayers_sid),
                                                             hud::gCountdownPosition,
                                                             ScreenPosition::Center));
+        return {TransitionProgress::None, UpdateStatus::KeepFrame};
     }
 
 
@@ -180,7 +192,7 @@ class WarmupPhase : public PhaseParent
 
     void updateImpl(float aDelta, StateMachine & aStateMachine)
     {
-        mRule.addNewCompetitors(true);
+        mRule.instantiateQueuedCompetitors(true);
         auto param = mCountdownParam.advance(aDelta);
         if(mCountdownParam.isCompleted())
         {
@@ -297,18 +309,27 @@ CompetitionRule::CompetitionRule(aunteater::EntityManager & aEntityManager,
                    std::shared_ptr<Control> aControlSystem,
                    std::shared_ptr<RenderToScreen> aRenderToScreenSystem) :
     RuleBase{aEntityManager, std::move(aContext), std::move(aControlSystem), std::move(aRenderToScreenSystem)},
-    mCompetitors{aEntityManager},
-    mCameras{aEntityManager},
-    mCameraPoints{aEntityManager},
+    mCompetitors{mEntityManager},
+    mCameras{mEntityManager},
+    mCameraPoints{mEntityManager},
+    mHudLine{mEntityManager},
     mPhases{setupGamePhases(mContext, *this)},
     // ATTENTION the state machine is entering the first state directly, before CompetitionRule is done cting.
     mPhaseMachine{mPhases[ExpectPlayers]}
-{}
+{
+    // Initially, the competitor who entered the game will be in PlayerList with _Playing state.
+    // Create a PlayerStatus for them, and ensure they are queued to be instantiated into the game.
+    updateConnectedControllers();
+    updatePlayerQueue(PlayerJoinState_Playing);
+}
 
 
 void CompetitionRule::update(const GrapitoTimer aTimer, const GameInputState & aInput)
 {
+    updateConnectedControllers();
+    updatePlayerQueue();
     mPhaseMachine.update(aTimer, aInput);
+    mHudLine.update();
 }
 
 
@@ -328,10 +349,10 @@ std::size_t CompetitionRule::eliminateCompetitors()
 
             fadeOutGuides.push_back(prepareCameraFadeOut(cameraPosition, geometry, cameraGuide));
 
-            // Remove the player from the game, and
+            // Remove the player from the game, and queue it to be instantiated on next opportunity.
             // TODO This is a good example of circumventing the type system with entities:
             // provide a competitor where the archetype of a player is expected.
-            kill(competitor);
+            killAndQueue(competitor);
         }
         else
         {
@@ -389,24 +410,53 @@ void CompetitionRule::resetCompetitors()
 {
     mCandidatePositions.reset();
     killAllCompetitors();
-    mAddedCompetitors.clear();
-    addNewCompetitors();
+    instantiateQueuedCompetitors();
 }
 
 
-void CompetitionRule::addNewCompetitors(bool aPreserveCameraPosition)
+void CompetitionRule::updateConnectedControllers()
+{
+    for(Controller gamepad : listPresentGamepads())
+    {
+        auto [value, inserted] = mControllerToPlayerStatus.emplace(gamepad, PlayerStatus{mContext});
+        if (inserted)
+        {
+            mHudLine.add(value->second);
+        }
+    }
+}
+
+
+void CompetitionRule::updatePlayerQueue(PlayerJoinState aStateToQueueFrom)
 {
     for (PlayerControllerState & player : mContext->mPlayerList)
     {
-        // Advance queued players to playing state.
+        if (player.mJoinState == aStateToQueueFrom)
+        {
+            mControllerToPlayerStatus.at(player.mControllerId).status = PlayerStatus::Queued;
+        }
+    }
+}
+
+
+void CompetitionRule::instantiateQueuedCompetitors(bool aPreserveCameraPosition)
+{
+    for (PlayerControllerState & player : mContext->mPlayerList)
+    {
+        // Note we do not keep the context player state in sync with the local player status
+        // In particular, we do not move the context back to queued, ever.
         if (player.mJoinState == PlayerJoinState_Queued)
         {
+            // Advance queued context players to playing state, which is used to control pause menu for e.g.
+            // This is feedback from downstream to the context, which is maybe not good architecture.
             player.mJoinState = PlayerJoinState_Playing;
         }
 
-        if (!mAddedCompetitors.contains(player.mPlayerSlot)
-            && player.mJoinState == PlayerJoinState_Playing)
+        auto & playerStatus = mControllerToPlayerStatus.at(player.mControllerId);
+        if (playerStatus.status == PlayerStatus::Queued || playerStatus.status == PlayerStatus::Eliminated)
         {
+            playerStatus.status = PlayerStatus::Playing;
+
             Position2 aSpawnPos = [&]()
             {
                 if (aPreserveCameraPosition)
@@ -426,17 +476,78 @@ void CompetitionRule::addNewCompetitors(bool aPreserveCameraPosition)
 
             mEntityManager.addEntity(
                 makePlayingPlayer(player.mPlayerSlot, player.mControllerId, player.mColor, aSpawnPos));
-            mAddedCompetitors.insert(player.mPlayerSlot);
         }
     }
 }
 
 
+void CompetitionRule::killAndQueue(aunteater::weak_entity aCompetitor)
+{
+    mControllerToPlayerStatus.at(aCompetitor->get<Controllable>().controller).status = PlayerStatus::Eliminated;
+    kill(aCompetitor);
+}
+
 void CompetitionRule::killAllCompetitors()
 {
     for (auto competitor : mCompetitors)
     {
-        kill(competitor);
+        killAndQueue(competitor);
+    }
+}
+
+//
+// Scoring and Hud
+//
+std::string PlayerStatus::text()
+{
+    switch(status)
+    {
+    case Connected:
+        return mContext->translate(hud_pressstart_sid);
+        break;
+    case Queued:
+        return mContext->translate(hud_joining_sid);
+        break;
+    case Eliminated:
+    case Playing:
+        return std::to_string(score);
+        break;
+    }
+}
+
+
+PlayerHud::PlayerHud(PlayerStatus & aStatus, aunteater::EntityManager & aEntityManager) :
+    status{aStatus},
+    hudText{aEntityManager.addEntity(
+        makeHudText("", hud::gAltimeterPosition, ScreenPosition::Center))}
+{
+    hudText->get<Text>().size = Text::Small;
+}
+
+
+void PlayerHud::update()
+{
+    hudText->get<Text>().message = status.text();
+}
+
+
+void HudLine::add(PlayerStatus & aStatus)
+{
+    mHuds.emplace_back(aStatus, mEntityManager);
+    reflow();
+}
+
+
+void HudLine::reflow()
+{
+    const float xSpacing = game::gAppResolution.width() / (mHuds.size() + 1);
+    int id = 1;
+    for (auto & hud : mHuds)
+    {
+        hud.hudText->get<ScreenPosition>().position.x() = 
+            -(game::gAppResolution.width() / 2)
+            + id * xSpacing;
+        ++id;
     }
 }
 
