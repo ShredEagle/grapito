@@ -33,7 +33,6 @@ const StringId hud_pressstart_sid = handy::internalizeString("hud_pressstart");
 const StringId hud_joining_sid = handy::internalizeString("hud_joining");
 
 
-
 using PhaseParent = PhaseBase<CompetitionRule>;
 
 
@@ -329,12 +328,7 @@ CompetitionRule::CompetitionRule(aunteater::EntityManager & aEntityManager,
     mPhases{setupGamePhases(mContext, *this)},
     // ATTENTION the state machine is entering the first state directly, before CompetitionRule is done cting.
     mPhaseMachine{mPhases[ExpectPlayers]}
-{
-    // Initially, the competitor who entered the game will be in PlayerList with _Playing state.
-    // Create a PlayerStatus for them, and ensure they are queued to be instantiated into the game.
-    updateConnectedControllers();
-    updatePlayerQueue(PlayerJoinState_Playing);
-}
+{}
 
 
 void CompetitionRule::update(const GrapitoTimer aTimer, const GameInputState & aInput)
@@ -452,11 +446,11 @@ void CompetitionRule::updateConnectedControllers()
 }
 
 
-void CompetitionRule::updatePlayerQueue(PlayerJoinState aStateToQueueFrom)
+void CompetitionRule::updatePlayerQueue()
 {
     for (PlayerControllerState & player : mContext->mPlayerList)
     {
-        if (player.mJoinState == aStateToQueueFrom)
+        if (player.mJoinState == PlayerJoinState_Queued)
         {
             mControllerToPlayerStatus.at(player.mControllerId).status = PlayerStatus::Queued;
         }

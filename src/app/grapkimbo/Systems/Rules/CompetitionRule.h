@@ -158,7 +158,7 @@ public:
 private:
     void updateConnectedControllers();
 
-    void updatePlayerQueue(PlayerJoinState aStateToQueueFrom = PlayerJoinState_Queued);
+    void updatePlayerQueue();
 
     /// \brief Reset all competitors to their initial state.
     void resetCompetitors();

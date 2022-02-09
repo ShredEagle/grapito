@@ -26,7 +26,8 @@ FreesoloRule::FreesoloRule(aunteater::EntityManager & aEntityManager,
 {
     mHudText->get<Text>().size = Text::Small;
 
-    PlayerControllerState player = *mContext->mPlayerList.begin();
+    PlayerControllerState & player = *mContext->mPlayerList.begin();
+    player.mJoinState = PlayerJoinState_Playing;
     mPlayer = mEntityManager.addEntity(
         makePlayingPlayer(player.mPlayerSlot, player.mControllerId, player.mColor, {0.f, 3.f}));
 }

@@ -275,7 +275,8 @@ void FloorIsLavaRule::update(const GrapitoTimer aTimer, const GameInputState & a
 
 void FloorIsLavaRule::addPlayer()
 {
-    PlayerControllerState player = *mContext->mPlayerList.begin();
+    PlayerControllerState & player = *mContext->mPlayerList.begin();
+    player.mJoinState = PlayerJoinState_Playing;
     mPlayer = mEntityManager.addEntity(
         makePlayingPlayer(player.mPlayerSlot, player.mControllerId, player.mColor, {0.f, 3.f}));
 }

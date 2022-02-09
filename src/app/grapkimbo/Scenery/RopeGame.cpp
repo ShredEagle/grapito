@@ -63,7 +63,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     GameScene{std::move(aContext), std::move(aAppInterface)},
     mGameMode{aGameMode}
 {
-    mContext->mPlayerList.addPlayer(aController, PlayerJoinState_Playing);
+    mContext->mPlayerList.addPlayer(aController, PlayerJoinState_Queued);
 
     mSystemManager.add<debug::DirectControl>();
 
