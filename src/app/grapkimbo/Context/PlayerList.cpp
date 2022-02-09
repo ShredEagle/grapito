@@ -53,6 +53,14 @@ PlayerJoinState PlayerList::getPlayerState(Controller aControllerId)
     return PlayerJoinState_NotActive;
 }
 
+
+const std::array<math::sdr::Rgb, 3> gPlayerIdToColor{
+    player::gBlueColor,
+    player::gGreenColor,
+    player::gRedColor,
+};
+
+
 int PlayerList::addPlayer(Controller aControllerId, PlayerJoinState aJoinState)
 {
     int availableSlot = getNextSlot();
@@ -63,7 +71,12 @@ int PlayerList::addPlayer(Controller aControllerId, PlayerJoinState aJoinState)
                 return state.mControllerId == aControllerId;
             }) == mPlayerList.end())
     {
-        mPlayerList.emplace_back(PlayerControllerState{availableSlot, aControllerId, aJoinState});
+        mPlayerList.emplace_back(PlayerControllerState{
+            availableSlot,
+            aControllerId,
+            aJoinState,
+            gPlayerIdToColor.at(availableSlot),
+        });
         return availableSlot;
     }
 
@@ -111,6 +124,12 @@ std::vector<Controller> PlayerList::getUnactiveControllers()
 std::size_t PlayerList::countActivePlayers() const
 {
     return mPlayerList.size();
+}
+
+
+void PlayerList::clear()
+{
+    mPlayerList.clear();
 }
 
 

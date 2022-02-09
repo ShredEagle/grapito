@@ -20,6 +20,13 @@ GameScene::GameScene(std::shared_ptr<Context> aContext,
 {}
 
 
+GameScene::~GameScene()
+{
+    // All players added during the game should be cleared, for next game.
+    mContext->mPlayerList.clear();
+}
+
+
 UpdateStatus GameScene::update(
     const GrapitoTimer & aTimer,
     const GameInputState & aInputs,
