@@ -140,6 +140,7 @@ class CompetitionRule : public RuleBase
     friend class PhaseBase;
     template <class>
     friend class MessagePhase;
+    friend class CongratulationPhase;
     friend class ExpectPlayersPhase;
     friend class WarmupPhase;
     friend class CompetitionPhase;
@@ -173,6 +174,8 @@ private:
     /// \brief Apply the elimination rule to each competitor, removing competitors failing the test.
     /// \return The number of competitors remaining in the game after this step of eliminations.
     std::size_t eliminateCompetitors();
+
+    void incrementScore();
 
     aunteater::Entity prepareCameraFadeOut(Position2 aCameraPosition,
                                            const Position & aGeometry,

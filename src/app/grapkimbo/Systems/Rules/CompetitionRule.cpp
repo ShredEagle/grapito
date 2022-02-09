@@ -36,7 +36,20 @@ const StringId hud_joining_sid = handy::internalizeString("hud_joining");
 
 using PhaseParent = PhaseBase<CompetitionRule>;
 
-using CongratulationPhase = MessagePhase<CompetitionRule>;
+
+class CongratulationPhase : public MessagePhase<CompetitionRule>
+{
+    using Base_type = MessagePhase<CompetitionRule>;
+public:
+    using Base_type::Base_type;
+
+    void beforeEnter() override
+    {
+        Base_type::beforeEnter();
+        mRule.incrementScore();
+    }
+};
+
 
 class ExpectPlayersPhase : public PhaseParent
 {
@@ -369,6 +382,18 @@ std::size_t CompetitionRule::eliminateCompetitors()
     }
 
     return remainingCompetitors;
+}
+
+
+void CompetitionRule::incrementScore()
+{
+    for(auto & [controller, playerStatus] : mControllerToPlayerStatus)
+    {
+        if (playerStatus.status == PlayerStatus::Playing)
+        {
+            ++playerStatus.score;
+        }
+    }
 }
 
 

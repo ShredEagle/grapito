@@ -59,6 +59,7 @@ class MessagePhase : public PhaseBase<T_rule>
         return result;
     }
 
+
 public:
     MessagePhase(std::shared_ptr<Context> aContext, T_rule & aCompetitionRule,
                  std::string aMessage, T_rule::Phase aNextPhase) :
@@ -69,11 +70,6 @@ public:
         mHudPositionInterpolation{mHudPositionInterpolationReference}
     {}
 
-private:
-    void resetInterpolation()
-    {
-        mHudPositionInterpolation = mHudPositionInterpolationReference;
-    }
 
     void beforeEnter() override
     {
@@ -102,13 +98,18 @@ private:
         return UpdateStatus::SwapBuffers;
     }
 
-
     void beforeExit() override
     {
         // TODO delay delete ?
         mHudText->markToRemove();
     }
 
+
+private:
+    void resetInterpolation()
+    {
+        mHudPositionInterpolation = mHudPositionInterpolationReference;
+    }
 
     std::string mMessage; 
     T_rule::Phase mNextPhase;
