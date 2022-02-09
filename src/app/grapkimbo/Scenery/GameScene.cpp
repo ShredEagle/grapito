@@ -5,7 +5,6 @@
 
 #include "../Configuration.h"
 #include "../Logging.h"
-#include "../TopLevelStates.h"
 
 #include "../Utils/MenuControls.h"
     
@@ -31,7 +30,7 @@ UpdateStatus GameScene::update(
     {
         if (mContext->mPlayerList.getPlayerState(pressingStartController) == PlayerJoinState_Playing)
         {
-            aStateMachine.pushState(setupPauseMenu(mContext, mAppInterface, shared_from_this()));
+            aStateMachine.pushState(getPauseMenu());
             // Causes troubles with detection of next press of pause button
             // it would still be the same edge!
             //return aStateMachine.update(aTimer, aInputs);

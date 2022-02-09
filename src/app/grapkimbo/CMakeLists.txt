@@ -56,7 +56,6 @@ set(${TARGET_NAME}_HEADERS
     Systems/CameraGuidedControl.h
     Systems/Control.h
     Systems/DelayDeleter.h
-    Systems/GameRule.h
     Systems/Gravity.h
     Systems/GrappleCleanup.h
     Systems/GrappleInteractions.h
@@ -76,6 +75,12 @@ set(${TARGET_NAME}_HEADERS
     Systems/TransitionAnimationState.h
 
     Systems/Debug/DirectControl.h
+
+    Systems/Rules/CompetitionRule.h
+    Systems/Rules/FloorIsLavaRule.h
+    Systems/Rules/FreesoloRule.h
+    Systems/Rules/Phases.h
+    Systems/Rules/RuleBase.h
 
     TestScenes/CollisionTest.h
     TestScenes/DistanceTest.h
@@ -130,7 +135,6 @@ set(${TARGET_NAME}_SOURCES
     Systems/CameraGuidedControl.cpp
     Systems/Control.cpp
     Systems/DelayDeleter.cpp
-    Systems/GameRule.cpp
     Systems/Gravity.cpp
     Systems/GrappleCleanup.cpp
     Systems/GrappleInteractions.cpp
@@ -149,6 +153,11 @@ set(${TARGET_NAME}_SOURCES
     Systems/TransitionAnimationState.cpp
 
     Systems/Debug/DirectControl.cpp
+
+    Systems/Rules/CompetitionRule.cpp
+    Systems/Rules/FloorIsLavaRule.cpp
+    Systems/Rules/FreesoloRule.cpp
+    Systems/Rules/RuleBase.cpp
 
     TestScenes/CollisionTest.cpp
     TestScenes/DistanceTest.cpp

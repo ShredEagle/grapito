@@ -1,15 +1,15 @@
 #pragma once
 
-#include "CameraGuidedControl.h" // for Camera archetype
+#include "RuleBase.h"
 
-#include "../Components/Position.h"
-#include "../Components/PlayerData.h"
+#include "../CameraGuidedControl.h" // for Camera archetype
 
-#include "../Scenery/StateMachine.h"
+#include "../../Components/Position.h"
+#include "../../Components/PlayerData.h"
 
-#include <aunteater/EntityManager.h>
+#include "../../Scenery/StateMachine.h"
+
 #include <aunteater/FamilyHelp.h>
-#include <aunteater/System.h>
 
 #include <handy/random.h>
 
@@ -21,11 +21,6 @@ namespace grapito {
 
 
 using Competitor = aunteater::Archetype<CameraGuide, PlayerData, Position>;
-
-
-class Control;
-class RenderToScreen;
-
 
 // This is a very naive implementation.
 // There are many better options with a single container.
@@ -61,12 +56,12 @@ private:
 };
 
 
-class GameRule : public aunteater::System<GrapitoTimer, GameInputState>
+class CompetitionRule : public RuleBase
 {
     enum Phase
     {
         Warmup,
-        Competition, 
+        Competition,
         Congratulation,
         ExpectPlayers,
         FadeOut,
@@ -77,21 +72,23 @@ class GameRule : public aunteater::System<GrapitoTimer, GameInputState>
 
     using PhasesArray = std::array<std::shared_ptr<State>, _End>;
 
-    friend PhasesArray setupGamePhases(std::shared_ptr<Context>, GameRule &);
+    friend PhasesArray setupGamePhases(std::shared_ptr<Context>, CompetitionRule &);
 
+    template <class>
     friend class PhaseBase;
+    template <class>
+    friend class MessagePhase;
     friend class ExpectPlayersPhase;
     friend class WarmupPhase;
     friend class CompetitionPhase;
-    friend class CongratulationPhase;
     friend class FadeOutPhase;
     friend class FadeInPhase;
 
 public:
-    GameRule(aunteater::EntityManager & aEntityManager,
-             std::shared_ptr<Context> aContext,
-             std::shared_ptr<Control> aControlSystem,
-             std::shared_ptr<RenderToScreen> aRenderToScreenSystem);
+    CompetitionRule(aunteater::EntityManager & aEntityManager,
+                    std::shared_ptr<Context> aContext,
+                    std::shared_ptr<Control> aControlSystem,
+                    std::shared_ptr<RenderToScreen> aRenderToScreenSystem);
 
     void update(const GrapitoTimer aTimer, const GameInputState & aInput) override;
 
@@ -112,34 +109,22 @@ private:
                                            const Position & aGeometry,
                                            CameraGuide & aCameraGuide);
 
-    void enableGrapples();
-    void disableGrapples();
-
-    void setFadeOpacity(float aOpacity);
-    void disableFade();
-
-    aunteater::EntityManager & mEntityManager;
     const aunteater::FamilyHelp<Competitor> mCompetitors;
     const aunteater::FamilyHelp<Camera> mCameras;
     const aunteater::FamilyHelp<CameraPoint> mCameraPoints;
 
-    std::shared_ptr<Control> mControlSystem;
-    std::shared_ptr<RenderToScreen> mRenderToScreenSystem;
-
-    std::shared_ptr<Context> mContext;
-
     // Values from PlayerControllerState.mPlayerSlot
     std::set<int> mAddedCompetitors;
 
-    PositionsBucket mCandidatePositions{ 
-        {-15.f, 3.f}, 
-        {-11.f, 3.f}, 
-        { -7.f, 3.f}, 
-        { -3.f, 3.f}, 
-        {  3.f, 3.f}, 
-        {  7.f, 3.f}, 
-        { 11.f, 3.f}, 
-        { 15.f, 3.f}, 
+    PositionsBucket mCandidatePositions{
+        {-15.f, 3.f},
+        {-11.f, 3.f},
+        { -7.f, 3.f},
+        { -3.f, 3.f},
+        {  3.f, 3.f},
+        {  7.f, 3.f},
+        { 11.f, 3.f},
+        { 15.f, 3.f},
     };
 
     PhasesArray mPhases;

@@ -34,7 +34,7 @@ public:
 private:
     const aunteater::FamilyHelp<HudText> mHudTexts;
 
-    graphics::Texting mTexting;
+    std::array<graphics::Texting, Text::_End> mSizeToTexting;
 };
 
 

@@ -70,7 +70,9 @@ namespace game
     extern const float gFadeDuration;
     extern const std::string gFallbackLanguage;
     extern const math::sdr::Rgb gFadeColor;
+    // TODO FP why 5 ?
     constexpr int gMaxPlayerSlots = 5;
+    extern const float FloorBecomesLavaHeight;
 } // namespace game
 
 
@@ -78,10 +80,18 @@ namespace hud
 {
     extern const float gViewedHeight;
     extern const char * const gFont;
-    extern const GLfloat gTextHeight;
-    extern const Position2 gModeTextPosition;
+    extern const GLfloat gSmallTextHeight;
+    extern const GLfloat gLargeTextHeight;
+
+    extern const Position2 gAltimeterPosition;
+    extern const Position2 gBestScorePosition;
     extern const Position2 gCountdownPosition;
+    extern const Position2 gModeTextPosition;
+
     extern const float gClimbMessageDuration;
+    extern const float gInstructionMessageDuration;
+
+    extern const math::sdr::Rgb gTextColor;
 }
 
 
