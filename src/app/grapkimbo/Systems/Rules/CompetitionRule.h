@@ -114,7 +114,6 @@ private:
 };
 
 
-
 class CompetitionRule : public RuleBase
 {
     enum Phase

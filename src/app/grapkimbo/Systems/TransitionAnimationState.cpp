@@ -16,6 +16,7 @@ namespace grapito {
 
 const StringId idleSid = handy::internalizeString("idle");
 const StringId runSid = handy::internalizeString("run");
+const StringId jumpSid = handy::internalizeString("jump");
 
 
 enum class Mirroring
@@ -48,7 +49,7 @@ AnimationStateMachine makePlayerAnimationStateMachine(const graphics::sprite::An
     // it could be copied from there directly into the VisualSprite, without being kept in AnimatedSprite.
 
     // Note Ad 2022/01/04: Now, AnimatedSprite can be mutated by the AnimationState::update(), in order to control the animation
-    // playbacke speed.
+    // playback speed.
 
     AnimationStateMachine result;
 
@@ -68,16 +69,19 @@ AnimationStateMachine makePlayerAnimationStateMachine(const graphics::sprite::An
         [](AnimatedSprite & aAnimation, const AccelAndSpeed & aAccelAndSpeed, const PlayerData & aPlayerData) 
         -> std::optional<PlayerAnimation>
         {
-            if (!isIdle(aPlayerData, aAccelAndSpeed)) 
+            //if (!isIdle(aPlayerData, aAccelAndSpeed)) 
+            //{
+            if (isJumping(aPlayerData))
             {
-                if (isGoingRight(aAccelAndSpeed))
-                {
-                    return PlayerAnimation::RunRight;
-                }
-                else
-                {
-                    return PlayerAnimation::RunLeft;
-                }
+                return PlayerAnimation::JumpLeft;
+            }
+            else if (isGoingRight(aAccelAndSpeed))
+            {
+                return PlayerAnimation::RunRight;
+            }
+            else if (isGoingLeft(aAccelAndSpeed))
+            {
+                return PlayerAnimation::RunLeft;
             }
 
             return std::nullopt;
@@ -89,16 +93,19 @@ AnimationStateMachine makePlayerAnimationStateMachine(const graphics::sprite::An
         [](AnimatedSprite & aAnimation, const AccelAndSpeed & aAccelAndSpeed, const PlayerData & aPlayerData) 
         -> std::optional<PlayerAnimation>
         {
-            if (!isIdle(aPlayerData, aAccelAndSpeed)) 
+            //if (!isIdle(aPlayerData, aAccelAndSpeed)) 
+            //{
+            if (isJumping(aPlayerData))
             {
-                if (isGoingLeft(aAccelAndSpeed))
-                {
-                    return PlayerAnimation::RunLeft;
-                }
-                else
-                {
-                    return PlayerAnimation::RunRight;
-                }
+                return PlayerAnimation::JumpRight;
+            }
+            else if (isGoingRight(aAccelAndSpeed))
+            {
+                return PlayerAnimation::RunRight;
+            }
+            else if (isGoingLeft(aAccelAndSpeed))
+            {
+                return PlayerAnimation::RunLeft;
             }
 
             return std::nullopt;
@@ -113,6 +120,10 @@ AnimationStateMachine makePlayerAnimationStateMachine(const graphics::sprite::An
             if (isIdle(aPlayerData, aAccelAndSpeed)) 
             {
                 return PlayerAnimation::IdleLeft;
+            }
+            else if (isJumping(aPlayerData))
+            {
+                return PlayerAnimation::JumpLeft;
             }
             else if (isGoingRight(aAccelAndSpeed))
             {
@@ -133,12 +144,66 @@ AnimationStateMachine makePlayerAnimationStateMachine(const graphics::sprite::An
             {
                 return PlayerAnimation::IdleRight;
             }
+            else if (isJumping(aPlayerData))
+            {
+                return PlayerAnimation::JumpRight;
+            }
             else if (isGoingLeft(aAccelAndSpeed))
             {
                 return PlayerAnimation::RunLeft;
             }
 
             aAnimation.parameterAdvanceSpeed = std::abs(aAccelAndSpeed.speed.x()) / player::gGroundSpeed;
+            return std::nullopt;
+        }
+    };
+
+    result.at(PlayerAnimation::JumpLeft) = {
+        makeLoopingAnimation(jumpSid, aAnimator, Mirroring::Horizontal),
+        [](AnimatedSprite & aAnimation, const AccelAndSpeed & aAccelAndSpeed, const PlayerData & aPlayerData) 
+        -> std::optional<PlayerAnimation>
+        {
+            if (isGrounded(aPlayerData)) 
+            {
+                if (isGoingLeft(aAccelAndSpeed))
+                {
+                    return PlayerAnimation::RunLeft;
+                }
+                else
+                {
+                    return PlayerAnimation::IdleLeft;
+                }
+            }
+            else if(isGoingRight(aAccelAndSpeed))
+            {
+                return PlayerAnimation::JumpRight;
+            }
+
+            return std::nullopt;
+        }
+    };
+
+    result.at(PlayerAnimation::JumpRight) = {
+        makeLoopingAnimation(jumpSid, aAnimator, Mirroring::None),
+        [](AnimatedSprite & aAnimation, const AccelAndSpeed & aAccelAndSpeed, const PlayerData & aPlayerData) 
+        -> std::optional<PlayerAnimation>
+        {
+            if (isGrounded(aPlayerData)) 
+            {
+                if (isGoingRight(aAccelAndSpeed))
+                {
+                    return PlayerAnimation::RunRight;
+                }
+                else
+                {
+                    return PlayerAnimation::IdleRight;
+                }
+            }
+            else if(isGoingLeft(aAccelAndSpeed))
+            {
+                return PlayerAnimation::JumpLeft;
+            }
+
             return std::nullopt;
         }
     };

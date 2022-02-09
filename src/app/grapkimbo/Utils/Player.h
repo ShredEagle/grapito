@@ -39,6 +39,12 @@ inline bool isGrounded(const PlayerData & aPlayerData)
 }
 
 
+inline bool isJumping(const PlayerData & aPlayerData)
+{
+    return aPlayerData.state & PlayerCollisionState_Jumping;
+}
+
+
 inline bool isGrappleOut(const PlayerData & aPlayerData)
 {
     return aPlayerData.controlState & (ControlState_Attached | ControlState_Throwing);
