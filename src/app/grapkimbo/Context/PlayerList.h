@@ -40,6 +40,8 @@ class PlayerList
 
         std::size_t countActivePlayers() const;
 
+        void clear();
+
         auto begin()
         { return mPlayerList.begin(); }
 

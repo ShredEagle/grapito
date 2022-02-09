@@ -127,5 +127,11 @@ std::size_t PlayerList::countActivePlayers() const
 }
 
 
+void PlayerList::clear()
+{
+    mPlayerList.clear();
+}
+
+
 }
 }

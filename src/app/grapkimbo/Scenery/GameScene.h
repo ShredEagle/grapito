@@ -24,6 +24,8 @@ public:
     GameScene(std::shared_ptr<Context> aContext,
               std::shared_ptr<graphics::AppInterface> aAppInterface);
 
+    ~GameScene();
+
     /// \brief Complete update step, including rendering.
     UpdateStatus update(
         const GrapitoTimer & aTimer,
