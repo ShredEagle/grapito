@@ -137,11 +137,24 @@ void RenderWorld::update(const GrapitoTimer aTimer, const GameInputState &)
 
     { // Sprites
         std::ranges::for_each(mAtlasToSprites, [](auto & aSprites){aSprites.clear();});
-        for(const auto & [position, visualSprite] : mSprites)
+        for(const auto & [geometry, visualSprite] : mSprites)
         {
+            Position2 position = [&]()
+            {
+                if (visualSprite.alignment == VisualSprite::AlignLeft)
+                {
+                    return geometry.position;
+                }
+                else
+                {
+                    return geometry.position 
+                        + Vec2{geometry.dimension.width() - visualSprite.getWorldSize().width(), 0.f};
+                }
+            }();
+
             mAtlasToSprites
                 .at(visualSprite.atlas)
-                    .emplace_back(position.position,
+                    .emplace_back(position,
                                   visualSprite.sprite,
                                   render::gSpriteOpacity,
                                   visualSprite.mirroring);

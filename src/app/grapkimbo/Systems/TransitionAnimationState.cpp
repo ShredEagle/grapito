@@ -300,10 +300,12 @@ void TransitionAnimationState::updateDrawnFrames(const GrapitoTimer aTimer)
         if (animatedSprite.horizontalMirroring)
         {
             visualSprite.mirroring.x() = -1;
+            visualSprite.alignment = VisualSprite::AlignLeft;
         }
         else
         {
             visualSprite.mirroring.x() = +1;
+            visualSprite.alignment = VisualSprite::AlignRight;
         }
     }
 }
