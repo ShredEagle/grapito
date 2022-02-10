@@ -6,6 +6,7 @@
 #include <aunteater/Component.h>
 
 #include <graphics/Sprite.h>
+#include <graphics/SpriteLoading.h>
 
 
 namespace ad {
@@ -23,6 +24,12 @@ struct VisualSprite : public aunteater::Component<VisualSprite>
     VisualSprite(AtlasIndex aAtlas = 0) :
         atlas{aAtlas},
         sprite{ {0, 0}, {0, 0} }
+    {}
+
+
+    VisualSprite(AtlasIndex aAtlas, graphics::LoadedSprite aSprite) :
+        atlas{aAtlas},
+        sprite{aSprite}
     {}
 
     Size2 getWorldSize() const

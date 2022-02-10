@@ -21,6 +21,10 @@ namespace ad {
 namespace grapito {
 
 
+// TODO Ad 2022/02/10: Refactor this major SMELL.
+//  We rely on some global mutable state to pass the atlas id accross to throwGrapple().
+inline std::size_t gGrappleAtlasIndex;
+
 aunteater::Entity makeCamera(Position2 pos = {0.f, 0.f});
 
 aunteater::Entity makeDirectControllable(Controller aController,
@@ -45,7 +49,7 @@ aunteater::Entity makeAnchor(Position2 aPosition, std::vector<Position2> aVertic
 
 aunteater::Entity createRopeSegment(Position2 origin, Position2 end, aunteater::weak_entity aPlayer);
 
-void throwGrapple(aunteater::weak_entity aPlayer, aunteater::EntityManager & aEntityManager);
+void throwGrapple(aunteater::weak_entity aPlayer, aunteater::EntityManager & aEntityManager, Context & aContext);
 
 void attachPlayerToGrapple(aunteater::weak_entity aPlayer, aunteater::EntityManager & aEntityManager);
 

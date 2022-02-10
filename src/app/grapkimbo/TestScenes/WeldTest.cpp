@@ -20,6 +20,8 @@
 #include "../Components/VisualRectangle.h"
 #include "../Components/WeldJoint.h"
 
+#include "Context/Context.h"
+
 #include <aunteater/UpdateTiming.h>
 #include <aunteater/Entity.h>
 
@@ -81,7 +83,7 @@ WeldTest::WeldTest(graphics::ApplicationGlfw & aApplication, DebugUI & aUI) :
     mUI{aUI}
 {
     mSystemManager.add<Gravity>();
-    mSystemManager.add<Control>();
+    mSystemManager.add<Control>(std::make_shared<Context>(""));
     mSystemManager.add<AccelSolver>();
     mSystemManager.add<Physics>();
     mSystemManager.add<RenderWorld>(aApplication.getAppInterface());

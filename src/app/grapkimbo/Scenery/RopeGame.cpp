@@ -68,7 +68,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     mSystemManager.add<debug::DirectControl>();
 
     mSystemManager.add<PlayerJoin>(mContext);
-    std::shared_ptr<Control> controlSystem = mSystemManager.add<Control>();
+    std::shared_ptr<Control> controlSystem = mSystemManager.add<Control>(mContext);
     mSystemManager.add<Gravity>();
     mSystemManager.add<RopeCreation>();
 
@@ -144,6 +144,13 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
             mRenderWorldSystem->installAtlas(graphics::sprite::loadAtlas(colorVariation));
         }
     }
+
+    { // Load grapple sprite
+        const graphics::sprite::LoadedAtlas & atlas = mContext->loadSingleSprite("sprite_sheet/grapple.png").first;
+        // TODO Ad 2022/02/10: Refactor this major SMELL.
+        gGrappleAtlasIndex = mRenderWorldSystem->installAtlas(atlas);
+    }
+
 
     { // Load sounds
         mContext->loadOggSoundData("sounds/burn.ogg", false);

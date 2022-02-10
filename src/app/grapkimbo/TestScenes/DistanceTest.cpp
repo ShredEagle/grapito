@@ -20,6 +20,8 @@
 #include "../Components/VisualRectangle.h"
 #include "../Components/DistanceJoint.h"
 
+#include "../Context/Context.h"
+
 #include <aunteater/UpdateTiming.h>
 #include <aunteater/Entity.h>
 
@@ -93,7 +95,7 @@ DistanceTest::DistanceTest(graphics::ApplicationGlfw & aApplication, DebugUI & a
     mUI{aUI}
 {
     mSystemManager.add<Gravity>();
-    mSystemManager.add<Control>();
+    mSystemManager.add<Control>(std::make_shared<Context>(""));
     mSystemManager.add<AccelSolver>();
     mSystemManager.add<Physics>();
     mSystemManager.add<RenderWorld>(aApplication.getAppInterface()); 
