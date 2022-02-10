@@ -63,12 +63,23 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
         //
         // Reset airborn jumps
         //
-        if (playerData.state & PlayerCollisionState_Grounded || isAnchored(playerData))
+        if (playerData.state & PlayerCollisionState_Grounded)
         {
             // TODO Ad 2022/01/05: This should actually only be done once when the player transition to grounded.
             // (But currently this transition happens into the physics engine.)
             // Or when the player actually anchors to the environments.
             resetJumps(playerData);
+        }
+        else if (isAnchored(playerData))
+        {
+            if (playerData.doubleJumpCooldownFrameCounter == 0)
+            {
+                resetJumps(playerData);
+            }
+            else
+            {
+                --playerData.doubleJumpCooldownFrameCounter;
+            }
         }
 
         //
@@ -182,8 +193,9 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
                         //
                         --playerData.airborneJumpsLeft;
                         aas.speed.y() = player::gJumpImpulse;
+                        playerData.doubleJumpCooldownFrameCounter = player::gDoubleJumpCooldown;
                     }
-                    else
+                    else if (!isAnchored(playerData))
                     {
                         float wallJumpHorizontalImpulse = player::gJumpImpulse * player::gDoubleJumpFactor * cos(math::pi<float> / 4.);
                         float wallJumpVerticalImpulse = player::gJumpImpulse * player::gDoubleJumpFactor * sin(math::pi<float> / 4.);
@@ -204,6 +216,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
                      && !isGrappleOut(playerData))
             {
                 --playerData.airborneJumpsLeft;
+                playerData.doubleJumpCooldownFrameCounter = player::gDoubleJumpCooldown;
                 aas.speed.y() = player::gJumpImpulse;
             }
         }
