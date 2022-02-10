@@ -17,6 +17,7 @@ namespace grapito {
 const StringId idleSid = handy::internalizeString("idle");
 const StringId runSid = handy::internalizeString("run");
 const StringId jumpSid = handy::internalizeString("jump");
+const StringId walledSid = handy::internalizeString("walled");
 
 
 enum class Mirroring
@@ -178,6 +179,14 @@ AnimationStateMachine makePlayerAnimationStateMachine(const graphics::sprite::An
             {
                 return PlayerAnimation::JumpRight;
             }
+            else if(isWalledLeft(aPlayerData))
+            {
+                return PlayerAnimation::WalledLeft;
+            }
+            else if(isWalledRight(aPlayerData))
+            {
+                return PlayerAnimation::WalledRight;
+            }
 
             return std::nullopt;
         }
@@ -202,6 +211,50 @@ AnimationStateMachine makePlayerAnimationStateMachine(const graphics::sprite::An
             else if(isGoingLeft(aAccelAndSpeed))
             {
                 return PlayerAnimation::JumpLeft;
+            }
+            else if(isWalledLeft(aPlayerData))
+            {
+                return PlayerAnimation::WalledLeft;
+            }
+            else if(isWalledRight(aPlayerData))
+            {
+                return PlayerAnimation::WalledRight;
+            }
+
+            return std::nullopt;
+        }
+    };
+
+    result.at(PlayerAnimation::WalledLeft) = {
+        makeLoopingAnimation(walledSid, aAnimator, Mirroring::Horizontal),
+        [](AnimatedSprite & aAnimation, const AccelAndSpeed & aAccelAndSpeed, const PlayerData & aPlayerData) 
+        -> std::optional<PlayerAnimation>
+        {
+            if (isGrounded(aPlayerData)) 
+            {
+                return PlayerAnimation::IdleLeft;
+            }
+            else if (!isWalledLeft(aPlayerData))
+            {
+                return PlayerAnimation::JumpLeft;
+            }
+
+            return std::nullopt;
+        }
+    };
+
+    result.at(PlayerAnimation::WalledRight) = {
+        makeLoopingAnimation(walledSid, aAnimator, Mirroring::None),
+        [](AnimatedSprite & aAnimation, const AccelAndSpeed & aAccelAndSpeed, const PlayerData & aPlayerData) 
+        -> std::optional<PlayerAnimation>
+        {
+            if (isGrounded(aPlayerData)) 
+            {
+                return PlayerAnimation::IdleRight;
+            }
+            else if (!isWalledRight(aPlayerData))
+            {
+                return PlayerAnimation::JumpRight;
             }
 
             return std::nullopt;

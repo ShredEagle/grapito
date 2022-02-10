@@ -121,6 +121,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
             std::ref(mContext->loadAnimationSpriteSheet("sprite_sheet/idle.json")),
             std::ref(mContext->loadAnimationSpriteSheet("sprite_sheet/run.json")),
             std::ref(mContext->loadAnimationSpriteSheet("sprite_sheet/jump.json")),
+            std::ref(mContext->loadAnimationSpriteSheet("sprite_sheet/walled.json")),
         };
 
         graphics::sprite::Animator animator;
@@ -138,6 +139,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
                     arte::ImageRgba{mContext->pathFor("sprite_sheet/idle_" + color + ".png")},
                     arte::ImageRgba{mContext->pathFor("sprite_sheet/run_" + color + ".png")},
                     arte::ImageRgba{mContext->pathFor("sprite_sheet/jump_" + color + ".png")},
+                    arte::ImageRgba{mContext->pathFor("sprite_sheet/walled_" + color + ".png")},
                 });
             mRenderWorldSystem->installAtlas(graphics::sprite::loadAtlas(colorVariation));
         }

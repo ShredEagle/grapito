@@ -14,6 +14,8 @@ enum class PlayerAnimation
     RunRight,
     JumpLeft,
     JumpRight,
+    WalledLeft,
+    WalledRight,
 
     // Keep it last
     _Count/*
