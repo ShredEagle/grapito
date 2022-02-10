@@ -54,6 +54,7 @@ struct PlayerData : public aunteater::Component<PlayerData>
 
     int wallClingFrameCounter = 0;
     int doubleJumpCooldownFrameCounter = 0;
+    int grappleCooldownFrameCounter = 0;
     int throwGrappleFrameCounter = 0;
     int airborneJumpsLeft = player::gAirborneJumps;
 

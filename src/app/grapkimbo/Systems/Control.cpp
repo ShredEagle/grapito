@@ -60,6 +60,12 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
             aInputState.asDirection(controllable.controller, 
                                LeftHorizontalAxis, LeftVerticalAxis, controller::gVerticalDeadZone, controller::gHorizontalDeadZone);
 
+        //Count down grappleCooldownFrameCounter
+        if (playerData.grappleCooldownFrameCounter != 0)
+        {
+            playerData.grappleCooldownFrameCounter--;
+        }
+
         //
         // Reset airborn jumps
         //
@@ -139,7 +145,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
                 Vec2 jointDirection = (attachPoint - playerPos).normalize();
                 Vec2 possibleDirection = {-jointDirection.y(), jointDirection.x()};
 
-                aas.speed += possibleDirection.dot(controllerDirection.normalize()) * 2.f * (player::gGrappleSwingSpeed / pow(possibleDirection.getNorm() + 1.f, 2)) * possibleDirection * controllerDirection.getNorm();
+                aas.speed += pow(possibleDirection.dot(controllerDirection.normalize()), 3) * 2.f * (player::gGrappleSwingSpeed / pow(possibleDirection.getNorm() + 1.f, 2)) * possibleDirection * controllerDirection.getNorm();
 
                 debugDrawer->drawLine({playerPos, playerPos + possibleDirection * 4.f, 2.f, math::sdr::gGreen});
             }
@@ -262,7 +268,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
             }
         }
 
-        if (mGrapplingEnabled && inputs[Grapple].positiveEdge() && !isGrappleOut(playerData))
+        if (mGrapplingEnabled && inputs[Grapple].positiveEdge() && !isGrappleOut(playerData) && playerData.grappleCooldownFrameCounter == 0)
         {
             throwGrapple(player, mEntityManager, *mContext);
             playerData.controlState |= ControlState_Throwing;

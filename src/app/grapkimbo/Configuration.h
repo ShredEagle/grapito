@@ -154,6 +154,7 @@ namespace player
     extern float gRopeDistanceJointFactor;
     extern float gGrappleDistanceJointFactor;
     extern const float gDoubleJumpCooldown;
+    extern const float gGrappleAnchoredCooldown;
     //static constexpr double gAirControlAcceleration = 12.; // m/s
     //constexpr double gAcceleration = 10.;
     //constexpr double gPlayerJumpImpulse = 10.; // m/s

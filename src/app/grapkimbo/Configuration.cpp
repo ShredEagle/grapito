@@ -102,7 +102,8 @@ namespace player
     const math::sdr::Rgb gGreenColor{52, 212, 136};
     const math::sdr::Rgb gRedColor{235, 68, 53};
     const math::sdr::Rgb gYellowColor{192, 192, 139};
-    const float gDoubleJumpCooldown = 120;
+    const float gDoubleJumpCooldown = 15;
+    const float gGrappleAnchoredCooldown = 30;
 } // namespace player
 
 
