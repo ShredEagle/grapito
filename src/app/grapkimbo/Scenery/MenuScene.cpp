@@ -45,7 +45,7 @@ MenuScene::MenuScene(Menu aMenu,
 
 
 UpdateStatus MenuScene::update(
-        const GrapitoTimer & aTimer,
+        const GrapitoTimer & /*aTimer*/,
         const GameInputState & aInputs,
         StateMachine & aStateMachine)
 {

@@ -233,11 +233,11 @@ add_executable(${TARGET_NAME}
 
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
     target_compile_options(${TARGET_NAME}
-        PRIVATE "-O3")
+        PRIVATE "-g" "-O3")
     target_compile_options(${TARGET_NAME}
-        PRIVATE "-Wall" "-Wextra" "-fsanitize=address" "-fsanitize=undefined")
+        PRIVATE "-fsanitize=leak" "-Wall" "-Wextra" "-fsanitize=address" "-fsanitize=undefined")
     target_link_options(${TARGET_NAME}
-        PRIVATE "-fsanitize=address" "-fsanitize=undefined")
+        PRIVATE "-fsanitize=address" "-fsanitize=leak" "-fsanitize=undefined")
 endif()
 
 if(NOT BUILD_Grapito_DEVMODE)

@@ -75,7 +75,7 @@ void RopeCreation::handleThrow(aunteater::weak_entity aRopeCreatorEntity)
         aunteater::weak_entity player = ropeCreator.mTargetEntity;
         if (player != nullptr && player->get<PlayerData>().controlState & ControlState_Throwing)
         {
-            aunteater::weak_entity lastSegment = aRopeCreator.mRopeSegments.back();
+            aunteater::weak_entity lastSegment = ropeCreator.mRopeSegments.back();
             Position2 playerMassCenter = player->get<Position>().position + player->get<Body>().massCenter.as<math::Vec>();
             Position2 lastSegmentPlayerEnd = getLocalPointInWorld(lastSegment->get<Body>(), lastSegment->get<Position>(),
                                                     {lastSegment->get<Position>().dimension.width(),
@@ -112,8 +112,8 @@ void RopeCreation::handleThrow(aunteater::weak_entity aRopeCreatorEntity)
                                 lastSegment
                             ));
 
-                aRopeCreator.mRopeSegments.push_back(link);
-                aRopeCreator.mPivotJoints.push_back(joint);
+                ropeCreator.mRopeSegments.push_back(link);
+                ropeCreator.mPivotJoints.push_back(joint);
                     length -= .4f;
                 }
             }
@@ -125,8 +125,7 @@ void RopeCreation::update(const GrapitoTimer, const GameInputState &)
 {
     for (auto & ropeCreatorEntity : mRopeCreator)
     {
-        RopeCreator & ropeCreator = ropeCreatorEntity->get<RopeCreator>();
-        handleThrow(ropeCreator);
+        handleThrow(ropeCreatorEntity);
     }
 }
 

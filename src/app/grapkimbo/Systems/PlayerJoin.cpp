@@ -18,14 +18,14 @@ PlayerJoin::PlayerJoin(aunteater::EntityManager & aEntityManager, std::shared_pt
 {}
 
 
-void PlayerJoin::update(const GrapitoTimer aTimer, const GameInputState & aInputs)
+void PlayerJoin::update(const GrapitoTimer, const GameInputState & aInputs)
 {
     for (auto controller : mContext->mPlayerList.getUnactiveControllers())
     {
         if (aInputs.get(controller)[Command::Start].positiveEdge())
         {
             //Change player to Choosing color state
-            int slot = mContext->mPlayerList.addPlayer(controller, PlayerJoinState_Queued);
+            mContext->mPlayerList.addPlayer(controller, PlayerJoinState_Queued);
         }
     }
 

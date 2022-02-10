@@ -50,7 +50,6 @@ void GrappleJointCreator::update(const GrapitoTimer, const GameInputState &)
     for (auto & ropeCreatorEntity : mRopeCreator)
     {
         Body & body = ropeCreatorEntity->get<Body>();
-        Position & pos = ropeCreatorEntity->get<Position>();
         RopeCreator & ropeCreator = ropeCreatorEntity->get<RopeCreator>();
         ConstructedBody & cBody = *body.constructedBodyIt;
         aunteater::weak_entity player = ropeCreator.mTargetEntity;

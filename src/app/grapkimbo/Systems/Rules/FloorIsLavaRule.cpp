@@ -123,8 +123,8 @@ class InitialInviciblePhase : public PhaseParent
     {}
 
     UpdateStatus update(
-        const GrapitoTimer & aTimer,
-        const GameInputState & aInputs,
+        const GrapitoTimer & /*aTimer*/,
+        const GameInputState & /*aInputs*/,
         StateMachine & aStateMachine) override
     {
         if (mRule.player()->get<Position>().position.y() > game::FloorBecomesLavaHeight)

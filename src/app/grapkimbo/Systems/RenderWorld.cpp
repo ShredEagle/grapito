@@ -48,7 +48,7 @@ AtlasIndex RenderWorld::installAtlas(graphics::sprite::LoadedAtlas aAtlas)
 }
 
 
-void RenderWorld::update(const GrapitoTimer aTimer, const GameInputState &)
+void RenderWorld::update(const GrapitoTimer /*aTimer*/, const GameInputState &)
 {
     mTrivialLineStrip.clearLines();
     mTrivialPolygon.clearPolygons();

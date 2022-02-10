@@ -69,7 +69,8 @@ IndexDifferences LevelGeneration::listDifferences(TileIndex aIndex) const
     auto newSet = listConnected(aIndex);
 
     IndexDifferences result{
-        oldSet
+        oldSet,
+        {}
     };
 
     for (const TileIndex id : newSet)

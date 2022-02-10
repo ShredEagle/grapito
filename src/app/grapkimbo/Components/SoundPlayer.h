@@ -42,7 +42,7 @@ struct SoundPlayer : public aunteater::Component<SoundPlayer>
     std::list<Sound> mSounds;
 };
 
-static void addSoundToEntity(aunteater::weak_entity aEntity, StringId aSoundId, bool aLooping = false, bool aStreaming = false, bool aStopOnDelete = false)
+inline void addSoundToEntity(aunteater::weak_entity aEntity, StringId aSoundId, bool aLooping = false, bool aStreaming = false, bool aStopOnDelete = false)
 {
     if (!aEntity->has<SoundPlayer>())
     {

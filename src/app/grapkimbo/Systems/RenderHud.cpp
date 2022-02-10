@@ -19,7 +19,7 @@ RenderHud::RenderHud(aunteater::EntityManager & aEntityManager,
 {}
 
 
-void RenderHud::update(const GrapitoTimer aTimer, const GameInputState &)
+void RenderHud::update(const GrapitoTimer /*aTimer*/, const GameInputState &)
 {
     std::array<graphics::Texting::Mapping, Text::_End> sizeToStrings;
 

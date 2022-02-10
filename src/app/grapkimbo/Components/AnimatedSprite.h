@@ -21,11 +21,11 @@ struct AnimatedSprite : public aunteater::Component<AnimatedSprite>
     template <class T_parameterAnimation>
     AnimatedSprite(StringId aAnimation, T_parameterAnimation aParameterAnimation, bool aHorizontalFlipping = false) :
         animation{aAnimation},
+        horizontalFlipping{aHorizontalFlipping},
         parameter{[paramAnimation = std::move(aParameterAnimation)](float aDelta) mutable
             {
                 return paramAnimation.advance(aDelta);
-            }},
-        horizontalFlipping{aHorizontalFlipping}
+            }}
     {}
 
     float advance(float aDelta)
