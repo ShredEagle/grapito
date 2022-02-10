@@ -51,9 +51,9 @@ void GrappleJointCreator::update(const GrapitoTimer, const GameInputState &)
     {
         Body & body = ropeCreatorEntity->get<Body>();
         Position & pos = ropeCreatorEntity->get<Position>();
-        RopeCreator & rope = ropeCreatorEntity->get<RopeCreator>();
+        RopeCreator & ropeCreator = ropeCreatorEntity->get<RopeCreator>();
         ConstructedBody & cBody = *body.constructedBodyIt;
-        aunteater::weak_entity player = rope.mTargetEntity;
+        aunteater::weak_entity player = ropeCreator.mTargetEntity;
         
         if (player != nullptr)
         {
@@ -63,7 +63,7 @@ void GrappleJointCreator::update(const GrapitoTimer, const GameInputState &)
             float length = 0.f;
             float lengthToContact = 0.f;
 
-            for (auto ropeIt = rope.mRopeSegments.rbegin(); ropeIt != rope.mRopeSegments.rend(); ++ropeIt)
+            for (auto ropeIt = ropeCreator.mRopeSegments.rbegin(); ropeIt != ropeCreator.mRopeSegments.rend(); ++ropeIt)
             {
                 //Here we go from the end attache to the player to the grapple and try
                 //to find a contact point to attach the player to

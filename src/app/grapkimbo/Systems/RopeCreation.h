@@ -30,7 +30,7 @@ public:
     void removedEntity(aunteater::LiveEntity & aEntity) override;
 
 private:
-    void handleThrow(RopeCreator & aRopeCreator);
+    void handleThrow(aunteater::weak_entity aRopeCreatorEntity);
 
     const aunteater::FamilyHelp<RopeCreatorType> mRopeCreator;
     aunteater::EntityManager & mEntityManager;
