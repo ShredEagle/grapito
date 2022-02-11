@@ -123,16 +123,16 @@ void RenderWorld::update(const GrapitoTimer aTimer, const GameInputState &)
                     static_cast<math::Position<2, GLfloat>>(geometry.position + body.massCenter.as<math::Vec>() + data.mAimVector * 5.f - Vec2{0.25f, 0.25f}),
                     {0.5f, 0.5f}
                 },
-                math::sdr::gGreen,
+                data.color,
         });
         mTrivialLineStrip.addLine({
                 {
                     static_cast<math::Position<2, GLfloat>>(geometry.position + body.massCenter.as<math::Vec>()),
-                    math::sdr::gGreen
+                    data.color,
                 },
                 {
                     static_cast<math::Position<2, GLfloat>>(geometry.position + body.massCenter.as<math::Vec>() + data.mAimVector * 5.f),
-                    math::sdr::gGreen
+                    data.color,
                 }
             });
     }
