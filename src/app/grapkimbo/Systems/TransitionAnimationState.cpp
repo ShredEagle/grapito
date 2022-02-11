@@ -297,14 +297,14 @@ void TransitionAnimationState::updateDrawnFrames(const GrapitoTimer aTimer)
     {
         visualSprite.sprite = mAnimator.at(animatedSprite.animation,
                                            animatedSprite.advance(aTimer.delta()));
-        if (animatedSprite.horizontalMirroring)
+        if (animatedSprite.horizontalFlipping)
         {
-            visualSprite.mirroring.x() = -1;
+            visualSprite.mirroring |= graphics::Mirroring::FlipHorizontal;
             visualSprite.alignment = VisualSprite::AlignLeft;
         }
         else
         {
-            visualSprite.mirroring.x() = +1;
+            visualSprite.mirroring = graphics::Mirroring::None;
             visualSprite.alignment = VisualSprite::AlignRight;
         }
     }

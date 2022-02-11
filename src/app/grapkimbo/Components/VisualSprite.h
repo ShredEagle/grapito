@@ -5,6 +5,7 @@
 
 #include <aunteater/Component.h>
 
+#include <graphics/commons.h>
 #include <graphics/Sprite.h>
 #include <graphics/SpriteLoading.h>
 
@@ -39,7 +40,7 @@ struct VisualSprite : public aunteater::Component<VisualSprite>
 
     AtlasIndex atlas;
     graphics::LoadedSprite sprite;
-    math::Vec<2, int> mirroring{1, 1};
+    graphics::Mirroring mirroring{graphics::Mirroring::None};
     Alignment alignment{AlignRight};
 };
 
