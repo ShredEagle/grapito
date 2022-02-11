@@ -1,6 +1,7 @@
 #include "PlayerJoin.h"
 
 #include "../Configuration.h"
+#include "../Logging.h"
 #include "../Timer.h"
 #include "Entities.h"
 #include "commons.h"
@@ -34,6 +35,7 @@ void PlayerJoin::update(const GrapitoTimer aTimer, const GameInputState & aInput
 
         if (!(controllable.controller == Controller::KeyboardMouse) && !isGamepadPresent(controllable.controller))
         {
+            ADLOG(info)("Removing player {} from the list.", player->get<PlayerData>().id);
             mContext->mPlayerList.removePlayer(controllable.controller);
             mEntityManager.markToRemove(player);
         }
