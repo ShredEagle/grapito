@@ -186,6 +186,7 @@ namespace rope
     constexpr GLfloat ropeWidth = .2f;
     constexpr GLfloat ropeHalfwidth = ropeWidth / 2 ;
     constexpr GLfloat curveTension = 0.f; // I.e. Catmull Rom
+    extern const math::hdr::Rgba gColor;
 }
 
 

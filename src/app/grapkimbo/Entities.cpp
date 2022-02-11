@@ -209,7 +209,7 @@ aunteater::Entity createRopeSegment(Position2 origin, Position2 end, aunteater::
                 size
                 )
             .add<RopeSegment>(aPlayer->get<PlayerData>().id)
-            .add<VisualRectangle>(math::sdr::gGreen, VisualRectangle::Scope::RopeStructure)
+            //.add<VisualRectangle>(math::sdr::gGreen, VisualRectangle::Scope::RopeStructure)
     ;
 
     setLocalPointToWorldPos(rope, {0.f, rope::ropeHalfwidth}, origin);

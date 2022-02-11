@@ -112,6 +112,12 @@ namespace render
 } // namespace render
 
 
+namespace rope
+{
+    const math::hdr::Rgba gColor{0.76f, 0.55f, 0.43f};
+} // namespace rope
+
+
 namespace spriteanimation
 {
     // The ASE animations are expressed in milliseconds

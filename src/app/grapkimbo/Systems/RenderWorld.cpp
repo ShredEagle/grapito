@@ -35,7 +35,9 @@ RenderWorld::RenderWorld(aunteater::EntityManager & aEntityManager,
     mTrivialPolygon{aAppInterface->getWindowSize()},
     mCurving{render::gBezierSubdivisions},
     mSpriting{render::gSpritePixelWorldSize}
-{}
+{
+    mCurving.setColor(rope::gColor);
+}
 
 
 AtlasIndex RenderWorld::installAtlas(graphics::sprite::LoadedAtlas aAtlas)
