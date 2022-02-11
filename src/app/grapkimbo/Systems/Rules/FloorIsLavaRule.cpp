@@ -207,7 +207,7 @@ class FloorIsLavaPhase : public PhaseParent
         {
             // TODO check for highscore
             mRule.disableGrapples();
-            addSoundToEntity(mRule.player(), soundId_BurnSid);
+            addSoundToEntity(mRule.player(), soundId_BurnSid, {.gain = .5f});
             aStateMachine.putNext(getPhase(FloorIsLavaRule::Death));
             aStateMachine.popState();
         }

@@ -27,7 +27,6 @@ namespace grapito
 {
 
 const StringId soundId_JumpSid = handy::internalizeString("jump");
-const StringId soundId_RopeJumpSid = handy::internalizeString("ropejump");
 
 Control::Control(aunteater::EntityManager & aEntityManager, std::shared_ptr<Context> aContext) :
     mEntityManager{aEntityManager},
@@ -114,7 +113,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
 
             if (inputs[Jump].positiveEdge())
             {
-                addSoundToEntity(player, soundId_JumpSid);
+                addSoundToEntity(player, soundId_JumpSid, {.gain = 2.f});
                 aas.speed.y() = player::gJumpImpulse;
             }
         }

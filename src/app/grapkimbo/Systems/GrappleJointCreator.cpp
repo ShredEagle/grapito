@@ -24,7 +24,7 @@ namespace ad {
 namespace grapito
 {
 
-const StringId soundId_WeldSid = handy::internalizeString("weld");
+const StringId soundId_WeldSid = handy::internalizeString("grapple_attached");
 
 
 aunteater::weak_entity getOtherEntity(const Body & aThisBody, const CollisionPair * aCollisionPair)
@@ -162,7 +162,7 @@ void GrappleJointCreator::update(const GrapitoTimer, const GameInputState &)
                                         otherEntity
                                     ));
                             playerData.grappleCooldownFrameCounter = player::gGrappleAnchoredCooldown;
-                            addSoundToEntity(ropeCreatorEntity, soundId_WeldSid);
+                            addSoundToEntity(ropeCreatorEntity, soundId_WeldSid, {.gain = 2.f});
                             break;
                         }
                     }

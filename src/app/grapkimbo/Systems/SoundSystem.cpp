@@ -49,7 +49,7 @@ void SoundSystem::update(const GrapitoTimer, const GameInputState &)
         {
             if (!sound.mPlaying)
             {
-                ALuint sourceId = mSoundManager.playSound(sound.mSoundId, sound.mLooping);
+                ALuint sourceId = mSoundManager.playSound(sound.mSoundId, sound.mOptions);
                 sound.sourceId = sourceId;
                 sound.mPlaying = true;
             }

@@ -157,10 +157,11 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
 
     { // Load sounds
         mContext->loadOggSoundData("sounds/burn.ogg", false);
-        mContext->loadOggSoundData("sounds/launch.ogg", false);
-        mContext->loadOggSoundData("sounds/weld.ogg", false);
+        mContext->loadOggSoundData("sounds/grapple_throwing.ogg", false);
+        mContext->loadOggSoundData("sounds/grapple_throwing2.ogg", false);
+        mContext->loadOggSoundData("sounds/grapple_attached.ogg", false);
+        mContext->loadOggSoundData("sounds/grapple_attached2.ogg", false);
         mContext->loadOggSoundData("sounds/jump.ogg", false);
-        mContext->loadOggSoundData("sounds/ropejump.ogg", false);
         mContext->loadOggSoundData("sounds/slash.ogg", false);
         mContext->loadOggSoundData("sounds/bgmusic.ogg", false);
     }
@@ -186,7 +187,7 @@ std::pair<TransitionProgress, UpdateStatus> RopeGame::enter(
             const GameInputState &,
             const StateMachine &)
 {
-    mBgMusicSource = mContext->mSoundManager.playSound(soundId_MusicSid, true);
+    mBgMusicSource = mContext->mSoundManager.playSound(soundId_MusicSid, {.gain = 0.2f, .looping = AL_TRUE});
     return {TransitionProgress::Complete, UpdateStatus::KeepFrame};
 }
 

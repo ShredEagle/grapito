@@ -21,7 +21,7 @@ namespace ad {
 namespace grapito
 {
 
-const StringId soundId_LaunchSid = handy::internalizeString("launch");
+const StringId soundId_LaunchSid = handy::internalizeString("grapple_throwing2");
 
 RopeCreation::RopeCreation(aunteater::EntityManager & aEntityManager) :
     mRopeCreator{aEntityManager},
@@ -38,7 +38,7 @@ void RopeCreation::addedEntity(aunteater::LiveEntity & aEntity)
 
     Position2 end = player->get<Position>().position + player->get<Body>().massCenter.as<math::Vec>();
     Position2 origin = pos.position;
-    addSoundToEntity(player, soundId_LaunchSid);
+    addSoundToEntity(player, soundId_LaunchSid, {.gain = 2.f});
 
     aunteater::weak_entity link = mEntityManager.addEntity(
         createRopeSegment(origin, end, player));
