@@ -27,6 +27,7 @@
 
 
 //#define EN_MODE_LAFF
+#define RELEASE_BUILD
 
 using namespace ad;
 using namespace ad::grapito;
@@ -96,6 +97,10 @@ int main(int argc, const char ** argv)
         {
             applicationFlags |= ad::graphics::ApplicationFlag::Fullscreen;
         }
+
+#if defined(RELEASE_BUILD)
+        applicationFlags |= ad::graphics::ApplicationFlag::HideCursor;
+#endif
 
         ad::graphics::ApplicationGlfw application(
             "grapkimbo", 
