@@ -109,11 +109,13 @@ int main(int argc, const char ** argv)
         // Need to wait for the graphics logger initialized by ApplicationGlfw constructor.
         initializeLogging();
 
+#if not defined(RELEASE_BUILD)
         setupImGui(application);
+        ad::grapito::ImguiState imguiState;
+#endif
 
         ad::debugDrawer = std::make_unique<ad::debug::DrawDebugStuff>(application);
 
-        ad::grapito::ImguiState imguiState;
         DebugUI debugUI;
 
         std::shared_ptr<Context> context = initializeContext(arguments);
@@ -143,8 +145,10 @@ int main(int argc, const char ** argv)
             timer.mark((float)glfwGetTime());
             if (topLevelFlow.update(timer, inputState) == UpdateStatus::SwapBuffers)
             {
+#if not defined(RELEASE_BUILD)
                 drawImGui(application, debugUI, imguiState);
                 renderImGui();
+#endif
                 debugDrawer->render();
                 application.swapBuffers();
             }
