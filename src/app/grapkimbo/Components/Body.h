@@ -154,7 +154,7 @@ struct Body : public aunteater::Component<Body>
     float friction;
     float restitution;
 
-    math::Radian<float> theta;
+    Radian theta;
 
     Shape shape;
 

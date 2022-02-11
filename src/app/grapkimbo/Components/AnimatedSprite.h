@@ -19,13 +19,13 @@ struct AnimatedSprite : public aunteater::Component<AnimatedSprite>
     AnimatedSprite() = default;
 
     template <class T_parameterAnimation>
-    AnimatedSprite(StringId aAnimation, T_parameterAnimation aParameterAnimation, bool aHorizontalMirroring = false) :
+    AnimatedSprite(StringId aAnimation, T_parameterAnimation aParameterAnimation, bool aHorizontalFlipping = false) :
         animation{aAnimation},
         parameter{[paramAnimation = std::move(aParameterAnimation)](float aDelta) mutable
             {
                 return paramAnimation.advance(aDelta);
             }},
-        horizontalMirroring{aHorizontalMirroring}
+        horizontalFlipping{aHorizontalFlipping}
     {}
 
     float advance(float aDelta)
@@ -35,7 +35,7 @@ struct AnimatedSprite : public aunteater::Component<AnimatedSprite>
 
     StringId animation = StringId::Null();  
     float parameterAdvanceSpeed{1.f};
-    bool horizontalMirroring{false};
+    bool horizontalFlipping{false};
 private:
     // This provides type erasure for the parameter animation
     std::function<float(float)> parameter;

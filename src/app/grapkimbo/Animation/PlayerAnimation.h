@@ -12,10 +12,14 @@ enum class PlayerAnimation
     IdleRight,
     RunLeft,
     RunRight,
+    JumpLeft,
+    JumpRight,
+    WalledLeft,
+    WalledRight,
 
-    // Keep me last
-    _Count,
-};
+    // Keep it last
+    _Count/*
+*/};
 
 
 } // namespace grapito

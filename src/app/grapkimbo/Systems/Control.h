@@ -25,7 +25,7 @@ class Control : public aunteater::System<GrapitoTimer, GameInputState>
 {
 
 public:
-    Control(aunteater::EntityManager & aEntityManager);
+    Control(aunteater::EntityManager & aEntityManager, std::shared_ptr<Context> aContext);
 
     void update(const GrapitoTimer, const GameInputState & aInputState) override;
 
@@ -36,6 +36,7 @@ private:
     std::pair<Position2, double> anchor(const Position2 aPosition);
 
     aunteater::EntityManager & mEntityManager;
+    std::shared_ptr<Context> mContext;
     const aunteater::FamilyHelp<CartesianControlled> mCartesianControllables;
     const aunteater::FamilyHelp<Grappler> mGrapplers;
 

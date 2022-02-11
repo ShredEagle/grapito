@@ -29,8 +29,9 @@ namespace grapito
 const StringId soundId_JumpSid = handy::internalizeString("jump");
 const StringId soundId_RopeJumpSid = handy::internalizeString("ropejump");
 
-Control::Control(aunteater::EntityManager & aEntityManager) :
+Control::Control(aunteater::EntityManager & aEntityManager, std::shared_ptr<Context> aContext) :
     mEntityManager{aEntityManager},
+    mContext{std::move(aContext)},
     mCartesianControllables{mEntityManager},
     mGrapplers{mEntityManager}
 {}
@@ -250,7 +251,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
 
         if (mGrapplingEnabled && inputs[Grapple].positiveEdge() && !isGrappleOut(playerData))
         {
-            throwGrapple(player, mEntityManager);
+            throwGrapple(player, mEntityManager, *mContext);
             playerData.controlState |= ControlState_Throwing;
         }
 

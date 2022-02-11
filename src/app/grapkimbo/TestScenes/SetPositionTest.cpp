@@ -21,6 +21,8 @@
 #include <Components/Position.h>
 #include "Components/VisualRectangle.h"
 
+#include "Context/Context.h"
+
 #include <aunteater/UpdateTiming.h>
 #include <aunteater/Entity.h>
 

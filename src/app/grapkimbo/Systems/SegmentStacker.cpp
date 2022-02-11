@@ -60,7 +60,7 @@ void SegmentStacker::updateAvailableSegments(SegmentIndex aIndex)
         auto keptAlive = listConnected(aIndex, gKeptAliveSpan);
         if(std::find(keptAlive.begin(), keptAlive.end(), segmentIt->first) == keptAlive.end())
         {
-            ADLOG(info)("Removing segment {}", segmentIt->first);
+            ADLOG(debug)("Removing segment {}.", segmentIt->first);
             for(aunteater::weak_entity entity : segmentIt->second)
             {
                 entity->markToRemove(); 
@@ -76,7 +76,7 @@ void SegmentStacker::updateAvailableSegments(SegmentIndex aIndex)
     {
         if (addedId >= mStartingIndex && !mSegments.contains(addedId))
         {
-            ADLOG(info)("Adding segment {}", addedId);
+            ADLOG(debug)("Adding segment {}.", addedId);
             generateSegment(addedId);
         }
     }

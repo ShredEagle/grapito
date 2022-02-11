@@ -68,7 +68,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     mSystemManager.add<debug::DirectControl>();
 
     mSystemManager.add<PlayerJoin>(mContext);
-    std::shared_ptr<Control> controlSystem = mSystemManager.add<Control>();
+    std::shared_ptr<Control> controlSystem = mSystemManager.add<Control>(mContext);
     mSystemManager.add<Gravity>();
     mSystemManager.add<RopeCreation>();
 
@@ -120,6 +120,8 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
         auto spriteSheets = {
             std::ref(mContext->loadAnimationSpriteSheet("sprite_sheet/idle.json")),
             std::ref(mContext->loadAnimationSpriteSheet("sprite_sheet/run.json")),
+            std::ref(mContext->loadAnimationSpriteSheet("sprite_sheet/jump.json")),
+            std::ref(mContext->loadAnimationSpriteSheet("sprite_sheet/walled.json")),
         };
 
         graphics::sprite::Animator animator;
@@ -136,10 +138,19 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
                 std::vector<arte::ImageRgba>{
                     arte::ImageRgba{mContext->pathFor("sprite_sheet/idle_" + color + ".png")},
                     arte::ImageRgba{mContext->pathFor("sprite_sheet/run_" + color + ".png")},
+                    arte::ImageRgba{mContext->pathFor("sprite_sheet/jump_" + color + ".png")},
+                    arte::ImageRgba{mContext->pathFor("sprite_sheet/walled_" + color + ".png")},
                 });
             mRenderWorldSystem->installAtlas(graphics::sprite::loadAtlas(colorVariation));
         }
     }
+
+    { // Load grapple sprite
+        const graphics::sprite::LoadedAtlas & atlas = mContext->loadSingleSprite("sprite_sheet/grapple.png").first;
+        // TODO Ad 2022/02/10: Refactor this major SMELL.
+        gGrappleAtlasIndex = mRenderWorldSystem->installAtlas(atlas);
+    }
+
 
     { // Load sounds
         mContext->loadOggSoundData("sounds/burn.ogg", false);

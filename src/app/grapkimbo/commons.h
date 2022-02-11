@@ -4,6 +4,7 @@
 #include <handy/StringId.h>
 #include <sounds/SoundManager.h>
 
+#include <math/Angle.h>
 #include <math/Rectangle.h>
 #include <math/Vector.h>
 
@@ -19,6 +20,7 @@ using Position3 = math::Position<3, float>;
 using Size2 = math::Size<2, float>;
 using Size3 = math::Size<3, float>;
 using Rectangle = math::Rectangle<float>;
+using Radian = math::Radian<float>;
 
 struct Context;
 

@@ -23,6 +23,7 @@ struct Context
     filesystem::path pathFor(const filesystem::path &aAsset) const;
 
     const arte::AnimationSpriteSheet & loadAnimationSpriteSheet(const filesystem::path &aAsset);
+    const graphics::sprite::SingleLoad & loadSingleSprite(const filesystem::path &aAsset);
     const OggSoundData & loadOggSoundData(const filesystem::path &aAsset, bool streamed);
 
     Resources resources;
@@ -58,6 +59,13 @@ inline const arte::AnimationSpriteSheet & Context::loadAnimationSpriteSheet(cons
 {
     return resources.animationSpriteSheets.load(aAsset, resources.locator); 
 }
+
+
+inline const graphics::sprite::SingleLoad & Context::loadSingleSprite(const filesystem::path &aAsset)
+{
+    return resources.singleSprites.load(aAsset, resources.locator); 
+}
+
 
 inline const OggSoundData & Context::loadOggSoundData(const filesystem::path &aAsset, bool streamed)
 {

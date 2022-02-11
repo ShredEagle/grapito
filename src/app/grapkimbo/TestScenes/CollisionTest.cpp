@@ -19,6 +19,8 @@
 #include <Components/Position.h>
 #include <Components/VisualRectangle.h>
 
+#include <Context/Context.h>
+
 #include <aunteater/UpdateTiming.h>
 #include <aunteater/Entity.h>
 
@@ -72,7 +74,7 @@ CollisionTest::CollisionTest(graphics::ApplicationGlfw & aApplication, DebugUI &
     mUI{aUI}
 {
     mSystemManager.add<Gravity>();
-    mSystemManager.add<Control>();
+    mSystemManager.add<Control>(std::make_shared<Context>(""));
     mSystemManager.add<AccelSolver>();
     mSystemManager.add<Physics>();
     mSystemManager.add<RenderWorld>(aApplication.getAppInterface());  

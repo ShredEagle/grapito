@@ -24,6 +24,8 @@
 
 #include "Components/Debug/DirectControlTag.h"
 
+#include "Context/Context.h"
+
 #include "Utils/Grapple.h"
 #include "Utils/PhysicsStructs.h"
 
@@ -207,21 +209,21 @@ aunteater::Entity createRopeSegment(Position2 origin, Position2 end, aunteater::
                 size
                 )
             .add<RopeSegment>(aPlayer->get<PlayerData>().id)
-            .add<VisualRectangle>(math::sdr::gGreen, VisualRectangle::Scope::RopeStructure)
+            //.add<VisualRectangle>(math::sdr::gGreen, VisualRectangle::Scope::RopeStructure)
     ;
 
     setLocalPointToWorldPos(rope, {0.f, rope::ropeHalfwidth}, origin);
     return rope;
 }
 
-void throwGrapple(aunteater::weak_entity aPlayer, aunteater::EntityManager & aEntityManager)
+void throwGrapple(aunteater::weak_entity aPlayer, aunteater::EntityManager & aEntityManager, Context & aContext)
 {
     Position2 grapplePos = static_cast<Position2>(aPlayer->get<Position>().position.as<math::Vec>() + aPlayer->get<Body>().massCenter.as<math::Vec>() + Vec2{.5f, .5f});
     Vec2 grappleImpulse = aPlayer->get<PlayerData>().mAimVector * player::gGrappleBaseImpulse + aPlayer->get<AccelAndSpeed>().speed;
     aPlayer->get<PlayerData>().grapple = aEntityManager.addEntity(aunteater::Entity()
             .add<Position>(
                 grapplePos,
-                math::Size<2, float>{1.f, 1.f}
+                math::Size<2, float>{player::gGrappleSpritePixelSize * render::gSpritePixelWorldSize}
                 )
             // TODO (Franz): named "configuration" instead of magic numbers.
             .add<Body>(
@@ -236,7 +238,9 @@ void throwGrapple(aunteater::weak_entity aPlayer, aunteater::EntityManager & aEn
                 std::vector<CollisionType>{CollisionType_Static_Env},
                 std::vector<CollisionType>{CollisionType_Static_Env, CollisionType_Moving_Env}
                 )
-            .add<VisualPolygon>(rope::grappleVertices, math::sdr::gYellow)
+            //.add<VisualPolygon>(rope::grappleVertices, math::sdr::gYellow)
+            .add<VisualSprite>(gGrappleAtlasIndex,
+                               aContext.loadSingleSprite("sprite_sheet/grapple.png").second)
             .add<AccelAndSpeed>(grappleImpulse, 0.f)
             );
 
