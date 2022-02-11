@@ -137,8 +137,9 @@ void RenderWorld::update(const GrapitoTimer aTimer, const GameInputState &)
 
     { // Sprites
         std::ranges::for_each(mAtlasToSprites, [](auto & aSprites){aSprites.clear();});
-        for(const auto & [geometry, visualSprite] : mSprites)
+        for(const auto & [body, geometry, visualSprite] : mSprites)
         {
+            // Handle sprite alignment on the bouding box edges.
             Position2 position = [&]()
             {
                 if (visualSprite.alignment == VisualSprite::AlignLeft)
@@ -152,12 +153,28 @@ void RenderWorld::update(const GrapitoTimer aTimer, const GameInputState &)
                 }
             }();
 
-            mAtlasToSprites
-                .at(visualSprite.atlas)
-                    .emplace_back(position,
-                                  visualSprite.sprite,
-                                  render::gSpriteOpacity,
-                                  visualSprite.mirroring);
+            if (body.theta == Radian{0.f})
+            {
+                mAtlasToSprites
+                    .at(visualSprite.atlas)
+                        .emplace_back(position,
+                                      visualSprite.sprite,
+                                      render::gSpriteOpacity,
+                                      visualSprite.mirroring);
+            }
+            else
+            {
+                auto modelTransform = 
+                    math::trans2d::rotateAbout(body.theta, body.massCenter)
+                    * math::trans2d::translate(position.as<math::Vec>()) 
+                    ;
+                mAtlasToSprites
+                    .at(visualSprite.atlas)
+                        .emplace_back(modelTransform,
+                                      visualSprite.sprite,
+                                      render::gSpriteOpacity,
+                                      visualSprite.mirroring);
+            }
         }
     }
 

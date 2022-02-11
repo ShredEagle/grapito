@@ -32,13 +32,13 @@ namespace ad {
 namespace grapito
 {
 
-typedef aunteater::Archetype<Position, VisualRectangle> RenderedRectangle;
-typedef aunteater::Archetype<Position, VisualPolygon> RenderedPolygon;
 typedef aunteater::Archetype<Position, Body, VisualRectangle> RenderedBodyRectangle;
 typedef aunteater::Archetype<Position, Body, VisualPolygon> RenderedBodyPolygon;
 typedef aunteater::Archetype<Position, VisualOutline> RenderedOutline;
 typedef aunteater::Archetype<Position, Body, PlayerData> AimVector;
-typedef aunteater::Archetype<Position, VisualSprite> RenderedSprite;
+typedef aunteater::Archetype<Position, VisualPolygon> RenderedPolygon;
+typedef aunteater::Archetype<Position, VisualRectangle> RenderedRectangle;
+typedef aunteater::Archetype<Body, Position, VisualSprite> RenderedSprite;
 
 class RenderWorld : public aunteater::System<GrapitoTimer, GameInputState>
 {

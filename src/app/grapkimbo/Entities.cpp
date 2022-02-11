@@ -223,7 +223,7 @@ void throwGrapple(aunteater::weak_entity aPlayer, aunteater::EntityManager & aEn
     aPlayer->get<PlayerData>().grapple = aEntityManager.addEntity(aunteater::Entity()
             .add<Position>(
                 grapplePos,
-                math::Size<2, float>{1.f, 1.f}
+                math::Size<2, float>{player::gGrappleSpritePixelSize * render::gSpritePixelWorldSize}
                 )
             // TODO (Franz): named "configuration" instead of magic numbers.
             .add<Body>(
@@ -238,6 +238,7 @@ void throwGrapple(aunteater::weak_entity aPlayer, aunteater::EntityManager & aEn
                 std::vector<CollisionType>{CollisionType_Static_Env},
                 std::vector<CollisionType>{CollisionType_Static_Env, CollisionType_Moving_Env}
                 )
+            //.add<VisualPolygon>(rope::grappleVertices, math::sdr::gYellow)
             .add<VisualSprite>(gGrappleAtlasIndex,
                                aContext.loadSingleSprite("sprite_sheet/grapple.png").second)
             .add<AccelAndSpeed>(grappleImpulse, 0.f)

@@ -93,6 +93,7 @@ namespace player
     const float gDetachSpeedBoostFactor = 1.5f;
     const float gIdleSpeedLimit = 1;
     const math::Size<2, float> gSize = math::Size<2, float>{5.6f, 7.5f} / gGigantismDampeningFactor;
+    const math::Size<2, float> gGrappleSpritePixelSize{30.f, 30.f};
     const float gGrappleFriction = 0.5f;
     float gGrappleDistanceJointFactor = 1.3f;
     float gRopeDistanceJointFactor = 1.1f;
