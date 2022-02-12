@@ -101,6 +101,7 @@ namespace player
     const math::sdr::Rgb gBlueColor{63, 63, 116};
     const math::sdr::Rgb gGreenColor{52, 212, 136};
     const math::sdr::Rgb gRedColor{235, 68, 53};
+    const math::sdr::Rgb gYellowColor{192, 192, 139};
 } // namespace player
 
 

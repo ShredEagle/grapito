@@ -54,10 +54,11 @@ PlayerJoinState PlayerList::getPlayerState(Controller aControllerId)
 }
 
 
-const std::array<math::sdr::Rgb, 3> gPlayerIdToColor{
+const std::array<math::sdr::Rgb, 4> gPlayerIdToColor{
     player::gBlueColor,
     player::gGreenColor,
     player::gRedColor,
+    player::gYellowColor,
 };
 
 

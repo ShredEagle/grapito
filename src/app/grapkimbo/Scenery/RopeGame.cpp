@@ -132,7 +132,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
 
         using namespace std::string_literals;
         // The blue variant is already installed above.
-        for (const auto & color : {"green"s, "red"s})
+        for (const auto & color : {"green"s, "red"s, "yellow"s})
         {
             arte::Image<math::sdr::Rgba> colorVariation = arte::stackVertical<math::sdr::Rgba>(
                 std::vector<arte::ImageRgba>{

@@ -164,6 +164,7 @@ namespace player
     extern const math::sdr::Rgb gBlueColor;
     extern const math::sdr::Rgb gGreenColor;
     extern const math::sdr::Rgb gRedColor;
+    extern const math::sdr::Rgb gYellowColor;
 
 } // namespace player
 
