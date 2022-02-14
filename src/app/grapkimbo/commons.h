@@ -9,6 +9,16 @@
 #include <math/Vector.h>
 
 
+#define RELEASE_BUILD
+
+#if not defined(RELEASE_BUILD)
+
+#define SHRED_ENABLE_STEPPING
+#define SHRED_ENABLE_KEYBOARD
+#define SHRED_DEV_ASSETS
+
+#endif
+
 namespace ad {
 namespace grapito {
 

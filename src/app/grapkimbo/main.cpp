@@ -27,12 +27,11 @@
 #include <iostream>
 
 
-#define RELEASE_BUILD
-
 using namespace ad;
 using namespace ad::grapito;
 
 namespace po = boost::program_options;
+
 
 po::variables_map handleCommandLine(int argc, const char ** argv)
 {
@@ -60,12 +59,12 @@ po::variables_map handleCommandLine(int argc, const char ** argv)
 std::shared_ptr<Context> initializeContext(const po::variables_map & aArguments)
 {
     std::shared_ptr<Context> context = 
-#if defined(RELEASE_BUILD)
-            std::make_shared<Context>(platform::getExecutableFilePath().parent_path()
-                                      / filesystem::path{"assets/"});
-#else
+#if defined(SHRED_DEV_ASSETS)
             std::make_shared<Context>(gRepositoryRoot 
                                       / filesystem::path{"../grapito_media/assets/"});
+#else
+            std::make_shared<Context>(platform::getExecutableFilePath().parent_path()
+                                      / filesystem::path{"assets/"});
 #endif
         // language
         std::string language;
