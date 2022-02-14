@@ -5,13 +5,15 @@
 
 #include "Input.h"
 #include "LevelStacks.h"
+
 #include "Systems/DelayDeleter.h"
 #include "Systems/GrappleCleanup.h"
 #include "Systems/GrappleInteractions.h"
 #include "Systems/GrappleJointCreator.h"
-#include "Systems/Debug/DirectControl.h"
 #include "Systems/PlayerJoin.h"
 #include "Systems/SoundSystem.h"
+
+#include "Systems/Debug/DirectControl.h"
 
 #include <Components/AccelAndSpeed.h>
 #include <Components/Body.h>
@@ -65,6 +67,7 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
 {
     mContext->mPlayerList.addPlayer(aController, PlayerJoinState_Queued);
 
+    // See `makeDirectControllable()` to instantiate a direct control guide.
     mSystemManager.add<debug::DirectControl>();
 
     mSystemManager.add<PlayerJoin>(mContext);
