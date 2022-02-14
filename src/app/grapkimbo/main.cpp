@@ -47,20 +47,20 @@ po::variables_map handleCommandLine(int argc, const char ** argv)
     po::store(po::parse_command_line(argc, argv, desc), vm);
     po::notify(vm);
 
-    if (vm.count("help")) 
+    if (vm.count("help"))
     {
         std::cout << desc << "\n";
     }
 
     return vm;
-}      
+}
 
 
 std::shared_ptr<Context> initializeContext(const po::variables_map & aArguments)
 {
-    std::shared_ptr<Context> context = 
+    std::shared_ptr<Context> context =
 #if defined(SHRED_DEV_ASSETS)
-            std::make_shared<Context>(gRepositoryRoot 
+            std::make_shared<Context>(gRepositoryRoot
                                       / filesystem::path{"../grapito_media/assets/"});
 #else
             std::make_shared<Context>(platform::getExecutableFilePath().parent_path()
@@ -68,7 +68,7 @@ std::shared_ptr<Context> initializeContext(const po::variables_map & aArguments)
 #endif
         // language
         std::string language;
-        if (aArguments.count("language")) 
+        if (aArguments.count("language"))
         {
             language = aArguments["language"].as<std::string>();
         }
@@ -88,7 +88,7 @@ int main(int argc, const char ** argv)
     {
         po::variables_map arguments = handleCommandLine(argc, argv);
 
-        if (arguments.count("help")) 
+        if (arguments.count("help"))
         {
             std::exit(EXIT_SUCCESS);
         }
@@ -104,7 +104,7 @@ int main(int argc, const char ** argv)
 #endif
 
         ad::graphics::ApplicationGlfw application(
-            "grapkimbo", 
+            "grapkimbo",
             game::gAppResolution.width(), game::gAppResolution.height(),
             applicationFlags);
         // Need to wait for the graphics logger initialized by ApplicationGlfw constructor.
@@ -124,7 +124,7 @@ int main(int argc, const char ** argv)
         std::shared_ptr<Context> context = initializeContext(arguments);
 
         StateMachine topLevelFlow;
-        
+
         // Important: Here states are added to the top with pushState, so they are added in reverse order.
 
         // The next state in the stack is the main menu
