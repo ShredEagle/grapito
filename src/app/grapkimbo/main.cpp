@@ -118,7 +118,9 @@ int main(int argc, const char ** argv)
 
         ad::debugDrawer = std::make_unique<ad::debug::DrawDebugStuff>(application);
 
+#if not defined(RELEASE_BUILD)
         DebugUI debugUI;
+#endif
 
         std::shared_ptr<Context> context = initializeContext(arguments);
 
