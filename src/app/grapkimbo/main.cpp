@@ -20,13 +20,13 @@
 #include <graphics/ApplicationGlfw.h>
 
 #include <platform/Locale.h>
+#include <platform/Path.h>
 
 #include <boost/program_options.hpp>
 
 #include <iostream>
 
 
-//#define EN_MODE_LAFF
 #define RELEASE_BUILD
 
 using namespace ad;
@@ -60,10 +60,12 @@ po::variables_map handleCommandLine(int argc, const char ** argv)
 std::shared_ptr<Context> initializeContext(const po::variables_map & aArguments)
 {
     std::shared_ptr<Context> context = 
-#if defined(EN_MODE_LAFF)
-            std::make_shared<Context>(filesystem::path{"assets/"});
+#if defined(RELEASE_BUILD)
+            std::make_shared<Context>(platform::getExecutableFilePath().parent_path()
+                                      / filesystem::path{"assets/"});
 #else
-            std::make_shared<Context>(gRepositoryRoot / filesystem::path{"../grapito_media/assets/"});
+            std::make_shared<Context>(gRepositoryRoot 
+                                      / filesystem::path{"../grapito_media/assets/"});
 #endif
         // language
         std::string language;
