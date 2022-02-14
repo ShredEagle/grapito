@@ -28,6 +28,11 @@ struct Splash
 };
 
 
+// TODO Ad 2022/02/14: It should be possible to overlay
+// several images (e.g. showing the studio name after the logo).
+// This would require to either allow composite steps (Splash), or
+// to remove the notion of steps 
+// (whith each image starting indepently on the global scene timeline).
 class SplashScene : public State 
 {
 public:
@@ -50,7 +55,7 @@ private:
     math::Position<2, int> mSpritePlacement_w{0, 0};
 
     std::vector<Splash>::size_type mCurrentSplashId{0};
-    GrapitoTimer::Value_t mTimeAccumlated{0};
+    GrapitoTimer::Value_t mTimeAccumulated{0};
     graphics::Spriting mSpriting;
     graphics::sprite::LoadedAtlas mAtlas;
     std::optional<graphics::LoadedSprite> mLoadedSprite;
