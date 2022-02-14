@@ -6,8 +6,8 @@ include(cmake/include.cmake)
 
 cmc_include_conan_configuration()
 
-option(BUILD_Grapito_RELEASEMODE
-       "Build Grapito application for public release."
+option(BUILD_Grapito_DEVMODE
+       "Build Grapito application in development mode, not for public release."
        TRUE)
 
 add_subdirectory(src)

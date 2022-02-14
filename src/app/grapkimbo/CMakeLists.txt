@@ -212,7 +212,7 @@ find_package(Ogg REQUIRED CONFIG)
 
 # Use the "Console" subsystem for development builds, so the console window does not close on exit.
 # (Note: we explicitly attach a console in code when the subsystem is "Windows")
-if(BUILD_Grapito_RELEASEMODE)
+if(NOT BUILD_Grapito_DEVMODE)
     set(WINDOWS_SUBSYSTEM WIN32)
 endif()
 
@@ -240,7 +240,7 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
         PRIVATE "-fsanitize=address" "-fsanitize=undefined")
 endif()
 
-if(BUILD_Grapito_RELEASEMODE)
+if(NOT BUILD_Grapito_DEVMODE)
     target_compile_definitions(${TARGET_NAME} PRIVATE BUILD_RELEASEMODE)
 endif()
 
