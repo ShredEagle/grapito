@@ -15,6 +15,8 @@
 
 #include "Utils/DrawDebugStuff.h"
 
+#include "Windows/Console.h"
+
 #include <aunteater/Timer.h>
 
 #include <graphics/ApplicationGlfw.h>
@@ -92,6 +94,11 @@ int main(int argc, const char ** argv)
         {
             std::exit(EXIT_SUCCESS);
         }
+
+#if defined(SHRED_CONSOLE_OUTPUT)
+        // no-op on non-Windows
+        windows::attachOutputToConsole();
+#endif
 
         auto applicationFlags = ad::graphics::ApplicationFlag::Window_Keep_Ratio;
         if (!arguments["windowed"].as<bool>())

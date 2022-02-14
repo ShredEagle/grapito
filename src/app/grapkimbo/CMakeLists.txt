@@ -182,6 +182,9 @@ set(${TARGET_NAME}_SOURCES
 
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    LIST(APPEND ${TARGET_NAME}_HEADERS
+        Windows/Console.h)
+
     LIST(APPEND ${TARGET_NAME}_SOURCES
         Windows/appicon.rc)
 endif()
