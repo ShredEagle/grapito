@@ -231,7 +231,9 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
         PRIVATE "-fsanitize=address" "-fsanitize=undefined")
 endif()
 
-target_compile_definitions(${TARGET_NAME} PRIVATE KIMBO_DEBUG)
+if(BUILD_Grapito_RELEASEMODE)
+    target_compile_definitions(${TARGET_NAME} PRIVATE BUILD_RELEASEMODE)
+endif()
 
 target_include_directories(${TARGET_NAME}
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}

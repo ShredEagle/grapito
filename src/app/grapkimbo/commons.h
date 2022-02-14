@@ -9,9 +9,8 @@
 #include <math/Vector.h>
 
 
-#define RELEASE_BUILD
 
-#if not defined(RELEASE_BUILD)
+#if not defined(BUILD_RELEASEMODE)
 
 #define SHRED_ENABLE_STEPPING
 #define SHRED_ENABLE_KEYBOARD

@@ -99,7 +99,7 @@ int main(int argc, const char ** argv)
             applicationFlags |= ad::graphics::ApplicationFlag::Fullscreen;
         }
 
-#if defined(RELEASE_BUILD)
+#if defined(BUILD_RELEASEMODE)
         applicationFlags |= ad::graphics::ApplicationFlag::HideCursor;
 #endif
 
@@ -110,14 +110,14 @@ int main(int argc, const char ** argv)
         // Need to wait for the graphics logger initialized by ApplicationGlfw constructor.
         initializeLogging();
 
-#if not defined(RELEASE_BUILD)
+#if not defined(BUILD_RELEASEMODE)
         setupImGui(application);
         ad::grapito::ImguiState imguiState;
 #endif
 
         ad::debugDrawer = std::make_unique<ad::debug::DrawDebugStuff>(application);
 
-#if not defined(RELEASE_BUILD)
+#if not defined(BUILD_RELEASEMODE)
         DebugUI debugUI;
 #endif
 
@@ -148,7 +148,7 @@ int main(int argc, const char ** argv)
             timer.mark((float)glfwGetTime());
             if (topLevelFlow.update(timer, inputState) == UpdateStatus::SwapBuffers)
             {
-#if not defined(RELEASE_BUILD)
+#if not defined(BUILD_RELEASEMODE)
                 drawImGui(application, debugUI, imguiState);
                 renderImGui();
 #endif
