@@ -40,9 +40,10 @@ po::variables_map handleCommandLine(int argc, const char ** argv)
     po::options_description desc("Allowed options");
     desc.add_options()
         ("help", "Produce help message.")
-        ("skip_splash", po::bool_switch(), "Skip splash screens.")
-        ("language", po::value<std::string>(), "Override auto-detected language.")
-        ("windowed", po::bool_switch(), "Launch application windowed instead of fullscreen.")
+        ("console",     po::bool_switch(),          "Attach a console for output streams.")
+        ("language",    po::value<std::string>(),   "Override auto-detected language.")
+        ("skip_splash", po::bool_switch(),          "Skip splash screens.")
+        ("windowed",    po::bool_switch(),          "Launch application windowed instead of fullscreen.")
     ;
 
     po::variables_map vm;
@@ -95,10 +96,11 @@ int main(int argc, const char ** argv)
             std::exit(EXIT_SUCCESS);
         }
 
-#if defined(SHRED_CONSOLE_OUTPUT)
-        // no-op on non-Windows
-        windows::attachOutputToConsole();
-#endif
+        if (arguments["console"].as<bool>())
+        {
+            // no-op on non-Windows
+            windows::attachOutputToConsole();
+        }
 
         auto applicationFlags = ad::graphics::ApplicationFlag::Window_Keep_Ratio;
         if (!arguments["windowed"].as<bool>())

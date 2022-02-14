@@ -210,8 +210,14 @@ find_package(Vorbis REQUIRED File CONFIG)
 find_package(Ogg REQUIRED CONFIG)
 
 
+# Use the "Console" subsystem for development builds, so the console window does not close on exit.
+# (Note: we explicitly attach a console in code when the subsystem is "Windows")
+if(BUILD_Grapito_RELEASEMODE)
+    set(WINDOWS_SUBSYSTEM WIN32)
+endif()
+
 add_executable(${TARGET_NAME}
-    WIN32
+    ${WINDOWS_SUBSYSTEM}
 
     ${${TARGET_NAME}_SOURCES}
     ${${TARGET_NAME}_HEADERS}
