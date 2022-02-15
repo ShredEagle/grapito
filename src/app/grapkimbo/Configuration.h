@@ -114,12 +114,12 @@ namespace physic
 {
     //This is the error that is allowed during physics resolution
     //This represent the separation that we expect at rest
-    constexpr float gLinearSlop = 0.0001f;
+    constexpr float gLinearSlop = 0.001f;
     constexpr float gAngularSlop = 2.f / 180 * math::pi<float>;
     constexpr float gBaumgarteFactor = 0.2f;
     constexpr float gMaxLinearCorrection = 0.2f;
-    constexpr int gMaxVelocityConstraintIteration = 50;
-    constexpr int gMaxPositionConstraintIteration = 50;
+    extern const int gMaxVelocityConstraintIteration;
+    extern const int gMaxPositionConstraintIteration;
 }
 
 

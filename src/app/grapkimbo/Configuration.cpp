@@ -83,6 +83,12 @@ namespace menu
     const float gTransitionDuration = 0.275f;
 } // namespace menu
 
+namespace physic
+{
+    const int gMaxVelocityConstraintIteration = 200;
+    const int gMaxPositionConstraintIteration = 200;
+}
+
 
 namespace player
 {

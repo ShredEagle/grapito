@@ -157,7 +157,7 @@ WeldJointConstraint::WeldJointConstraint(
     mDamping{aWeldJoint.mDamping}
 {}
 
-void WeldJointConstraint::InitVelocityConstraint(const GrapitoTimer & timer)
+void WeldJointConstraint::InitVelocityConstraint(const GrapitoTimer & timer, float aTimerRatio)
 {
     bodyPosA = cbA->bodyPos;
     bodyPosB = cbB->bodyPos;
@@ -221,6 +221,8 @@ void WeldJointConstraint::InitVelocityConstraint(const GrapitoTimer & timer)
         mGamma = 0.f;
         mBias = 0.f;
     }
+
+    mImpulse *= aTimerRatio;
 
     Vec2 impulseSpeed = {mImpulse.x(), mImpulse.y()};
 
@@ -428,7 +430,7 @@ PivotJointConstraint::PivotJointConstraint(
     localAnchorB{aPivotJoint.localAnchorB}
 {}
 
-void PivotJointConstraint::InitVelocityConstraint(const GrapitoTimer &)
+void PivotJointConstraint::InitVelocityConstraint(const GrapitoTimer &, float aTimerRatio)
 {
     bodyPosA = cbA->bodyPos;
     bodyPosB = cbB->bodyPos;
@@ -448,6 +450,8 @@ void PivotJointConstraint::InitVelocityConstraint(const GrapitoTimer &)
     k.at(0,1) = -rA.y() * rA.x() * iA - rB.y() * rB.x() * iB;
     k.at(1,0) = k.at(0,1);
     k.at(1,1) = mA + mB + rA.x() * rA.x() * iA + rB.x() * rB.x() * iB;
+
+    mImpulse *= aTimerRatio;
 
     //warm start constraint
     velocityA->v -= mImpulse * invMassA;
@@ -561,7 +565,7 @@ DistanceJointConstraint::DistanceJointConstraint(
     mMaxBaseLength = mBaseLength * (1 + aDistanceJoint.mMaxSlackFactor); 
 }
 
-void DistanceJointConstraint::InitVelocityConstraint(const GrapitoTimer & aTimer)
+void DistanceJointConstraint::InitVelocityConstraint(const GrapitoTimer & aTimer, float aTimerRatio)
 {
     bodyPosA = cbA->bodyPos;
     velocityA = cbA->velocity;
@@ -615,6 +619,10 @@ void DistanceJointConstraint::InitVelocityConstraint(const GrapitoTimer & aTimer
         mBias = 0.f;
         mSoftMass = mMass;
     }
+
+    mImpulse *= aTimerRatio;
+    mLowerImpulse *= aTimerRatio;
+    mUpperImpulse *= aTimerRatio;
 
     Vec2 impulse = (mImpulse + mLowerImpulse - mUpperImpulse) * mCurrentDirection;
 
@@ -768,6 +776,35 @@ void DistanceJointConstraint::debugRender()
     debugDrawer->drawLine({cB + rB, cB + rB + distanceVec, 2.f, math::sdr::gMagenta});
 }
 
+JointVariant::JointVariant(
+            const DistanceJoint & aDistanceJoint,
+            ConstructedBody * aBodyA,
+            ConstructedBody * aBodyB,
+            aunteater::weak_entity aEntity
+        ) :
+    mType{JointType_Distance},
+    mConstraint{DistanceJointConstraint{aDistanceJoint, aBodyA, aBodyB, aEntity}}
+{}
+
+JointVariant::JointVariant(
+            const PivotJoint & aPivotJoint,
+            ConstructedBody * aBodyA,
+            ConstructedBody * aBodyB,
+            aunteater::weak_entity aEntity
+        ) :
+    mType{JointType_Pivot},
+    mConstraint{PivotJointConstraint{aPivotJoint, aBodyA, aBodyB, aEntity}}
+{}
+JointVariant::JointVariant(
+            const WeldJoint & aWeldJoint,
+            ConstructedBody * aBodyA,
+            ConstructedBody * aBodyB,
+            aunteater::weak_entity aEntity
+        ) :
+    mType{JointType_Weld},
+    mConstraint{WeldJointConstraint{aWeldJoint, aBodyA, aBodyB, aEntity}}
+{}
+
 std::ostream &operator<<(std::ostream & os, const VelocityConstraint & vc)
 {
     os << "{ VelocityConstraint\n";
@@ -809,7 +846,7 @@ std::ostream &operator<<(std::ostream & os, const ConstructedBody & cb)
     os << "    speed : " << cb.velocity->v << "\n";
     os << "    w : " << cb.velocity->w << "\n";
     os << "    bodyType : " << cb.bodyType << "\n";
-    os << "    box: " << cb.box << "\n";
+    os << "    box: " << *cb.box << "\n";
     os << "}\n";
     return os;
 }

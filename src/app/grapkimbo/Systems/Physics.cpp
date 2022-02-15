@@ -72,10 +72,9 @@ void BodyObserver::removedEntity(aunteater::LiveEntity & aEntity)
         collisionPair->toRemove = true;
     }
 
-    for (auto jcIt : body.jointItList)
+    for (aunteater::weak_entity entity : body.jointEntityList)
     {
-        auto & jc = *jcIt;
-        jc->jointEntity->markToRemove();
+        entity->markToRemove();
     }
 
     mPhysicsSystem->constructedBodies.erase(aEntity.get<Body>().constructedBodyIt);
@@ -96,9 +95,8 @@ void JointObserver<T_joint, T_joint_constraint>::addedEntity(aunteater::LiveEnti
     ConstructedBody & bodyA = *joint.bodyA->template get<Body>().constructedBodyIt;
     ConstructedBody & bodyB = *joint.bodyB->template get<Body>().constructedBodyIt;
 
-    auto jointIt = mPhysicsSystem->jointConstraints.insert(
-        mPhysicsSystem->jointConstraints.end(),
-        std::make_unique<T_joint_constraint>(
+    mPhysicsSystem->jointConstraints.push_back(
+        JointVariant(
             joint,
 
             &bodyA,
@@ -108,18 +106,20 @@ void JointObserver<T_joint, T_joint_constraint>::addedEntity(aunteater::LiveEnti
         )
     );
 
-    auto itA = bodyA.jointItList.insert(
-            bodyA.jointItList.end(),
-            jointIt
+    size_t jointIndex = mPhysicsSystem->jointConstraints.size() - 1;
+
+    auto itA = bodyA.jointEntityList.insert(
+            bodyA.jointEntityList.end(),
+            &aEntity
     );
-    auto itB = bodyB.jointItList.insert(
-            bodyB.jointItList.end(),
-            jointIt
+    auto itB = bodyB.jointEntityList.insert(
+            bodyB.jointEntityList.end(),
+            &aEntity
     );
 
-    aEntity.get<T_joint>().constraintIt = jointIt;
-    aEntity.get<T_joint>().constructedBodyConstraintItB = itB;
-    aEntity.get<T_joint>().constructedBodyConstraintItA = itA;
+    aEntity.get<T_joint>().constraintIndex = jointIndex;
+    aEntity.get<T_joint>().constructedBodyEntityItB = itB;
+    aEntity.get<T_joint>().constructedBodyEntityItA = itA;
 }
 
 template<class T_joint, class T_joint_constraint>
@@ -132,16 +132,53 @@ void JointObserver<T_joint, T_joint_constraint>::removedEntity(aunteater::LiveEn
        )
     {
         ConstructedBody & bodyA = *aEntity.get<T_joint>().bodyA->template get<Body>().constructedBodyIt;
-        bodyA.jointItList.erase(joint.constructedBodyConstraintItA);
+        bodyA.jointEntityList.erase(joint.constructedBodyEntityItA);
     }
     if (aEntity.get<T_joint>().bodyB->template has<Body>() &&
         aEntity.get<T_joint>().bodyB->template get<Body>().constructedBodyIt != mPhysicsSystem->constructedBodies.end()
        )
     {
         ConstructedBody & bodyB = *aEntity.get<T_joint>().bodyB->template get<Body>().constructedBodyIt;
-        bodyB.jointItList.erase(joint.constructedBodyConstraintItB);
+        bodyB.jointEntityList.erase(joint.constructedBodyEntityItB);
     }
-    mPhysicsSystem->jointConstraints.erase(joint.constraintIt);
+
+    //We can't switch joint constraint from the back if there is only one constraint in the vector
+    //Or if we removing the last constraint
+    if (mPhysicsSystem->jointConstraints.size() - 1 != joint.constraintIndex)
+    {
+        //We take the last constraint of the vector
+        JointVariant lastConstraint = mPhysicsSystem->jointConstraints.back();
+        //And remove it from the end of the vector of constraint
+        mPhysicsSystem->jointConstraints.pop_back();
+        //We then put it in place of the removed constraint
+        mPhysicsSystem->jointConstraints.at(joint.constraintIndex) = lastConstraint;
+        //And adjust the index of the moved constraint in the corresponding entity
+        switch(lastConstraint.mType)
+        {
+            case JointType_Distance:
+            {
+                auto constraint = std::get<DistanceJointConstraint>(lastConstraint.mConstraint);
+                constraint.jointEntity->get<DistanceJoint>().constraintIndex = joint.constraintIndex;
+                break;
+            }
+            case JointType_Pivot:
+            {
+                auto constraint = std::get<PivotJointConstraint>(lastConstraint.mConstraint);
+                constraint.jointEntity->get<PivotJoint>().constraintIndex = joint.constraintIndex;
+                break;
+            }
+            case JointType_Weld:
+            {
+                auto constraint = std::get<WeldJointConstraint>(lastConstraint.mConstraint);
+                constraint.jointEntity->get<WeldJoint>().constraintIndex = joint.constraintIndex;
+                break;
+            }
+        }
+    }
+    else
+    {
+        mPhysicsSystem->jointConstraints.erase(mPhysicsSystem->jointConstraints.begin() + joint.constraintIndex);
+    }
 }
 
 
@@ -213,21 +250,21 @@ static inline bool getBestQuery(
     ContactManifold queryA = queryFunctions[bodyA.shapeType][bodyB.shapeType](bodyA, bodyB);
 
 
-    if (queryA.separation > 0.f)
+    if (queryA.separation > physic::gLinearSlop)
     {
         return false;
     }
 
     ContactManifold queryB = queryFunctions[bodyB.shapeType][bodyA.shapeType](bodyB, bodyA);
 
-    if (queryB.separation > 0.f)
+    if (queryB.separation > physic::gLinearSlop)
     {
         return false;
     }
     
     // We want the highest distance to minimize displacement because those distance are
     // negative !
-    if (queryB.separation > queryA.separation + 0.001)
+    if (queryB.separation > queryA.separation)
     {
         resultManifold = queryB;
         resultManifold.face = ContactManifold::FACEB;
@@ -319,7 +356,9 @@ static inline std::vector<ContactFeature> getContactPoints(
     // best incident edge
     Position2 intersectA{0.f, 0.f};
     Position2 intersectB{0.f, 0.f};
-    Line incidentLine{incidentEdge.origin, incidentEdge.end - incidentEdge.origin};
+    Vec2 edgeVector = incidentEdge.end - incidentEdge.origin;
+    Vec2 edgeNormal = {edgeVector.y(), -edgeVector.x()};
+    Line incidentLine{incidentEdge.origin + edgeNormal * physic::gLinearSlop, incidentEdge.end - incidentEdge.origin + edgeNormal * physic::gLinearSlop};
 
     bool hasInterA = findIntersectionPoint(intersectA, lineA, incidentLine);
     bool hasInterB = findIntersectionPoint(intersectB, lineB, incidentLine);
@@ -715,10 +754,32 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
         }
     }
 
+    float timerRatio = aTimer.delta() * mInvOldTimer;
+
     //Init joint constraint
-    for (auto & constraint : jointConstraints)
+    for (auto & constraintVariant : jointConstraints)
     {
-        constraint->InitVelocityConstraint(aTimer);
+        switch(constraintVariant.mType)
+        {
+            case JointType_Distance:
+            {
+                auto & constraint = std::get<DistanceJointConstraint>(constraintVariant.mConstraint);
+                constraint.InitVelocityConstraint(aTimer, timerRatio);
+                break;
+            }
+            [[likely]]case JointType_Pivot:
+            {
+                auto & constraint = std::get<PivotJointConstraint>(constraintVariant.mConstraint);
+                constraint.InitVelocityConstraint(aTimer, timerRatio);
+                break;
+            }
+            case JointType_Weld:
+            {
+                auto & constraint = std::get<WeldJointConstraint>(constraintVariant.mConstraint);
+                constraint.InitVelocityConstraint(aTimer, timerRatio);
+                break;
+            }
+        }
     }
     
 
@@ -728,7 +789,7 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
         // Warm starting the constraint
         ContactFeature & cf = constraint.cf;
 
-        Vec2 impulseVec = cf.normalImpulse * constraint.normal + cf.tangentImpulse * constraint.tangent;
+        Vec2 impulseVec = cf.normalImpulse * constraint.normal + cf.tangentImpulse * constraint.tangent * timerRatio;
 
         constraint.velocityA->v += impulseVec * constraint.invMassA;
         constraint.velocityA->w += twoDVectorCross(constraint.rA, impulseVec) * constraint.invMoiA;
@@ -738,57 +799,65 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
 
     for (int i = 0; i < physic::gMaxVelocityConstraintIteration; i++)
     {
-        for (auto & constraint : jointConstraints)
+        for (auto & constraintVariant : jointConstraints)
         {
-            constraint->debugRender();
-            constraint->SolveVelocityConstraint(aTimer);
+            switch(constraintVariant.mType)
+            {
+                case JointType_Distance:
+                {
+                    auto & constraint = std::get<DistanceJointConstraint>(constraintVariant.mConstraint);
+                    constraint.SolveVelocityConstraint(aTimer);
+                    break;
+                }
+                [[likely]]case JointType_Pivot:
+                {
+                    auto & constraint = std::get<PivotJointConstraint>(constraintVariant.mConstraint);
+                    constraint.SolveVelocityConstraint(aTimer);
+                    break;
+                }
+                case JointType_Weld:
+                {
+                    auto & constraint = std::get<WeldJointConstraint>(constraintVariant.mConstraint);
+                    constraint.SolveVelocityConstraint(aTimer);
+                    break;
+                }
+            }
         }
-    }
 
-    for (int i = 0; i < physic::gMaxVelocityConstraintIteration; i++)
-    {
         for (VelocityConstraint & constraint : velocityConstraints)
         {
             solveContactVelocityConstraint(constraint);
         }
     }
 
+    //Position integration
+    for (size_t i = 0; i < velocities.size(); i++)
+    {
+        auto & velocity = velocities[i];
+        auto & position = positions[i];
+        constexpr float maxRotation = 0.5 * math::pi<float>;
+        Vec2 v = velocity.v;
+        Vec2 translation = v * aTimer.delta();
+        float w = velocity.w;
+        float rotation = velocity.w * aTimer.delta();
+        if (translation.dot(translation) > 4.)
+        {
+            v *= 2. / translation.getNorm();
+        }
+        if (rotation * rotation > maxRotation * maxRotation)
+        {
+            w *= maxRotation / std::abs(rotation);
+        }
+
+        position.p += v * aTimer.delta();
+        position.c += v * aTimer.delta();
+        position.a += math::Radian<float>{w * aTimer.delta()};
+        velocity.v = v;
+        velocity.w = w;
+    }
+
     for (VelocityConstraint & constraint : velocityConstraints)
     {
-        constexpr float maxRotation = 0.5 * math::pi<float>;
-        Vec2 v = constraint.velocityA->v;
-        Vec2 translation = v * aTimer.delta();
-        float w = constraint.velocityA->w;
-        float rotation = constraint.velocityA->w * aTimer.delta();
-        if (translation.dot(translation) > 4.)
-        {
-            v *= 2. / translation.getNorm();
-        }
-        if (rotation * rotation > maxRotation * maxRotation)
-        {
-            w *= maxRotation / std::abs(rotation);
-        }
-
-        constraint.bodyPosA->p += v * aTimer.delta();
-        constraint.bodyPosA->c += v * aTimer.delta();
-        constraint.bodyPosA->a += math::Radian<float>{w * aTimer.delta()};
-
-        v = constraint.velocityB->v;
-        translation = v * aTimer.delta();
-        w = constraint.velocityB->w;
-        rotation = constraint.velocityB->w * aTimer.delta();
-        if (translation.dot(translation) > 4.)
-        {
-            v *= 2. / translation.getNorm();
-        }
-        if (rotation * rotation > maxRotation * maxRotation)
-        {
-            w *= maxRotation / std::abs(rotation);
-        }
-        constraint.bodyPosB->p += v * aTimer.delta();
-        constraint.bodyPosB->c += v * aTimer.delta();
-        constraint.bodyPosB->a += math::Radian<float>{w * aTimer.delta()};
-
         constraint.angleBaseA = constraint.bodyPosA->a;
         constraint.angleBaseB = constraint.bodyPosB->a;
     }
@@ -797,7 +866,9 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
     {
         constraint.cPlayer->bodyPos->p += constraint.separation * constraint.normal;
         Vec2 tangent = {-constraint.normal.y(), constraint.normal.x()};
-        constraint.cPlayer->velocity->v = constraint.cPlayer->velocity->v.dot(tangent) * tangent;
+        float normalComponent = std::max(0.f, constraint.cPlayer->velocity->v.dot(-constraint.normal));
+        Vec2 normalSpeed = normalComponent * -constraint.normal;
+        constraint.cPlayer->velocity->v = constraint.cPlayer->velocity->v.dot(tangent) * tangent + normalSpeed;
 
         if (-constraint.normal.dot(PlayerGroundedNormal) > PlayerGroundedSlopeDotValue)
         {
@@ -829,9 +900,29 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
     for (int i = 0; i < physic::gMaxPositionConstraintIteration; i++)
     {
         bool jointOkay = true;
-        for (auto & constraint : jointConstraints)
+        for (auto & constraintVariant : jointConstraints)
         {
-            jointOkay = constraint->SolvePositionConstraint() && jointOkay;
+            switch(constraintVariant.mType)
+            {
+                case JointType_Distance:
+                {
+                    auto & constraint = std::get<DistanceJointConstraint>(constraintVariant.mConstraint);
+                    jointOkay = constraint.SolvePositionConstraint() && jointOkay;
+                    break;
+                }
+                [[likely]]case JointType_Pivot:
+                {
+                    auto & constraint = std::get<PivotJointConstraint>(constraintVariant.mConstraint);
+                    jointOkay = constraint.SolvePositionConstraint() && jointOkay;
+                    break;
+                }
+                case JointType_Weld:
+                {
+                    auto & constraint = std::get<WeldJointConstraint>(constraintVariant.mConstraint);
+                    jointOkay = constraint.SolvePositionConstraint() && jointOkay;
+                    break;
+                }
+            }
         }
 
         for (VelocityConstraint & constraint : velocityConstraints)
@@ -879,6 +970,8 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
     //Cleaning up
     velocityConstraints.clear();
     playerConstraints.clear();
+
+    mInvOldTimer = 1 / aTimer.delta();
 }
 
 } // namespace grapito

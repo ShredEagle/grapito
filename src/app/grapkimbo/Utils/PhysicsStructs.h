@@ -9,6 +9,7 @@
 
 #include <math/Angle.h>
 #include <math/Matrix.h>
+#include <variant>
 
 namespace ad {
 namespace grapito {
@@ -160,7 +161,7 @@ class ConstructedBody
     // this should probably use some sort of polymorphism
     // for this we would need the list of joint to be pointer based
     // this has some issue vis-a-vis the memory coherence of the physics system
-    std::list<std::list<std::unique_ptr<JointConstraint>>::iterator> jointItList;
+    std::list<aunteater::weak_entity> jointEntityList; 
 
     BodyType bodyType;
     ShapeType shapeType;
@@ -260,7 +261,7 @@ class JointConstraint
     {}
     virtual ~JointConstraint() = default;
 
-    virtual void InitVelocityConstraint(const GrapitoTimer & aTimer) = 0;
+    virtual void InitVelocityConstraint(const GrapitoTimer & aTimer, float aTimerRatio) = 0;
     virtual void SolveVelocityConstraint(const GrapitoTimer & aTimer) = 0;
     virtual bool SolvePositionConstraint() = 0;
     virtual void debugRender() = 0;
@@ -281,7 +282,7 @@ class WeldJointConstraint : public JointConstraint
             aunteater::weak_entity aEntity
             );
 
-    void InitVelocityConstraint(const GrapitoTimer & aTimer) override;
+    void InitVelocityConstraint(const GrapitoTimer & aTimer, float aTimerRatio) override;
     void SolveVelocityConstraint(const GrapitoTimer & aTimer) override;
     bool SolvePositionConstraint() override;
     void debugRender() override;
@@ -322,7 +323,7 @@ class PivotJointConstraint : public JointConstraint
             aunteater::weak_entity aEntity
             );
 
-    void InitVelocityConstraint(const GrapitoTimer & aTimer) override;
+    void InitVelocityConstraint(const GrapitoTimer & aTimer, float aTimerRatio) override;
     void SolveVelocityConstraint(const GrapitoTimer & aTimer) override;
     bool SolvePositionConstraint() override;
     void debugRender() override;
@@ -361,7 +362,7 @@ class DistanceJointConstraint : public JointConstraint
             aunteater::weak_entity aEntity
             );
 
-    void InitVelocityConstraint(const GrapitoTimer & aTimer) override;
+    void InitVelocityConstraint(const GrapitoTimer & aTimer, float aTimerRatio) override;
     void SolveVelocityConstraint(const GrapitoTimer & aTimer) override;
     bool SolvePositionConstraint() override;
     void debugRender() override;
@@ -398,6 +399,38 @@ class DistanceJointConstraint : public JointConstraint
     float mMinBaseLength = 0.f;
     float mMaxBaseLength = 0.f;
     float mCurrentLength = 0.f;
+};
+
+enum JointType
+{
+    JointType_Distance,
+    JointType_Weld,
+    JointType_Pivot,
+};
+
+struct JointVariant
+{
+    explicit JointVariant(
+            const DistanceJoint & aDistanceJoint,
+            ConstructedBody * aBodyA,
+            ConstructedBody * aBodyB,
+            aunteater::weak_entity aEntity
+            );
+    explicit JointVariant(
+            const PivotJoint & aPivotJoint,
+            ConstructedBody * aBodyA,
+            ConstructedBody * aBodyB,
+            aunteater::weak_entity aEntity
+            );
+    explicit JointVariant(
+            const WeldJoint & aWeldJoint,
+            ConstructedBody * aBodyA,
+            ConstructedBody * aBodyB,
+            aunteater::weak_entity aEntity
+            );
+
+    JointType mType;
+    std::variant<PivotJointConstraint, DistanceJointConstraint, WeldJointConstraint> mConstraint;
 };
 }
 }
