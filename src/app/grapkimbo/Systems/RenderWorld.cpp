@@ -142,7 +142,7 @@ void RenderWorld::update(const GrapitoTimer /*aTimer*/, const GameInputState &)
         for(const auto & [body, geometry, visualSprite] : mSprites)
         {
             // Handle sprite alignment on the bouding box edges.
-            Position2 position = [&]()
+            Position2 position = [&, visualSprite = visualSprite, geometry = geometry]()
             {
                 if (visualSprite.alignment == VisualSprite::AlignLeft)
                 {
