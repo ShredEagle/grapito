@@ -35,7 +35,8 @@ std::shared_ptr<SplashScene> setupSplashScreen(math::Size<2, int> aResolution,
     std::shared_ptr<SplashScene> scene = std::make_unique<SplashScene>(aResolution);
     scene->splashes.push_back(
         {
-            arte::ImageRgba{aContext.pathFor("images/splashes/splash.bmp")},
+            arte::ImageRgba{aContext.pathFor("images/splashes/cpp.png"),
+                            arte::ImageOrientation::InvertVerticalAxis},
             splash::gDuration,
         });
 
@@ -56,7 +57,8 @@ std::shared_ptr<SplashScene> setupSplashScreen(math::Size<2, int> aResolution,
 
     scene->splashes.push_back(
         {
-            arte::ImageRgba{aContext.pathFor("images/splashes/cpp.png")},
+            arte::ImageRgba{aContext.pathFor("images/splashes/shred_eagle.png"),
+                            arte::ImageOrientation::InvertVerticalAxis},
             splash::gDuration,
             [interpolation = 
                 math::makeInterpolation<math::None, math::ease::SmoothStep>(math::hdr::gBlack,

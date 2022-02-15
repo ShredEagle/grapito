@@ -164,6 +164,7 @@ namespace player
     extern const math::sdr::Rgb gBlueColor;
     extern const math::sdr::Rgb gGreenColor;
     extern const math::sdr::Rgb gRedColor;
+    extern const math::sdr::Rgb gYellowColor;
 
 } // namespace player
 
@@ -200,10 +201,10 @@ namespace sight
 
 namespace splash
 {
-    constexpr int gVerticalResolution = 800;
+    constexpr int gVerticalResolution = 1440;
     constexpr float gHiddenDuration = 0.2f;
-    constexpr float gLinearDuration = 0.6f;
-    constexpr float gConstantDuration = 0.8f;
+    constexpr float gLinearDuration = 0.8f;
+    constexpr float gConstantDuration = 1.1f;
     constexpr float gDuration = 2 * (gHiddenDuration + gLinearDuration) + gConstantDuration;
 } // namespace splash
 

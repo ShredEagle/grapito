@@ -36,13 +36,13 @@ UpdateStatus SplashScene::update(
     const GameInputState & aInputs,
     StateMachine & aStateMachine)
 {
-    mTimeAccumlated += aTimer.delta();
+    mTimeAccumulated += aTimer.delta();
     // If accumulated time gets longer than current splash duration,
     // advance to next splash.
     while (mCurrentSplashId < splashes.size() 
-        && mTimeAccumlated > current().mDuration)
+        && mTimeAccumulated > current().mDuration)
     {
-        mTimeAccumlated -= current().mDuration;
+        mTimeAccumulated -= current().mDuration;
         mLoadedSprite.reset();
         if (++mCurrentSplashId == splashes.size())
         {
@@ -84,7 +84,7 @@ Splash & SplashScene::current()
 void SplashScene::reset()
 {
     mCurrentSplashId = 0;
-    mTimeAccumlated = 0.;
+    mTimeAccumulated = 0.;
     mLoadedSprite.reset();
 }
 

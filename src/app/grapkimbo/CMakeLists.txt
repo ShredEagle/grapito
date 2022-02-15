@@ -180,6 +180,16 @@ set(${TARGET_NAME}_SOURCES
     Utils/Shape.cpp
 )
 
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    LIST(APPEND ${TARGET_NAME}_HEADERS
+        Windows/Console.h)
+
+    LIST(APPEND ${TARGET_NAME}_SOURCES
+        Windows/appicon.rc)
+endif()
+
+
 source_group(TREE ${CMAKE_CURRENT_LIST_DIR}
              FILES ${${TARGET_NAME}_HEADERS} ${${TARGET_NAME}_SOURCES}
 )
@@ -200,7 +210,15 @@ find_package(Vorbis REQUIRED File CONFIG)
 find_package(Ogg REQUIRED CONFIG)
 
 
+# Use the "Console" subsystem for development builds, so the console window does not close on exit.
+# (Note: we explicitly attach a console in code when the subsystem is "Windows")
+if(NOT BUILD_Grapito_DEVMODE)
+    set(WINDOWS_SUBSYSTEM WIN32)
+endif()
+
 add_executable(${TARGET_NAME}
+    ${WINDOWS_SUBSYSTEM}
+
     ${${TARGET_NAME}_SOURCES}
     ${${TARGET_NAME}_HEADERS}
 
@@ -222,7 +240,9 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
         PRIVATE "-fsanitize=address" "-fsanitize=undefined")
 endif()
 
-target_compile_definitions(${TARGET_NAME} PRIVATE KIMBO_DEBUG)
+if(NOT BUILD_Grapito_DEVMODE)
+    target_compile_definitions(${TARGET_NAME} PRIVATE BUILD_RELEASEMODE)
+endif()
 
 target_include_directories(${TARGET_NAME}
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
@@ -252,6 +272,13 @@ target_link_libraries(${TARGET_NAME}
 set_target_properties(${TARGET_NAME} PROPERTIES
                       VERSION "${${PROJECT_NAME}_VERSION}"
 )
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    # Tell MSVC to use main instead of WinMain for Windows subsystem executables.
+    # This way we do not have to define different entrypoints depending on the target OS.
+    set_target_properties(${TARGET_NAME} PROPERTIES
+                          LINK_FLAGS "/ENTRY:mainCRTStartup")
+endif()
 
 
 ##

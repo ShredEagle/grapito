@@ -45,8 +45,13 @@ UpdateStatus GameScene::update(
         }
     }
 
+#if defined(SHRED_ENABLE_STEPPING)
     InputState debugPause = aInputs.get(Controller::KeyboardMouse)[Command::Pause];
     InputState debugStep  = aInputs.get(Controller::KeyboardMouse)[Command::Step];
+#else
+    constexpr InputState debugPause;
+    constexpr InputState debugStep;
+#endif
 
     if (debugPause.positiveEdge())
     {

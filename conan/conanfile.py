@@ -13,12 +13,14 @@ class GrapitoConan(ConanFile):
     topics = ("opengl", "2D", "game")
     settings = "os", "compiler", "build_type", "arch"
     options = {
-        "shared": [True, False],
+        "build_devmode": [True, False],
         "build_tests": [True, False],
+        "shared": [True, False],
     }
     default_options = {
-        "shared": False,
+        "build_devmode": False,
         "build_tests": False,
+        "shared": False,
     }
 
     requires = (
@@ -30,7 +32,7 @@ class GrapitoConan(ConanFile):
         ("vorbis/1.3.7"),
 
         ("aunteater/50a0c94674@adnn/develop"),
-        ("graphics/6cb63a5c01@adnn/develop"),
+        ("graphics/fd9497ef21@adnn/develop"),
         ("math/fd9b30cce0@adnn/develop"),
         ("sounds/ad53c2d701@adnn/develop"),
         ("websocket/ef5d5bf4d9@adnn/develop"),
@@ -63,6 +65,7 @@ class GrapitoConan(ConanFile):
             # avoid path.join, on Windows it outputs '\', which is a string escape sequence.
             config.write("include(\"{}\")\n".format("${CMAKE_CURRENT_LIST_DIR}/conan_paths.cmake"))
             config.write("set({} {})\n".format("BUILD_tests", self.options.build_tests))
+            config.write("set({} {})\n".format("BUILD_Grapito_DEVMODE", self.options.build_devmode))
 
 
     def generate(self):

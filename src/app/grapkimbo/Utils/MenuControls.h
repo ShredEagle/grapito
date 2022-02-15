@@ -1,6 +1,8 @@
 #pragma once
 
 
+#include "commons.h"
+
 #include "../Input.h"
 
 
@@ -9,7 +11,9 @@ namespace grapito {
 
 
 static const std::initializer_list<Controller> gMenuControllers = {
+#if defined(SHRED_ENABLE_KEYBOARD)
     Controller::KeyboardMouse,
+#endif
     Controller::Gamepad_0,
     Controller::Gamepad_1,
     Controller::Gamepad_2,
