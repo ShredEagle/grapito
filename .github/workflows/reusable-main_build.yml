@@ -2,6 +2,14 @@ name: Reusable main build workflow
 
 on:
   workflow_call:
+    inputs:
+      os:
+        description: "Stringified JSON array listing the target runner OSes."
+        default: >-
+          ["ubuntu-latest", "windows-latest", "macos-11"]
+        required: true
+        type: string
+
     secrets:
       SHREDROBOT_GITHUB_TOKEN:
         required: true
@@ -30,10 +38,8 @@ jobs:
     name: Build, test, deploy
     strategy:
       matrix:
-        # Disable macos while spdlog crashes its compiler
-        # see: https://github.com/conan-io/conan-center-index/issues/8480
-        #os: [ubuntu-latest, windows-latest, macos-11]
-        os: [ubuntu-latest, windows-latest]
+        #see: https://github.community/t/reusable-workflow-with-strategy-matrix/205676/2
+        os: ${{fromJson(inputs.os)}}
         development_build: ["True", "False"]
         cppstd: [20]
         include:
