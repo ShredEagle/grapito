@@ -123,8 +123,8 @@ class InitialInviciblePhase : public PhaseParent
     {}
 
     UpdateStatus update(
-        const GrapitoTimer & aTimer,
-        const GameInputState & aInputs,
+        const GrapitoTimer & /*aTimer*/,
+        const GameInputState & /*aInputs*/,
         StateMachine & aStateMachine) override
     {
         if (mRule.player()->get<Position>().position.y() > game::FloorBecomesLavaHeight)
@@ -207,7 +207,7 @@ class FloorIsLavaPhase : public PhaseParent
         {
             // TODO check for highscore
             mRule.disableGrapples();
-            addSoundToEntity(mRule.player(), soundId_BurnSid);
+            addSoundToEntity(mRule.player(), soundId_BurnSid, {});
             aStateMachine.putNext(getPhase(FloorIsLavaRule::Death));
             aStateMachine.popState();
         }

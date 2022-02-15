@@ -33,7 +33,7 @@ FreesoloRule::FreesoloRule(aunteater::EntityManager & aEntityManager,
 }
 
 
-void FreesoloRule::update(const GrapitoTimer aTimer, const GameInputState & aInput)
+void FreesoloRule::update(const GrapitoTimer /*aTimer*/, const GameInputState & /*aInput*/)
 {
     mHeights.pop_front();
     mHeights.push_back(std::max(0.f, std::floor(mPlayer->get<Position>().position.y())));

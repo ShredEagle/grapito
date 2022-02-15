@@ -38,9 +38,6 @@ void DirectControl::update(const GrapitoTimer aTimer, const GameInputState & aIn
             }
         }
 
-        const ControllerInputState & inputs =
-            aInputState.controllerState[(std::size_t)controllable.controller];
-
         position.position += aInputState.getRightDirection(controllable.controller)
                              * debug::gDirectControlSpeed 
                              * aTimer.delta();

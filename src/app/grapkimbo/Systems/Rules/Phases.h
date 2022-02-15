@@ -29,7 +29,7 @@ public:
     {}
 
 protected:
-    std::shared_ptr<State> getPhase(T_rule::Phase aPhase)
+    std::shared_ptr<State> getPhase(typename T_rule::Phase aPhase)
     {
         return mRule.mPhases[aPhase];
     }
@@ -62,7 +62,7 @@ class MessagePhase : public PhaseBase<T_rule>
 
 public:
     MessagePhase(std::shared_ptr<Context> aContext, T_rule & aCompetitionRule,
-                 std::string aMessage, T_rule::Phase aNextPhase) :
+                 std::string aMessage, typename T_rule::Phase aNextPhase) :
         PhaseBase<T_rule>{std::move(aContext), aCompetitionRule},
         mMessage{std::move(aMessage)},
         mNextPhase{aNextPhase},
@@ -112,7 +112,7 @@ private:
     }
 
     std::string mMessage; 
-    T_rule::Phase mNextPhase;
+    typename T_rule::Phase mNextPhase;
 
     const CompositeTransition<Position2, float> mHudPositionInterpolationReference;
     CompositeTransition<Position2, float> mHudPositionInterpolation;

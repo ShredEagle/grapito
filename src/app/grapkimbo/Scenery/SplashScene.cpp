@@ -33,7 +33,7 @@ SplashScene::SplashScene(math::Size<2, int> aResolution) :
 
 UpdateStatus SplashScene::update(
     const GrapitoTimer & aTimer,
-    const GameInputState & aInputs,
+    const GameInputState & /*aInputs*/,
     StateMachine & aStateMachine)
 {
     mTimeAccumulated += aTimer.delta();

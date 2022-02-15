@@ -58,7 +58,7 @@ void appendRopeSpline(const RopeCreator & aRope,
     }
 
     Spline result;
-    for (int segment = 0; (segment + 3) < knots.size(); ++segment)
+    for (size_t segment = 0; (segment + 3) < knots.size(); ++segment)
     {
         *(aOutputIterator++) = {
             math::CardinalCubic<3, GLfloat>{

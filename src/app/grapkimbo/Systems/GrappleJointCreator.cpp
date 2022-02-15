@@ -24,7 +24,7 @@ namespace ad {
 namespace grapito
 {
 
-const StringId soundId_WeldSid = handy::internalizeString("weld");
+const StringId soundId_WeldSid = handy::internalizeString("grapple_attached");
 
 
 aunteater::weak_entity getOtherEntity(const Body & aThisBody, const CollisionPair * aCollisionPair)
@@ -50,10 +50,9 @@ void GrappleJointCreator::update(const GrapitoTimer, const GameInputState &)
     for (auto & ropeCreatorEntity : mRopeCreator)
     {
         Body & body = ropeCreatorEntity->get<Body>();
-        Position & pos = ropeCreatorEntity->get<Position>();
-        RopeCreator & rope = ropeCreatorEntity->get<RopeCreator>();
+        RopeCreator & ropeCreator = ropeCreatorEntity->get<RopeCreator>();
         ConstructedBody & cBody = *body.constructedBodyIt;
-        aunteater::weak_entity player = rope.mTargetEntity;
+        aunteater::weak_entity player = ropeCreator.mTargetEntity;
         
         if (player != nullptr)
         {
@@ -63,7 +62,7 @@ void GrappleJointCreator::update(const GrapitoTimer, const GameInputState &)
             float length = 0.f;
             float lengthToContact = 0.f;
 
-            for (auto ropeIt = rope.mRopeSegments.rbegin(); ropeIt != rope.mRopeSegments.rend(); ++ropeIt)
+            for (auto ropeIt = ropeCreator.mRopeSegments.rbegin(); ropeIt != ropeCreator.mRopeSegments.rend(); ++ropeIt)
             {
                 //Here we go from the end attache to the player to the grapple and try
                 //to find a contact point to attach the player to
@@ -118,7 +117,6 @@ void GrappleJointCreator::update(const GrapitoTimer, const GameInputState &)
             {
                 for (auto & collisionPair : cBody.contactList)
                 {
-#if 1
                     //We go through all the collision pair the grapple is a part of
                     //and we try to find if it's in contact with a static environment
                     //if he is we weld the grapple to the static environment
@@ -163,51 +161,11 @@ void GrappleJointCreator::update(const GrapitoTimer, const GameInputState &)
                                         ropeCreatorEntity,
                                         otherEntity
                                     ));
-                            addSoundToEntity(ropeCreatorEntity, soundId_WeldSid);
+                            playerData.grappleCooldownFrameCounter = player::gGrappleAnchoredCooldown;
+                            addSoundToEntity(ropeCreatorEntity, soundId_WeldSid, {.gain = 2.f});
                             break;
                         }
                     }
-#else
-                    //We go through all the collision pair the grapple is a part of
-                    //and we try to find if it's in contact with a static environment
-                    //if he is we weld the grapple to the static environment
-                    if (
-                        (collisionPair->bodyA.collisionType == CollisionType_Static_Env ||
-                        collisionPair->bodyB.collisionType == CollisionType_Static_Env) &&
-                        collisionPair->manifold.contacts.size() >0
-                    )
-                    {
-                        //We found a static env contact with the grapple
-                        //We can weld the grapple to it
-                        aunteater::weak_entity otherEntity;
-                        bool incidentIsGrapple;
-
-                        if (&collisionPair->bodyA == &cBody)
-                        {
-                            otherEntity = collisionPair->bodyB.entity;
-
-                            incidentIsGrapple = collisionPair->manifold.face == ContactManifold::FACEB;
-                        }
-                        else
-                        {
-                            otherEntity = collisionPair->bodyA.entity;
-                            incidentIsGrapple = collisionPair->manifold.face == ContactManifold::FACEA;
-                        }
-                        Position2 localPointGrapple = (incidentIsGrapple ? collisionPair->manifold.contacts[0].localPointInc : collisionPair->manifold.contacts[0].localPointRef).as<math::Position>();
-                        Position2 localPointOther = (incidentIsGrapple ? collisionPair->manifold.contacts[0].localPointRef : collisionPair->manifold.contacts[0].localPointInc).as<math::Position>();
-
-                        playerData.mGrappleWeldJoint = mEntityManager.addEntity(
-                                aunteater::Entity()
-                                .add<PivotJoint>(
-                                    localPointGrapple,
-                                    localPointOther,
-                                    ropeCreatorEntity,
-                                    otherEntity
-                                ));
-                        addSoundToEntity(ropeCreatorEntity, soundId_WeldSid);
-                        break;
-                    }
-#endif
                 }
             }
 

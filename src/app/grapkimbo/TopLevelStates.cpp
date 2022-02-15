@@ -103,7 +103,7 @@ std::shared_ptr<MenuScene> setupMainMenu(const std::shared_ptr<Context> & aConte
                     }
                 },
                 { aContext->translate(menu_exit_sid),
-                  [](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface, const Controller)
+                  [](StateMachine & /*aMachine*/, std::shared_ptr<graphics::AppInterface> & aAppInterface, const Controller)
                     {
                         aAppInterface->requestCloseApplication();
                     }

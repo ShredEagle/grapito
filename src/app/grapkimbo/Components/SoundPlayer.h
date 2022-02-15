@@ -15,18 +15,18 @@ namespace grapito
 
 struct Sound
 {
-    explicit Sound(StringId aSoundId, bool aLooping, bool aStreaming, bool aStopOnDelete) :
+    explicit Sound(StringId aSoundId, sounds::SoundOption aOptions, bool aStreaming, bool aStopOnDelete) :
         mSoundId{aSoundId},
-        mLooping{aLooping},
+        mOptions{aOptions},
         mStreaming{aStreaming},
         mStopOnDelete{aStopOnDelete}
     {};
 
     //mPlaying should never be initialize to anything other than false
-    Sound(StringId aSoundId, bool aLooping, bool aStreaming, bool aStopOnDelete, bool aPlaying) = delete;
+    Sound(StringId aSoundId, sounds::SoundOption aOptions, bool aStreaming, bool aStopOnDelete, bool aPlaying) = delete;
 
     StringId mSoundId;
-    bool mLooping;
+    sounds::SoundOption mOptions;
     bool mStreaming = false;
     bool mStopOnDelete = false;
     bool mPlaying = false;
@@ -42,7 +42,7 @@ struct SoundPlayer : public aunteater::Component<SoundPlayer>
     std::list<Sound> mSounds;
 };
 
-static void addSoundToEntity(aunteater::weak_entity aEntity, StringId aSoundId, bool aLooping = false, bool aStreaming = false, bool aStopOnDelete = false)
+inline void addSoundToEntity(aunteater::weak_entity aEntity, StringId aSoundId, sounds::SoundOption aOptions, bool aStreaming = false, bool aStopOnDelete = false)
 {
     if (!aEntity->has<SoundPlayer>())
     {
@@ -50,7 +50,7 @@ static void addSoundToEntity(aunteater::weak_entity aEntity, StringId aSoundId, 
     }
 
     SoundPlayer & sp = aEntity->get<SoundPlayer>();
-    sp.mSounds.emplace_back(Sound{aSoundId, aLooping, aStreaming, aStopOnDelete});
+    sp.mSounds.emplace_back(Sound{aSoundId, aOptions, aStreaming, aStopOnDelete});
 };
 
 } // namespace grapito

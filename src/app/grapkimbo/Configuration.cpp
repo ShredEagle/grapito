@@ -95,13 +95,15 @@ namespace player
     const math::Size<2, float> gSize = math::Size<2, float>{5.6f, 7.5f} / gGigantismDampeningFactor;
     const math::Size<2, float> gGrappleSpritePixelSize{30.f, 30.f};
     const float gGrappleFriction = 0.5f;
-    float gGrappleDistanceJointFactor = 1.3f;
+    float gGrappleDistanceJointFactor = 1.5f;
     float gRopeDistanceJointFactor = 1.1f;
 
     const math::sdr::Rgb gBlueColor{63, 63, 116};
     const math::sdr::Rgb gGreenColor{52, 212, 136};
     const math::sdr::Rgb gRedColor{235, 68, 53};
     const math::sdr::Rgb gYellowColor{192, 192, 139};
+    const float gDoubleJumpCooldown = 15;
+    const float gGrappleAnchoredCooldown = 30;
 } // namespace player
 
 

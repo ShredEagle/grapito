@@ -27,7 +27,6 @@ namespace grapito
 {
 
 const StringId soundId_JumpSid = handy::internalizeString("jump");
-const StringId soundId_RopeJumpSid = handy::internalizeString("ropejump");
 
 Control::Control(aunteater::EntityManager & aEntityManager, std::shared_ptr<Context> aContext) :
     mEntityManager{aEntityManager},
@@ -60,15 +59,32 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
             aInputState.asDirection(controllable.controller, 
                                LeftHorizontalAxis, LeftVerticalAxis, controller::gVerticalDeadZone, controller::gHorizontalDeadZone);
 
+        //Count down grappleCooldownFrameCounter
+        if (playerData.grappleCooldownFrameCounter != 0)
+        {
+            playerData.grappleCooldownFrameCounter--;
+        }
+
         //
         // Reset airborn jumps
         //
-        if (playerData.state & PlayerCollisionState_Grounded || isAnchored(playerData))
+        if (playerData.state & PlayerCollisionState_Grounded)
         {
             // TODO Ad 2022/01/05: This should actually only be done once when the player transition to grounded.
             // (But currently this transition happens into the physics engine.)
             // Or when the player actually anchors to the environments.
             resetJumps(playerData);
+        }
+        else if (isAnchored(playerData))
+        {
+            if (playerData.doubleJumpCooldownFrameCounter == 0)
+            {
+                resetJumps(playerData);
+            }
+            else
+            {
+                --playerData.doubleJumpCooldownFrameCounter;
+            }
         }
 
         //
@@ -97,7 +113,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
 
             if (inputs[Jump].positiveEdge())
             {
-                addSoundToEntity(player, soundId_JumpSid);
+                addSoundToEntity(player, soundId_JumpSid, {.gain = 2.f});
                 aas.speed.y() = player::gJumpImpulse;
             }
         }
@@ -128,7 +144,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
                 Vec2 jointDirection = (attachPoint - playerPos).normalize();
                 Vec2 possibleDirection = {-jointDirection.y(), jointDirection.x()};
 
-                aas.speed += possibleDirection.dot(controllerDirection.normalize()) * 2.f * (player::gGrappleSwingSpeed / pow(possibleDirection.getNorm() + 1.f, 2)) * possibleDirection * controllerDirection.getNorm();
+                aas.speed += pow(possibleDirection.dot(controllerDirection.normalize()), 3) * 2.f * (player::gGrappleSwingSpeed / pow(possibleDirection.getNorm() + 1.f, 2)) * possibleDirection * controllerDirection.getNorm();
 
                 debugDrawer->drawLine({playerPos, playerPos + possibleDirection * 4.f, 2.f, math::sdr::gGreen});
             }
@@ -182,8 +198,9 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
                         //
                         --playerData.airborneJumpsLeft;
                         aas.speed.y() = player::gJumpImpulse;
+                        playerData.doubleJumpCooldownFrameCounter = player::gDoubleJumpCooldown;
                     }
-                    else
+                    else if (!isAnchored(playerData))
                     {
                         float wallJumpHorizontalImpulse = player::gJumpImpulse * player::gDoubleJumpFactor * cos(math::pi<float> / 4.);
                         float wallJumpVerticalImpulse = player::gJumpImpulse * player::gDoubleJumpFactor * sin(math::pi<float> / 4.);
@@ -204,6 +221,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
                      && !isGrappleOut(playerData))
             {
                 --playerData.airborneJumpsLeft;
+                playerData.doubleJumpCooldownFrameCounter = player::gDoubleJumpCooldown;
                 aas.speed.y() = player::gJumpImpulse;
             }
         }
@@ -249,7 +267,7 @@ void Control::update(const GrapitoTimer, const GameInputState & aInputState)
             }
         }
 
-        if (mGrapplingEnabled && inputs[Grapple].positiveEdge() && !isGrappleOut(playerData))
+        if (mGrapplingEnabled && inputs[Grapple].positiveEdge() && !isGrappleOut(playerData) && playerData.grappleCooldownFrameCounter == 0)
         {
             throwGrapple(player, mEntityManager, *mContext);
             playerData.controlState |= ControlState_Throwing;

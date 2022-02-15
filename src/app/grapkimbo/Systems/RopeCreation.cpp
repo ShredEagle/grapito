@@ -21,7 +21,7 @@ namespace ad {
 namespace grapito
 {
 
-const StringId soundId_LaunchSid = handy::internalizeString("launch");
+const StringId soundId_LaunchSid = handy::internalizeString("grapple_throwing2");
 
 RopeCreation::RopeCreation(aunteater::EntityManager & aEntityManager) :
     mRopeCreator{aEntityManager},
@@ -38,7 +38,7 @@ void RopeCreation::addedEntity(aunteater::LiveEntity & aEntity)
 
     Position2 end = player->get<Position>().position + player->get<Body>().massCenter.as<math::Vec>();
     Position2 origin = pos.position;
-    addSoundToEntity(player, soundId_LaunchSid);
+    addSoundToEntity(player, soundId_LaunchSid, {.gain = 2.f});
 
     aunteater::weak_entity link = mEntityManager.addEntity(
         createRopeSegment(origin, end, player));
@@ -69,34 +69,53 @@ void RopeCreation::removedEntity(aunteater::LiveEntity & aEntity)
     }
 }
 
-void RopeCreation::handleThrow(RopeCreator & aRopeCreator)
+void RopeCreation::handleThrow(aunteater::weak_entity aRopeCreatorEntity)
 {
-        aunteater::weak_entity player = aRopeCreator.mTargetEntity;
+        RopeCreator & ropeCreator = aRopeCreatorEntity->get<RopeCreator>();
+        aunteater::weak_entity player = ropeCreator.mTargetEntity;
         if (player != nullptr && player->get<PlayerData>().controlState & ControlState_Throwing)
         {
-            aunteater::weak_entity lastSegment = aRopeCreator.mRopeSegments.back();
-            Position2 end = player->get<Position>().position + player->get<Body>().massCenter.as<math::Vec>();
-            Position2 origin = getLocalPointInWorld(lastSegment->get<Body>(), lastSegment->get<Position>(),
+            aunteater::weak_entity lastSegment = ropeCreator.mRopeSegments.back();
+            Position2 playerMassCenter = player->get<Position>().position + player->get<Body>().massCenter.as<math::Vec>();
+            Position2 lastSegmentPlayerEnd = getLocalPointInWorld(lastSegment->get<Body>(), lastSegment->get<Position>(),
                                                     {lastSegment->get<Position>().dimension.width(),
                                                     rope::ropeHalfwidth});
-            double length = (end - origin).getNorm();
+            float length = (lastSegmentPlayerEnd - playerMassCenter).getNorm();
 
             if (length > .4f)
             {
-                aunteater::weak_entity link = mEntityManager.addEntity(
-                    createRopeSegment(origin, end, player));
+                while (length > 0.f)
+                {
+                    lastSegment = ropeCreator.mRopeSegments.back();
+                    lastSegmentPlayerEnd = getLocalPointInWorld(lastSegment->get<Body>(), lastSegment->get<Position>(),
+                                                        {lastSegment->get<Position>().dimension.width(),
+                                                        rope::ropeHalfwidth});
+                    aunteater::weak_entity link;
+                    if (length > .4f)
+                    {
+                        Vec2 direction = (playerMassCenter  - lastSegmentPlayerEnd).normalize();
+                        link = mEntityManager.addEntity(
+                            createRopeSegment(lastSegmentPlayerEnd, lastSegmentPlayerEnd + direction * .4f, player));
+                    }
+                    else
+                    {
+                        link = mEntityManager.addEntity(
+                            createRopeSegment(lastSegmentPlayerEnd, playerMassCenter, player));
+                    }
 
-                aunteater::weak_entity joint = mEntityManager.addEntity(
-                        aunteater::Entity()
-                        .add<PivotJoint>(
-                            Position2{0.f, rope::ropeHalfwidth},
-                            Position2{lastSegment->get<Position>().dimension.width(), rope::ropeHalfwidth},
-                            link,
-                            lastSegment
-                        ));
+                    aunteater::weak_entity joint = mEntityManager.addEntity(
+                            aunteater::Entity()
+                            .add<PivotJoint>(
+                                Position2{0.f, rope::ropeHalfwidth},
+                                Position2{lastSegment->get<Position>().dimension.width(), rope::ropeHalfwidth},
+                                link,
+                                lastSegment
+                            ));
 
-                aRopeCreator.mRopeSegments.push_back(link);
-                aRopeCreator.mPivotJoints.push_back(joint);
+                ropeCreator.mRopeSegments.push_back(link);
+                ropeCreator.mPivotJoints.push_back(joint);
+                    length -= .4f;
+                }
             }
         }
 }
@@ -106,8 +125,7 @@ void RopeCreation::update(const GrapitoTimer, const GameInputState &)
 {
     for (auto & ropeCreatorEntity : mRopeCreator)
     {
-        RopeCreator & ropeCreator = ropeCreatorEntity->get<RopeCreator>();
-        handleThrow(ropeCreator);
+        handleThrow(ropeCreatorEntity);
     }
 }
 

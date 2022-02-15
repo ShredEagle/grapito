@@ -81,7 +81,7 @@ void GrappleInteractions::update(const GrapitoTimer, const GameInputState &)
         if(playersToDetach.contains(playerData.id))
         {
             detachPlayerFromGrapple(player);
-            addSoundToEntity(player, soundId_CutRopeSid);
+            addSoundToEntity(player, soundId_CutRopeSid, {.gain = 1.3f});
         }
     }
 }

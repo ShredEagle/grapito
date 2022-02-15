@@ -58,7 +58,7 @@ AnimationStateMachine makePlayerAnimationStateMachine(const graphics::sprite::An
     // (Otherwise, if the player was already in an Idle state, the AnimatedSprite would not be populated accordingly.)
     result.at(PlayerAnimation::Initial) = {
         {},
-        [](AnimatedSprite & aAnimation, const AccelAndSpeed & aAccelAndSpeed, const PlayerData & aPlayerData)
+        [](AnimatedSprite & /*aAnimation*/, const AccelAndSpeed & /*aAccelAndSpeed*/, const PlayerData & /*aPlayerData*/)
         {
             return PlayerAnimation::IdleRight;
         }
@@ -67,7 +67,7 @@ AnimationStateMachine makePlayerAnimationStateMachine(const graphics::sprite::An
 
     result.at(PlayerAnimation::IdleLeft) = {
         makeLoopingAnimation(idleSid, aAnimator, Mirroring::Horizontal),
-        [](AnimatedSprite & aAnimation, const AccelAndSpeed & aAccelAndSpeed, const PlayerData & aPlayerData) 
+        [](AnimatedSprite & /*aAnimation*/, const AccelAndSpeed & aAccelAndSpeed, const PlayerData & aPlayerData) 
         -> std::optional<PlayerAnimation>
         {
             //if (!isIdle(aPlayerData, aAccelAndSpeed)) 
@@ -91,7 +91,7 @@ AnimationStateMachine makePlayerAnimationStateMachine(const graphics::sprite::An
 
     result.at(PlayerAnimation::IdleRight) = {
         makeLoopingAnimation(idleSid, aAnimator, Mirroring::None),
-        [](AnimatedSprite & aAnimation, const AccelAndSpeed & aAccelAndSpeed, const PlayerData & aPlayerData) 
+        [](AnimatedSprite & /*aAnimation*/, const AccelAndSpeed & aAccelAndSpeed, const PlayerData & aPlayerData) 
         -> std::optional<PlayerAnimation>
         {
             //if (!isIdle(aPlayerData, aAccelAndSpeed)) 

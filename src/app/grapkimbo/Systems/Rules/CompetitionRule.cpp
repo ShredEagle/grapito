@@ -194,7 +194,7 @@ class WarmupPhase : public PhaseParent
 
     UpdateStatus update(
         const GrapitoTimer & aTimer,
-        const GameInputState & aInputs,
+        const GameInputState & /*aInputs*/,
         StateMachine & aStateMachine) override
     {
         updateImpl(aTimer.delta(), aStateMachine);
