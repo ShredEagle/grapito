@@ -4,11 +4,21 @@ on:
   workflow_call:
     inputs:
       os:
-        description: "Stringified JSON array listing the target runner OSes."
+        description: >-
+          Stringified JSON array listing the target runner OSes.
         default: >-
           ["ubuntu-latest", "windows-latest", "macos-11"]
         required: true
         type: string
+      deployrecipe_userchannel:
+        description: >-
+          Control execution of the deployment of Conan recipe, as well as user and channel.
+        default: "" # Default does not execute the step
+        type: string
+      #step_artifact:
+      #  description: "Control execution of the github upload of built artifact."
+      #  default: false
+      #  type: boolean
 
     secrets:
       SHREDROBOT_GITHUB_TOKEN:
@@ -30,8 +40,6 @@ env:
   # see: https://docs.conan.io/en/latest/reference/env_vars.html#conan-user-home-short
   # Disable short paths on Windows, which otherwise ruins the cache@v2 actions.
   CONAN_USER_HOME_SHORT: None
-  # Custom variables used by the workflow
-  CONAN_DEV_USER_CHANNEL: adnn/develop
 
 jobs:
   build_test_deploy:
@@ -138,10 +146,11 @@ jobs:
       #  # see: https://github.community/t/multiline-commands-on-windows-do-not-fail-if-individual-commands-fail/16753
       #  shell: cmd
 
-      - name: Deploy recipe (develop)
-        if: ${{ success() && contains('refs/heads/develop', github.ref) }}
+      - name: Deploy Conan recipe
+        #if: ${{ success() && contains('refs/heads/develop', github.ref) }}
+        if: ${{ success() && inputs.deployrecipe_userchannel }} != ""
         run: |
           conan user -p ${{ secrets.CONAN_USER_PASSWORD }} -r adnn ${{ secrets.CONAN_USER_NAME }}
-          conan copy --all ${{ steps.recipe.outputs.reference }} ${CONAN_DEV_USER_CHANNEL}
-          conan upload -r adnn --confirm ${{ steps.recipe.outputs.reference }}@${CONAN_DEV_USER_CHANNEL}
+          conan copy --all ${{ steps.recipe.outputs.reference }} ${{ inputs.deployrecipe_userchannel }}
+          conan upload -r adnn --confirm ${{ steps.recipe.outputs.reference }}@${{ inputs.deployrecipe_userchannel }}
         shell: bash
