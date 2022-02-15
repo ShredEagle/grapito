@@ -1,6 +1,16 @@
 name: Reusable main build workflow
 
-on: workflow_call
+on:
+  workflow_call:
+    secrets:
+      SHREDROBOT_GITHUB_TOKEN:
+        required: true
+      ACTION_CACHENAME:
+        required: true
+      CONAN_USER_NAME:
+        required: true
+      CONAN_USER_PASSWORD:
+        required: true
 
 jobs:
   build_test_deploy:
