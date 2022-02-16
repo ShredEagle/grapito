@@ -550,6 +550,7 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
         bodyBIt++;
 
         bodyA.box->shape.debugRender();
+        auto aabbA = bodyA.box->shape.getAABB();
 
         for (; bodyBIt != constructedBodies.end(); ++bodyBIt)
         {
@@ -560,7 +561,6 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
                 continue;
             }
 
-            auto aabbA = bodyA.box->shape.getAABB();
             auto aabbB = bodyB.box->shape.getAABB();
 
             //Basic SAT for AABB
