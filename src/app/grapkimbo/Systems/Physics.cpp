@@ -549,7 +549,9 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
         auto bodyBIt = bodyAIt;
         bodyBIt++;
 
+#if defined(SHRED_DEBUG_RENDER)
         bodyA.box->shape.debugRender();
+#endif
         auto aabbA = bodyA.box->shape.getAABB();
 
         for (; bodyBIt != constructedBodies.end(); ++bodyBIt)
@@ -732,7 +734,9 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
                         
                         contact,
                     });
+#if defined(SHRED_DEBUG_RENDER)
                     velocityConstraints.back().debugRender();
+#endif
                 }
             }
         }
@@ -887,7 +891,9 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
 
             constraint.cPlayer->entity->get<PlayerData>().wallClingFrameCounter = 0;
         }
+#if defined(SHRED_DEBUG_RENDER)
         constraint.cPlayer->box->shape.debugRender();
+#endif
     }
 
     //Position integration

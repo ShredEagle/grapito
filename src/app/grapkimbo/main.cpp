@@ -119,7 +119,7 @@ int main(int argc, const char ** argv)
         // Need to wait for the graphics logger initialized by ApplicationGlfw constructor.
         initializeLogging();
 
-#if not defined(BUILD_RELEASEMODE)
+#if defined(SHRED_DISPLAY_IMGUI)
         setupImGui(application);
         ad::grapito::ImguiState imguiState;
 #endif
@@ -157,7 +157,7 @@ int main(int argc, const char ** argv)
             timer.mark((float)glfwGetTime());
             if (topLevelFlow.update(timer, inputState) == UpdateStatus::SwapBuffers)
             {
-#if not defined(BUILD_RELEASEMODE)
+#if defined(SHRED_DISPLAY_IMGUI)
                 drawImGui(application, debugUI, imguiState);
                 renderImGui();
 #endif
