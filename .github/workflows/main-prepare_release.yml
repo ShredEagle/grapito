@@ -17,6 +17,7 @@ jobs:
         ["ubuntu-latest", "windows-latest"]
       deployrecipe_userchannel: adnn/develop
       step_artifacts: true
+      version: "3.2.1"
     secrets:
       SHREDROBOT_GITHUB_TOKEN: ${{ secrets.SHREDROBOT_GITHUB_TOKEN }}
       ACTION_CACHENAME: ${{ secrets.ACTION_CACHENAME }}
