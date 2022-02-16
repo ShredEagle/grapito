@@ -140,6 +140,10 @@ static void drawImGui(graphics::ApplicationGlfw & aApplication, DebugUI & aUI, I
         ImGui::SetNextWindowPos(ImVec2(main_viewport->WorkPos.x + 20 , main_viewport->WorkPos.y + main_viewport->WorkSize.y - 20), ImGuiCond_Once, ImVec2(0.f, 1.f));
         Begin("Player physic tuning", &showTuningWindow, ImGuiWindowFlags_AlwaysAutoResize);
 
+        Text("Physic iteration");
+        SliderInt("Velocity iterations count", &physic::gMaxVelocityConstraintIteration, 50, 200);
+        SliderInt("Position iterations count", &physic::gMaxPositionConstraintIteration, 50, 200);
+
         Text("Ground tuning Values");
         SliderFloat("Player ground max speed", &player::gGroundSpeed, 10., 70.);
         SliderInt("Player ground accel frames", &player::gGroundNumberOfAccelFrame, 2, 15);

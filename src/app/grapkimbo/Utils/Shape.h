@@ -29,7 +29,10 @@ public:
 
     Shape(math::Rectangle<float> aRectangle);
 
-    const Position2 getVertice(const int index) const;
+    inline const Position2 getVertice(const int index) const
+    {
+        return vertices.at(index);
+    };
     const Edge getEdge(const int index) const;
     const math::Rectangle<float> getAABB() const;
     void debugRender();

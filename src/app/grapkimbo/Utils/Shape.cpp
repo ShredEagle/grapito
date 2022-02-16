@@ -20,11 +20,6 @@ Shape::Shape(math::Rectangle<float> aRectangle) :
     }
 }
 
-const Position2 Shape::getVertice(const int index) const
-{
-    return vertices.at(index);
-}
-
 const Shape::Edge Shape::getEdge(const int index) const
 {
     Position2 origin = getVertice(index);
@@ -46,7 +41,7 @@ const math::Rectangle<float> Shape::getAABB() const
 
     for (size_t index = 0; index < mFaceCount; ++index)
     {
-        const auto pos = getVertice(index);
+        const Position2 pos = getVertice(index);
         const float x = pos.x();
         const float y = pos.y();
 

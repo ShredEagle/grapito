@@ -9,12 +9,13 @@
 #include <math/Vector.h>
 
 
-
 #if not defined(BUILD_RELEASEMODE)
 
 #define SHRED_ENABLE_STEPPING
 #define SHRED_ENABLE_KEYBOARD
 #define SHRED_DEV_ASSETS
+#define SHRED_DEBUG_RENDER 
+#define SHRED_DISPLAY_IMGUI
 
 #endif
 

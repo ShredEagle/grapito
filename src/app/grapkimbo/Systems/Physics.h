@@ -78,7 +78,7 @@ public:
     void update(const GrapitoTimer aTimer, const GameInputState & aInputState) override;
 
     //This is here to simplify the implementation of JointObserver
-    std::list<std::unique_ptr<JointConstraint>> jointConstraints;
+    std::vector<JointVariant> jointConstraints;
     std::list<ConstructedBody> constructedBodies;
 
 private:
@@ -99,6 +99,9 @@ private:
     std::vector<PlayerEnvironmentConstraint> playerConstraints;
 
     aunteater::EntityManager & mEntityManager;
+
+    //Timer variance mitigation
+    float mInvOldTimer;
 
     //Think of putting in place a pool_allocator from foonathan/memory of from boost
 };

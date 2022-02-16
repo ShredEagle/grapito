@@ -114,12 +114,12 @@ namespace physic
 {
     //This is the error that is allowed during physics resolution
     //This represent the separation that we expect at rest
-    constexpr float gLinearSlop = 0.0001f;
+    constexpr float gLinearSlop = 0.001f;
     constexpr float gAngularSlop = 2.f / 180 * math::pi<float>;
     constexpr float gBaumgarteFactor = 0.2f;
     constexpr float gMaxLinearCorrection = 0.2f;
-    constexpr int gMaxVelocityConstraintIteration = 50;
-    constexpr int gMaxPositionConstraintIteration = 50;
+    extern int gMaxVelocityConstraintIteration;
+    extern int gMaxPositionConstraintIteration;
 }
 
 
@@ -182,10 +182,7 @@ namespace render
 
 namespace rope
 {
-    inline std::vector<grapito::Position2> grappleVertices{
-        grapito::Position2{0.f, 0.f}, grapito::Position2{0.5f, 0.f},
-        grapito::Position2{0.7f, 0.2f}, grapito::Position2{0.55f, 0.55f},
-        grapito::Position2{0.2f, 0.7f}, grapito::Position2{0.f, 0.5f}};
+    extern const std::vector<grapito::Position2> grappleVertices;
     constexpr GLfloat ropeWidth = .2f;
     constexpr GLfloat ropeHalfwidth = ropeWidth / 2 ;
     constexpr GLfloat curveTension = 0.f; // I.e. Catmull Rom
