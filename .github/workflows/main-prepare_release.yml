@@ -29,7 +29,7 @@ jobs:
       # see: https://github.com/conan-io/conan-center-index/issues/8480
       os: >-
         ["ubuntu-latest", "windows-latest"]
-      deployrecipe_userchannel: adnn/develop
+      deployrecipe_userchannel: adnn/stable
       step_artifacts: true
       version: ${{ needs.extract_tag.outputs.version }}
     secrets:
