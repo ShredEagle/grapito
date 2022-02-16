@@ -15,14 +15,14 @@ on:
           Control execution of the deployment of Conan recipe, as well as user and channel.
         default: "" # Default does not execute the step
         type: string
+      step_artifacts:
+        description: "Control execution of the github upload of build artifacts."
+        default: false
+        type: boolean
       step_conancache:
         description: "Control execution of the cache action over Conan local packages."
         default: true
         type: boolean
-      #step_artifact:
-      #  description: "Control execution of the github upload of built artifact."
-      #  default: false
-      #  type: boolean
 
     secrets:
       SHREDROBOT_GITHUB_TOKEN:
@@ -159,3 +159,24 @@ jobs:
           conan copy --all ${{ steps.recipe.outputs.reference }} ${{ inputs.deployrecipe_userchannel }}
           conan upload -r adnn --confirm ${{ steps.recipe.outputs.reference }}@${{ inputs.deployrecipe_userchannel }}
         shell: bash
+
+      - name: Retrieve build artifacts
+        if: ${{ success() && inputs.step_artifacts }}
+        # This will execute the deploy() method of the Conan recipe, responsible for retrieval.
+        run: >
+          conan install
+          --profile:build build/${{ runner.os }}
+          --profile:host game
+          -o ${{ steps.recipe.outputs.name }}:build_tests=True
+          -o ${{ steps.recipe.outputs.name }}:build_devmode=${{ matrix.development_build && 'True' || 'False' }}
+          -s compiler.cppstd=${{ matrix.cppstd }}
+          ${{ steps.recipe.outputs.reference }}@
+        shell: bash
+
+      - name: Upload build artifacts
+        if: ${{ success() && inputs.step_artifacts }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ runner.os }}-${{ matrix.development_build && 'devbuild' || 'build' }}
+          path: bin/
+          retention-days: 1

@@ -1,0 +1,41 @@
+name: build-test-deployrecipe
+
+on:
+  push:
+    branches:
+      #TODO change to main
+      - topic/**
+
+jobs:
+  upload_artifacts:
+    name: build-test-deployrecipe-uploadartifacts
+    uses: ./.github/workflows/reusable-main_build.yml
+    with:
+      # Disable macos while spdlog crashes its compiler
+      # see: https://github.com/conan-io/conan-center-index/issues/8480
+      os: >-
+        ["ubuntu-latest", "windows-latest"]
+      deployrecipe_userchannel: adnn/develop
+      step_artifacts: true
+    secrets:
+      SHREDROBOT_GITHUB_TOKEN: ${{ secrets.SHREDROBOT_GITHUB_TOKEN }}
+      ACTION_CACHENAME: ${{ secrets.ACTION_CACHENAME }}
+      CONAN_USER_NAME: ${{ secrets.CONAN_USER_NAME }}
+      CONAN_USER_PASSWORD: ${{ secrets.CONAN_USER_PASSWORD }}
+      #see: https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/enabling-debug-logging#enabling-step-debug-logging
+
+  archive_release:
+    name: archive-release
+    needs: upload_artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: Windows-build
+
+      - name: List content
+        shell: bash
+        run: |
+          ls .
+          ls bin/
