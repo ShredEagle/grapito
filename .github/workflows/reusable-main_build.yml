@@ -52,7 +52,7 @@ jobs:
       matrix:
         #see: https://github.community/t/reusable-workflow-with-strategy-matrix/205676/2
         os: ${{fromJson(inputs.os)}}
-        development_build: ["True", "False"]
+        development_build: [true, false]
         cppstd: [20]
         include:
           - os: ubuntu-latest
@@ -119,7 +119,7 @@ jobs:
           --profile:build build/${{ runner.os }}
           --profile:host game
           -o ${{ steps.recipe.outputs.name }}:build_tests=True
-          -o ${{ steps.recipe.outputs.name }}:build_devmode=${{ matrix.development_build }}
+          -o ${{ steps.recipe.outputs.name }}:build_devmode=${{ matrix.development_build && 'True' || 'False' }}
           -s compiler.cppstd=${{ matrix.cppstd }}
           conan/ ${{ steps.recipe.outputs.reference }}@
 
@@ -130,7 +130,7 @@ jobs:
       #    --profile:build build/${{ runner.os }}
       #    --profile:host game
       #    -o ${{ steps.recipe.outputs.name }}:build_tests=True
-      #    -o ${{ steps.recipe.outputs.name }}:build_devmode=${{ matrix.development_build }}
+      #    -o ${{ steps.recipe.outputs.name }}:build_devmode=${{ matrix.development_build && 'True' || 'False' }}
       #    -s compiler.cppstd=${{ matrix.cppstd }}
       #    ${{ steps.recipe.outputs.reference }}@
       #
