@@ -118,8 +118,8 @@ namespace physic
     constexpr float gAngularSlop = 2.f / 180 * math::pi<float>;
     constexpr float gBaumgarteFactor = 0.2f;
     constexpr float gMaxLinearCorrection = 0.2f;
-    extern const int gMaxVelocityConstraintIteration;
-    extern const int gMaxPositionConstraintIteration;
+    extern int gMaxVelocityConstraintIteration;
+    extern int gMaxPositionConstraintIteration;
 }
 
 

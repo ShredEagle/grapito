@@ -85,8 +85,8 @@ namespace menu
 
 namespace physic
 {
-    const int gMaxVelocityConstraintIteration = 200;
-    const int gMaxPositionConstraintIteration = 200;
+    int gMaxVelocityConstraintIteration = 200;
+    int gMaxPositionConstraintIteration = 200;
 }
 
 
