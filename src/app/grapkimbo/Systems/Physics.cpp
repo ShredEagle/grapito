@@ -684,6 +684,7 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
             {
                 for (auto & contact : manifold.contacts)
                 {
+                    collisionPair.cold = false;
                     Vec2 tangent = {manifold.normal.y(), -manifold.normal.x()};
 
                     Vec2 rA = contact.contactPoint.as<math::Vec>() - (bodyRef->bodyPos->c.as<math::Vec>());
