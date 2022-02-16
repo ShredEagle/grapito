@@ -1,34 +1,38 @@
 #pragma once
 
-#include "Input.h"
+#include "../Input.h"
 
-#include <Components/Weight.h>
-#include <Components/ForceAndSpeed.h>
+#include "../commons.h"
+#include "../Components/PlayerData.h"
+#include "../Components/Body.h"
+#include "../Components/AccelAndSpeed.h"
 
 #include <aunteater/Archetype.h>
 #include <aunteater/FamilyHelp.h>
 #include <aunteater/System.h>
 
 namespace ad {
+namespace grapito
+{
 
-typedef aunteater::Archetype<Weight, ForceAndSpeed> Weightable;
+typedef aunteater::Archetype<AccelAndSpeed, Body> Massive;
+typedef aunteater::Archetype<AccelAndSpeed, PlayerData> Player;
 
-class Gravity : public aunteater::System
+class Gravity : public aunteater::System<GrapitoTimer, GameInputState>
 {
 
 public:
-    Gravity(aunteater::Engine & aEngine);
+    Gravity(aunteater::EntityManager & aEntityManager);
 
-    void update(const aunteater::Timer aTimer) override;
+    void update(const GrapitoTimer, const GameInputState &) override;
 
-    void loadInputState(const gameInputState & aInputState);
-
-    static constexpr double gAcceleration = 9.8;
+    static constexpr double gAcceleration = 10.;
 
 private:
-    aunteater::Engine & mEngine;
-    const aunteater::FamilyHelp<Weightable> mWeightables;
+    const aunteater::FamilyHelp<Massive> mMassives;
+    const aunteater::FamilyHelp<Player> mPlayers;
 
 };
 
+} // namespace grapito
 } // namespace ad

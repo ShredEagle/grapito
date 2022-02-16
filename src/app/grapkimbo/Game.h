@@ -1,27 +1,29 @@
 #pragma once
 
+#include "DebugUI.h"
 #include "Input.h"
-#include "Systems/Control.h"
 
-#include <aunteater/Engine.h>
+#include <aunteater/EntityManager.h>
 #include <aunteater/Timer.h>
+#include <aunteater/SystemManager.h>
 
-#include <engine/Application.h>
+#include <graphics/ApplicationGlfw.h>
 
 #include <iostream>
+#include <string>
 
 namespace ad {
-namespace grapkimbo {
+namespace grapito {
 
 class Game
 {
 public:
-    Game(aunteater::Engine & aEngine, Application & aApplication);
+    virtual ~Game() {};
+    virtual bool update(const GrapitoTimer & aTimer, const GameInputState & aInputState) = 0;
 
-    bool update(const aunteater::Timer & aTimer, gameInputState & aInputState);
-
-private:
-    aunteater::Engine & mEntityEngine;
-    std::shared_ptr<Control> mControlSystem;
+protected:
+    bool pause = false;
+    aunteater::EntityManager mEntityManager;
+    aunteater::SystemManager<GrapitoTimer, GameInputState> mSystemManager{mEntityManager};
 };
 }} // namespace ad::grapkimbo

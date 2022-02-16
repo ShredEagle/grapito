@@ -1,21 +1,34 @@
 #include "Gravity.h"
 
+#include "../Configuration.h"
+#include "../Timer.h"
+
 #include <math/Vector.h>
 
 namespace ad {
+namespace grapito
+{
 
-const math::Vec<2, double> gravityVector = {0., - Gravity::gAcceleration};
-
-Gravity::Gravity(aunteater::Engine & aEngine) :
-    mEngine(aEngine),
-    mWeightables(mEngine)
+Gravity::Gravity(aunteater::EntityManager & aEntityManager) :
+    mMassives(aEntityManager),
+    mPlayers(aEntityManager)
 {}
 
-void Gravity::update(const aunteater::Timer aTimer)
+void Gravity::update(const GrapitoTimer, const GameInputState &)
 {
-    for(auto weightable : mWeightables)
+    for(auto massive : mMassives)
     {
-        weightable->get<ForceAndSpeed>().forces.push_back(gravityVector * weightable->get<Weight>().weight);
+        if (massive->get<Body>().bodyType != BodyType_Static)
+        {
+            const Vec2 gravityVector = {0.f, - player::gAcceleration * massive->get<Body>().gravityScale};
+            massive->get<AccelAndSpeed>().accel += gravityVector;
+        }
+    }
+
+    for (auto player: mPlayers)
+    {
+        player->get<AccelAndSpeed>().speed.y() = std::max(player::gAirMaxFallSpeed, player->get<AccelAndSpeed>().speed.y());
     }
 }
+} // namespace grapito
 } // namespace ad
