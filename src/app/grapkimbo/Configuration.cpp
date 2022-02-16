@@ -124,6 +124,10 @@ namespace render
 namespace rope
 {
     const math::hdr::Rgba gColor{0.76f, 0.55f, 0.43f};
+    const std::vector<grapito::Position2> grappleVertices{
+        grapito::Position2{0.f, 0.f}, grapito::Position2{0.8f, 0.2f},
+        grapito::Position2{1.0f, 0.4f}, grapito::Position2{0.85f, 0.85f},
+        grapito::Position2{0.4f, 1.0f}, grapito::Position2{0.2f, 0.8f}};
 } // namespace rope
 
 

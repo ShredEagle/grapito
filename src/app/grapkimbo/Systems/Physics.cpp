@@ -830,6 +830,65 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
         }
     }
 
+    for (auto & constraint : playerConstraints)
+    {
+        Vec2 tangent = {-constraint.normal.y(), constraint.normal.x()};
+        float normalComponent = std::max(0.f, constraint.cPlayer->velocity->v.dot(-constraint.normal));
+        Vec2 normalSpeed = normalComponent * -constraint.normal;
+
+        //Since velocity integration is delayed after the physics system
+        //we need to check that the y velocity is greater than 0
+        //This indicates that the player is moving upwards and cannot be grounded for this frame
+        if (
+                -constraint.normal.dot(PlayerGroundedNormal) > PlayerGroundedSlopeDotValue
+                && normalComponent <= 0.f
+            )
+        {
+            if (
+                !(constraint.cPlayer->entity->get<PlayerData>().state & PlayerCollisionState_Grounded)
+               )
+            {
+                constraint.cPlayer->bodyPos->p += constraint.separation * constraint.normal;
+                constraint.cPlayer->velocity->v = constraint.cPlayer->velocity->v.dot(tangent) * tangent + normalSpeed;
+            }
+
+            //Set player as grounded
+            constraint.cPlayer->entity->get<PlayerData>().state |= PlayerCollisionState_Grounded;
+            constraint.cPlayer->entity->get<PlayerData>().state &= ~PlayerCollisionState_Jumping;
+        }
+        else if ((constraint.normal.dot(PlayerWalledNormal) < -PlayerWallSlopeDotValue ||
+            constraint.normal.dot(PlayerWalledNormal) > PlayerWallSlopeDotValue)
+            && normalComponent <= 0.f
+            )
+        {
+            if (
+                !(constraint.cPlayer->entity->get<PlayerData>().state & PlayerCollisionState_Walled)
+               )
+            {
+                constraint.cPlayer->bodyPos->p += constraint.separation * constraint.normal;
+                constraint.cPlayer->velocity->v = constraint.cPlayer->velocity->v.dot(tangent) * tangent + normalSpeed;
+            }
+
+            constraint.cPlayer->entity->get<PlayerData>().state |= PlayerCollisionState_Walled;
+            if (constraint.normal.x() > 0.f)
+            {
+                constraint.cPlayer->entity->get<PlayerData>().state |= PlayerCollisionState_WalledRight;
+            }
+            else
+            {
+                constraint.cPlayer->entity->get<PlayerData>().state |= PlayerCollisionState_WalledLeft;
+            }
+        }
+        else
+        {
+            constraint.cPlayer->bodyPos->p += constraint.separation * constraint.normal;
+            constraint.cPlayer->velocity->v = constraint.cPlayer->velocity->v.dot(tangent) * tangent + normalSpeed;
+
+            constraint.cPlayer->entity->get<PlayerData>().wallClingFrameCounter = 0;
+        }
+        constraint.cPlayer->box->shape.debugRender();
+    }
+
     //Position integration
     for (size_t i = 0; i < velocities.size(); i++)
     {
@@ -861,42 +920,6 @@ void Physics::update(const GrapitoTimer aTimer, const GameInputState &)
         constraint.angleBaseA = constraint.bodyPosA->a;
         constraint.angleBaseB = constraint.bodyPosB->a;
     }
-
-    for (auto & constraint : playerConstraints)
-    {
-        constraint.cPlayer->bodyPos->p += constraint.separation * constraint.normal;
-        Vec2 tangent = {-constraint.normal.y(), constraint.normal.x()};
-        float normalComponent = std::max(0.f, constraint.cPlayer->velocity->v.dot(-constraint.normal));
-        Vec2 normalSpeed = normalComponent * -constraint.normal;
-        constraint.cPlayer->velocity->v = constraint.cPlayer->velocity->v.dot(tangent) * tangent + normalSpeed;
-
-        if (-constraint.normal.dot(PlayerGroundedNormal) > PlayerGroundedSlopeDotValue)
-        {
-            //Set player as grounded
-            constraint.cPlayer->entity->get<PlayerData>().state |= PlayerCollisionState_Grounded;
-            constraint.cPlayer->entity->get<PlayerData>().state &= ~PlayerCollisionState_Jumping;
-        }
-        else if (constraint.normal.dot(PlayerWalledNormal) < -PlayerWallSlopeDotValue ||
-            constraint.normal.dot(PlayerWalledNormal) > PlayerWallSlopeDotValue)
-        {
-            constraint.cPlayer->entity->get<PlayerData>().state |= PlayerCollisionState_Walled;
-            if (constraint.normal.x() > 0.)
-            {
-                constraint.cPlayer->entity->get<PlayerData>().state |= PlayerCollisionState_WalledRight;
-            }
-            else
-            {
-                constraint.cPlayer->entity->get<PlayerData>().state |= PlayerCollisionState_WalledLeft;
-            }
-        }
-        else
-        {
-            constraint.cPlayer->entity->get<PlayerData>().wallClingFrameCounter = 0;
-        }
-        constraint.cPlayer->box->shape.debugRender();
-    }
-
-
     for (int i = 0; i < physic::gMaxPositionConstraintIteration; i++)
     {
         bool jointOkay = true;

@@ -27,7 +27,7 @@ void AccelSolver::update(const GrapitoTimer aTimer, const GameInputState &)
         Position & pos = accelerated->get<Position>();
 
         pos.oldPosition = pos.position;
-        //pos.position += aas.speed * aTimer.delta() + .5f * aas.accel * aTimer.delta() * aTimer.delta();
+
         aas.oldSpeed = aas.speed;
         aas.speed += aas.accel * aTimer.delta();
 
