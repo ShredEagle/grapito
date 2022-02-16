@@ -1,4 +1,4 @@
-name: build-test
+name: Topical build-test
 
 on:
   push:

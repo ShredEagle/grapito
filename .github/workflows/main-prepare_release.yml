@@ -1,4 +1,4 @@
-name: build-test-deployrecipe
+name: Prepare release
 
 on:
   push:
@@ -22,20 +22,31 @@ jobs:
       ACTION_CACHENAME: ${{ secrets.ACTION_CACHENAME }}
       CONAN_USER_NAME: ${{ secrets.CONAN_USER_NAME }}
       CONAN_USER_PASSWORD: ${{ secrets.CONAN_USER_PASSWORD }}
-      #see: https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/enabling-debug-logging#enabling-step-debug-logging
 
   archive_release:
     name: archive-release
     needs: upload_artifacts
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout assets
+        uses: actions/checkout@v2
+        with:
+          repository: ShredEagle/grapito_media
+          ref: 'main'
+          token: ${{ secrets.SHREDROBOT_GITHUB_TOKEN }}
+
       - name: Download build artifacts
         uses: actions/download-artifact@v2
         with:
           name: Windows-build
 
-      - name: List content
+      - name: Prepare the release archive
         shell: bash
         run: |
-          ls .
-          ls bin/
+          zip -r grapito.zip grapkimbo.exe assets/
+
+      - name: Upload the release archive
+        uses: actions/upload-artifact@v2
+        with:
+          name: grapito-release
+          path: grapito.zip
