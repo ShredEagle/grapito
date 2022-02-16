@@ -20,18 +20,6 @@ jobs:
           echo "Extracted version ${tag_version}."
           echo "::set-output name=version::${tag_version}"
 
-  verify_branch:
-    name: verify-branch
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Test branch name
-        run: |
-          echo $(git branch --show-current)
-      - run: |
-          branch=$(git branch --show-current)
-          if [[ "$branch" = "master" ]]; then exit -1; fi
-
   upload_artifacts:
     name: build-test-deployrecipe-uploadartifacts
     needs: extract_tag
