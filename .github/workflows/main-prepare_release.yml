@@ -2,13 +2,27 @@ name: Prepare release
 
 on:
   push:
-    branches:
-      #TODO change to main
-      - topic/**
+    tags:
+      - v*.*.*
 
 jobs:
+  extract_tag:
+    name: extract-tag
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.tag.outputs.version }}
+    steps:
+      - name: Extract version from tag
+        id: tag
+        shell: bash
+        run: |
+          tag_version=$(echo "${{ github.ref_name }}" | cut -c2-)
+          echo "Extracted version ${tag_version}."
+          echo "::set-output name=version::${tag_version}"
+
   upload_artifacts:
     name: build-test-deployrecipe-uploadartifacts
+    needs: extract_tag
     uses: ./.github/workflows/reusable-main_build.yml
     with:
       # Disable macos while spdlog crashes its compiler
@@ -17,7 +31,7 @@ jobs:
         ["ubuntu-latest", "windows-latest"]
       deployrecipe_userchannel: adnn/develop
       step_artifacts: true
-      version: "3.2.1"
+      version: ${{ needs.extract_tag.outputs.version }}
     secrets:
       SHREDROBOT_GITHUB_TOKEN: ${{ secrets.SHREDROBOT_GITHUB_TOKEN }}
       ACTION_CACHENAME: ${{ secrets.ACTION_CACHENAME }}
