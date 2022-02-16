@@ -40,7 +40,9 @@ jobs:
 
   archive_release:
     name: archive-release
-    needs: upload_artifacts
+    needs:
+      - extract_tag
+      - upload_artifacts
     runs-on: ubuntu-latest
     steps:
       - name: Checkout assets
@@ -58,10 +60,10 @@ jobs:
       - name: Prepare the release archive
         shell: bash
         run: |
-          zip -r grapito.zip grapkimbo.exe assets/
+          zip -r grapito-${{ needs.extract_tag.outputs.version }}.zip grapkimbo.exe assets/
 
       - name: Upload the release archive
         uses: actions/upload-artifact@v2
         with:
           name: grapito-release
-          path: grapito.zip
+          path: grapito-${{ needs.extract_tag.outputs.version }}.zip
