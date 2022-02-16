@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(Grapito VERSION "${BUILD_VERSION}")
+# NOTE: Cannot set `VERSION ${BUILD_VERSION}` here, because the conanuser_config
+# file defining the variable has not yet been included
+project(Grapito)
 
 include(cmake/include.cmake)
 
