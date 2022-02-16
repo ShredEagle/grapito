@@ -1,4 +1,4 @@
-name: build-test-deployrecipe
+name: Develop build-test-deployrecipe
 
 on:
   push:
