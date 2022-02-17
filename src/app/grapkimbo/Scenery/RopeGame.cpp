@@ -51,13 +51,6 @@ namespace grapito {
 
 StringId soundId_MusicSid = handy::internalizeString("bgmusic");
 
-aunteater::Entity setupPlayer(const Controller aController)
-{
-    return makePlayingPlayer(0, aController, math::sdr::gCyan);
-
-}
-
-
 RopeGame::RopeGame(std::shared_ptr<Context> aContext,
                    std::shared_ptr<graphics::AppInterface> aAppInterface,
                    GameMode aGameMode,
@@ -65,6 +58,8 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     GameScene{std::move(aContext), std::move(aAppInterface)},
     mGameMode{aGameMode}
 {
+    //Cleanup player list context to make sure its empty
+    mContext->mPlayerList.clear();
     mContext->mPlayerList.addPlayer(aController, PlayerJoinState_Queued);
 
     // See `makeDirectControllable()` to instantiate a direct control guide.
