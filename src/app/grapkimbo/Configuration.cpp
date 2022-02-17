@@ -103,6 +103,7 @@ namespace player
     const float gGrappleFriction = 0.5f;
     float gGrappleDistanceJointFactor = 1.5f;
     float gRopeDistanceJointFactor = 1.1f;
+    float gGrappleBaseImpulse = 100.f;
 
     const math::sdr::Rgb gBlueColor{63, 63, 116};
     const math::sdr::Rgb gGreenColor{52, 212, 136};

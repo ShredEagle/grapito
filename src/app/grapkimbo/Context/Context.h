@@ -15,7 +15,7 @@ namespace grapito {
 /// It centralizes different objects that would otherwise easily become globals.
 struct Context
 {
-    Context(const filesystem::path aRoot);
+    Context(const filesystem::path aRoot, bool nosound, bool nobgmusic);
 
     /// \brief Get the localized string for `aStringId`, in the active language of `locale` data member.
     const std::string & translate(StringId aStringId) const;
@@ -24,23 +24,38 @@ struct Context
 
     const arte::AnimationSpriteSheet & loadAnimationSpriteSheet(const filesystem::path &aAsset);
     const graphics::sprite::SingleLoad & loadSingleSprite(const filesystem::path &aAsset);
-    const OggSoundData & loadOggSoundData(const filesystem::path &aAsset, bool streamed);
+    void loadOggSoundData(const filesystem::path &aAsset, bool streamed);
 
     Resources resources;
     Locale locale;
-    SoundManager mSoundManager;
+    std::unique_ptr<SoundManager> mSoundManager;
 
     PlayerList mPlayerList;
+    
+    //Command line switch
+    bool nosound;
+    bool nobgmusic;
 };
 
 
 //
 // Implementations
 //
-inline Context::Context(const filesystem::path aRoot) :
+inline Context::Context(const filesystem::path aRoot, bool nosound, bool nobgmusic) :
     resources{{std::move(aRoot)}},
-    locale{resources.locator.pathFor("localization/strings.json")}
-{}
+    locale{resources.locator.pathFor("localization/strings.json")},
+    nosound{nosound},
+    nobgmusic{nobgmusic}
+{
+    if (!nosound)
+    {
+        mSoundManager = std::make_unique<SoundManager>();
+    }
+    else
+    {
+        mSoundManager = nullptr;
+    }
+}
 
 
 inline const std::string & Context::translate(StringId aStringId) const
@@ -67,11 +82,13 @@ inline const graphics::sprite::SingleLoad & Context::loadSingleSprite(const file
 }
 
 
-inline const OggSoundData & Context::loadOggSoundData(const filesystem::path &aAsset, bool streamed)
+inline void Context::loadOggSoundData(const filesystem::path &aAsset, bool streamed)
 {
-    const OggSoundData & data = resources.oggSoundFiles.load(aAsset, resources.locator, streamed);
-    mSoundManager.storeDataInLoadedSound(data);
-    return data;
+    if (!nosound)
+    {
+        const OggSoundData & data = resources.oggSoundFiles.load(aAsset, resources.locator, streamed);
+        mSoundManager->storeDataInLoadedSound(data);
+    }
 }
 
 

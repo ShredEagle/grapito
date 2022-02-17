@@ -44,6 +44,8 @@ po::variables_map handleCommandLine(int argc, const char ** argv)
         ("language",    po::value<std::string>(),   "Override auto-detected language.")
         ("skip_splash", po::bool_switch(),          "Skip splash screens.")
         ("windowed",    po::bool_switch(),          "Launch application windowed instead of fullscreen.")
+        ("nosound",    po::bool_switch(),          "Launch application with no sound (mostly for profiling)")
+        ("nobgmusic",    po::bool_switch(),          "Launch application with no background music")
     ;
 
     po::variables_map vm;
@@ -64,7 +66,7 @@ std::shared_ptr<Context> initializeContext(const po::variables_map & aArguments)
     std::shared_ptr<Context> context =
 #if defined(SHRED_DEV_ASSETS)
             std::make_shared<Context>(gRepositoryRoot
-                                      / filesystem::path{"../grapito_media/assets/"});
+                                      / filesystem::path{"../grapito_media/assets/"}, aArguments["nosound"].as<bool>(), aArguments["nobgmusic"].as<bool>());
 #else
             std::make_shared<Context>(platform::getExecutableFilePath().parent_path()
                                       / filesystem::path{"assets/"});

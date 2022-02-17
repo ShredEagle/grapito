@@ -166,7 +166,8 @@ static void drawImGui(graphics::ApplicationGlfw & aApplication, DebugUI & aUI, I
         Text("Grapple tuning values");
         SliderFloat("Rope distance joint factor", &player::gRopeDistanceJointFactor, 1.1f, 1.3f);
         SliderFloat("gGrappleReleaseImpulse", &player::gGrappleReleaseImpulse, 15.f, 50.f);
-        SliderFloat("gGrappleReleaseImpulse", &player::gGrappleSwingSpeed, 2.f, 10.f);
+        SliderFloat("gGrappleSwingSpeed", &player::gGrappleSwingSpeed, 2.f, 10.f);
+        SliderFloat("gGrapple base impulse", &player::gGrappleBaseImpulse, 2.f, 10.f);
 
         End();
 

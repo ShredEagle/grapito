@@ -88,7 +88,10 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     mSystemManager.add<SegmentStacker>(0.f); // after the camera is repositioned
     mSystemManager.add<DelayDeleter>();
 
-    auto soundSystem = mSystemManager.add<SoundSystem>(mContext->mSoundManager);
+    if (!mContext->nosound)
+    {
+        mSystemManager.add<SoundSystem>(*mContext->mSoundManager);
+    }
 
     auto renderToScreen = std::make_shared<RenderToScreen>(mEntityManager, mAppInterface, *this); 
     // Done after CameraGuidedControl, to avoid having two camera guides on the frame a player is killed.
@@ -187,7 +190,10 @@ std::pair<TransitionProgress, UpdateStatus> RopeGame::enter(
             const GameInputState &,
             const StateMachine &)
 {
-    mBgMusicSource = mContext->mSoundManager.playSound(soundId_MusicSid, {.gain = 0.2f, .looping = AL_TRUE});
+    if (!mContext->nosound && !mContext->nobgmusic)
+    {
+        mBgMusicSource = mContext->mSoundManager->playSound(soundId_MusicSid, {.gain = 0.2f, .looping = AL_TRUE});
+    }
     return {TransitionProgress::Complete, UpdateStatus::KeepFrame};
 }
 
@@ -196,7 +202,10 @@ std::pair<TransitionProgress, UpdateStatus> RopeGame::exit(
             const GameInputState &,
             const StateMachine &)
 {
-    mContext->mSoundManager.stopSound(mBgMusicSource);
+    if (!mContext->nosound && !mContext->nobgmusic)
+    {
+        mContext->mSoundManager->stopSound(mBgMusicSource);
+    }
     return {TransitionProgress::Complete, UpdateStatus::KeepFrame};
 }
 
