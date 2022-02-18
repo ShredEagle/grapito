@@ -187,7 +187,7 @@ std::pair<TransitionProgress, UpdateStatus> RopeGame::enter(
 {
     if (!mContext->nosound && !mContext->nobgmusic)
     {
-        mBgMusicSource = mContext->mSoundManager->playSound(soundId_MusicSid, {.gain = 0.2f, .looping = AL_TRUE});
+        mBgMusicSource = mContext->mSoundManager->playSound(soundId_MusicSid, {.gain = 0.3f, .looping = AL_TRUE});
     }
     return {TransitionProgress::Complete, UpdateStatus::KeepFrame};
 }

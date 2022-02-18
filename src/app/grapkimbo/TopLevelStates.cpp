@@ -117,7 +117,7 @@ std::shared_ptr<MenuScene> setupMainMenu(const std::shared_ptr<Context> & aConte
         [aContext]()
         {
                         aContext->loadOggSoundData("sounds/menumusic.ogg", false);
-                        aContext->mSoundManager->playSound(soundId_MenuMusicSid, {.gain = 0.7f, .storeInManager = true});
+                        aContext->mSoundManager->playSound(soundId_MenuMusicSid, {.gain = 0.3f, .looping = AL_TRUE, .storeInManager = true});
         },
         [aContext]()
         {
