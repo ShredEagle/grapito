@@ -69,7 +69,7 @@ std::shared_ptr<Context> initializeContext(const po::variables_map & aArguments)
                                       / filesystem::path{"../grapito_media/assets/"}, aArguments["nosound"].as<bool>(), aArguments["nobgmusic"].as<bool>());
 #else
             std::make_shared<Context>(platform::getExecutableFilePath().parent_path()
-                                      / filesystem::path{"assets/"});
+                                      / filesystem::path{"assets/"}, aArguments["nosound"].as<bool>(), aArguments["nobgmusic"].as<bool>());
 #endif
         // language
         std::string language;
