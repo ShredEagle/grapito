@@ -111,7 +111,10 @@ std::shared_ptr<MenuScene> setupMainMenu(const std::shared_ptr<Context> & aConte
             },
         },
         aContext->pathFor(menu::gFont),
-        std::move(aAppInterface));
+        std::move(aAppInterface),
+        nullptr,
+        std::optional<arte::ImageRgba>{aContext->pathFor("images/backgrounds/menu.png")}
+        );
 }
 
 

@@ -105,7 +105,7 @@ namespace menu
     extern const GLfloat gTextHeight;
     extern const float gButtonSpacing;
     extern const math::sdr::Rgb gButtonColor;
-    extern const math::sdr::Rgb gSelectedColor;
+    extern const std::vector<math::sdr::Rgb> gSelectedColor;
     extern const float gTransitionDuration;
 }
 

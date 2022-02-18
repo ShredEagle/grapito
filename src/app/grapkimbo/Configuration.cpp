@@ -70,25 +70,29 @@ namespace hud
 }
 
 
-namespace menu
-{
-    const int gBlurringPasses = 6;
-    const float gViewedHeight = 1000.f;
-    const char * gFont = "fonts/Titillium_Web/TitilliumWeb-Bold.ttf";
-    const math::sdr::Rgba gTextColor = math::sdr::gWhite;
-    const GLfloat gTextHeight = 0.65f * gButtonSize.height();
-    const float gButtonSpacing = 100.f;
-    const math::sdr::Rgb gButtonColor{ 120, 100, 110 };
-    const math::sdr::Rgb gSelectedColor{ 190, 190, 80 };
-    const float gTransitionDuration = 0.275f;
-} // namespace menu
-
 namespace physic
 {
     int gMaxVelocityConstraintIteration = 200;
     int gMaxPositionConstraintIteration = 200;
 }
 
+namespace menu
+{
+    const int gBlurringPasses = 6;
+    const float gViewedHeight = 1000.f;
+    const char* gFont = "fonts/Titillium_Web/TitilliumWeb-Bold.ttf";
+    const math::sdr::Rgba gTextColor = math::sdr::gWhite;
+    const GLfloat gTextHeight = 0.65f * gButtonSize.height();
+    const float gButtonSpacing = 100.f;
+    const math::sdr::Rgb gButtonColor{ 120, 100, 110 };
+    const std::vector<math::sdr::Rgb> gSelectedColor{
+        player::gBlueColor,
+        player::gGreenColor,
+        player::gRedColor,
+        player::gYellowColor
+    };
+    const float gTransitionDuration = 0.275f;
+} // namespace menu
 
 namespace player
 {
@@ -112,7 +116,6 @@ namespace player
     const float gDoubleJumpCooldown = 15;
     const float gGrappleAnchoredCooldown = 30;
 } // namespace player
-
 
 namespace render
 {

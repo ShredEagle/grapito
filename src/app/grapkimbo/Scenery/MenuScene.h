@@ -7,6 +7,8 @@
 #include "../Utils/RenderEffect.h"
 
 #include <graphics/AppInterface.h>
+#include <graphics/SpriteLoading.h>
+#include <graphics/Spriting.h>
 #include <graphics/Texting.h>
 #include <graphics/TrivialShaping.h>
 
@@ -58,7 +60,8 @@ public:
     MenuScene(Menu aMenu,
               const filesystem::path & aFontPath,
               std::shared_ptr<graphics::AppInterface> aAppInterface,
-              std::shared_ptr<const GameScene> aGameScene = nullptr);
+              std::shared_ptr<const GameScene> aGameScene = nullptr,
+              std::optional<arte::ImageRgba> aImage = std::nullopt);
 
     UpdateStatus update(
         const GrapitoTimer & aTimer,
@@ -104,6 +107,12 @@ private:
         GrapitoTimer::Value_t,
         math::None,
         math::ease::SmoothStep> mMenuXPosition;
+    std::optional<graphics::LoadedSprite> mLoadedBackground;
+    std::optional<arte::ImageRgba> mImageBackground;
+    graphics::sprite::LoadedAtlas mAtlas;
+    graphics::Spriting mSpriting;
+
+    math::Position<2, int> mBackgroundPlacement{ 0, 0 };
 }; 
 
 
