@@ -27,6 +27,7 @@ const StringId menu_exit_sid        = handy::internalizeString("menu_exit");
 const StringId menu_resume_sid      = handy::internalizeString("menu_resume");
 const StringId menu_restart_sid     = handy::internalizeString("menu_restart");
 const StringId menu_main_sid        = handy::internalizeString("menu_main");
+StringId soundId_MenuMusicSid     = handy::internalizeString("menumusic");
 
 
 std::shared_ptr<SplashScene> setupSplashScreen(math::Size<2, int> aResolution,
@@ -82,28 +83,28 @@ std::shared_ptr<MenuScene> setupMainMenu(const std::shared_ptr<Context> & aConte
                                          std::shared_ptr<graphics::AppInterface> aAppInterface)
 {
     return std::make_shared<MenuScene>(
-        Menu {
+        Menu{
             std::vector<UiButton>{
                 { aContext->translate(menu_multiplayer_sid),
-                [aContext](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface, const Controller aController)
+                [aContext](StateMachine& aMachine, std::shared_ptr<graphics::AppInterface>& aAppInterface, const Controller aController)
                     {
                         aMachine.emplaceState<RopeGame>(aContext, aAppInterface, GameMode::Multiplayer, aController);
                     }
                 },
                 { aContext->translate(menu_freesolo_sid),
-                [aContext](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface, const Controller aController)
+                [aContext](StateMachine& aMachine, std::shared_ptr<graphics::AppInterface>& aAppInterface, const Controller aController)
                     {
                         aMachine.emplaceState<RopeGame>(aContext, aAppInterface, GameMode::Freesolo, aController);
                     }
                 },
                 { aContext->translate(menu_floorislava_sid),
-                [aContext](StateMachine & aMachine, std::shared_ptr<graphics::AppInterface> & aAppInterface, const Controller aController)
+                [aContext](StateMachine& aMachine, std::shared_ptr<graphics::AppInterface>& aAppInterface, const Controller aController)
                     {
                         aMachine.emplaceState<RopeGame>(aContext, aAppInterface, GameMode::FloorIsLava, aController);
                     }
                 },
                 { aContext->translate(menu_exit_sid),
-                  [](StateMachine & /*aMachine*/, std::shared_ptr<graphics::AppInterface> & aAppInterface, const Controller)
+                  [](StateMachine& /*aMachine*/, std::shared_ptr<graphics::AppInterface>& aAppInterface, const Controller)
                     {
                         aAppInterface->requestCloseApplication();
                     }
@@ -111,7 +112,17 @@ std::shared_ptr<MenuScene> setupMainMenu(const std::shared_ptr<Context> & aConte
             },
         },
         aContext->pathFor(menu::gFont),
-        std::move(aAppInterface));
+        std::move(aAppInterface),
+        nullptr,
+        [aContext]()
+        {
+                        aContext->loadOggSoundData("sounds/menumusic.ogg", false);
+                        aContext->mSoundManager->playSound(soundId_MenuMusicSid, {.gain = 0.7f, .storeInManager = true});
+        },
+        [aContext]()
+        {
+            aContext->mSoundManager->stopSound(soundId_MenuMusicSid);
+        });
 }
 
 

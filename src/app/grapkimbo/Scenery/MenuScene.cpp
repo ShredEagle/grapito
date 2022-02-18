@@ -30,10 +30,14 @@ auto makeInterpolation(std::shared_ptr<graphics::AppInterface> aAppInterface, GL
 MenuScene::MenuScene(Menu aMenu,
                      const filesystem::path & aFontPath,
                      std::shared_ptr<graphics::AppInterface> aAppInterface,
-                     std::shared_ptr<const GameScene> aGameScene) :
+                     std::shared_ptr<const GameScene> aGameScene,
+                     std::function<void()> aEnterFunc,
+                     std::function<void()> aExitFunc) :
     mMenu{std::move(aMenu)},
     mAppInterface{std::move(aAppInterface)},
     mOptionalGameScene{aGameScene},
+    mOptionalEnter{aEnterFunc},
+    mOptionalExit{aExitFunc},
     mRenderEffect{mAppInterface},
     mShaping{mAppInterface->getFramebufferSize()},
     mTexting{aFontPath, menu::gTextHeight, menu::gViewedHeight, mAppInterface},
@@ -80,12 +84,14 @@ UpdateStatus MenuScene::update(
 
 void MenuScene::beforeEnter()
 {
+    mOptionalEnter();
     mMenuXPosition = makeInterpolation(mAppInterface, 0.5f, -0.5f);
 }
 
 
 void MenuScene::beforeExit()
 {
+    mOptionalExit();
     mMenuXPosition = makeInterpolation(mAppInterface, -0.5f, -1.5f);
 }
 
