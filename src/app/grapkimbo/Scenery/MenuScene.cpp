@@ -32,7 +32,8 @@ MenuScene::MenuScene(Menu aMenu,
                      std::shared_ptr<graphics::AppInterface> aAppInterface,
                      std::shared_ptr<const GameScene> aGameScene,
                      std::function<void()> aEnterFunc,
-                     std::function<void()> aExitFunc) :
+                     std::function<void()> aExitFunc,
+                     std::optional<arte::ImageRgba> aImage) :
     mMenu{std::move(aMenu)},
     mAppInterface{std::move(aAppInterface)},
     mOptionalGameScene{aGameScene},
@@ -42,7 +43,9 @@ MenuScene::MenuScene(Menu aMenu,
     mShaping{mAppInterface->getFramebufferSize()},
     mTexting{aFontPath, menu::gTextHeight, menu::gViewedHeight, mAppInterface},
     // Useless, it is setup before transitions. But there is no default ctor.
-    mMenuXPosition{makeInterpolation(mAppInterface, 0.f, 0.f)} 
+    mMenuXPosition{makeInterpolation(mAppInterface, 0.f, 0.f)},
+    mImageBackground{aImage},
+    mSpriting{}
 {
     updateMenuBuffers();
 }
@@ -77,13 +80,19 @@ UpdateStatus MenuScene::update(
         // TODO get a better understanding of the error scenario.
         return UpdateStatus::KeepFrame;
     }
-
+    
     renderMenu();
     return UpdateStatus::SwapBuffers;
 }
 
 void MenuScene::beforeEnter()
 {
+    setViewedRectangle(
+        mSpriting,
+        math::Rectangle<GLfloat>{
+        math::Position<2, GLfloat>::Zero(),
+            static_cast<math::Size<2, GLfloat>>(mAppInterface->getWindowSize())
+    });
     mOptionalEnter();
     mMenuXPosition = makeInterpolation(mAppInterface, 0.5f, -0.5f);
 }
@@ -135,9 +144,12 @@ void MenuScene::updateMenuBuffers()
         debugDrawer->drawOutline(
             mTexting.getStringBounds(mMenu[buttonId].mText, buttonCenter + centeringPenOffset));
 
-        rectangles.push_back({
-            Rectangle{ buttonCenter , menu::gButtonSize }.centered(),
-            buttonId == mMenu.mSelected ? menu::gSelectedColor : menu::gButtonColor });
+        if (mMenu.mSelected == buttonId)
+        {
+            rectangles.push_back({
+                Rectangle{ buttonCenter , menu::gButtonSize }.centered(),
+                menu::gSelectedColor[buttonId % menu::gSelectedColor.size()]});
+        }
         buttonY -= incrementY;
     }
 
@@ -149,6 +161,24 @@ void MenuScene::updateMenuBuffers()
 void MenuScene::renderMenu()
 {
     graphics::AppInterface::clear();
+
+    if (mImageBackground)
+    {
+        if (!mLoadedBackground)
+        {
+            std::tie(mAtlas, mLoadedBackground) = graphics::sprite::load(*mImageBackground);
+            mBackgroundPlacement = (- (*mImageBackground).dimensions() / 2).as<math::Position>();
+        }
+        mSpriting.updateInstances(
+            std::array<graphics::Spriting::Instance, 1>{
+            graphics::Spriting::Instance{
+                {0.f, 0.f},
+                *mLoadedBackground,
+                1.f,
+                graphics::Mirroring::FlipVertical}
+        });
+        mSpriting.render(mAtlas);
+    }
 
     if (mOptionalGameScene)
     {
