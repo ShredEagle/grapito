@@ -7,6 +7,8 @@
 #include "../Utils/RenderEffect.h"
 
 #include <graphics/AppInterface.h>
+#include <graphics/SpriteLoading.h>
+#include <graphics/Spriting.h>
 #include <graphics/Texting.h>
 #include <graphics/TrivialShaping.h>
 
@@ -58,7 +60,10 @@ public:
     MenuScene(Menu aMenu,
               const filesystem::path & aFontPath,
               std::shared_ptr<graphics::AppInterface> aAppInterface,
-              std::shared_ptr<const GameScene> aGameScene = nullptr);
+              std::shared_ptr<const GameScene> aGameScene = nullptr,
+              std::function<void ()> aEnterFunc = []() {},
+              std::function<void ()> aExitFunc = []() {},
+              std::optional<arte::ImageRgba> aImage = std::nullopt);
 
     UpdateStatus update(
         const GrapitoTimer & aTimer,
@@ -95,7 +100,9 @@ private:
     // * it avoids having to dig in the StateMachine for the state of interest
     // * it ensures the game is kept alive at least until the menu is completely done (transitions included)
     // There is however a risk of circular keep-alive if the game later keeps a shared_ptr to the menu.
-    std::shared_ptr<const GameScene> mOptionalGameScene; 
+    std::shared_ptr<const GameScene> mOptionalGameScene;
+    std::function<void()> mOptionalEnter;
+    std::function<void()> mOptionalExit;
     RenderEffect mRenderEffect;
     graphics::TrivialShaping mShaping;
     graphics::Texting mTexting;
@@ -104,6 +111,12 @@ private:
         GrapitoTimer::Value_t,
         math::None,
         math::ease::SmoothStep> mMenuXPosition;
+    std::optional<graphics::LoadedSprite> mLoadedBackground;
+    std::optional<arte::ImageRgba> mImageBackground;
+    graphics::sprite::LoadedAtlas mAtlas;
+    graphics::Spriting mSpriting;
+
+    math::Position<2, int> mBackgroundPlacement{ 0, 0 };
 }; 
 
 

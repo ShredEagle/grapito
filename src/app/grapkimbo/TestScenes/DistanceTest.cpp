@@ -95,7 +95,7 @@ DistanceTest::DistanceTest(graphics::ApplicationGlfw & aApplication, DebugUI & a
     mUI{aUI}
 {
     mSystemManager.add<Gravity>();
-    mSystemManager.add<Control>(std::make_shared<Context>(""));
+    mSystemManager.add<Control>(std::make_shared<Context>("", true, true));
     mSystemManager.add<AccelSolver>();
     mSystemManager.add<Physics>();
     mSystemManager.add<RenderWorld>(aApplication.getAppInterface()); 

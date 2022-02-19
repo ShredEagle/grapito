@@ -105,7 +105,7 @@ namespace menu
     extern const GLfloat gTextHeight;
     extern const float gButtonSpacing;
     extern const math::sdr::Rgb gButtonColor;
-    extern const math::sdr::Rgb gSelectedColor;
+    extern const std::vector<math::sdr::Rgb> gSelectedColor;
     extern const float gTransitionDuration;
 }
 
@@ -144,12 +144,12 @@ namespace player
     inline int gAirNumberOfAccelFrame = 10;
     inline int gAirNumberOfSlowFrame = 10;
     inline float gAirMaxFallSpeed = -50.f; // m/s
-    inline float gJumpImpulse = 24.f; // m/s
+    inline float gJumpImpulse = 25.f; // m/s
     inline float gGrappleReleaseImpulse = 24.f; // m/s
     inline float gGrappleSwingSpeed = 5.f; // m/s
     inline float gWallFriction = 4.f; // m/s
     inline float gDoubleJumpFactor = 1.3f; // m/s
-    inline float gGrappleBaseImpulse = 70.f;
+    extern float gGrappleBaseImpulse;
     extern const float gGrappleFriction;
     extern float gRopeDistanceJointFactor;
     extern float gGrappleDistanceJointFactor;

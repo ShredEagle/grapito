@@ -24,7 +24,7 @@ public:
     GameScene(std::shared_ptr<Context> aContext,
               std::shared_ptr<graphics::AppInterface> aAppInterface);
 
-    ~GameScene();
+    ~GameScene() = default;
 
     /// \brief Complete update step, including rendering.
     UpdateStatus update(

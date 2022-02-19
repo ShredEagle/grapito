@@ -51,13 +51,6 @@ namespace grapito {
 
 StringId soundId_MusicSid = handy::internalizeString("bgmusic");
 
-aunteater::Entity setupPlayer(const Controller aController)
-{
-    return makePlayingPlayer(0, aController, math::sdr::gCyan);
-
-}
-
-
 RopeGame::RopeGame(std::shared_ptr<Context> aContext,
                    std::shared_ptr<graphics::AppInterface> aAppInterface,
                    GameMode aGameMode,
@@ -65,6 +58,8 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     GameScene{std::move(aContext), std::move(aAppInterface)},
     mGameMode{aGameMode}
 {
+    //Cleanup player list context to make sure its empty
+    mContext->mPlayerList.clear();
     mContext->mPlayerList.addPlayer(aController, PlayerJoinState_Queued);
 
     // See `makeDirectControllable()` to instantiate a direct control guide.
@@ -88,7 +83,10 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
     mSystemManager.add<SegmentStacker>(0.f); // after the camera is repositioned
     mSystemManager.add<DelayDeleter>();
 
-    auto soundSystem = mSystemManager.add<SoundSystem>(mContext->mSoundManager);
+    if (!mContext->nosound)
+    {
+        mSystemManager.add<SoundSystem>(*mContext->mSoundManager);
+    }
 
     auto renderToScreen = std::make_shared<RenderToScreen>(mEntityManager, mAppInterface, *this); 
     // Done after CameraGuidedControl, to avoid having two camera guides on the frame a player is killed.
@@ -187,7 +185,10 @@ std::pair<TransitionProgress, UpdateStatus> RopeGame::enter(
             const GameInputState &,
             const StateMachine &)
 {
-    mBgMusicSource = mContext->mSoundManager.playSound(soundId_MusicSid, {.gain = 0.2f, .looping = AL_TRUE});
+    if (!mContext->nosound && !mContext->nobgmusic)
+    {
+        mBgMusicSource = mContext->mSoundManager->playSound(soundId_MusicSid, {.gain = 0.3f, .looping = AL_TRUE});
+    }
     return {TransitionProgress::Complete, UpdateStatus::KeepFrame};
 }
 
@@ -196,7 +197,10 @@ std::pair<TransitionProgress, UpdateStatus> RopeGame::exit(
             const GameInputState &,
             const StateMachine &)
 {
-    mContext->mSoundManager.stopSound(mBgMusicSource);
+    if (!mContext->nosound && !mContext->nobgmusic)
+    {
+        mContext->mSoundManager->stopSound(mBgMusicSource);
+    }
     return {TransitionProgress::Complete, UpdateStatus::KeepFrame};
 }
 
