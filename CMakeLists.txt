@@ -10,6 +10,6 @@ cmc_include_conan_configuration()
 
 option(BUILD_Grapito_DEVMODE
        "Build Grapito application in development mode, not for public release."
-       TRUE)
+       FALSE)
 
 add_subdirectory(src)

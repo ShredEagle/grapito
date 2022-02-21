@@ -240,6 +240,7 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
         PRIVATE "-fsanitize=address" "-fsanitize=leak" "-fsanitize=undefined")
 endif()
 
+# TODO Change to positive definition of BUILD_DEVMODE macro instead.
 if(NOT BUILD_Grapito_DEVMODE)
     target_compile_definitions(${TARGET_NAME} PRIVATE BUILD_RELEASEMODE)
 endif()

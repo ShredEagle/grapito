@@ -18,9 +18,9 @@ namespace ad {
 namespace grapito {
 
 
-auto makeInterpolation(std::shared_ptr<graphics::AppInterface> aAppInterface, GLfloat aStartFactor, GLfloat aEndFactor)
+auto makeInterpolation(GLfloat aStartFactor, GLfloat aEndFactor)
 {
-    GLfloat viewedWidth_w = math::getRatio<float>(aAppInterface->getFramebufferSize()) * menu::gViewedHeight;
+    GLfloat viewedWidth_w = math::getRatio<float>(game::gAppResolution) * menu::gViewedHeight;
     return math::makeInterpolation<math::None, math::ease::SmoothStep>(
         aStartFactor * viewedWidth_w,
         aEndFactor   * viewedWidth_w,
@@ -40,10 +40,10 @@ MenuScene::MenuScene(Menu aMenu,
     mOptionalEnter{aEnterFunc},
     mOptionalExit{aExitFunc},
     mRenderEffect{mAppInterface},
-    mShaping{mAppInterface->getFramebufferSize()},
+    mShaping{game::gAppResolution},
     mTexting{aFontPath, menu::gTextHeight, menu::gViewedHeight, mAppInterface},
     // Useless, it is setup before transitions. But there is no default ctor.
-    mMenuXPosition{makeInterpolation(mAppInterface, 0.f, 0.f)},
+    mMenuXPosition{makeInterpolation(0.f, 0.f)},
     mImageBackground{aImage},
     mSpriting{}
 {
@@ -85,29 +85,30 @@ UpdateStatus MenuScene::update(
     return UpdateStatus::SwapBuffers;
 }
 
+
 void MenuScene::beforeEnter()
 {
     setViewedRectangle(
         mSpriting,
         math::Rectangle<GLfloat>{
-        math::Position<2, GLfloat>::Zero(),
-            static_cast<math::Size<2, GLfloat>>(mAppInterface->getWindowSize())
+            math::Position<2, GLfloat>::Zero(),
+            static_cast<math::Size<2, GLfloat>>(game::gAppResolution)
     });
     mOptionalEnter();
-    mMenuXPosition = makeInterpolation(mAppInterface, 0.5f, -0.5f);
+    mMenuXPosition = makeInterpolation(0.5f, -0.5f);
 }
 
 
 void MenuScene::beforeExit()
 {
     mOptionalExit();
-    mMenuXPosition = makeInterpolation(mAppInterface, -0.5f, -1.5f);
+    mMenuXPosition = makeInterpolation(-0.5f, -1.5f);
 }
 
 
 std::pair<TransitionProgress, UpdateStatus> MenuScene::scrollMenu(const GrapitoTimer & aTimer)
 {
-    Rectangle viewed = graphics::getViewRectangle(mAppInterface->getFramebufferSize(), menu::gViewedHeight);
+    Rectangle viewed = graphics::getViewRectangle(game::gAppResolution, menu::gViewedHeight);
     viewed.origin().x() = mMenuXPosition.advance(aTimer.delta());
     setViewedRectangle(mShaping, viewed);
     // Uncomment to also scroll the text
