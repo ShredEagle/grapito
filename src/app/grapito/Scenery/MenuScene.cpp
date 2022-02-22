@@ -45,10 +45,28 @@ MenuScene::MenuScene(Menu aMenu,
     mTexting{aFontPath, menu::gTextHeight, menu::gViewedHeight, mAppInterface},
     // Useless, it is setup before transitions. But there is no default ctor.
     mMenuXPosition{makeInterpolation(0.f, 0.f)},
-    mImageBackground{aImage},
     mSpriting{}
 {
     updateMenuBuffers();
+
+    if (aImage)
+    {
+        graphics::sprite::SingleLoad load = graphics::sprite::load(*aImage);
+        mSpriting.updateInstances(
+            std::array<graphics::Spriting::Instance, 1>{
+            graphics::Spriting::Instance{
+                {0.f, 0.f},
+                load.second,
+                1.f
+            }
+        });
+        mAtlas = std::move(load.first);
+    }
+    else
+    {
+        // Non-allocated texture, yet it can be bound so we can call Spriting::render() unconditionnaly
+        mAtlas.texture = std::make_shared<graphics::Texture>(GL_TEXTURE_2D);
+    } 
 }
 
 
@@ -176,23 +194,7 @@ void MenuScene::renderMenu()
 {
     graphics::AppInterface::clear();
 
-    if (mImageBackground)
-    {
-        if (!mLoadedBackground)
-        {
-            std::tie(mAtlas, mLoadedBackground) = graphics::sprite::load(*mImageBackground);
-            mBackgroundPlacement = (- (*mImageBackground).dimensions() / 2).as<math::Position>();
-        }
-        mSpriting.updateInstances(
-            std::array<graphics::Spriting::Instance, 1>{
-            graphics::Spriting::Instance{
-                {0.f, 0.f},
-                *mLoadedBackground,
-                1.f,
-                graphics::Mirroring::FlipVertical}
-        });
-        mSpriting.render(mAtlas);
-    }
+    mSpriting.render(mAtlas);
 
     if (mOptionalGameScene)
     {

@@ -113,12 +113,8 @@ private:
         GrapitoTimer::Value_t,
         math::None,
         math::ease::SmoothStep> mMenuXPosition;
-    std::optional<graphics::LoadedSprite> mLoadedBackground;
-    std::optional<arte::ImageRgba> mImageBackground;
     graphics::sprite::LoadedAtlas mAtlas;
     graphics::Spriting mSpriting;
-
-    math::Position<2, int> mBackgroundPlacement{ 0, 0 };
 }; 
 
 

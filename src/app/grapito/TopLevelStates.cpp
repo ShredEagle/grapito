@@ -130,7 +130,8 @@ std::shared_ptr<MenuScene> setupMainMenu(const std::shared_ptr<Context> & aConte
                 aContext->mSoundManager->stopSound(soundId_MenuMusicSid);
             }
         },
-        std::optional<arte::ImageRgba>{aContext->pathFor("images/backgrounds/menu.png")});
+        arte::ImageRgba{aContext->pathFor("images/backgrounds/menu.png"),
+                        arte::ImageOrientation::InvertVerticalAxis});
 }
 
 
