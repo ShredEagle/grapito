@@ -21,6 +21,7 @@
 
 #include <graphics/ApplicationGlfw.h>
 
+#include <platform/Gui.h>
 #include <platform/Locale.h>
 #include <platform/Path.h>
 
@@ -92,6 +93,16 @@ int main(int argc, const char ** argv)
     try
     {
         initializeLogging();
+    }
+    catch(const std::exception & e)
+    {
+        platform::showErrorBox(e.what(), "Error " + getVersionedName());
+        std::cerr << "Could not initialize logging, due to exception:\n" << e.what();
+        std::exit(EXIT_FAILURE);
+    }
+
+    try
+    {
         ADLOG(info)("Launching {}.", getVersionedName());
 
         po::variables_map arguments = handleCommandLine(argc, argv);
@@ -171,9 +182,8 @@ int main(int argc, const char ** argv)
     }
     catch(const std::exception & e)
     {
-        std::cerr << "Exception:\n"
-                  << e.what()
-                  << std::endl;
+        platform::showErrorBox(e.what(), "Error " + getVersionedName());
+        ADLOG(critical)("Terminating due to exception:\n{}", e.what());
         std::exit(EXIT_FAILURE);
     }
 
