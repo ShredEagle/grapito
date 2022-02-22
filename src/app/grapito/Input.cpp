@@ -122,12 +122,6 @@ int toGlfwJoystickId(Controller aController)
 }
 
 
-constexpr bool isGamepad(Controller aController)
-{
-    return aController != Controller::KeyboardMouse;
-}
-
-
 bool isGamepadPresent(Controller aController)
 {
     assert(aController >= Controller::Gamepad_0);

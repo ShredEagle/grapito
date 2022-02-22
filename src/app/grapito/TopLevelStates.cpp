@@ -27,7 +27,7 @@ const StringId menu_exit_sid        = handy::internalizeString("menu_exit");
 const StringId menu_resume_sid      = handy::internalizeString("menu_resume");
 const StringId menu_restart_sid     = handy::internalizeString("menu_restart");
 const StringId menu_main_sid        = handy::internalizeString("menu_main");
-StringId soundId_MenuMusicSid     = handy::internalizeString("menumusic");
+const StringId soundId_MenuMusicSid = handy::internalizeString("menumusic");
 
 
 std::shared_ptr<SplashScene> setupSplashScreen(math::Size<2, int> aResolution,
@@ -116,14 +116,22 @@ std::shared_ptr<MenuScene> setupMainMenu(const std::shared_ptr<Context> & aConte
         nullptr,
         [aContext]()
         {
-                        aContext->loadOggSoundData("sounds/menumusic.ogg", false);
-                        aContext->mSoundManager->playSound(soundId_MenuMusicSid, {.gain = 0.3f, .looping = AL_TRUE, .storeInManager = true});
+            if (!aContext->nosound && !aContext->nobgmusic)
+            {
+                aContext->loadOggSoundData("sounds/menumusic.ogg", false);
+                aContext->mSoundManager->playSound(soundId_MenuMusicSid,
+                                                   {.gain = 0.3f, .looping = AL_TRUE, .storeInManager = true});
+            }
         },
         [aContext]()
         {
-            aContext->mSoundManager->stopSound(soundId_MenuMusicSid);
+            if (!aContext->nosound && !aContext->nobgmusic)
+            {
+                aContext->mSoundManager->stopSound(soundId_MenuMusicSid);
+            }
         },
-        std::optional<arte::ImageRgba>{aContext->pathFor("images/backgrounds/menu.png")});
+        arte::ImageRgba{aContext->pathFor("images/backgrounds/menu.png"),
+                        arte::ImageOrientation::InvertVerticalAxis});
 }
 
 
@@ -133,7 +141,7 @@ std::shared_ptr<MenuScene> setupPauseMenu(
     std::shared_ptr<const GameScene> aGameScene,
     GameMode aGameMode)
 {
-    return std::make_shared<MenuScene>(
+    auto menu = std::make_shared<MenuScene>(
         Menu {
             std::vector<UiButton>{
                 { aContext->translate(menu_resume_sid),
@@ -163,6 +171,10 @@ std::shared_ptr<MenuScene> setupPauseMenu(
         aAppInterface,
         std::move(aGameScene)
     );
+    menu->addSelfPopCommand(Start);
+    menu->addSelfPopCommand(Grapple);
+
+    return menu;
 }
 
 

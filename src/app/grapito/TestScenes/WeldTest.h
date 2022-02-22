@@ -15,14 +15,14 @@
 namespace ad {
 namespace grapito {
 
-class DistanceTest : public Game
+class WeldTest : public Game
 {
 public:
-    DistanceTest(graphics::ApplicationGlfw & aApplication, DebugUI & aUI);
-    ~DistanceTest() = default;
+    WeldTest(graphics::ApplicationGlfw & aApplication, DebugUI & aUI);
+    ~WeldTest() = default;
 
     bool update(const GrapitoTimer & aTimer, const GameInputState & aInputState);
 private:
     DebugUI & mUI;
 };
-}} // namespace ad::grapkimbo
+}} // namespace ad::grapito

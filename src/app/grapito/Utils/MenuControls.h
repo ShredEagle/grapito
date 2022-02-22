@@ -1,8 +1,7 @@
 #pragma once
 
 
-#include "commons.h"
-
+#include "../commons.h"
 #include "../Input.h"
 
 
@@ -26,6 +25,11 @@ inline Controller isPositiveEdge(const GameInputState & aInputs, Command aButton
     for (auto controller : gMenuControllers)
     {
         if (aInputs.asButton(controller, aButton, aAxis, aSign, controller::gDeadzone) == PositiveEdge)
+        {
+            return controller;
+        }
+        // Additionally try the button if it exists on the gamepad (above only tried the axis on the gamepad)
+        if (isGamepad(controller) && aInputs.get(controller)[aButton].positiveEdge())
         {
             return controller;
         }

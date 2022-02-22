@@ -26,4 +26,4 @@ protected:
     aunteater::EntityManager mEntityManager;
     aunteater::SystemManager<GrapitoTimer, GameInputState> mSystemManager{mEntityManager};
 };
-}} // namespace ad::grapkimbo
+}} // namespace ad::grapito

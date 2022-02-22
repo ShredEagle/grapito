@@ -23,6 +23,7 @@ namespace background
 namespace camera
 {
     const float gCompetitorGuideFadeOutDuration = 1.5f;
+    const float gLateralLimitMargin = 1.f;
 } // namespace camera
 
 
@@ -92,17 +93,21 @@ namespace menu
         player::gYellowColor
     };
     const float gTransitionDuration = 0.275f;
+
+    const Position2 gVersionPosition{550.f, -450.f};
+    const math::sdr::Rgba gVersionTextColor{170, 170, 170};
 } // namespace menu
 
 namespace player
 {
+    const math::Size<2, float> gSize = math::Size<2, float>{5.6f, 7.5f} / gGigantismDampeningFactor;
+    
     const int gAirborneJumps = 1;
-    const Vec2 gCameraGuideOffset{0.f, 15.f};
+    const Vec2 gCameraGuideOffset{gSize.width() / 2.f, 15.f};
     const float gCameraGuideWeight = 1.f;
     const std::array<float, 2> gCameraLimits{7.f, -2.5f};
     const float gDetachSpeedBoostFactor = 1.5f;
     const float gIdleSpeedLimit = 1;
-    const math::Size<2, float> gSize = math::Size<2, float>{5.6f, 7.5f} / gGigantismDampeningFactor;
     const math::Size<2, float> gGrappleSpritePixelSize{30.f, 30.f};
     const float gGrappleFriction = 0.5f;
     float gGrappleDistanceJointFactor = 1.5f;

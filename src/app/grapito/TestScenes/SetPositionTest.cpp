@@ -92,5 +92,5 @@ bool SetPositionTest::update(const GrapitoTimer & aTimer, const GameInputState &
     return ! mSystemManager.isPaused();
 }
 
-} // namespace grapkimbo
+} // namespace grapito
 } // namespace ad
