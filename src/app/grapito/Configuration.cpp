@@ -23,6 +23,7 @@ namespace background
 namespace camera
 {
     const float gCompetitorGuideFadeOutDuration = 1.5f;
+    const float gLateralLimitMargin = 1.f;
 } // namespace camera
 
 

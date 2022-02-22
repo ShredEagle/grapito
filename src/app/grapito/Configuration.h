@@ -37,6 +37,9 @@ namespace camera
 
     // When a competitor is eliminated, the duration for its camera guide fade out.
     extern const float gCompetitorGuideFadeOutDuration;
+
+    // How much margin to take on left/right level limits
+    extern const float gLateralLimitMargin;
 }
 
 
