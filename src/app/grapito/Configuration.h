@@ -37,6 +37,9 @@ namespace camera
 
     // When a competitor is eliminated, the duration for its camera guide fade out.
     extern const float gCompetitorGuideFadeOutDuration;
+
+    // How much margin to take on left/right level limits
+    extern const float gLateralLimitMargin;
 }
 
 
@@ -107,6 +110,9 @@ namespace menu
     extern const math::sdr::Rgb gButtonColor;
     extern const std::vector<math::sdr::Rgb> gSelectedColor;
     extern const float gTransitionDuration;
+
+    extern const Position2 gVersionPosition;
+    extern const math::sdr::Rgba gVersionTextColor;
 }
 
 
@@ -125,13 +131,14 @@ namespace physic
 
 namespace player
 {
+    extern const math::Size<2, float> gSize;
+
     extern const int gAirborneJumps;
     extern const Vec2 gCameraGuideOffset;
     extern const float gCameraGuideWeight;
     extern const std::array<float, 2> gCameraLimits;
     extern const float gDetachSpeedBoostFactor;
     constexpr float gMass = 80.f;
-    extern const math::Size<2, float> gSize;
     extern const math::Size<2, float> gGrappleSpritePixelSize;
     constexpr float gInitialRopeLength = 3.f;
     constexpr math::Radian<float> gInitialAngle{math::pi<float>/3.f};

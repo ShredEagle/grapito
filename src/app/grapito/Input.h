@@ -159,7 +159,10 @@ constexpr std::array<Controller, gControllerCount> gAllControllers{
     Controller::Gamepad_3
 };
 
-constexpr bool isGamepad(Controller aController);
+constexpr bool isGamepad(Controller aController)
+{
+    return aController != Controller::KeyboardMouse;
+}
 
 bool isGamepadPresent(Controller aController);
 

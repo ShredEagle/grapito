@@ -1,13 +1,13 @@
-#include "FrictionTest.h"
+#include "CollisionTest.h"
 
 #include "Entities.h"
-#include "Systems/Physics.h"
 #include "commons.h"
 #include "Configuration.h"
 #include "Input.h"
 #include "../Timer.h"
 
 #include <Systems/RenderWorld.h>
+#include <Systems/Physics.h>
 #include <Systems/Control.h>
 #include <Systems/Gravity.h>
 #include <Systems/AccelSolver.h>
@@ -19,52 +19,58 @@
 #include <Components/Position.h>
 #include <Components/VisualRectangle.h>
 
-#include "Context/Context.h"
+#include <Context/Context.h>
 
 #include <aunteater/UpdateTiming.h>
 #include <aunteater/Entity.h>
 
+#include <cmath>
 #include <iostream>
 
 namespace ad {
 
 namespace grapito {
 
-void createFrictionTest(float height, float friction, aunteater::EntityManager & mEntityManager)
+void createStaticPlatform(Position2 pos, math::Size<2, float> size, float angle, aunteater::EntityManager & mEntityManager)
 {
     mEntityManager.addEntity(
             aunteater::Entity()
-            .add<Position>(Position2{3.f, height}, math::Size<2, float>{2.f, 2.f})
-            .add<Body>(
-                math::Rectangle<float>{{0.f, 0.f}, {2.f, 2.f}},
-                BodyType_Dynamic,
-                ShapeType_Hull,
-                CollisionType_Static_Env,
-                1.,
-                0.,
-                friction
-            )
-            .add<VisualRectangle>(math::sdr::gCyan)
-            .add<AccelAndSpeed>(Vec2{2.0f, 0.f}, 0.f)
-            );
-
-    mEntityManager.addEntity(
-            aunteater::Entity()
             .add<AccelAndSpeed>()
-            .add<Position>(Position2{1.f, height - 1.1f}, math::Size<2, float>{12.f, 1.f})
+            .add<Position>(pos, size)
             .add<VisualRectangle>(math::sdr::gCyan)
             .add<Body>(
-                math::Rectangle<float>{{0.f, 0.f}, {12.f, 1.f}},
+                math::Rectangle<float>{{0.f, 0.f}, size},
                 BodyType_Static,
                 ShapeType_Hull,
-                CollisionType_Moving_Env,
+                CollisionType_Static_Env,
                 0.,
-                0.,
-                friction
+                angle,
+                .9
             ));
 }
 
-FrictionTest::FrictionTest(graphics::ApplicationGlfw & aApplication, DebugUI & aUI) :
+void createBox(Position2 pos, math::Size<2, float> size, float angularSpeed, aunteater::EntityManager & mEntityManager)
+{
+    mEntityManager.addEntity(
+            aunteater::Entity()
+            .add<Position>(pos, size)
+            .add<Body>(
+                math::Rectangle<float>{{0.f, 0.f}, size},
+                BodyType_Dynamic,
+                ShapeType_Hull,
+                CollisionType_Moving_Env,
+                1.,
+                1.,
+                .5
+            )
+            .add<VisualRectangle>(math::sdr::gCyan)
+            .add<AccelAndSpeed>(Vec2{0.f, 0.f}, angularSpeed)
+            );
+}
+
+// This test is basically succesful given our current
+// contact solving. It cannot converge without contact persistence.
+CollisionTest::CollisionTest(graphics::ApplicationGlfw & aApplication, DebugUI & aUI) :
     mUI{aUI}
 {
     mSystemManager.add<Gravity>();
@@ -75,12 +81,19 @@ FrictionTest::FrictionTest(graphics::ApplicationGlfw & aApplication, DebugUI & a
 
     mEntityManager.addEntity(makeCamera({10.f, 2.f}));
 
-    createFrictionTest(5.f, 0.2f, mEntityManager);
-    createFrictionTest(0.f, 0.75f, mEntityManager);
-    createFrictionTest(-5.f, 1.f, mEntityManager);
+    createStaticPlatform({-2.f, 0.f}, {15.f, 2.f}, -math::pi<float> / 3.f, mEntityManager);
+    createStaticPlatform({6.f, 0.f}, {15.f, 2.f}, -2.f * math::pi<float> / 3.f, mEntityManager);
+
+    for (int i = 0; i < 6; ++i)
+    {
+        for (int j = 0; j < 10; ++j)
+        {
+            createBox({5.f + i * 1.5f, 5.f + j * 1.5f}, {0.5f, 0.5f}, (j + i * 5) % 3, mEntityManager);
+        }
+    }
 }
 
-bool FrictionTest::update(const GrapitoTimer & aTimer, const GameInputState & aInputState)
+bool CollisionTest::update(const GrapitoTimer & aTimer, const GameInputState & aInputState)
 {
     aunteater::UpdateTiming<GrapitoTimer, GameInputState> timings;
     InputState pauseInput = aInputState.get(Controller::KeyboardMouse)[Command::Pause];
@@ -104,5 +117,5 @@ bool FrictionTest::update(const GrapitoTimer & aTimer, const GameInputState & aI
     return ! mSystemManager.isPaused();
 }
 
-} // namespace grapkimbo
+} // namespace grapito
 } // namespace ad

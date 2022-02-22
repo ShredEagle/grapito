@@ -71,7 +71,7 @@ createStackTwo(aunteater::EntityManager & aEntityManager, float baseHeight)
 
     segment.push_back(aEntityManager.addEntity(makeAnchor({-gLevelHalfWidth + 10.f, gJumpHeight * 3 - gPlatformHeight + baseHeight}, {gLevelHalfWidth * 2 - 20.f, gPlatformHeight})));
 
-    aEntityManager.addEntity(makeAnchor({-gLevelHalfWidth + 14.f, gJumpHeight * 3 + baseHeight}, {gPlatformHeight, gJumpHeight * 9.f}));
+    segment.push_back(aEntityManager.addEntity(makeAnchor({-gLevelHalfWidth + 14.f, gJumpHeight * 3 + baseHeight}, {gPlatformHeight, gJumpHeight * 9.f})));
     segment.push_back(aEntityManager.addEntity(makeAnchor({gLevelHalfWidth - 14.f - gPlatformHeight, gJumpHeight * 3 + baseHeight}, {gPlatformHeight, gJumpHeight * 9.f})));
 
     segment.push_back(aEntityManager.addEntity(makeAnchor({-gLevelHalfWidth + 22.f, gJumpHeight * 6 + baseHeight}, {gPlatformHeight, gJumpHeight * 9.f})));
@@ -145,7 +145,7 @@ createStackFive(aunteater::EntityManager & aEntityManager, float baseHeight)
 {
     std::vector<aunteater::weak_entity> segment;
 
-    aEntityManager.addEntity(makeWall({-gLevelHalfWidth - gWallWidth, 0.f + baseHeight}));
+    segment.push_back(aEntityManager.addEntity(makeWall({-gLevelHalfWidth - gWallWidth, 0.f + baseHeight})));
     segment.push_back(aEntityManager.addEntity(makeWall({gLevelHalfWidth, 0.f + baseHeight})));
 
     segment.push_back(aEntityManager.addEntity(makeAnchor({-gLevelHalfWidth, gJumpHeight * 3.f - gPlatformHeight + baseHeight}, {28.f, gPlatformHeight})));

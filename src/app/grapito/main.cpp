@@ -21,6 +21,7 @@
 
 #include <graphics/ApplicationGlfw.h>
 
+#include <platform/Gui.h>
 #include <platform/Locale.h>
 #include <platform/Path.h>
 
@@ -42,10 +43,10 @@ po::variables_map handleCommandLine(int argc, const char ** argv)
         ("help", "Produce help message.")
         ("console",     po::bool_switch(),          "Attach a console for output streams.")
         ("language",    po::value<std::string>(),   "Override auto-detected language.")
-        ("skip_splash", po::bool_switch(),          "Skip splash screens.")
+        ("skip-splash", po::bool_switch(),          "Skip splash screens.")
         ("windowed",    po::bool_switch(),          "Launch application windowed instead of fullscreen.")
-        ("nosound",    po::bool_switch(),          "Launch application with no sound (mostly for profiling)")
-        ("nobgmusic",    po::bool_switch(),          "Launch application with no background music")
+        ("nosound",     po::bool_switch(),          "Launch application with no sound (mostly for profiling)")
+        ("nobgmusic",   po::bool_switch(),          "Launch application with no background music")
     ;
 
     po::variables_map vm;
@@ -91,6 +92,19 @@ int main(int argc, const char ** argv)
 {
     try
     {
+        initializeLogging();
+    }
+    catch(const std::exception & e)
+    {
+        platform::showErrorBox(e.what(), "Error " + getVersionedName());
+        std::cerr << "Could not initialize logging, due to exception:\n" << e.what();
+        std::exit(EXIT_FAILURE);
+    }
+
+    try
+    {
+        ADLOG(info)("Launching {}.", getVersionedName());
+
         po::variables_map arguments = handleCommandLine(argc, argv);
 
         if (arguments.count("help"))
@@ -115,11 +129,9 @@ int main(int argc, const char ** argv)
 #endif
 
         ad::graphics::ApplicationGlfw application(
-            "grapkimbo",
+            getVersionedName(),
             game::gAppResolution.width(), game::gAppResolution.height(),
             applicationFlags);
-        // Need to wait for the graphics logger initialized by ApplicationGlfw constructor.
-        initializeLogging();
 
 #if defined(SHRED_DISPLAY_IMGUI)
         setupImGui(application);
@@ -141,7 +153,7 @@ int main(int argc, const char ** argv)
         // The next state in the stack is the main menu
         topLevelFlow.pushState(setupMainMenu(context, application.getAppInterface()));
 
-        if (!arguments["skip_splash"].as<bool>())
+        if (!arguments["skip-splash"].as<bool>())
         {
             // note: coordinates are used for window proportions
             topLevelFlow.pushState(setupSplashScreen(application.getAppInterface()->getWindowSize(),
@@ -170,9 +182,8 @@ int main(int argc, const char ** argv)
     }
     catch(const std::exception & e)
     {
-        std::cerr << "Exception:\n"
-                  << e.what()
-                  << std::endl;
+        platform::showErrorBox(e.what(), "Error " + getVersionedName());
+        ADLOG(critical)("Terminating due to exception:\n{}", e.what());
         std::exit(EXIT_FAILURE);
     }
 

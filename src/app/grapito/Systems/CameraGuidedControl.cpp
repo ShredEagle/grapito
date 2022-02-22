@@ -1,6 +1,7 @@
 #include "CameraGuidedControl.h"
 
 #include "../Configuration.h"
+#include "../LevelStacks.h"
 #include "../Timer.h"
 
 #include "../Utils/Camera.h"
@@ -44,6 +45,19 @@ Position2 placeCamera(Position2 aAveragePosition, float aLowerLimit, float aUppe
     if(viewed.yMax() < aUpperLimit)
     {
         viewed.y() += (aUpperLimit - viewed.yMax());
+    }
+
+    // Hardcoded lateral limits, so both sides of the stack are always visibles
+    // TODO This has to be made more generic (potentially entity based) if we want to
+    // introduce "horizontal" levels.
+    const float lateralLimit = gLevelHalfWidth + camera::gLateralLimitMargin;
+    if(viewed.xMin() > -lateralLimit)
+    {
+        viewed.x() -= (viewed.xMin() + lateralLimit);
+    }
+    else if(viewed.xMax() < lateralLimit)
+    {
+        viewed.x() += (lateralLimit - viewed.xMax());
     }
 
     return viewed.center();
