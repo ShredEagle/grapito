@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include <cstring>
+
 
 @AUTOGEN_DISCLAIMER@
 
