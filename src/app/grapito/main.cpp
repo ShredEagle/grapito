@@ -44,8 +44,8 @@ po::variables_map handleCommandLine(int argc, const char ** argv)
         ("language",    po::value<std::string>(),   "Override auto-detected language.")
         ("skip-splash", po::bool_switch(),          "Skip splash screens.")
         ("windowed",    po::bool_switch(),          "Launch application windowed instead of fullscreen.")
-        ("nosound",    po::bool_switch(),           "Launch application with no sound (mostly for profiling)")
-        ("nobgmusic",    po::bool_switch(),         "Launch application with no background music")
+        ("nosound",     po::bool_switch(),          "Launch application with no sound (mostly for profiling)")
+        ("nobgmusic",   po::bool_switch(),          "Launch application with no background music")
     ;
 
     po::variables_map vm;
