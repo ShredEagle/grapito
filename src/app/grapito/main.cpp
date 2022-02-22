@@ -42,10 +42,10 @@ po::variables_map handleCommandLine(int argc, const char ** argv)
         ("help", "Produce help message.")
         ("console",     po::bool_switch(),          "Attach a console for output streams.")
         ("language",    po::value<std::string>(),   "Override auto-detected language.")
-        ("skip_splash", po::bool_switch(),          "Skip splash screens.")
+        ("skip-splash", po::bool_switch(),          "Skip splash screens.")
         ("windowed",    po::bool_switch(),          "Launch application windowed instead of fullscreen.")
-        ("nosound",    po::bool_switch(),          "Launch application with no sound (mostly for profiling)")
-        ("nobgmusic",    po::bool_switch(),          "Launch application with no background music")
+        ("nosound",    po::bool_switch(),           "Launch application with no sound (mostly for profiling)")
+        ("nobgmusic",    po::bool_switch(),         "Launch application with no background music")
     ;
 
     po::variables_map vm;
@@ -141,7 +141,7 @@ int main(int argc, const char ** argv)
         // The next state in the stack is the main menu
         topLevelFlow.pushState(setupMainMenu(context, application.getAppInterface()));
 
-        if (!arguments["skip_splash"].as<bool>())
+        if (!arguments["skip-splash"].as<bool>())
         {
             // note: coordinates are used for window proportions
             topLevelFlow.pushState(setupSplashScreen(application.getAppInterface()->getWindowSize(),
