@@ -85,6 +85,8 @@ public:
     void beforeEnter() override;
     void beforeExit() override;
 
+    MenuScene & addSelfPopCommand(Command aCommand);
+
 private:
     std::pair<TransitionProgress, UpdateStatus> scrollMenu(const GrapitoTimer & aTimer);
 
@@ -115,6 +117,7 @@ private:
         math::ease::SmoothStep> mMenuXPosition;
     graphics::sprite::LoadedAtlas mAtlas;
     graphics::Spriting mSpriting;
+    std::vector<Command> mSelfPopCommands;
 }; 
 
 

@@ -141,7 +141,7 @@ std::shared_ptr<MenuScene> setupPauseMenu(
     std::shared_ptr<const GameScene> aGameScene,
     GameMode aGameMode)
 {
-    return std::make_shared<MenuScene>(
+    auto menu = std::make_shared<MenuScene>(
         Menu {
             std::vector<UiButton>{
                 { aContext->translate(menu_resume_sid),
@@ -171,6 +171,10 @@ std::shared_ptr<MenuScene> setupPauseMenu(
         aAppInterface,
         std::move(aGameScene)
     );
+    menu->addSelfPopCommand(Start);
+    menu->addSelfPopCommand(Grapple);
+
+    return menu;
 }
 
 
