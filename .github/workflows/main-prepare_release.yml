@@ -60,7 +60,7 @@ jobs:
       - name: Prepare the release archive
         shell: bash
         run: |
-          zip -r grapito-${{ needs.extract_tag.outputs.version }}.zip grapkimbo.exe assets/
+          zip -r grapito-${{ needs.extract_tag.outputs.version }}.zip grapito.exe assets/
 
       - name: Upload the release archive
         uses: actions/upload-artifact@v2
