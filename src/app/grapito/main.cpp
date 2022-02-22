@@ -91,6 +91,9 @@ int main(int argc, const char ** argv)
 {
     try
     {
+        initializeLogging();
+        ADLOG(info)("Launching {}.", getVersionedName());
+
         po::variables_map arguments = handleCommandLine(argc, argv);
 
         if (arguments.count("help"))
@@ -118,8 +121,6 @@ int main(int argc, const char ** argv)
             getVersionedName(),
             game::gAppResolution.width(), game::gAppResolution.height(),
             applicationFlags);
-        // Need to wait for the graphics logger initialized by ApplicationGlfw constructor.
-        initializeLogging();
 
 #if defined(SHRED_DISPLAY_IMGUI)
         setupImGui(application);
