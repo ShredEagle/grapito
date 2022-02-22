@@ -115,7 +115,7 @@ int main(int argc, const char ** argv)
 #endif
 
         ad::graphics::ApplicationGlfw application(
-            "grapkimbo",
+            getVersionedName(),
             game::gAppResolution.width(), game::gAppResolution.height(),
             applicationFlags);
         // Need to wait for the graphics logger initialized by ApplicationGlfw constructor.
