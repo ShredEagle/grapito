@@ -88,6 +88,8 @@ public:
 private:
     std::pair<TransitionProgress, UpdateStatus> scrollMenu(const GrapitoTimer & aTimer);
 
+    void prepareVersion(graphics::Texting::Mapping & aStrings);
+
     /// \brief Generate menu geometry and fonts, and update all vertex buffers of renderers.
     void updateMenuBuffers();
 

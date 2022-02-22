@@ -107,6 +107,9 @@ namespace menu
     extern const math::sdr::Rgb gButtonColor;
     extern const std::vector<math::sdr::Rgb> gSelectedColor;
     extern const float gTransitionDuration;
+
+    extern const Position2 gVersionPosition;
+    extern const math::sdr::Rgba gVersionTextColor;
 }
 
 

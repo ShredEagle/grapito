@@ -5,6 +5,7 @@
 #include "../commons.h"
 #include "../Configuration.h"
 #include "../Logging.h"
+#include <build_info.h>
 
 #include "../Utils/DrawDebugStuff.h"
 #include "../Utils/MenuControls.h"
@@ -122,11 +123,23 @@ std::pair<TransitionProgress, UpdateStatus> MenuScene::scrollMenu(const GrapitoT
     };
 }
 
+void MenuScene::prepareVersion(graphics::Texting::Mapping & aStrings)
+{
+    if(isVersioned())
+    {
+        mTexting.prepareString(prefixVersion(),
+                               menu::gVersionPosition,
+                               menu::gVersionTextColor,
+                               aStrings);
+    }
+}
 
 void MenuScene::updateMenuBuffers()
 {
     std::vector<graphics::TrivialShaping::Rectangle> rectangles;
     graphics::Texting::Mapping strings;
+
+    prepareVersion(strings);
 
     GLfloat menuHeight = mMenu.size() * menu::gButtonSize.height()
         + (mMenu.size() - 1) * menu::gButtonSpacing;

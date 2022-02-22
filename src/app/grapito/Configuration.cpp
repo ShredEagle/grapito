@@ -92,6 +92,9 @@ namespace menu
         player::gYellowColor
     };
     const float gTransitionDuration = 0.275f;
+
+    const Position2 gVersionPosition{550.f, -450.f};
+    const math::sdr::Rgba gVersionTextColor{170, 170, 170};
 } // namespace menu
 
 namespace player

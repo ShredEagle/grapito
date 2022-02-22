@@ -20,13 +20,26 @@ constexpr const char * gApplicationName = "@TARGET_NAME@";
 constexpr const char * gBuildVersion = "@BUILD_VERSION@";
 
 
-std::string getVersionedName()
+inline bool isVersioned()
+{
+    return strcmp(gBuildVersion, "") != 0;
+}
+
+
+inline std::string prefixVersion()
+{
+    std::string result{"v"};
+    result += gBuildVersion;
+    return result;
+}
+
+
+inline std::string getVersionedName()
 {
     std::string result{gApplicationName};
-    if(strcmp(gBuildVersion, ""))
+    if(isVersioned())
     {
-        result += " v";
-        result += gBuildVersion;
+        result += " " + prefixVersion();
     }
     return result;
 }
