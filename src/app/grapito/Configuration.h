@@ -128,13 +128,14 @@ namespace physic
 
 namespace player
 {
+    extern const math::Size<2, float> gSize;
+
     extern const int gAirborneJumps;
     extern const Vec2 gCameraGuideOffset;
     extern const float gCameraGuideWeight;
     extern const std::array<float, 2> gCameraLimits;
     extern const float gDetachSpeedBoostFactor;
     constexpr float gMass = 80.f;
-    extern const math::Size<2, float> gSize;
     extern const math::Size<2, float> gGrappleSpritePixelSize;
     constexpr float gInitialRopeLength = 3.f;
     constexpr math::Radian<float> gInitialAngle{math::pi<float>/3.f};
