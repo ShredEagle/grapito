@@ -117,5 +117,5 @@ bool CollisionTest::update(const GrapitoTimer & aTimer, const GameInputState & a
     return ! mSystemManager.isPaused();
 }
 
-} // namespace grapkimbo
+} // namespace grapito
 } // namespace ad

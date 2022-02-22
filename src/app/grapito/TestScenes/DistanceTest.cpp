@@ -135,5 +135,5 @@ bool DistanceTest::update(const GrapitoTimer & aTimer, const GameInputState & aI
     return ! mSystemManager.isPaused();
 }
 
-} // namespace grapkimbo
+} // namespace grapito
 } // namespace ad

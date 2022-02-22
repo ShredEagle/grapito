@@ -25,4 +25,4 @@ public:
 private:
     DebugUI & mUI;
 };
-}} // namespace ad::grapkimbo
+}} // namespace ad::grapito

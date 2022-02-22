@@ -113,5 +113,5 @@ bool PivotTest::update(const GrapitoTimer & aTimer, const GameInputState & aInpu
     return ! mSystemManager.isPaused();
 }
 
-} // namespace grapkimbo
+} // namespace grapito
 } // namespace ad

@@ -118,5 +118,5 @@ bool WeldTest::update(const GrapitoTimer & aTimer, const GameInputState & aInput
     return ! mSystemManager.isPaused();
 }
 
-} // namespace grapkimbo
+} // namespace grapito
 } // namespace ad
