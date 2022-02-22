@@ -29,6 +29,11 @@ inline Controller isPositiveEdge(const GameInputState & aInputs, Command aButton
         {
             return controller;
         }
+        // Additionally try the button if it exists on the gamepad (above only tried the axis on the gamepad)
+        if (isGamepad(controller) && aInputs.get(controller)[aButton].positiveEdge())
+        {
+            return controller;
+        }
     }
     return Controller::_End;
 };
