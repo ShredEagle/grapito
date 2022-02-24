@@ -59,7 +59,7 @@ jobs:
         development_build: [true, false]
         cppstd: [20]
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-20.04
             gccversion: 10
       fail-fast: false
     runs-on: ${{ matrix.os }}
