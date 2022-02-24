@@ -20,7 +20,7 @@ on:
         description: >-
           Stringified JSON array listing the target runner OSes.
         default: >-
-          ["ubuntu-latest", "windows-latest", "macos-11"]
+          ["ubuntu-20.04", "windows-2019", "macos-11"]
         required: true
         type: string
       version:
@@ -59,7 +59,7 @@ jobs:
         development_build: [true, false]
         cppstd: [20]
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-20.04
             gccversion: 10
       fail-fast: false
     runs-on: ${{ matrix.os }}
