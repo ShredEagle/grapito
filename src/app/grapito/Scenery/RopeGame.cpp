@@ -104,10 +104,17 @@ RopeGame::RopeGame(std::shared_ptr<Context> aContext,
         break;
     }
 
-    mRenderBackgroundSystem = mSystemManager.add<RenderBackground>(mAppInterface); 
-    mRenderBackgroundSystem->addLayer(mContext->pathFor(background::gSpaceImage), background::gSpaceScrollFactor);
-    mRenderBackgroundSystem->addLayer(mContext->pathFor(background::gSmallStarImage), background::gSmallStarScrollFactor);
-    mRenderBackgroundSystem->addLayer(mContext->pathFor(background::gStarImage), background::gStarScrollFactor);
+    mRenderBackgroundSystem = mSystemManager.add<RenderBackground>(mAppInterface);
+    mRenderBackgroundSystem->addTiledLayer(mContext->pathFor(background::gSpaceImage), background::gSpaceScrollFactor);
+    mRenderBackgroundSystem->addTiledLayer(mContext->pathFor(background::gSmallStarImage), background::gSmallStarScrollFactor);
+    mRenderBackgroundSystem->addTiledLayer(mContext->pathFor(background::gStarImage), background::gStarScrollFactor);
+    mRenderBackgroundSystem->addLayer(mContext->pathFor(background::gEarthImage), { -gLevelHalfWidth - gWallWidth, -60.f * background::gEarthScrollFactor * render::gSpritePixelWorldSize, background::gEarthScrollFactor });
+    mRenderBackgroundSystem->addLayer(mContext->pathFor(background::gBuildingImage), {-gLevelHalfWidth - gWallWidth - 4.f, -15.f * background::gBuidlingScrollFactor * render::gSpritePixelWorldSize, background::gBuidlingScrollFactor});
+
+    for (int i = 0; i < 5; i++)
+    {
+        mRenderBackgroundSystem->addLayer(mContext->pathFor(background::gBuildingWindowImage), { -gLevelHalfWidth, 322.f * i * render::gSpritePixelWorldSize, 0.f });
+    }
 
     mRenderWorldSystem = mSystemManager.add<RenderWorld>(mAppInterface); 
     mRenderHudSystem = mSystemManager.add<RenderHud>(mContext->pathFor(hud::gFont), mAppInterface); 

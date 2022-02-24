@@ -5,6 +5,7 @@
 #include "CameraGuidedControl.h" // for Camera archetype
 
 #include <graphics/adapters/ParallaxScroller.h>
+#include <graphics/Spriting.h>
 
 
 namespace ad {
@@ -24,7 +25,9 @@ public:
 
     void render() const;
 
-    void addLayer(const filesystem::path & aImage, float aScrollFactor);
+    void addTiledLayer(const filesystem::path & aImage, float aScrollFactor);
+
+    void addLayer(const filesystem::path& aImage, Vec3 aLayerPos);
 
 private:
 
@@ -33,7 +36,9 @@ private:
     const aunteater::FamilyHelp<Camera> mCameras;
 
     graphics::ParallaxScroller mParallaxScroller;
-
+    mutable graphics::Spriting mSpriting;
+    std::vector<std::vector<graphics::Spriting::Instance>> mAtlasToSprite;
+    std::vector<std::pair<graphics::sprite::SingleLoad, Position3>> mSingleLayerAtlases;
 };
 
 

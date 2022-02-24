@@ -27,6 +27,12 @@ namespace background
     extern const float gSmallStarScrollFactor;
     extern const std::string gStarImage;
     extern const float gStarScrollFactor;
+    extern const std::string gBuildingWindowImage;
+    extern float gBuidlingWindowScrollFactor;
+    extern const std::string gBuildingImage;
+    extern float gBuidlingScrollFactor;
+    extern const std::string gEarthImage;
+    extern float gEarthScrollFactor;
 } // namespace background
 
 

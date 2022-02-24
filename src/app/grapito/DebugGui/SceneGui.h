@@ -168,6 +168,9 @@ static void drawImGui(graphics::ApplicationGlfw & aApplication, DebugUI & aUI, I
         SliderFloat("gGrappleReleaseImpulse", &player::gGrappleReleaseImpulse, 15.f, 50.f);
         SliderFloat("gGrappleSwingSpeed", &player::gGrappleSwingSpeed, 2.f, 10.f);
         SliderFloat("gGrapple base impulse", &player::gGrappleBaseImpulse, 2.f, 10.f);
+        Text("parallax");
+        SliderFloat("1st building parallax", &background::gBuidlingScrollFactor, 1.f, 20.f);
+        SliderFloat("last building parallax", &background::gEarthScrollFactor, 1.f, 20.f);
 
         End();
 

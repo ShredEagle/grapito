@@ -17,6 +17,12 @@ namespace background
     const float gSmallStarScrollFactor = 7.5f;
     const std::string gStarImage = "images/backgrounds/Dynamic Space Background FREE/Stars-Big_1_1_PC.png";
     const float gStarScrollFactor = 10.f;
+    const std::string gBuildingWindowImage = "images/backgrounds/building_windows.png";
+    float gBuidlingWindowScrollFactor = 1 / render::gSpritePixelWorldSize;
+    const std::string gBuildingImage = "images/backgrounds/bg1.png";
+    float gBuidlingScrollFactor = 1.f;
+    const std::string gEarthImage = "images/backgrounds/earth.png";
+    float gEarthScrollFactor = 23.f;
 } // namespace background
 
 
