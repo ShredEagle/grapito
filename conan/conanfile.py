@@ -32,6 +32,8 @@ class GrapitoConan(ConanFile):
         ("spdlog/1.9.2"),
         ("openal/1.21.1"),
         ("vorbis/1.3.7"),
+        # There is not direct dependency on zlib, but boost conflicts with libpng
+        ("zlib/1.3"),
 
         ("aunteater/50a0c94674@adnn/develop"),
         ("graphics/092da6bc60@adnn/develop"),
